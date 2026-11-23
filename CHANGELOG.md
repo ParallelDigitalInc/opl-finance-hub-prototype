@@ -12,14 +12,21 @@ Synced from Figma: section "Subsidy Home - First Cut" `416:44852`, frames `416:4
   - Policy Benefits 2×2 tiles and "See other benefits" (4 rows).
   - Apply: the expert help card, portal and website links, and How it works (4 steps, "Share these steps with my CA").
   - A sticky Apply Now / Talk to an Expert bar.
-- **Presets:** Collapsed, Expanded. AI Mitra nudge toggle.
+- **Benefit sheets** (`416:47994`, 10 frames): Capital (Activity 1 / 2), Interest (Activity 1 / 2), Power tariff, Payroll, SHG job work, Quality certification, Energy and water saving, and Technology acquisition.
+  - Each is opened from its tile or row.
+  - All ten match their Figma heights exactly.
+  - New components: `BenefitSheetBody`, `ActivitySwitch`, `RateRows`, `SheetCondition`, `.btn--ghost`.
+- **Presets:** Collapsed, Expanded, and one per benefit sheet. AI Mitra nudge toggle.
 - **Components** (`js/components-subsidy.js`, `css/components/subsidy.css`; also on `library.html`): `PolicyPeriod`, `BenefitTile`, `ListRow`, `Disclosure`, `HelpCardExpert`, `HowItWorks` / `HowStep`, `SubsidyFoot`, `CountBadge`, `.deadline-chip`, `.btn--line`.
 - **Motion:** the benefits landing, period fill, disclosure height and stagger with self-scroll, rail draw, stamp press, and directional press nudges. See README.
 - **Assets** in `assets/lazy/subsidy/` (screen-only): the illustration SVGs, the satin texture, the expert photo, the stamp (rasterised from a 139 KB vector to 6 KB), and 23 icons.
 
 **Changed**
 
-- `tools/build.sh` strips comments from the CSS bundle. Sources keep them. This saves about 17 KB of first load, which keeps the total under 700 KB.
+- `tools/build.sh` strips comments from the bundles. Sources keep them.
+  - CSS: all comments.
+  - JS: whole-line comments only, never inside template strings.
+  - This brings first load from 712 KB to 681 KB, under the 700 KB cap.
 
 ## v0.8.0 — 23 Nov 2026 · NeSL signing (group E)
 

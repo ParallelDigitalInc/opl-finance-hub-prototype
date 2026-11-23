@@ -31,7 +31,10 @@ starts the HTML component kit that later mobile flows reuse.
   - Gujarat Textile Policy 2024, collapsed `416:44853` and expanded `416:45617` (panel presets).
   - Reached from any Home "Top subsidy matches" card.
   - "See other benefits" and "How it works" open and close in place.
-  - Hotspots for later: benefit sheets (`416:47994`), Calculate Estimate (`416:76869`), Talk to an Expert, Apply Now and the two links.
+  - **Benefit sheets** (section `416:47994`): any Policy Benefits tile or "See other benefits" row opens its sheet.
+    - Capital and Interest have an Activity 1 / 2 switch.
+    - Each Figma frame is a panel preset, e.g. "Sheet · Capital · Activity 2".
+  - Hotspots for later: Calculate Estimate (`416:76869`), Talk to an Expert, Apply Now and the two links.
 
 ## Run it
 
@@ -262,6 +265,10 @@ All of this is behaviour on existing elements. None of it adds UI:
     - the AI Mitra nudge line "Ask anything about this policy" (panel toggle)
     - the "Steps copied" confirmation when sharing steps without a native share sheet
 11. **Illustration:** the five vector layers (plinth ×2, notes, two coin stacks) are composed from Figma's own SVGs at their offsets, so the entrance can land them. The two clip-path groups inside the coins came through empty from Figma, so check the coin rims against the frame.
+12. **Sheets: the exclusion row tint differs.** Power tariff has white at 50% over `#FFEDD5`; Quality and Technology have 40%. 40% is used for all three.
+13. **Sheets: Power tariff and Payroll have no "Apply Now" link**, only Talk to an Expert. Kept as drawn.
+14. **Sheets: Apply Now is drawn in Figtree** (label/medium) and the primary button in Instrument Sans. Geist is used.
+15. **Sheets on a phone:** a sheet taller than the screen stops 12 below the status bar and its body scrolls. Capital, Interest and Payroll are 914–993 tall in Figma.
 
 **Motion (prototype layer):**
 - **The benefits land:** the plinth settles, the notes drop onto it, the coins clink down, and "Up to ₹1.2Cr" counts up as they land.
@@ -269,6 +276,11 @@ All of this is behaviour on existing elements. None of it adds UI:
 - Disclosures open by height. Their rows stagger in, and the list scrolls into view if it opened below the fold.
 - The How it works rail draws step by step.
 - The OPL Verified stamp presses onto the expert card once.
+- **Sheets:**
+  - The sheet slides up and its sections rise in.
+  - The benefit's icon pops into its tile, and the condition marks tick in one by one.
+  - On Activity 1 / 2, the white thumb slides across and the rate figures slide out and back in the same direction.
+  - Close turns its ✕. Drag down, tap the scrim or press Esc to dismiss, and focus returns to the tile you came from.
 - Tiles, rows and buttons have press states, with their arrows nudging in the direction they lead.
 - Reduced motion and "Motion off" render everything at rest.
 

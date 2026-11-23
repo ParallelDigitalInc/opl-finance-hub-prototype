@@ -103,10 +103,19 @@
      disclosures; tapping them in the prototype toggles them live. */
   OPL.variants["subsidy-detail"] = {
     presets: [
-      { id: "collapsed", label: "Collapsed", figma: "416:44853", set: { others: "closed", steps: "closed" } },
-      { id: "expanded", label: "Expanded", figma: "416:45617", set: { others: "open", steps: "open" } },
+      { id: "collapsed", label: "Collapsed", figma: "416:44853", set: { others: "closed", steps: "closed", sheet: "none" } },
+      { id: "expanded", label: "Expanded", figma: "416:45617", set: { others: "open", steps: "open", sheet: "none" } },
+      // Benefit sheets (416:47994), each over the collapsed screen
+      ...[
+        ["capital-1", "Capital · Activity 1", "416:47995"], ["capital-2", "Capital · Activity 2", "416:48787"],
+        ["interest-1", "Interest · Activity 1", "416:49579"], ["interest-2", "Interest · Activity 2", "416:50370"],
+        ["power", "Power tariff", "416:51161"], ["payroll", "Payroll assistance", "416:51939"],
+        ["shg", "SHG job work", "416:52730"], ["quality", "Quality certification", "416:53511"],
+        ["energy", "Energy & water saving", "416:54292"], ["tech", "Technology acquisition", "416:55073"],
+      ].map(([sheet, label, figma]) => ({ id: `sheet-${sheet}`, label: `Sheet · ${label}`, figma, set: { others: "closed", steps: "closed", sheet } })),
     ],
     groups: [
+      { id: "sheet", hidden: true, default: "none", options: ["none", "capital-1", "capital-2", "interest-1", "interest-2", "power", "payroll", "shg", "quality", "energy", "tech"].map((value) => ({ value })) },
       { id: "others", hidden: true, default: "closed", options: [{ value: "closed" }, { value: "open" }] },
       { id: "steps", hidden: true, default: "closed", options: [{ value: "closed" }, { value: "open" }] },
       {

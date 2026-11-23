@@ -83,7 +83,7 @@
                 <div class="sd-benefits__grid">${b.tiles.map((t) => ui.BenefitTile(t))}</div>
                 ${ui.Disclosure({
                   id: "others", label: b.others.label, count: b.others.count, open: v.others === "open",
-                  body: OPL.raw(b.others.rows.map((r, i) => ui.ListRow({ ...r, goto: "benefit-sheet", attrs: `data-benefit="${r.id}" style="--i:${i}"` })).join("")),
+                  body: OPL.raw(b.others.rows.map((r, i) => ui.ListRow({ ...r, attrs: `data-benefit="${r.id}" aria-haspopup="dialog" style="--i:${i}"` })).join("")),
                 })}
               </section>
 
@@ -99,16 +99,71 @@
         <div class="floating floating--sd">
           ${ui.AiMitraFab({ nudge: v.nudge === "on" ? d.aiNudge : null })}
         </div>
-        ${ui.SubsidyFoot(d.foot)}`;
+        ${ui.SubsidyFoot(d.foot)}
+        ${ui.BenefitSheetLayer()}`;
 
-      this.wire(page, d);
+      this.wire(page, d, v);
     },
 
-    wire(page, d) {
+    wire(page, d, v) {
       const sc = page.querySelector(".scroller");
       const motionOff = OPL.fx.motionOff();
       OPL.fx.statusOnScroll(page);
       OPL.fx.nudge(page, this.timers);
+
+      /* ---- benefit sheets (416:47994) ------------------------------------ */
+      let lastTrigger = null;
+      const sheets = OPL.fx.sheets(page, { onClose: () => {
+        if (OPL.state.get().sheet) OPL.state.set({ sheet: null }, { silent: true });   // a preset-opened sheet stays closed
+        if (lastTrigger && lastTrigger.isConnected) lastTrigger.focus({ preventScroll: true });
+      } });
+      const sheetEl = page.querySelector("[data-bsheet]");
+      const openBenefit = (id, { activity = 0, instant = false } = {}) => {
+        const s = d.sheets[id];
+        if (!s) return;
+        sheetEl.innerHTML = ui.BenefitSheetBody({ s, activity, actions: d.sheetActions }).toString();
+        sheetEl.setAttribute("aria-label", s.title);
+        sheetEl.dataset.benefit = id;
+        const body = sheetEl.querySelector(".bsheet__body");
+        body.scrollTop = 0;
+        sheetEl.classList.remove("is-presenting"); void sheetEl.offsetWidth;
+        if (!motionOff && !instant) sheetEl.classList.add("is-presenting");
+        sheets.open("benefit", { instant });
+        this.timers.push(setTimeout(() => sheetEl.querySelector(".bsheet__close")?.focus({ preventScroll: true }), instant || motionOff ? 0 : 440));
+      };
+      page.addEventListener("click", (e) => {
+        const t = e.target.closest("[data-benefit]");
+        if (t && !t.closest("[data-bsheet]")) { lastTrigger = t; return openBenefit(t.dataset.benefit); }
+        /* Activity switch: thumb slides, rates and the activity note cross-fade */
+        const opt = e.target.closest(".aswitch__opt");
+        if (opt) {
+          const i = +opt.dataset.activity;
+          const sw = opt.parentElement;
+          if (+sw.style.getPropertyValue("--sel") === i) return;
+          const s = d.sheets[sheetEl.dataset.benefit];
+          const act = s.rates.activities[i];
+          sw.style.setProperty("--sel", i);
+          sw.querySelectorAll(".aswitch__opt").forEach((o, k) => { o.classList.toggle("is-on", k === i); o.setAttribute("aria-selected", k === i); });
+          const list = sheetEl.querySelector("[data-rate-list]");
+          const note = sheetEl.querySelector("[data-act-note]");
+          const swap = () => {
+            list.innerHTML = ui.RateRows({ rows: act.rows }).toString();
+            note.textContent = act.note;
+            list.dataset.dir = i > 0 ? "next" : "prev";
+            list.classList.remove("is-swapping"); note.classList.remove("is-swapping");
+            void list.offsetWidth;
+            if (!motionOff) { list.classList.add("is-swapping"); note.classList.add("is-swapping"); }
+          };
+          if (motionOff) return swap();
+          list.classList.add("is-leaving"); note.classList.add("is-leaving");
+          this.timers.push(setTimeout(() => { list.classList.remove("is-leaving"); note.classList.remove("is-leaving"); swap(); }, 130));
+        }
+      });
+      // Preset: open a sheet straight away (Figma frame state)
+      if (v && v.sheet && v.sheet !== "none") {
+        const [id, act] = v.sheet.split("-");
+        openBenefit(id, { activity: act ? +act - 1 : 0, instant: true });
+      }
 
       /* ---- disclosures: See other benefits · How it works ---------------- */
       const foot = page.querySelector(".sfoot");
