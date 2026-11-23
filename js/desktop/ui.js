@@ -713,7 +713,7 @@
       </div>
       <div class="d-cbar__actions">
         <button class="d-cbar__clear" data-cbar-clear>Clear all</button>
-        <button class="d-cbar__go" data-cbar-go ${n < 2 ? "disabled" : ""}>Compare${D.icon("bar-arrow", 16)}</button>
+        <button class="d-cbar__go" data-cbar-go ${n < 2 ? "disabled" : ""}>Compare${D.icon("bar-arrow-on", 16)}</button>
       </div>`);
   };
   D.mountCompareBar = (page) => {

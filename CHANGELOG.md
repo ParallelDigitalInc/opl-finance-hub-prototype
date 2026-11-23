@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.13.6 — 23 Nov 2026 · Icons with masks render fully again
+
+**Fixed**
+
+- **Faint or missing strokes on 27 desktop icons**, including the Selected check, button arrows, the external-link arrow, the compare tray arrow, the tag icons, the notification and chat buttons and the sidebar toggle. Shreya spotted it on the Selected check and the arrows. Since v0.11.0, the build's SVG minifier stripped every `id`, including the ones those icons' masks, `<use>` and clip paths point to, so parts of each icon didn't draw.
+  - The inliner is now `tools/inline-icons.py`. It keeps referenced ids, and the build fails if any icon is left with a dangling reference.
+- **Compare tray arrow** was exported from the disabled button, so 50% opacity was baked in. It looked faded even when Compare was enabled. It now uses a full-strength copy (`bar-arrow-on`); the disabled state fades it in CSS.
+
 ## v0.13.5 — 23 Nov 2026 · Quieter "Selected"
 
 - **Compare's Select → Selected** no longer bounces; Shreya found the 0.6 → 1.2 → 1 spring too dramatic. The button now settles in 240ms (slight fade and 98.5% scale to full) while the check slides in. The selected column's blue glow is softer too, at rest and on hover.
