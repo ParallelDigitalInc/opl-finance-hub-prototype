@@ -42,13 +42,13 @@
       </div>
       <div class="d-promo__art" aria-hidden="true">
         <img class="d-promo__ground" src="${OPL.simg("home/promo-ground.svg")}" alt="">
-        <img class="d-promo__pin d-promo__pin--lg" src="${OPL.simg("home/pin-large.svg")}" alt="">
+        <img class="d-promo__pin d-promo__pin--lg" src="${OPL.simg("home/pin-large.png")}" alt="">
         <div class="d-promo__factory">
-          <img class="d-promo__smoke d-promo__smoke--b" src="${OPL.simg("home/smoke-b.svg")}" alt="">
-          <img class="d-promo__smoke d-promo__smoke--a" src="${OPL.simg("home/smoke-a.svg")}" alt="">
-          <img class="d-promo__building" src="${OPL.simg("home/factory.svg")}" alt="">
+          <img class="d-promo__smoke d-promo__smoke--b" src="${OPL.simg("home/smoke-b.png")}" alt="">
+          <img class="d-promo__smoke d-promo__smoke--a" src="${OPL.simg("home/smoke-a.png")}" alt="">
+          <img class="d-promo__building" src="${OPL.simg("home/factory.png")}" alt="">
         </div>
-        <img class="d-promo__pin d-promo__pin--sm" src="${OPL.simg("home/pin-small.svg")}" alt="">
+        <img class="d-promo__pin d-promo__pin--sm" src="${OPL.simg("home/pin-small.png")}" alt="">
       </div>
     </section>`;
 
@@ -261,13 +261,13 @@
                 </div>
                 <div class="d-subx__art" aria-hidden="true">
                   <img class="d-subx__ground" src="${OPL.simg("home/promo-ground.svg")}" alt="">
-                  <img class="d-subx__pin d-subx__pin--lg" src="${OPL.simg("home/pin-large.svg")}" alt="">
+                  <img class="d-subx__pin d-subx__pin--lg" src="${OPL.simg("home/pin-large.png")}" alt="">
                   <div class="d-subx__factory">
-                    <img class="d-promo__smoke d-promo__smoke--b" src="${OPL.simg("home/smoke-b.svg")}" alt="">
-                    <img class="d-promo__smoke d-promo__smoke--a" src="${OPL.simg("home/smoke-a.svg")}" alt="">
-                    <img class="d-promo__building" src="${OPL.simg("home/factory.svg")}" alt="">
+                    <img class="d-promo__smoke d-promo__smoke--b" src="${OPL.simg("home/smoke-b.png")}" alt="">
+                    <img class="d-promo__smoke d-promo__smoke--a" src="${OPL.simg("home/smoke-a.png")}" alt="">
+                    <img class="d-promo__building" src="${OPL.simg("home/factory.png")}" alt="">
                   </div>
-                  <img class="d-subx__pin d-subx__pin--sm" src="${OPL.simg("home/pin-small.svg")}" alt="">
+                  <img class="d-subx__pin d-subx__pin--sm" src="${OPL.simg("home/pin-small.png")}" alt="">
                 </div>
               </section>
             </div>

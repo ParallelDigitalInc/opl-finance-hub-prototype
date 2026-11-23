@@ -4,7 +4,7 @@
 
 (function () {
 const OPL = (window.OPL = window.OPL || {});
-OPL.VERSION = "0.16.2";
+OPL.VERSION = "0.16.3";
 OPL.FIGMA_FILE = "https://www.figma.com/design/GHuBkYGEQZvQppv3v55EaA/OPL----Internal-Playground--5-";
 OPL.figmaLink = (nodeId) => `${OPL.FIGMA_FILE}?node-id=${nodeId.replace(":", "-")}`;
 const esc = (v) =>
@@ -4068,13 +4068,13 @@ ${t.filters.map((f) => ui.Chip({ label: f.label, selected: this.filter === f.mat
 </section>
 <section class="sh-promo">
 <img class="sh-promo__ground" src="${simg("home/promo-ground.svg")}" alt="" aria-hidden="true">
-<img class="sh-promo__pin sh-promo__pin--lg" src="${simg("home/pin-large.svg")}" alt="" aria-hidden="true">
+<img class="sh-promo__pin sh-promo__pin--lg" src="${simg("home/pin-large.png")}" alt="" aria-hidden="true">
 <div class="sh-promo__factory" aria-hidden="true">
-<img class="sh-promo__smoke sh-promo__smoke--b" src="${simg("home/smoke-b.svg")}" alt="">
-<img class="sh-promo__smoke sh-promo__smoke--a" src="${simg("home/smoke-a.svg")}" alt="">
-<img class="sh-promo__building" src="${simg("home/factory.svg")}" alt="">
+<img class="sh-promo__smoke sh-promo__smoke--b" src="${simg("home/smoke-b.png")}" alt="">
+<img class="sh-promo__smoke sh-promo__smoke--a" src="${simg("home/smoke-a.png")}" alt="">
+<img class="sh-promo__building" src="${simg("home/factory.png")}" alt="">
 </div>
-<img class="sh-promo__pin sh-promo__pin--sm" src="${simg("home/pin-small.svg")}" alt="" aria-hidden="true">
+<img class="sh-promo__pin sh-promo__pin--sm" src="${simg("home/pin-small.png")}" alt="" aria-hidden="true">
 <h2 class="sh-promo__title">${d.promo.title}</h2>
 <div class="sh-promo__actions">
 <button class="sh-pbtn sh-pbtn--line" data-press data-goto="${d.promo.secondary.goto}">${sicon("phone-calling-rounded-16", 16)}<span>${d.promo.secondary.label}</span></button>
@@ -4211,9 +4211,9 @@ ${ui.StatusBar()}
 <span class="sx-brief__art" aria-hidden="true">
 <img class="sx-brief__ground" src="${OPL.simg("home/promo-ground.svg")}" alt="">
 <span class="sx-brief__factory">
-<img class="sx-brief__smoke sx-brief__smoke--b" src="${OPL.simg("home/smoke-b.svg")}" alt="">
-<img class="sx-brief__smoke sx-brief__smoke--a" src="${OPL.simg("home/smoke-a.svg")}" alt="">
-<img src="${OPL.simg("home/factory.svg")}" alt="">
+<img class="sx-brief__smoke sx-brief__smoke--b" src="${OPL.simg("home/smoke-b.png")}" alt="">
+<img class="sx-brief__smoke sx-brief__smoke--a" src="${OPL.simg("home/smoke-a.png")}" alt="">
+<img src="${OPL.simg("home/factory.png")}" alt="">
 </span>
 </span>
 <span class="sx-brief__text">

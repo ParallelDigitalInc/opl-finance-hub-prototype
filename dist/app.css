@@ -2138,9 +2138,12 @@ transition: transform var(--dur-press) var(--ease-out), background var(--dur-fas
 .sh-promo__ground { position: absolute; left: calc(50% - 372px); top: 216px; width: 744px; height: 744px; max-width: none; }
 .sh-promo__factory { position: absolute; left: calc(50% - 62px); top: 141px; width: 124px; height: 124px; }
 .sh-promo__factory img { position: absolute; inset: 0; width: 124px; height: 124px; max-width: none; }
+.sh-promo__factory img.sh-promo__smoke { position: absolute; max-width: none; }
+.sh-promo__factory img.sh-promo__smoke--a { left: 34.15%; top: 0; width: 32.32%; height: 32.32%; }
+.sh-promo__factory img.sh-promo__smoke--b { left: 7.93%; top: 12.8%; width: 26.22%; height: 20.73%; }
 .sh-promo__pin { position: absolute; max-width: none; transform-origin: 50% 100%; }
-.sh-promo__pin--sm { left: 253.5px; top: 213.6px; width: 18.1px; height: 23.2px; }
-.sh-promo__pin--lg { left: 63.4px; top: 203.6px; width: 34px; height: 43px; }
+.sh-promo__pin--sm { left: 253.5px; top: 212.8px; width: 18px; height: 24px; }
+.sh-promo__pin--lg { left: 63.4px; top: 201.6px; width: 34px; height: 45px; }
 .sh-promo.is-playing .sh-promo__ground { animation: promo-ground 700ms var(--ease-out) both; }
 .sh-promo.is-playing .sh-promo__building { animation: promo-rise 620ms var(--ease-out) 120ms both; }
 .sh-promo.is-playing .sh-promo__pin--lg { animation: pin-drop 640ms cubic-bezier(0.3, 1.4, 0.5, 1) 520ms both; }
@@ -2240,3 +2243,6 @@ transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
 }
 .sx-select select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(56, 88, 229, 0.12); }
 .sx-select__chev { position: absolute; right: 14px; top: 14px; pointer-events: none; }
+.sx-brief__factory img.sx-brief__smoke { position: absolute; max-width: none; }
+.sx-brief__factory img.sx-brief__smoke--a { left: 34.15%; top: 0; width: 32.32%; height: 32.32%; }
+.sx-brief__factory img.sx-brief__smoke--b { left: 7.93%; top: 12.8%; width: 26.22%; height: 20.73%; }

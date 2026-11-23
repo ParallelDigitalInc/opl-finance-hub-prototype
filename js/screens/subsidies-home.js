@@ -89,13 +89,13 @@
 
             <section class="sh-promo">
               <img class="sh-promo__ground" src="${simg("home/promo-ground.svg")}" alt="" aria-hidden="true">
-              <img class="sh-promo__pin sh-promo__pin--lg" src="${simg("home/pin-large.svg")}" alt="" aria-hidden="true">
+              <img class="sh-promo__pin sh-promo__pin--lg" src="${simg("home/pin-large.png")}" alt="" aria-hidden="true">
               <div class="sh-promo__factory" aria-hidden="true">
-                <img class="sh-promo__smoke sh-promo__smoke--b" src="${simg("home/smoke-b.svg")}" alt="">
-                <img class="sh-promo__smoke sh-promo__smoke--a" src="${simg("home/smoke-a.svg")}" alt="">
-                <img class="sh-promo__building" src="${simg("home/factory.svg")}" alt="">
+                <img class="sh-promo__smoke sh-promo__smoke--b" src="${simg("home/smoke-b.png")}" alt="">
+                <img class="sh-promo__smoke sh-promo__smoke--a" src="${simg("home/smoke-a.png")}" alt="">
+                <img class="sh-promo__building" src="${simg("home/factory.png")}" alt="">
               </div>
-              <img class="sh-promo__pin sh-promo__pin--sm" src="${simg("home/pin-small.svg")}" alt="" aria-hidden="true">
+              <img class="sh-promo__pin sh-promo__pin--sm" src="${simg("home/pin-small.png")}" alt="" aria-hidden="true">
               <h2 class="sh-promo__title">${d.promo.title}</h2>
               <div class="sh-promo__actions">
                 <button class="sh-pbtn sh-pbtn--line" data-press data-goto="${d.promo.secondary.goto}">${sicon("phone-calling-rounded-16", 16)}<span>${d.promo.secondary.label}</span></button>

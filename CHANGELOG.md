@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.16.3 — 23 Nov 2026 · 3D factory and pins for the new-unit art
+
+The illustration I missed in v0.16.2 (Illustrations `558:103493`).
+
+- **"Planning a new unit…" factory and pins are the new 3D set**, everywhere the art appears: the desktop Subsidies home promo, the mobile Subsidies home promo, and both Explore subsidies brief cards (desktop and mobile).
+- Desktop promo placement is as drawn: factory 164 at (801, 10), pins 50 × 66 and 33 × 44. Mobile and the brief cards keep their sizes.
+- **The smoke still drifts.** In Figma the two puffs are crops of the factory art, laid back over it. I cut them out of the base factory and animate them on top, placed relative to the factory so they scale with it in every box.
+- Rebuilt at 2× from the transparent sources and palette-compressed (2–9 KB each). The old flat SVGs are removed. The green ground ellipse is unchanged.
+
 ## v0.16.2 — 23 Nov 2026 · New illustrations (Figma "Illustrations" 558:102537 + 558:104693)
 
 Shreya's improved 3D illustrations, mobile and desktop:

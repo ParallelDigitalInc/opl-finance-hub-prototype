@@ -34,11 +34,17 @@
 .d-promo__actions { position: absolute; z-index: 2; left: 23px; top: 111px; width: 322px; display: flex; gap: 12px; }
 .d-promo__art { position: absolute; inset: 0; pointer-events: none; }
 .d-promo__ground { position: absolute; left: 467px; top: 113px; width: 744px; height: 744px; max-width: none; }
-.d-promo__factory { position: absolute; left: 831px; top: 18px; width: 144px; height: 144px; }
-.d-promo__factory img { position: absolute; inset: 0; width: 144px; height: 144px; max-width: none; }
+.d-promo__factory { position: absolute; left: 801px; top: 10px; width: 164px; height: 164px; }   /* 558:103493 */
+.d-promo__factory img { position: absolute; inset: 0; width: 164px; height: 164px; max-width: none; }
+/* 3D factory (Illustrations 558:103493): the two smoke puffs are crops of the art, laid back over
+   their spots (factory-relative, so they scale with any box) and animated on their own */
+.d-promo__factory img.d-promo__smoke, .d-subx__factory img.d-promo__smoke { position: absolute; max-width: none; }
+.d-promo__factory img.d-promo__smoke--a, .d-subx__factory img.d-promo__smoke--a { left: 34.15%; top: 0; width: 32.32%; height: 32.32%; }
+.d-promo__factory img.d-promo__smoke--b, .d-subx__factory img.d-promo__smoke--b { left: 7.93%; top: 12.8%; width: 26.22%; height: 20.73%; }
+
 .d-promo__pin { position: absolute; max-width: none; transform-origin: 50% 100%; }
-.d-promo__pin--lg { left: 665px; top: 102px; width: 42px; height: 55px; }
-.d-promo__pin--sm { left: 982px; top: 130px; width: 28px; height: 36px; }
+.d-promo__pin--lg { left: 718px; top: 92px; width: 50px; height: 66px; }
+.d-promo__pin--sm { left: 973px; top: 125px; width: 33px; height: 44px; }
 .d-promo.is-playing .d-promo__ground { animation: promo-ground 700ms var(--ease-out) both; }
 .d-promo.is-playing .d-promo__building { animation: promo-rise 620ms var(--ease-out) 120ms both; }
 .d-promo.is-playing .d-promo__pin--lg { animation: pin-drop 640ms cubic-bezier(0.3, 1.4, 0.5, 1) 520ms both; }
@@ -106,7 +112,7 @@
 .d-subx__factory { position: absolute; right: 60px; top: 12px; width: 102px; height: 102px; }
 .d-subx__factory img { position: absolute; inset: 0; width: 102px; height: 102px; max-width: none; }
 .d-subx__pin { position: absolute; max-width: none; transform-origin: 50% 100%; }
-.d-subx__pin--lg { right: 189px; top: 64px; width: 26px; height: 33px; }
+.d-subx__pin--lg { right: 189px; top: 63px; width: 26px; height: 34px; }
 .d-subx__pin--sm { right: 36px; top: 78px; width: 18px; height: 23px; }
 .d-subx__brief.is-playing .d-subx__ground { animation: promo-ground 700ms var(--ease-out) both; }
 .d-subx__brief.is-playing .d-subx__factory { animation: d-subx-settle 620ms var(--ease-spring) 240ms both; }

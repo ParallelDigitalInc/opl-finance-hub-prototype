@@ -61,9 +61,9 @@
                 <span class="sx-brief__art" aria-hidden="true">
                   <img class="sx-brief__ground" src="${OPL.simg("home/promo-ground.svg")}" alt="">
                   <span class="sx-brief__factory">
-                    <img class="sx-brief__smoke sx-brief__smoke--b" src="${OPL.simg("home/smoke-b.svg")}" alt="">
-                    <img class="sx-brief__smoke sx-brief__smoke--a" src="${OPL.simg("home/smoke-a.svg")}" alt="">
-                    <img src="${OPL.simg("home/factory.svg")}" alt="">
+                    <img class="sx-brief__smoke sx-brief__smoke--b" src="${OPL.simg("home/smoke-b.png")}" alt="">
+                    <img class="sx-brief__smoke sx-brief__smoke--a" src="${OPL.simg("home/smoke-a.png")}" alt="">
+                    <img src="${OPL.simg("home/factory.png")}" alt="">
                   </span>
                 </span>
                 <span class="sx-brief__text">

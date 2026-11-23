@@ -88,9 +88,14 @@
 .sh-promo__ground { position: absolute; left: calc(50% - 372px); top: 216px; width: 744px; height: 744px; max-width: none; }
 .sh-promo__factory { position: absolute; left: calc(50% - 62px); top: 141px; width: 124px; height: 124px; }
 .sh-promo__factory img { position: absolute; inset: 0; width: 124px; height: 124px; max-width: none; }
+/* 3D factory (Illustrations 558:103493): the two smoke puffs are crops of the art, laid back over
+   their spots (factory-relative, so they scale with any box) and animated on their own */
+.sh-promo__factory img.sh-promo__smoke { position: absolute; max-width: none; }
+.sh-promo__factory img.sh-promo__smoke--a { left: 34.15%; top: 0; width: 32.32%; height: 32.32%; }
+.sh-promo__factory img.sh-promo__smoke--b { left: 7.93%; top: 12.8%; width: 26.22%; height: 20.73%; }
 .sh-promo__pin { position: absolute; max-width: none; transform-origin: 50% 100%; }
-.sh-promo__pin--sm { left: 253.5px; top: 213.6px; width: 18.1px; height: 23.2px; }
-.sh-promo__pin--lg { left: 63.4px; top: 203.6px; width: 34px; height: 43px; }
+.sh-promo__pin--sm { left: 253.5px; top: 212.8px; width: 18px; height: 24px; }   /* 3D pin, 33:44 */
+.sh-promo__pin--lg { left: 63.4px; top: 201.6px; width: 34px; height: 45px; }   /* 3D pin, 50:66 */
 
 /* the story plays once when the card scrolls into view */
 .sh-promo.is-playing .sh-promo__ground { animation: promo-ground 700ms var(--ease-out) both; }

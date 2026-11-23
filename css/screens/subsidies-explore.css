@@ -64,3 +64,9 @@
 }
 .sx-select select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(56, 88, 229, 0.12); }
 .sx-select__chev { position: absolute; right: 14px; top: 14px; pointer-events: none; }
+
+/* 3D factory (Illustrations 558:103493): the two smoke puffs are crops of the art, laid back over
+   their spots (factory-relative, so they scale with any box) and animated on their own */
+.sx-brief__factory img.sx-brief__smoke { position: absolute; max-width: none; }
+.sx-brief__factory img.sx-brief__smoke--a { left: 34.15%; top: 0; width: 32.32%; height: 32.32%; }
+.sx-brief__factory img.sx-brief__smoke--b { left: 7.93%; top: 12.8%; width: 26.22%; height: 20.73%; }
