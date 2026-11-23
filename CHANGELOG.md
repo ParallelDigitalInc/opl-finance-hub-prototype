@@ -17,6 +17,11 @@ Synced from Figma: section "Subsidy Home - First Cut" `416:44852`, frames `416:4
   - All ten match their Figma heights exactly.
   - New components: `BenefitSheetBody`, `ActivitySwitch`, `RateRows`, `SheetCondition`, `.btn--ghost`.
 - **Presets:** Collapsed, Expanded, and one per benefit sheet. AI Mitra nudge toggle.
+- **Subsidies home** (`524:103425`), `subsidies-overview`, reached from Finance Home → "Explore Subsidies".
+  - Hero with the count-up amount and benefit-type chips.
+  - Top subsidies, with a location pill and filters (Central / State filter live) and the kit's subsidy match cards.
+  - The "new unit" promo card with its animated illustration.
+  - Listing links show hotspot hints until the listing is designed.
 - **Calculate estimate** (`416:76869`): a form (`416:77107` / `416:76872`) with live per-benefit figures, Add more / Remove and validation, and a result (`416:77363`) with a calculated total and breakdown.
   - **The result is a "cash arrives" celebration:**
     - a bundle drops onto the plinth for each benefit, with a thud, gold sparks and the total climbing

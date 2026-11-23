@@ -22,6 +22,7 @@ CSS=(
   css/screens/nesl.css
   css/screens/subsidy-detail.css
   css/screens/subsidy-estimate.css
+  css/screens/subsidies-home.css
 )
 JS=(
   js/core.js
@@ -37,6 +38,7 @@ JS=(
   js/data/signed-hero.js
   js/data/subsidy-detail.js
   js/data/subsidy-estimate.js
+  js/data/subsidies-home.js
   js/screens/home.js
   js/screens/loans-overview.js
   js/screens/loan-offers.js
@@ -46,6 +48,7 @@ JS=(
   js/screens/nesl.js
   js/screens/subsidy-detail.js
   js/screens/subsidy-estimate.js
+  js/screens/subsidies-home.js
   js/app.js
 )
 

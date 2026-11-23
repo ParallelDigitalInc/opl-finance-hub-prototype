@@ -126,6 +126,16 @@
     ],
   };
 
+  /* Subsidies home (524:103425) */
+  OPL.variants["subsidies-overview"] = {
+    presets: [{ id: "default", label: "Subsidies home", figma: "524:103425", set: {} }],
+    groups: [{
+      id: "nudge", label: "AI Mitra nudge", default: "on",
+      options: [{ value: "on", label: "Shows once" }, { value: "off", label: "Off" }],
+      note: "Proposed line: “Ask anything about subsidies”. Not in Figma.",
+    }],
+  };
+
   /* Calculate estimate (416:76869) */
   OPL.variants["subsidy-estimate"] = {
     presets: [

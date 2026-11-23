@@ -27,6 +27,10 @@ starts the HTML component kit that later mobile flows reuse.
     - The NeSL portal follows (six screenshots, `433:8115` … `416:83101`), then Confirming (`416:82947`), then Application · Signed with its milestone sheet (`431:8486`).
     - "I'll come back later" or Cancel on NeSL leads to Application · Sign letter (`431:7803`).
   - Group F (disbursal: `435:8001`, `435:8572`) comes next.
+- **Subsidies home** (`524:103425`), screen `subsidies-overview`: Finance Home → "Explore Subsidies". It's the gateway to every subsidy.
+  - The "Top subsidies" cards are Home's subsidy match cards and open Subsidy details.
+  - Central and State filter the rail live.
+  - The benefit-type chips, View all, Sector, Import & Export, "Schemes in Gujarat" and Explore Now lead to the subsidy listing (`subsidy-list`), which isn't designed yet, so they show a hotspot hint.
 - **Subsidy details** (branch `flow/subsidies`; section "Subsidy Home - First Cut" `416:44852`):
   - Gujarat Textile Policy 2024, collapsed `416:44853` and expanded `416:45617` (panel presets).
   - Reached from any Home "Top subsidy matches" card.
@@ -272,6 +276,22 @@ All of this is behaviour on existing elements. None of it adds UI:
 13. **Sheets: Power tariff and Payroll have no "Apply Now" link**, only Talk to an Expert. Kept as drawn.
 14. **Sheets: Apply Now is drawn in Figtree** (label/medium) and the primary button in Instrument Sans. Geist is used.
 15. **Sheets on a phone:** a sheet taller than the screen stops 12 below the status bar and its body scrolls. Capital, Interest and Payroll are 914–993 tall in Figma.
+
+## Figma flags · Subsidies home (`524:103425`)
+
+1. **Two hero layers:** `524:103429` fully covers `524:103426`, which has a stroke. The visible one is built, as on Loans overview.
+2. **"Up to ₹72 Lakhs" and the chip counts are as drawn.** They don't come from the cards (Capital 2 + Interest 1 + Other 6 = 9 schemes, while three cards are shown).
+3. **Gujarat Electronics Policy is tagged "Central Government"** here and on Home, but it's a state policy. The Central filter follows the tag, so it shows that card.
+4. **Sector and Import & Export** need the listing, as do "Schemes in Gujarat" and the benefit chips, so they lead there.
+5. **No filter-chip selected state is drawn.** The kit's selected chip (Loan offers `392:490`) is used.
+6. **Proposed, not in Figma:** the AI Mitra nudge "Ask anything about subsidies" (panel toggle).
+7. **Promo illustration:** the factory is composed from Figma's own vectors (building plus two smoke layers), with the ground and two pins, so the card can tell its story.
+
+**Motion (Subsidies home):**
+- "Up to ₹72 Lakhs" counts up, the benefit chips settle in and their counts tick up, and the cards slide in from the right.
+- Central / State filter the rail in place: non-matching cards fold away and the rest slide together. Tap again to clear.
+- When the "new unit" card scrolls in, the ground rises, the factory settles, both map pins drop in with a bounce, and the smoke drifts up twice.
+- Press states: chips dip and their icons tilt, chevrons and arrows nudge the way they lead, and the phone icon rings.
 
 ## Figma flags · Calculate estimate (`416:76869`)
 
