@@ -376,10 +376,14 @@
   outline: 2px solid #fff; outline-offset: -2px;
   border-radius: var(--r-large);
   background: var(--help-bg);
-  box-shadow: var(--shadow-s);
   overflow: hidden;
+  /* the backdrop-blur child breaks radius clipping in Chromium/WebKit, so clip explicitly */
+  clip-path: inset(0 round var(--r-large));
+  isolation: isolate;
 }
-.tray__texture { position: absolute; left: 50%; top: calc(50% - 17px); width: 358px; height: 474px; max-width: none; translate: -50% -50%; opacity: 0.45; pointer-events: none; }
+/* shadow lives on the wrapper, since clip-path would cut it off */
+.floating__tray { border-radius: var(--r-large); box-shadow: var(--shadow-s); }
+.tray__texture { position: absolute; left: 50%; top: calc(50% - 17px); width: 358px; height: 474px; max-width: none; translate: -50% -50%; opacity: 0.2; pointer-events: none; } /* lighter than Figma's 45% (Shreya, 23 Nov) */
 .tray__blur { position: absolute; left: 0; top: 0; width: 358px; height: 118px; background: rgba(255, 255, 255, 0.01); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); pointer-events: none; }
 .tray__head, .tray__row { position: relative; display: flex; align-items: center; justify-content: space-between; }
 .tray__title { font-size: 14px; line-height: 20px; font-weight: var(--fw-semibold); color: var(--foreground); }

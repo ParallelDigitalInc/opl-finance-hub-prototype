@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.4.2 — 23 Nov 2026 · Compare tray polish
+
+- **Tray corners:** the compare tray clips to its 16px radius. The backdrop-blur layer had been breaking the rounded clipping, so the clip is now explicit with `clip-path`, and the shadow moved to the wrapper.
+- **Tray pattern:** lightened from Figma's 45% to 20%, per Shreya.
+
 ## v0.4.1 — 23 Nov 2026 · Compare follows selection
 
 - **Compare loans columns now follow the Loan offers selection,** in tick order. Without a selection it falls back to the Figma frame (Citi, SIDBI, SBI; 2 of 3 picked).
