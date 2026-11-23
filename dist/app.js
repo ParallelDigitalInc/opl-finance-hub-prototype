@@ -4,7 +4,7 @@
 
 (function () {
 const OPL = (window.OPL = window.OPL || {});
-OPL.VERSION = "0.16.6";
+OPL.VERSION = "0.16.7";
 OPL.FIGMA_FILE = "https://www.figma.com/design/GHuBkYGEQZvQppv3v55EaA/OPL----Internal-Playground--5-";
 OPL.figmaLink = (nodeId) => `${OPL.FIGMA_FILE}?node-id=${nodeId.replace(":", "-")}`;
 const esc = (v) =>
@@ -1127,21 +1127,24 @@ ui.CmrGauge = (d) => html`
 </div>
 </div>`;
 ui.CmrFactor = (f, i) => html`
-<li class="cmrf" data-status="${f.status}" style="--i:${i}">
-<button class="cmrf__row" aria-expanded="false" data-cmr-factor>
-<span class="cmrf__ico">${cicon(f.icon, 20)}</span>
-<span class="cmrf__text"><span class="cmrf__name">${f.name}</span>
-<span class="cmrf__meta"><span class="cmrf__status">${f.label}</span><span class="cmrf__val">${f.value}</span></span></span>
-${cicon("chevron", 16, "cmrf__chev")}
+<li class="${cx("cmrf", f.wide && "cmrf--wide")}" data-status="${f.status}" style="--i:${i}">
+<button class="cmrf__tile" aria-pressed="false" aria-label="${f.caption}: ${f.to}${f.suffix}, ${f.label}, ${f.impact}" data-cmr-factor>
+<span class="cmrf__card">
+<span class="cmrf__face cmrf__front">
+<span class="cmrf__top">${cicon(f.icon, 22)}${cicon("info", 16, "cmrf__hint")}</span>
+<span class="cmrf__main">
+<span class="cmrf__fig"><span class="cmrf__num" data-to="${f.to}" data-suffix="${f.suffix}">${f.to}${f.suffix}</span><span class="cmrf__dot"></span></span>
+<span class="cmrf__cap">${f.caption}</span>
+${f.meter ? raw(`<span class="cmrf__meter" style="--now:${f.to}%;--target:${f.meter.target}%"><span class="cmrf__mfill"></span><span class="cmrf__mtick"></span></span>`) : ""}
+</span>
+<span class="cmrf__foot"><span class="cmrf__impact">${f.impact}</span><span class="cmrf__status">${f.label}</span></span>
+</span>
+<span class="cmrf__face cmrf__back" aria-hidden="true">
+<span class="cmrf__top"><span class="cmrf__bimpact">${f.impact}</span>${cicon("flip", 16, "cmrf__hint")}</span>
+<span class="cmrf__detail">${f.detail}</span>
+</span>
+</span>
 </button>
-<div class="cmrf__panel"><div class="cmrf__inner">
-<p class="cmrf__why"><span class="cmrf__impact">${f.impact}</span>${f.why}</p>
-${f.meter ? html`
-<div class="cmrm" style="--now:${f.meter.now}%;--target:${f.meter.target}%">
-<div class="cmrm__track"><span class="cmrm__fill"></span><span class="cmrm__tick"></span></div>
-<div class="cmrm__labels"><span class="cmrm__now">${f.meter.nowLabel}</span><span class="cmrm__target">${f.meter.targetLabel}</span></div>
-</div>` : ""}
-</div></div>
 </li>`;
 ui.CmrSheet = (d) => html`
 <div class="sheet-layer" data-sheet="cmr" hidden>
@@ -1160,7 +1163,7 @@ ${ui.CmrGauge(d)}
 <p class="cmrs__verdict">${d.verdict}</p>
 </section>
 <section class="cmrs__sec">
-<div class="cmrs__h"><h3 class="bsheet__h">${d.factorsTitle}</h3><p class="cmrs__sub">${d.factorsSub}</p></div>
+<div class="cmrs__h"><h3 class="bsheet__h">${d.factorsTitle}</h3><span class="cmrs__hint">${d.factorsHint}</span></div>
 <ul class="cmrs__factors">${d.factors.map((f, i) => ui.CmrFactor(f, i))}</ul>
 </section>
 <section class="cmrs__sec">
@@ -1178,13 +1181,6 @@ ${ui.CmrGauge(d)}
 </div>
 <button class="cmrp__link" data-press data-goto="${d.lead.link.goto}">${d.lead.link.label}${cicon("arrow", 16)}</button>
 </article>
-<ol class="cmrs__steps">
-${d.steps.map((s) => html`
-<li class="cmrstep">
-<span class="cmrstep__ico">${cicon(s.icon, 20)}</span>
-<span class="cmrstep__text"><span class="cmrstep__title">${s.title}</span><span class="cmrstep__body">${s.body}</span></span>
-</li>`)}
-</ol>
 </section>
 <p class="cmrs__note">${cicon("shield", 18)}<span>${d.note}</span></p>
 </div>
@@ -1241,6 +1237,20 @@ t(() => { shiftNum.textContent = `${d.lead.to}%`; }, 250 + dur + 80);
 const io = "IntersectionObserver" in window
 ? new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && playShift()), { root: body, threshold: 0.6 })
 : null;
+const countFigures = () => el.querySelectorAll(".cmrf__num").forEach((n, i) => {
+const to = +n.dataset.to, suf = n.dataset.suffix, dur = 800, delay = 520 + i * 70;
+n.textContent = `0${suf}`;
+t(() => {
+const t0 = performance.now();
+const step = (now) => {
+const p = Math.min(1, (now - t0) / dur);
+n.textContent = `${Math.round(to * (1 - Math.pow(1 - p, 3)))}${suf}`;
+if (p < 1 && el.isConnected) requestAnimationFrame(step);
+};
+requestAnimationFrame(step);
+t(() => { n.textContent = `${to}${suf}`; }, dur + 60);
+}, delay);
+});
 const lift = () => foot.classList.toggle("is-raised", body.scrollTop + body.clientHeight < body.scrollHeight - 2);
 body.addEventListener("scroll", lift, { passive: true });
 const open = ({ instant = false } = {}) => {
@@ -1248,7 +1258,8 @@ const still = instant || fx.motionOff();
 gauge.classList.remove("is-in", "is-settled");
 lead.classList.remove("is-on");
 shiftNum.textContent = `${d.lead.from}%`;
-el.querySelectorAll(".cmrf.is-open").forEach((f) => { f.classList.remove("is-open"); f.querySelector("[data-cmr-factor]").setAttribute("aria-expanded", "false"); });
+el.querySelectorAll(".cmrf.is-flipped").forEach((f) => { f.classList.remove("is-flipped"); f.querySelector("[data-cmr-factor]").setAttribute("aria-pressed", "false"); });
+if (!still) countFigures();
 body.scrollTop = 0;
 rankEl.textContent = still ? d.rank : 10;
 el.classList.remove("is-presenting"); void el.offsetWidth;
@@ -1266,12 +1277,12 @@ t(() => el.querySelector(".bsheet__close")?.focus({ preventScroll: true }), stil
 page.addEventListener("click", (e) => {
 const trig = e.target.closest('[data-goto="cmr-score"]');
 if (trig && !trig.closest("[data-cmr-sheet]")) { e.stopPropagation(); open(); return; }
-const row = e.target.closest("[data-cmr-factor]");
-if (row) {
-const li = row.closest(".cmrf"), on = !li.classList.contains("is-open");
-li.classList.toggle("is-open", on);
-row.setAttribute("aria-expanded", on);
-t(lift, 340);
+const tile = e.target.closest("[data-cmr-factor]");
+if (tile) {
+const li = tile.closest(".cmrf"), on = !li.classList.contains("is-flipped");
+li.classList.toggle("is-flipped", on);
+tile.setAttribute("aria-pressed", on);
+li.querySelector(".cmrf__back").setAttribute("aria-hidden", !on);
 }
 });
 return { open };
@@ -2496,24 +2507,23 @@ angle: 31.8,                     // needle as drawn on desktop, degrees up from 
 risk: "Low risk",
 verdict: "Lenders read ranks 1 to 3 as low risk. You're one rank from the best.",
 factorsTitle: "What shapes your rank",
-factorsSub: "From your CIBIL report, biggest effect first",
+factorsHint: "Tap a card to see why",
 factors: [
-{ id: "repay", icon: "repay", name: "Repayment history", value: "No missed EMI in 24 months",
+{ id: "repay", icon: "repay", to: 100, suffix: "%", caption: "EMIs paid on time",
 status: "good", label: "Excellent", impact: "High impact",
-why: "Lenders weigh this the most. One EMI paid 30+ days late can move you down a rank." },
-{ id: "usage", icon: "usage", name: "Credit line usage", value: "₹14.70 L of ₹33 L used",
-status: "fair", label: "Fair", impact: "High impact",
-why: "Using most of your limit reads as stretched cash flow. Under 30% reads as headroom.",
-meter: { now: 45, target: 30, nowLabel: "45% used", targetLabel: "Aim for 30%" } },
-{ id: "enquiry", icon: "enquiry", name: "New loan enquiries", value: "3 in the last 90 days",
+detail: "No missed EMI in 24 months. Lenders weigh this the most: one EMI paid 30+ days late can cost you a rank." },
+{ id: "usage", icon: "usage", to: 45, suffix: "%", caption: "Credit line in use",
+status: "fair", label: "Fair", impact: "High impact", meter: { target: 30 },
+detail: "₹14.70 L of your ₹33 L limit. Under 30% reads as headroom; near the limit reads as stretched cash flow." },
+{ id: "enquiry", icon: "enquiry", to: 3, suffix: "", caption: "Loan enquiries in 90 days",
 status: "fair", label: "Fair", impact: "Medium impact",
-why: "Every application adds an enquiry. Several close together can look like urgent need for cash." },
-{ id: "age", icon: "age", name: "Credit age", value: "Oldest loan: 6 years",
+detail: "Every application adds one. Several close together can look like urgent need for cash." },
+{ id: "age", icon: "age", to: 6, suffix: " yrs", caption: "Age of your oldest loan",
 status: "good", label: "Good", impact: "Medium impact",
-why: "A long, steady record gives lenders more to go on. Keep older accounts open." },
-{ id: "mix", icon: "mix", name: "Credit mix", value: "Term loans + credit line",
-status: "good", label: "Good", impact: "Low impact",
-why: "Handling different kinds of credit well shows you can manage both fixed EMIs and a revolving limit." },
+detail: "A long, steady record gives lenders more to go on. Keep older accounts open." },
+{ id: "mix", icon: "mix", to: 2, suffix: " types", caption: "Term loans and a credit line",
+status: "good", label: "Good", impact: "Low impact", wide: true,
+detail: "Handling both fixed EMIs and a revolving limit well shows you can manage different kinds of credit." },
 ],
 pathTitle: "Your path to CMR-1",
 lead: {
@@ -2523,12 +2533,6 @@ body: "Pay ₹4.80 L of the ₹14.70 L you've drawn. Usage falls from 45% to 30%
 from: 45, to: 30,
 link: { label: "View credit line", goto: "my-loans" },
 },
-steps: [
-{ icon: "tip-wait", title: "Let Citi decide before you apply again",
-body: "Your Citi application is in progress. A new one now adds a fourth enquiry." },
-{ icon: "tip-autopay", title: "Put every EMI on autopay",
-body: "On-time repayment is your strongest factor. Autopay keeps the record clean." },
-],
 note: "Checking your rank here doesn't change it. CIBIL refreshes it every month.",
 cta: { label: "See loans for CMR-2", goto: "loan-offers" },
 };
