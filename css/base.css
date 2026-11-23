@@ -35,25 +35,31 @@ img { display: block; user-select: none; -webkit-user-drag: none; }
 .device-wrap { flex-shrink: 0; transform-origin: center; }
 .device {
   position: relative;
-  padding: 12px;
-  border-radius: 58px;
+  padding: 8px;                  /* bezel: thinner on request (was 12) */
+  border-radius: 54px;           /* screen radius 46 + bezel 8 */
   background: #0f172a;
+  /* a tight, light lift instead of the old wide dark halo (40px/80px at 35%), which read
+     as a blurry dark smudge round the phone */
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.06) inset,
-    0 40px 80px -24px rgba(15, 23, 42, 0.35),
-    0 12px 24px -12px rgba(15, 23, 42, 0.25);
+    0 18px 36px -18px rgba(15, 23, 42, 0.2),
+    0 4px 10px -6px rgba(15, 23, 42, 0.14);
 }
 .screen {
   position: relative;
   width: var(--screen-w);
   height: var(--screen-h);
-  border-radius: 46px;
+  border-radius: var(--screen-r, 46px);
   overflow: hidden;
   background: var(--surface);
   isolation: isolate;
+  /* Backdrop root: a clip-path makes the screen the edge of every backdrop-filter inside it,
+     so frosted layers (Home hero, scrolled status bar) stop sampling the dark bezel behind
+     the screen. That was the dark, blurry rim along the top corners and sides. */
+  clip-path: inset(0 round var(--screen-r, 46px));
 }
 html[data-frame="off"] .device { padding: 0; background: none; box-shadow: 0 24px 60px -24px rgba(15, 23, 42, 0.3); border-radius: 16px; }
-html[data-frame="off"] .screen { border-radius: 16px; }
+html[data-frame="off"] .screen { --screen-r: 16px; }
 
 .scroller {
   position: absolute;
@@ -109,7 +115,7 @@ html[data-device="desktop"] .browser-bar {
   height: 26px; display: flex; align-items: center; justify-content: center;
   border-radius: 8px; background: #fff; color: #64748b; font-size: 13px; letter-spacing: 0.01em;
 }
-html[data-device="desktop"] .screen { width: 1440px; height: 900px; border-radius: 0; background: #f8fafc; }
+html[data-device="desktop"] .screen { width: 1440px; height: 900px; --screen-r: 0px; background: #f8fafc; }
 html[data-device="desktop"][data-frame="off"] .browser-bar { display: none; }
 html[data-device="desktop"][data-frame="off"] .device { border-radius: 12px; }
 html[data-device="desktop"] .page { background: #f8fafc; }
@@ -126,7 +132,7 @@ html[data-device="desktop"] .boot { background: #f8fafc; }
   .stage { padding: 0; gap: 0; display: block; background: var(--surface); }
   .device-wrap { transform: none !important; }
   .device { padding: 0; border-radius: 0; background: none; box-shadow: none; }
-  .screen { border-radius: 0; }
+  .screen { --screen-r: 0px; }
   .status-bar { display: none !important; }
   .panel { display: none; }
 }

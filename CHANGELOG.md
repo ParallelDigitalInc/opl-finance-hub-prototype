@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.16.14 — 23 Nov 2026 · Thinner phone frame, no blurry edges
+
+Shreya: why are there dark, blurry edges round the phone? Make the frame slightly thinner.
+
+- **Thinner bezel:** 8px instead of 12, with the corner radius 54 to match (screen 46 + 8). The critical CSS in `index.html` matches, so the frame doesn't jump on load.
+- **No dark halo:** the drop shadow was wide and dark (40px offset, 80px blur, 35%) and read as a smudge round the phone. It's now a light, tight lift.
+- **The screen is a backdrop root** (`clip-path` on `.screen`), so frosted layers inside it (the Home hero, the scrolled status bar) can never sample the dark bezel at their edges. A 2× capture showed no bleed before either; this guards it.
+
 ## v0.16.13 — 23 Nov 2026 · Debt Profile, as designed, with the maths fixed
 
 Shreya: improve the Debt Profile (was "Your Borrowing", Figma `570:105880`); the data viz and maths need correcting. Keep changing the questions in the AI widget.
