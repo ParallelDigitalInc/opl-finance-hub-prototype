@@ -1,0 +1,241 @@
+/* ==========================================================================
+   Desktop shell — Figma "loans overview" 476:200124.
+   Sidebar 230 (#F8FAFC, 1px #F1F5F9 right) · main panel white, 1px slate-200,
+   r16 on the left, inset 12px top/bottom · content 32px side padding.
+   Interaction layer (prototype): hover / focus-visible / active on every control,
+   gliding tab ink, frosted top bar on scroll, content fade between pages.
+   ========================================================================== */
+
+:root {
+  --d-bg: #f8fafc;                    /* colorscheme/surfacecontainerlow */
+  --d-sidebar-border: #f1f5f9;        /* sidebar/border */
+  --d-nav-fg: #334155;                /* sidebar-foreground */
+  --d-nav-fg-active: #1e293b;         /* sidebar-accent-foreground */
+  --d-nav-muted: #64748b;             /* sidebar-muted-foreground */
+  --d-nav-hover: rgba(241, 245, 249, 0.7);
+  --d-hover: #f8fafc;
+  --d-border-hover: #cbd5e1;          /* slate-300 */
+  --d-focus: 0 0 0 3px rgba(56, 88, 229, 0.22);
+  --d-shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);       /* Shadow/xs */
+  --d-shadow-l: 0 2px 24px 0 rgba(0, 0, 0, 0.06);       /* Shadow/l */
+  --d-shadow-hover: 0 12px 28px -8px rgba(15, 23, 42, 0.12), 0 2px 6px rgba(15, 23, 42, 0.04);
+  --d-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.d-app { position: absolute; inset: 0; display: flex; background: var(--d-bg); font-family: var(--font); color: var(--foreground); }
+.d-app :focus { outline: none; }
+.d-app :focus-visible { outline: none; box-shadow: var(--d-focus); }
+.d-app button { -webkit-tap-highlight-color: transparent; }
+
+/* ---- Sidebar (476:200125) ------------------------------------------------ */
+.d-side {
+  width: 230px; flex-shrink: 0;
+  display: flex; flex-direction: column; gap: 16px;
+  padding: 20px 16px;
+  background: var(--d-bg);
+  border-right: 1px solid var(--d-sidebar-border);
+  overflow-y: auto; scrollbar-width: none;
+}
+.d-switcher {
+  display: flex; align-items: center; gap: 8px;
+  padding: 13px 13px 13px 9px;            /* stroke is in layout here (frame 50 = 12+24+12+2) */
+  border-radius: 16px; background: #fff;
+  box-shadow: inset 0 0 0 1px var(--border), var(--d-shadow-xs);
+  transition: box-shadow 160ms, transform 160ms var(--d-ease);
+}
+.d-switcher:hover { box-shadow: inset 0 0 0 1px var(--d-border-hover), 0 4px 12px -4px rgba(15, 23, 42, 0.08); }
+.d-switcher:active { transform: scale(0.985); }
+.d-switcher__avatar {
+  width: 24px; height: 24px; flex-shrink: 0; border-radius: 999px;
+  display: grid; place-items: center;
+  background: #e4f2f0; color: #042f2e; font-size: 9px; line-height: 12px; font-weight: 600;
+}
+.d-switcher__name { flex: 1; min-width: 0; margin-left: -4px; font-size: 14px; line-height: 20px; font-weight: 600; color: var(--d-nav-fg-active); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; }
+.d-switcher__chev { transition: transform 200ms var(--d-ease); }
+.d-switcher:hover .d-switcher__chev { transform: translateY(1px); }
+
+.d-nav__group { display: flex; flex-direction: column; gap: 4px; }
+.d-nav__heading { height: 28px; display: flex; align-items: center; padding-left: 10px; font-size: 12px; line-height: 16px; font-weight: 600; color: var(--d-nav-muted); }
+.d-nav__items { display: flex; flex-direction: column; gap: 2px; }
+.d-nav__item {
+  position: relative;
+  display: flex; align-items: center; gap: 10px;
+  height: 36px; padding: 0 10px; border-radius: 8px;
+  font-size: 14px; line-height: 20px; font-weight: 500; color: var(--d-nav-fg);
+  transition: background 140ms, color 140ms;
+}
+.d-nav__icon { width: 16px; height: 16px; display: grid; place-items: center; transition: transform 200ms var(--d-ease); }
+.d-nav__label { flex: 1; text-align: left; }
+.d-nav__item:hover { background: var(--d-nav-hover); color: var(--d-nav-fg-active); }
+.d-nav__item:hover .d-nav__icon { transform: translateX(1px) scale(1.06); }
+.d-nav__item:active { background: #eef2f6; }
+.d-nav__item.is-active { background: #f1f5f9; color: var(--d-nav-fg-active); font-weight: 600; }
+.d-side__spacer { flex: 1; min-height: 16px; }
+.d-nav__footer { display: flex; flex-direction: column; gap: 6px; }
+.d-nav__divider { height: 1px; background: var(--d-sidebar-border); }
+
+/* ---- Main panel ------------------------------------------------------------ */
+.d-main {
+  position: relative; flex: 1; min-width: 0;
+  margin: 12px 0;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-right: 0;
+  border-radius: 16px 0 0 16px;
+  box-shadow: var(--shadow-s);
+  overflow: hidden;
+}
+.d-main__scroll { position: absolute; inset: 0; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent; }
+.d-main__scroll::-webkit-scrollbar { display: block; width: 8px; }
+.d-main__scroll::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 8px; }
+.d-main__inner { padding: 0 32px 40px; max-width: 1208px; margin: 0 auto; }
+
+/* ---- Top bar (476:200177) — sticky, frosts once content passes under it ----- */
+.d-top {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 72px; margin: 0 -32px; padding: 16px 32px;
+  transition: background 200ms, box-shadow 200ms, backdrop-filter 200ms;
+}
+.d-top.is-stuck { background: rgba(255, 255, 255, 0.82); backdrop-filter: blur(12px) saturate(1.4); -webkit-backdrop-filter: blur(12px) saturate(1.4); box-shadow: 0 1px 0 var(--border); }
+.d-top > * { filter: drop-shadow(0 2px 12px rgba(0, 0, 0, 0.06)); }   /* frame drop-shadow, Shadow/l */
+.d-top__toggle { width: 40px; height: 40px; border-radius: 999px; transition: transform 160ms var(--d-ease), box-shadow 160ms; }
+.d-top__toggle:hover { box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.04); }
+.d-top__toggle:active { transform: scale(0.94); }
+
+.d-search {
+  position: relative; display: flex; align-items: center; gap: 8px;
+  width: 260px; height: 40px; padding: 0 8px 0 12px;
+  border-radius: 999px; background: #fff;
+  box-shadow: inset 0 0 0 1px var(--border);
+  cursor: text;
+  transition: width 260ms var(--d-ease), box-shadow 160ms;
+}
+.d-search:hover { box-shadow: inset 0 0 0 1px var(--d-border-hover); }
+.d-search:focus-within { width: 340px; box-shadow: inset 0 0 0 1px var(--primary), var(--d-focus); }
+.d-search__input { flex: 1; min-width: 0; height: 100%; border: 0; background: none; font: inherit; font-size: 14px; line-height: 20px; color: var(--foreground); outline: none; }
+.d-search__input::placeholder { color: var(--tertiary-foreground); }
+.d-search__input::-webkit-search-cancel-button { display: none; }
+.d-search__kbd { padding: 4px 8px; border-radius: 999px; background: var(--muted); font: inherit; font-size: 12px; line-height: 16px; font-weight: 500; color: var(--muted-foreground); transition: opacity 160ms; }
+.d-search:focus-within .d-search__kbd { opacity: 0; }
+
+.d-top__actions { display: flex; align-items: center; gap: 12px; }
+.d-top__btn { position: relative; width: 40px; height: 40px; border-radius: 999px; display: grid; place-items: center; transition: transform 160ms var(--d-ease), box-shadow 160ms, background 160ms; }
+.d-top__btn--plain { background: #fff; box-shadow: inset 0 0 0 1px var(--border); }
+.d-top__btn--plain:hover { background: var(--d-hover); box-shadow: inset 0 0 0 1px var(--d-border-hover); }
+.d-top__btn--baked:hover { box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.04); }
+.d-top__btn:active { transform: scale(0.94); }
+.d-top__baked { position: absolute; left: 0; top: -2px; width: 42px; height: 42px; pointer-events: none; }
+.d-top__btn--baked:hover .d-top__baked .ico { animation: d-ring 520ms var(--d-ease); }
+@keyframes d-ring { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-6deg); } 60% { transform: rotate(4deg); } }
+/* unread dot ping (the dot itself is in the Figma asset at 30,0 · 10×10) */
+.d-top__ping { position: absolute; left: 30px; top: -2px; width: 10px; height: 10px; border-radius: 50%; pointer-events: none; }
+.d-top__ping::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: #ef4444; opacity: 0; animation: d-ping 2.4s ease-out 1.2s 2; }
+@keyframes d-ping { 0% { transform: scale(1); opacity: 0.45; } 70%, 100% { transform: scale(2.6); opacity: 0; } }
+
+.d-lang { display: flex; height: 40px; padding: 4px; border-radius: 999px; background: #fff; box-shadow: inset 0 0 0 1px var(--border); }
+.d-lang__opt { width: 36px; height: 100%; border-radius: 999px; display: grid; place-items: center; font-size: 14px; line-height: 20px; color: var(--foreground); transition: background 160ms; }
+.d-lang__opt.is-on { background: #eef2ff; }
+.d-lang__opt--hi { padding-top: 4px; font-family: "Noto Sans Devanagari", "Kohinoor Devanagari", var(--font); }
+.d-lang__opt:not(.is-on):hover { background: var(--d-hover); }
+
+/* ---- Content + title -------------------------------------------------------- */
+.d-content { padding-top: 20px; }
+.d-title { font-size: 30px; line-height: 40px; letter-spacing: -0.4px; font-weight: 400; color: var(--foreground); }
+.d-crumbs { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; font-size: 14px; line-height: 20px; color: var(--muted-foreground); }
+.d-crumbs__link { color: var(--muted-foreground); transition: color 140ms; }
+.d-crumbs__link:hover { color: var(--primary); }
+.d-crumbs__here { color: var(--foreground); font-weight: 500; }
+.d-crumbs__sep { opacity: 0.6; }
+
+/* ---- Tabs (476:200199) — px20 py12, active 2px #3858E5 + SemiBold ------------- */
+.d-tabs { position: relative; display: flex; align-items: stretch; margin-top: 16px; padding: 4px 0; filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.06)); }
+.d-tab {
+  position: relative; display: flex; align-items: center; gap: 6px;
+  height: 46px; padding: 12px 20px; border-bottom: 1px solid var(--border);   /* 46 = active item with its 2px rule */
+  font-size: 14px; line-height: 20px; font-weight: 500; color: var(--muted-foreground); white-space: nowrap;
+  transition: color 160ms;
+}
+.d-tab .ico { opacity: 0.85; transition: transform 200ms var(--d-ease), opacity 160ms; }
+.d-tab:hover, .d-tab.is-hover { color: var(--foreground); }
+.d-tab:hover .ico { opacity: 1; transform: translateY(-1px); }
+.d-tab::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: -1px; height: 2px; border-radius: 2px; background: var(--d-border-hover); transform: scaleX(0); transition: transform 220ms var(--d-ease); }
+.d-tab:not(.is-active):hover::after { transform: scaleX(1); }
+.d-tab.is-active { color: var(--foreground); font-weight: 600; }
+.d-tab.is-active .ico { opacity: 1; }
+.d-tabs__rest { flex: 1; border-bottom: 1px solid var(--border); }
+.d-tabs__ink { position: absolute; left: 0; bottom: 4px; height: 2px; background: var(--primary); width: 0; transition: transform 380ms var(--d-ease), width 380ms var(--d-ease); pointer-events: none; }
+.d-tab__count {
+  min-width: 18px; height: 18px; padding: 0 5px; margin-left: 2px;
+  border-radius: 999px; background: var(--primary); color: #fff;
+  font-size: 11px; line-height: 18px; font-weight: 600; text-align: center;
+}
+.d-tab__count.is-bump { animation: d-bump 420ms var(--ease-spring); }
+@keyframes d-bump { 0% { transform: scale(0.6); } 60% { transform: scale(1.2); } 100% { transform: scale(1); } }
+
+/* ---- AI Mitra FAB (476:200642) --------------------------------------------- */
+.d-fab-wrap { position: absolute; right: 40px; bottom: 28px; z-index: 30; display: flex; align-items: center; }
+.d-fab {
+  position: relative; width: 60px; height: 60px; border-radius: 999px;
+  display: grid; place-items: center;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 60%), #3858e5;
+  box-shadow: 0 1.154px 2.308px rgba(15, 23, 41, 0.06), 0 6.923px 16.154px rgba(67, 56, 202, 0.3),
+              inset 0 -2.308px 4.615px rgba(15, 23, 41, 0.12), inset 0 1.154px 0 rgba(255, 255, 255, 0.35);
+  transition: transform 220ms var(--ease-spring), box-shadow 220ms;
+}
+.d-fab .ico { transition: transform 600ms var(--d-ease); }
+.d-fab:hover { transform: translateY(-2px) scale(1.05); box-shadow: 0 2px 4px rgba(15, 23, 41, 0.08), 0 12px 28px rgba(67, 56, 202, 0.36), inset 0 -2.308px 4.615px rgba(15, 23, 41, 0.12), inset 0 1.154px 0 rgba(255, 255, 255, 0.35); }
+.d-fab:hover .ico { transform: rotate(180deg); }
+.d-fab:active { transform: scale(0.96); }
+.d-fab-nudge {
+  position: absolute; right: 30px; white-space: nowrap;
+  padding: 10px 44px 10px 16px; border-radius: 999px;
+  background: #fff; box-shadow: inset 0 0 0 1px var(--border), var(--d-shadow-l);
+  font-size: 14px; line-height: 20px; color: var(--muted-foreground);
+  opacity: 0; transform: translateX(16px) scale(0.96); transform-origin: right center; pointer-events: none;
+  transition: opacity 260ms var(--d-ease), transform 360ms var(--d-ease);
+}
+.d-fab-nudge b { color: var(--foreground); font-weight: 600; }
+.d-fab-wrap.is-nudging .d-fab-nudge { opacity: 1; transform: none; }
+
+/* ---- Tooltip ------------------------------------------------------------------ */
+.d-tip {
+  position: absolute; left: 50%; bottom: calc(100% + 10px); z-index: 40;
+  width: max-content; max-width: 260px; padding: 10px 12px; border-radius: 10px;
+  background: #0f172a; color: #f8fafc; font-size: 12px; line-height: 17px; font-weight: 400; letter-spacing: 0; text-align: left; white-space: normal;
+  box-shadow: 0 12px 24px -8px rgba(15, 23, 42, 0.35);
+  opacity: 0; transform: translate(-50%, 4px); pointer-events: none;
+  transition: opacity 160ms, transform 200ms var(--d-ease);
+}
+.d-tip::after { content: ""; position: absolute; left: 50%; top: 100%; margin-left: -5px; border: 5px solid transparent; border-top-color: #0f172a; }
+:hover > .d-tip, :focus-visible > .d-tip { opacity: 1; transform: translate(-50%, 0); transition-delay: 120ms; }
+
+/* ---- Toast ---------------------------------------------------------------------- */
+.d-toast {
+  position: absolute; left: 50%; bottom: 32px; z-index: 50;
+  display: flex; align-items: center; gap: 16px;
+  padding: 10px 10px 10px 18px; border-radius: 999px;
+  background: #0f172a; color: #f8fafc; font-size: 14px; line-height: 20px;
+  box-shadow: 0 16px 32px -12px rgba(15, 23, 42, 0.45);
+  opacity: 0; transform: translate(-50%, 12px); transition: opacity 220ms, transform 320ms var(--d-ease);
+}
+.d-toast.is-in { opacity: 1; transform: translate(-50%, 0); }
+.d-toast__act { padding: 6px 12px; border-radius: 999px; background: rgba(255, 255, 255, 0.12); color: #fff; font-weight: 600; font-size: 13px; transition: background 140ms; }
+.d-toast__act:hover { background: rgba(255, 255, 255, 0.2); }
+
+/* ---- Page transitions + entrances ------------------------------------------------ */
+.page.is-d-in .d-content { animation: d-content-in 340ms var(--d-ease) both; }
+@keyframes d-content-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.d-enter { opacity: 0; transform: translateY(10px); transition: opacity 420ms var(--d-ease) var(--d, 0ms), transform 520ms var(--d-ease) var(--d, 0ms); }
+.d-enter.is-in { opacity: 1; transform: none; }
+
+/* ---- Fallback (screen not on desktop yet) ------------------------------------------ */
+.d-missing { margin-top: 32px; padding: 48px; border-radius: 16px; background: var(--d-bg); box-shadow: inset 0 0 0 1px var(--border); text-align: center; }
+.d-missing__eyebrow { font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--tertiary-foreground); }
+.d-missing__title { margin-top: 8px; font-size: 20px; line-height: 28px; font-weight: 600; }
+.d-missing__body { margin-top: 4px; font-size: 14px; line-height: 20px; color: var(--muted-foreground); }
+.d-missing__actions { margin-top: 20px; display: flex; gap: 12px; justify-content: center; }
+
+@media (prefers-reduced-motion: reduce) {
+  .d-app *, .d-app *::before, .d-app *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; }
+}

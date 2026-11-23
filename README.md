@@ -29,6 +29,34 @@ starts the HTML component kit that later mobile flows reuse.
   - **Disbursal** (group F, v0.9.0): Money on its way (`435:8001`), then Money received with the Disbursed sheet (`435:8572`). After the signed sheet closes, these follow on their own (3.5 s, then 6 s).
   - **The loan journey is complete:** offers → compare → apply → track → approved → KFS → NeSL → signed → disbursed.
 
+## Desktop view (`flow/desktop`)
+
+Switch with **View → Desktop** in the panel, press **D**, or link `#device=desktop`. The current screen and its params carry over. Desktop renders `OPL.dscreens` (in `js/desktop/`), a separate bundle loaded the first time you switch, so the mobile first load is unchanged.
+
+- **Source frame for the shell and card language:** `476:200124` "loans overview" (page *Finance Hub - Desktop Loans* `357:54674`).
+- **Mapping:** mobile Home has no desktop twin; the desktop sidebar opens on Loans, so `home` → `loans-overview` (`OPL.dalias`).
+- **Not on desktop yet:** a mobile screen keeps the desktop shell and offers "Open in mobile view".
+- **Files:** `css/desktop/` (shell, components, `screens/`) and `js/desktop/` (`ui.js` = `OPL.d.*`, `data/`, `screens/`). Desktop assets are in `assets/lazy/dsk`. `tools/build.sh` inlines the SVGs into `dist/desktop.js`.
+- **Adding a desktop screen:** put the data in `js/desktop/data/`, the screen in `js/desktop/screens/` (register `OPL.dscreens[<same name as mobile>]`), and the CSS in `css/desktop/screens/`. Add the files to `DCSS`/`DJS` in `build.sh`.
+
+**Desktop rules** (consistency with mobile):
+- Geist only.
+- CTA and links use `#3858E5`. Tonal "Apply Now" is `--soft-primary` with primary text, as on mobile.
+- Selected chip: `#F0F6FE` with a `#3858E5` stroke.
+- Strokes are drawn inside, except where the frame puts them in layout (business switcher).
+- Hover and focus states exist on every control. Pages crossfade their content; the shell never moves.
+
+**Desktop flags (kept as drawn; to confirm):**
+1. The desktop frame uses indigo `#4338CA` for links and `#3730A3`/`#EEF2FF` for the tonal button. They're shown as `#3858E5` to match mobile (the mobile consistency pass made the same change).
+2. Debt Profile figures (05 sanctioned, ₹4.65 L utilised, ₹2.80 L available, Term Loans 5) don't match the revised My Loans data (₹64.92 L outstanding).
+3. "Due on 31 Nov 2026" on the Gold loan row is not a real date.
+4. All three match cards show the same Est. EMI, ₹1,60,048, though SBI's loan is ₹20 L.
+5. Proposed, not in Figma:
+   - the CMR info tooltip copy and the chart info tooltip copy
+   - the filter empty state copy (after the old "No matches" frame `357:100347`)
+   - the Sort options (taken from mobile)
+   - the compare toast
+
 ## Run it
 
 The working copy lives in `~/Code/opl-finance-hub-prototype`, outside iCloud. iCloud's "Optimize Mac Storage" offloads files under ~/Documents and stalls git, so don't keep a repo there.

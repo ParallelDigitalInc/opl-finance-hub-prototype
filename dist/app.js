@@ -9,7 +9,7 @@
 (function () {
   const OPL = (window.OPL = window.OPL || {});
 
-  OPL.VERSION = "0.9.2";
+  OPL.VERSION = "0.10.0";
   OPL.FIGMA_FILE = "https://www.figma.com/design/GHuBkYGEQZvQppv3v55EaA/OPL----Internal-Playground--5-";
   OPL.figmaLink = (nodeId) => `${OPL.FIGMA_FILE}?node-id=${nodeId.replace(":", "-")}`;
 
@@ -81,7 +81,7 @@
       const el = e.target.closest("[data-goto]");
       if (el) {
         const target = el.getAttribute("data-goto");
-        if (OPL.screens && OPL.screens[target]) return OPL.go(target);
+        if (OPL.hasScreen ? OPL.hasScreen(target) : OPL.screens && OPL.screens[target]) return OPL.go(target);
         flash([el]);
         return;
       }
@@ -3291,6 +3291,9 @@ OPL.ui.DisbursedHeroSvg = '<svg class="mss" viewBox="0 0 390 196" width="390" he
    Navigation: OPL.go(name) pushes a page (slides in from the right) and a
    browser history entry; OPL.back() / the browser back button pops it.
    Variant changes re-render the current page in place.
+   Device: #device=desktop swaps the phone for a 1440-wide browser window and renders
+   OPL.dscreens (js/desktop/*, a separate bundle fetched on first switch). The screen
+   name and its params carry over, so the same state opens in either view.
    ========================================================================== */
 (function () {
   const screenEl = document.getElementById("screen");
@@ -3300,9 +3303,44 @@ OPL.ui.DisbursedHeroSvg = '<svg class="mss" viewBox="0 0 390 196" width="390" he
   let currentPage = null;
   let depth = 0;
 
+  /* ---- device ------------------------------------------------------------ */
+  OPL.dscreens = OPL.dscreens || {};
+  // Mobile screens whose desktop home is another screen (desktop has no Finance Home:
+  // the sidebar opens straight on Loans).
+  OPL.dalias = { home: "loans-overview" };
+  const isDesktop = () => OPL.state.get().device === "desktop" && window.innerWidth > 500;
+  OPL.isDesktop = isDesktop;
+  const dName = (name) => (OPL.dscreens[name] ? name : OPL.dscreens[OPL.dalias[name]] ? OPL.dalias[name] : null);
+  OPL.hasScreen = (name) => (isDesktop() ? !!dName(name) : !!OPL.screens[name]);
+
+  let dLoading = null;
+  function loadDesktop() {
+    if (OPL.dReady) return Promise.resolve();
+    if (dLoading) return dLoading;
+    dLoading = new Promise((resolve, reject) => {
+      const v = OPL.VERSION;
+      const css = document.createElement("link");
+      css.rel = "stylesheet";
+      css.href = `dist/desktop.css?v=${v}`;
+      const cssReady = new Promise((r) => { css.onload = css.onerror = r; });
+      document.head.appendChild(css);
+      const js = document.createElement("script");
+      js.src = `dist/desktop.js?v=${v}`;
+      js.onload = () => cssReady.then(() => { OPL.dReady = true; resolve(); });
+      js.onerror = reject;
+      document.head.appendChild(js);
+    });
+    return dLoading;
+  }
+
   const screenName = () => {
     const st = OPL.state.get();
-    return OPL.screens[st.screen] ? st.screen : "home";
+    return OPL.screens[st.screen] || OPL.dscreens[st.screen] ? st.screen : "home";
+  };
+  // The implementation that renders `name` in the current device
+  const impl = (name) => {
+    if (isDesktop()) return OPL.dscreens[dName(name)] || OPL.dscreens.__missing;
+    return OPL.screens[name] || OPL.screens.home;
   };
   const hashFor = (patch) => {
     const next = { ...OPL.state.get(), ...patch };
@@ -3313,7 +3351,7 @@ OPL.ui.DisbursedHeroSvg = '<svg class="mss" viewBox="0 0 390 196" width="390" he
   // replace: swap the current history entry (hand-offs like NeSL → loader → result,
   // so Back doesn't land on a page that only makes sense once)
   OPL.go = (name, params = {}, { replace = false } = {}) => {
-    if (!OPL.screens[name]) return;
+    if (!OPL.hasScreen(name)) return;
     const next = hashFor({ screen: name, ...params });
     if (next === location.hash || (name === screenName() && !Object.keys(params).length)) return;
     if (replace) history.replaceState({ depth }, "", next);
@@ -3329,19 +3367,27 @@ OPL.ui.DisbursedHeroSvg = '<svg class="mss" viewBox="0 0 390 196" width="390" he
   function render({ dir } = {}) {
     const st = OPL.state.get();
     const name = screenName();
-    document.documentElement.dataset.hotspots = st.hotspots || "on";
-    document.documentElement.dataset.frame = st.frame || "on";
+    const device = isDesktop() ? "desktop" : "mobile";
+    const root = document.documentElement;
+    root.dataset.hotspots = st.hotspots || "on";
+    root.dataset.frame = st.frame || "on";
+    if (root.dataset.device !== device) { root.dataset.device = device; fit(); }
+    if (device === "desktop" && !OPL.dReady) {
+      loadDesktop().then(() => { render({ dir }); fit(); }, () => OPL.state.set({ device: null }));
+      return;
+    }
+    const s = impl(name);
 
     // Same screen (variant / panel change): re-render on a fresh element so listeners
     // bound by the previous render are dropped (no double handlers).
-    if (currentPage && currentPage.dataset.screen === name && !dir) {
+    if (currentPage && currentPage.dataset.screen === name && currentPage.dataset.device === device && !dir) {
       const fresh = document.createElement("div");
       fresh.className = currentPage.className.replace(/\b(is-push-in|is-pop-in|is-entering)\b/g, "").trim();
       fresh.dataset.screen = name;
+      fresh.dataset.device = device;
       const scroll = currentPage.querySelector(".scroller")?.scrollTop || 0;
       currentPage.replaceWith(fresh);
       currentPage = fresh;
-      const s = OPL.screens[name];
       if (s.leave) s.leave();
       s.render(fresh);
       const sc = fresh.querySelector(".scroller"); if (sc) sc.scrollTop = scroll;
@@ -3351,17 +3397,27 @@ OPL.ui.DisbursedHeroSvg = '<svg class="mss" viewBox="0 0 390 196" width="390" he
     // Clean up the outgoing screen BEFORE rendering: when both pages are the same screen
     // (e.g. application → application), a later leave() would cancel the new page's timers.
     const old = currentPage;
-    if (old) { const leaving = OPL.screens[old.dataset.screen]; if (leaving && leaving.leave) leaving.leave(); }
+    if (old) {
+      const reg = old.dataset.device === "desktop" ? OPL.dscreens : OPL.screens;
+      const leaving = reg[old.dataset.screen] || (old.dataset.device === "desktop" && OPL.dscreens[OPL.dalias[old.dataset.screen]]);
+      if (leaving && leaving.leave) leaving.leave();
+    }
 
     const page = document.createElement("div");
     page.className = "page";
     page.dataset.screen = name;
+    page.dataset.device = device;
     screenEl.appendChild(page);
-    OPL.screens[name].render(page);
+    s.render(page);
 
     currentPage = page;
     if (old) {
-      if (dir && !OPL.fx.motionOff()) {
+      // Desktop: the shell (sidebar, top bar, tabs) is identical on every page, so swap
+      // instantly and let only the content area fade up (css/desktop/shell.css).
+      if (device === "desktop" || old.dataset.device !== device) {
+        old.remove();
+        if (dir && old.dataset.device === device && !OPL.fx.motionOff()) page.classList.add("is-d-in");
+      } else if (dir && !OPL.fx.motionOff()) {
         const [inC, outC] = dir === "back" ? ["is-pop-in", "is-pop-out"] : ["is-push-in", "is-push-out"];
         page.classList.add(inC);
         old.classList.add(outC);
@@ -3375,9 +3431,32 @@ OPL.ui.DisbursedHeroSvg = '<svg class="mss" viewBox="0 0 390 196" width="390" he
   }
 
   /* ---- fit the device to the viewport on a laptop/projector ------------- */
+  // Desktop: a 1440-wide browser window, scaled to the space left of the panel; its
+  // height grows to fill the stage so it reads as a real window, not a fixed artboard.
+  const D_W = 1440, D_MIN_H = 760;
   function fit() {
-    if (window.innerWidth <= 500) { wrap.style.transform = ""; wrap.style.margin = ""; return; }
-    wrap.style.transform = ""; wrap.style.margin = "";
+    wrap.style.transform = ""; wrap.style.margin = ""; wrap.style.width = ""; wrap.style.height = "";
+    screenEl.style.height = "";
+    if (window.innerWidth <= 500) return;
+    if (document.documentElement.dataset.device === "desktop") {
+      const panelW = panelEl && getComputedStyle(panelEl).display !== "none" && window.innerWidth > 1000 ? panelEl.offsetWidth + 32 : 0;
+      const chrome = wrap.offsetHeight - screenEl.offsetHeight;          // browser bar
+      const availW = window.innerWidth - 48 - panelW;
+      const availH = window.innerHeight - 48;
+      const s = Math.min(1, availW / D_W);
+      const h = Math.max(D_MIN_H, Math.floor((availH - chrome * s) / s));
+      screenEl.style.height = `${h}px`;
+      const fullH = h + chrome;
+      // Reserve the scaled box in layout so the panel sits right next to it.
+      wrap.style.width = `${D_W * s}px`;
+      wrap.style.height = `${fullH * s}px`;
+      wrap.style.transform = s < 1 ? `scale(${s})` : "";
+      wrap.style.transformOrigin = "top left";
+      wrap.style.visibility = "visible";
+      return;
+    }
+    wrap.style.transformOrigin = "";
+    wrap.style.visibility = "visible";
     const h = wrap.offsetHeight, avail = window.innerHeight - 48;
     const s = Math.min(1, avail / h);
     wrap.style.transform = s < 1 ? `scale(${s})` : "";
@@ -3393,23 +3472,32 @@ OPL.ui.DisbursedHeroSvg = '<svg class="mss" viewBox="0 0 390 196" width="390" he
 
   function renderPanel(name) {
     if (!panelEl) return;
-    const reg = OPL.variants[name];
+    const desk = isDesktop();
+    const reg = desk ? OPL.dvariants?.[dName(name)] : OPL.variants[name];
     const st = OPL.state.get();
-    const v = reg ? OPL.variantValues(name) : {};
+    const v = reg ? (desk ? OPL.dvariantValues(dName(name)) : OPL.variantValues(name)) : {};
     const activePreset = reg?.presets.find((p) => Object.entries(p.set).every(([k, val]) => v[k] === val));
-    const figmaNode = activePreset?.figma || Object.values(OPL.screens[name].figma || {})[0];
+    const scr = impl(name);
+    const figmaNode = activePreset?.figma || Object.values(scr.figma || {})[0];
+    const list = desk ? Object.entries(OPL.dscreens).filter(([id]) => !id.startsWith("__")) : Object.entries(OPL.screens);
+    const active = desk ? dName(name) : name;
 
     panelEl.innerHTML = `
       <div class="panel__head">
-        <span class="panel__title">${OPL.screens[name].title}</span>
+        <span class="panel__title">${scr.title}</span>
         <span class="panel__ver">v${OPL.VERSION}</span>
       </div>
       <p class="panel__sub">OPL Finance Hub · HTML prototype</p>
 
+      <div class="panel__group panel__group--device">
+        <div class="panel__label"><span>View</span><span class="panel__kbd">D</span></div>
+        ${seg("device", [{ value: "mobile", label: "Mobile" }, { value: "desktop", label: "Desktop" }], desk ? "desktop" : "mobile")}
+      </div>
+
       <div class="panel__group">
-        <div class="panel__label"><span>Screens</span></div>
-        <div class="presets">${Object.entries(OPL.screens)
-          .map(([id, s]) => `<button class="preset ${id === name ? "is-on" : ""}" data-screen="${id}">${s.title}<small>${Object.values(s.figma || {})[0] || ""}</small></button>`)
+        <div class="panel__label"><span>Screens</span>${desk ? `<span>${list.length} built for desktop</span>` : ""}</div>
+        <div class="presets">${list
+          .map(([id, s]) => `<button class="preset ${id === active ? "is-on" : ""}" data-screen="${id}">${s.title}<small>${Object.values(s.figma || {})[0] || ""}</small></button>`)
           .join("")}</div>
       </div>
 
@@ -3449,25 +3537,40 @@ OPL.ui.DisbursedHeroSvg = '<svg class="mss" viewBox="0 0 390 196" width="390" he
     const scr = e.target.closest("[data-screen]");
     if (scr) {
       const target = scr.dataset.screen;
-      if (target === screenName()) return;
+      if (target === screenName() || (isDesktop() && target === dName(screenName()))) return;
       // Going "up" to home reads as a back; anything else pushes.
-      if (target === "home") { history.replaceState({ depth: 0 }, "", hashFor({ screen: null })); depth = 0; return render({ dir: "back" }); }
+      if (target === "home" || (isDesktop() && target === "loans-overview" && depth === 0)) { history.replaceState({ depth: 0 }, "", hashFor({ screen: null })); depth = 0; return render({ dir: "back" }); }
       return OPL.go(target);
     }
     const preset = e.target.closest("[data-preset]");
     if (preset) {
-      const p = OPL.variants[OPL.current()].presets.find((x) => x.id === preset.dataset.preset);
+      const reg = isDesktop() ? OPL.dvariants[dName(OPL.current())] : OPL.variants[OPL.current()];
+      const p = reg.presets.find((x) => x.id === preset.dataset.preset);
       return OPL.state.set(p.set);
     }
     const btn = e.target.closest(".seg button");
     if (btn) {
       const group = btn.parentElement.dataset.group;
+      if (group === "device") return setDevice(btn.dataset.value);
       return OPL.state.set({ [group]: group === "motion" && btn.dataset.value === "on" ? null : btn.dataset.value });
     }
     if (e.target.closest("[data-replay]")) {
       currentPage?.querySelector(".scroller")?.scrollTo({ top: 0 });
       return render();
     }
+  });
+
+  function setDevice(d) {
+    if ((d === "desktop") === isDesktop()) return;
+    if (d === "desktop" && window.innerWidth <= 500) return;
+    OPL.state.set({ device: d === "desktop" ? "desktop" : null });
+  }
+  OPL.setDevice = setDevice;
+  // "D" flips the view (ignored while typing)
+  window.addEventListener("keydown", (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey || e.key.toLowerCase() !== "d") return;
+    if (e.target.closest && e.target.closest("input, textarea, [contenteditable]")) return;
+    setDevice(isDesktop() ? "mobile" : "desktop");
   });
 
   OPL.current = () => screenName();
@@ -3480,7 +3583,11 @@ OPL.ui.DisbursedHeroSvg = '<svg class="mss" viewBox="0 0 390 196" width="390" he
     depth = (e.state && e.state.depth) || 0;
     render({ dir: "back" });
   });
-  window.addEventListener("resize", fit);
+  window.addEventListener("resize", () => {
+    fit();
+    // crossed the phone breakpoint while in desktop view → re-render for the new device
+    if ((isDesktop() ? "desktop" : "mobile") !== document.documentElement.dataset.device) render();
+  });
 
   OPL.initInteractions(screenEl);
   history.replaceState({ depth: 0 }, "", location.hash || "#");

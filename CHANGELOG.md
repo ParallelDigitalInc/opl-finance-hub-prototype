@@ -1,5 +1,38 @@
 # Changelog
 
+## v0.10.0 — 23 Nov 2026 · Desktop view + Loans overview (desktop)
+
+Branch `flow/desktop`. Synced from Figma `476:200124` "loans overview" (page *Finance Hub - Desktop Loans* `357:54674`).
+
+**Added**
+
+- **Mobile ⇄ Desktop switch.** "View" in the panel, the `D` key, or `#device=desktop`. The screen and its params carry over, so the same state opens in either view. Desktop shows a 1440-wide browser window scaled to the space next to the panel; its height grows to fill the stage. On a phone (≤500px) it's always mobile.
+- **Desktop loads on demand.** It's a separate bundle (`dist/desktop.css` + `dist/desktop.js`, with icons inlined), fetched the first time you switch. Mobile first load is unchanged. `tools/check.sh` gives desktop its own budget (600 KB).
+- **Desktop shell** (`476:200125`, `476:200177`, `476:200199`): sidebar with business switcher and nav groups, sticky pill top bar (search, support, notifications, messages, EN/हिं), underline tabs (Overview · Loan Offers · Compare · Applications · My Loans), and the AI Mitra FAB.
+- **Loans › Overview** (`476:200124`):
+  - Safe Borrowing Limit hero with 3 quick picks and an AI row.
+  - **CIBIL MSME Rank** gauge, built from Figma's 20 bars (`476:200271`) so each bar can animate.
+  - Top loan matches: chips, Sort, Filters, and 3 tinted-head offer cards.
+  - Debt Profile: 3 stat tiles, Monthly Repayment Trend chart, and Term Loans.
+- **Desktop with no design yet**: a mobile screen without a desktop version keeps the desktop shell and offers "Open in mobile view", so the switch never dead-ends.
+
+**Interaction layer (prototype, behaviour on drawn elements)**
+
+- Hover, focus-visible and active states on every control:
+  - nav rows tint and their icon nudges
+  - tabs preview their underline
+  - cards lift 2px with a deeper shadow and a slate-300 stroke
+  - buttons, chips and pills darken and press to 0.97
+  - AI rows: the arrow slides and the Mitra mark turns
+  - quick-pick and stat icons pop
+- The tab underline glides from the previous tab to the new one. The content fades up between pages while the shell stays put.
+- The top bar frosts once content scrolls under it. ⌘K focuses search, which widens.
+- CMR gauge: the bars sweep in, the needle springs to rank 2, then the rank and the "Low Risk" chip settle. Hovering the gauge keeps your rank lit and dims the rest. The info icon shows a tooltip.
+- Chips filter the cards (AND), with an empty state and "Clear filters". The Sort menu re-orders the cards with a FLIP glide. Cards keep Figma's order until you pick a sort.
+- Compare checkboxes add to a shared selection (the same one mobile Loan offers uses), show a counter on the Compare tab, and raise a toast with "Compare now" (max 3).
+- The ₹50 Lakhs limit counts up. The repayment chart draws in left → right, then the point pings and its tooltip appears.
+- The unread dots ping twice, and the bell rings on hover. The AI Mitra nudge slides out once, as on mobile.
+
 ## v0.9.2 — 23 Nov 2026 · Days-left tag corner
 
 - **The "2 days left" tag on application cards** (Loans overview and Track Loans) is now clipped to the tinted lender block's 13px corner, as in Figma (`416:121716` has overflow clip). Its square top-right corner used to poke out past the curve.

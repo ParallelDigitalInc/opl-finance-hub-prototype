@@ -1,0 +1,187 @@
+/* ==========================================================================
+   Desktop components — card language from 476:200124.
+   Card shell: white, 1px slate-200 inside, r16, p4 (no bottom), Shadow/s.
+   Tinted head r14 (lender tint) · white body r14. Strokes are drawn inside
+   (box-shadow inset) so a border never changes card height (mobile kit rule).
+   Hover: lift 2px + deeper shadow + slate-300 stroke. Press: scale .99.
+   ========================================================================== */
+
+/* ---- Section header (476:200398) ------------------------------------------------ */
+.d-sh { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.d-sh__title { display: flex; align-items: center; gap: 6px; font-size: 20px; line-height: 28px; font-weight: 600; color: var(--foreground); }
+.d-count {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px; border-radius: 999px; background: var(--badge-bg);
+  font-size: 12px; line-height: 1; font-weight: 500; color: var(--foreground);
+}
+.d-link { display: inline-flex; align-items: center; gap: 6px; font-size: 16px; line-height: 24px; font-weight: 600; color: var(--primary); border-radius: 6px; transition: opacity 140ms; }
+.d-link__arrow { transition: transform 200ms var(--d-ease); }
+.d-link:hover .d-link__arrow { transform: translateX(3px); }
+.d-link:hover span, .d-link:hover { text-decoration: none; }
+.d-link:active { opacity: 0.7; }
+
+/* ---- Buttons (DS Button: Filled / Tonal / Outlined / Text · lg 44 · md 38 · sm 32) --- */
+.d-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  border-radius: 999px; white-space: nowrap; font-weight: 600;
+  transition: background 160ms, box-shadow 160ms, color 160ms, transform 120ms var(--d-ease);
+}
+.d-btn--lg { height: 44px; padding: 0 20px; font-size: 14px; line-height: 20px; }
+.d-btn--md { height: 38px; padding: 10px 14px; font-size: 13px; line-height: 18px; }
+.d-btn--sm { height: 32px; padding: 0 12px; font-size: 13px; line-height: 18px; }
+.d-btn--filled { background: var(--primary); color: #fff; box-shadow: 0 1px 2px rgba(56, 88, 229, 0.2); }
+.d-btn--filled:hover { background: #2f4ed6; box-shadow: 0 6px 16px -6px rgba(56, 88, 229, 0.55); }
+.d-btn--tonal { background: var(--soft-primary); color: var(--primary); }
+.d-btn--tonal:hover { background: #e0e7fd; }
+.d-btn--outlined { background: #fff; color: var(--primary); box-shadow: inset 0 0 0 1px var(--primary); }
+.d-btn--outlined:hover { background: var(--primary-tint); }
+.d-btn--text { padding-left: 0; padding-right: 0; height: auto; color: var(--primary); }
+.d-btn--text:hover { opacity: 0.8; }
+.d-btn:active { transform: scale(0.97); }
+.d-btn[disabled] { opacity: 0.45; pointer-events: none; }
+.d-btn .ico { transition: transform 200ms var(--d-ease); }
+.d-btn:hover .ico:last-child:not(:first-child) { transform: translateX(2px); }
+
+/* ---- Chips (476:200411) — Medium 14, #F1F5F9, px12 py8 ------------------------------- */
+.d-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 12px; border-radius: 999px; background: var(--muted);
+  font-size: 14px; line-height: 20px; font-weight: 500; color: var(--foreground); white-space: nowrap;
+  transition: background 160ms, box-shadow 160ms, color 160ms, transform 120ms var(--d-ease);
+}
+.d-chip:hover { background: #e8edf3; }
+.d-chip:active { transform: scale(0.96); }
+/* selected = mobile kit chip rule: #F0F6FE fill + #3858E5 stroke (inside) */
+.d-chip.is-selected { background: var(--primary-tint); color: var(--primary); box-shadow: inset 0 0 0 1px var(--primary); }
+
+/* Sort / Filter pills (476:200427 · 476:200432) */
+.d-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  height: 36px; padding: 0 12px 0 14px; border-radius: 999px; background: var(--muted);
+  font-size: 14px; line-height: 20px; font-weight: 500; color: var(--muted-foreground); white-space: nowrap;
+  transition: background 160ms, transform 120ms var(--d-ease), box-shadow 160ms;
+}
+.d-pill:not(.d-pill--sort) { gap: 6px; padding: 8px 12px; }
+.d-pill b { font-weight: 600; color: var(--foreground); }
+.d-pill__muted { font-weight: 400; }
+.d-pill__chev { transform: rotate(90deg); transition: transform 220ms var(--d-ease); }
+.d-pill:hover { background: #e8edf3; }
+.d-pill:active { transform: scale(0.97); }
+.d-pill[aria-expanded="true"] { background: #fff; box-shadow: inset 0 0 0 1px var(--border), var(--d-shadow-l); }
+.d-pill[aria-expanded="true"] .d-pill__chev { transform: rotate(-90deg); }
+
+/* Dropdown menu */
+.d-menu-anchor { position: relative; }
+.d-menu {
+  position: absolute; right: 0; top: calc(100% + 8px); z-index: 25; min-width: 240px;
+  padding: 6px; border-radius: 14px; background: #fff;
+  box-shadow: inset 0 0 0 1px var(--border), 0 16px 40px -12px rgba(15, 23, 42, 0.18);
+  opacity: 0; transform: translateY(-4px) scale(0.98); transform-origin: top right; pointer-events: none;
+  transition: opacity 160ms, transform 220ms var(--d-ease);
+}
+.d-menu.is-open { opacity: 1; transform: none; pointer-events: auto; }
+.d-menu__item { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; border-radius: 10px; font-size: 14px; line-height: 20px; color: var(--foreground); transition: background 120ms; }
+.d-menu__item:hover, .d-menu__item:focus-visible { background: var(--d-bg); box-shadow: none; }
+.d-menu__item.is-on { font-weight: 600; color: var(--primary); }
+
+/* ---- Checkbox (Compare, 476:200470) ----------------------------------------------------- */
+.d-check { display: inline-flex; align-items: center; gap: 8px; padding: 4px 6px 4px 0; border-radius: 8px; }
+.d-check__box { position: relative; width: 20px; height: 20px; }
+.d-check__box .ico { position: absolute; inset: 0; width: 20px; height: 20px; transition: opacity 160ms, transform 260ms var(--ease-spring); }
+.d-check__on { opacity: 0; transform: scale(0.6); }
+.d-check.is-checked .d-check__on { opacity: 1; transform: none; }
+.d-check.is-checked .d-check__off { opacity: 0; }
+.d-check__label { font-size: 14px; line-height: 20px; color: var(--muted-foreground); transition: color 140ms; }
+.d-check:hover .d-check__label, .d-check.is-checked .d-check__label { color: var(--foreground); }
+.d-check:hover .d-check__off { transform: scale(1.06); }
+
+/* ---- AI Mitra row (476:200247 · 476:200355) ---------------------------------------------- */
+.d-mitra-mark { width: 24px; height: 24px; flex-shrink: 0; border-radius: 999px; background: var(--primary); display: grid; place-items: center; transition: transform 500ms var(--d-ease); }
+.d-ai { width: 100%; display: flex; align-items: center; gap: 10px; padding: 12px; text-align: left; transition: background 160ms; }
+.d-ai__text { flex: 1; font-size: 14px; line-height: 20px; font-weight: 500; color: var(--foreground); }
+.d-ai__arrow { transition: transform 200ms var(--d-ease); }
+.d-ai:hover { background: rgba(56, 88, 229, 0.04); }
+.d-ai:hover .d-ai__arrow { transform: translateX(3px); }
+.d-ai:hover .d-mitra-mark { transform: rotate(180deg); }
+
+/* ---- Logo ---------------------------------------------------------------------------------- */
+.d-logo { width: var(--sz); height: var(--sz); flex-shrink: 0; border-radius: 999px; overflow: hidden; background: #fff; display: block; transition: transform 260ms var(--ease-spring); }
+.d-logo img { width: 100%; height: 100%; object-fit: cover; }
+.d-logo--crop { position: relative; }
+.d-logo--crop img { position: absolute; max-width: none; object-fit: fill; }
+
+/* ---- Card shell -------------------------------------------------------------------------- */
+.d-card {
+  position: relative; display: flex; flex-direction: column;
+  padding: 4px 4px 0; border-radius: 16px; background: #fff; overflow: hidden;
+  box-shadow: inset 0 0 0 1px var(--border), var(--shadow-s);
+}
+
+/* Offer card · vertical (476:200437) */
+.d-offer { cursor: pointer; transition: transform 260ms var(--d-ease), box-shadow 260ms var(--d-ease); }
+.d-offer:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 1px var(--d-border-hover), var(--d-shadow-hover); }
+.d-offer:hover .d-logo { transform: scale(1.06); }
+.d-offer:focus-visible { box-shadow: inset 0 0 0 1px var(--primary), var(--d-focus); }
+.d-card__head { display: flex; flex-direction: column; padding: 0 0 16px 20px; border-radius: 14px; background: var(--tint); }
+.d-card__tag { align-self: flex-end; padding: 6px 8px; border-radius: 0 0 0 12px; background: #fff; font-size: 12px; line-height: normal; font-weight: 500; color: var(--primary); }
+.d-card__id { display: flex; flex-direction: column; gap: 12px; }
+.d-card__name { font-size: 18px; line-height: 21px; font-weight: 500; color: var(--foreground); }
+.d-card__sub { margin-top: 3px; font-size: 12px; line-height: 18px; font-weight: 500; color: var(--muted-foreground); }
+.d-card__body { display: flex; flex-direction: column; gap: 20px; padding: 20px 16px 14px 20px; border-radius: 14px; background: #fff; }
+.d-figs { display: flex; gap: 48px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+.d-fig { display: flex; flex-direction: column; gap: 2px; justify-content: flex-end; height: 46px; }
+.d-fig__label { font-size: 12px; line-height: 16px; color: var(--muted-foreground); }
+.d-fig__value { display: flex; align-items: baseline; gap: 4px; font-size: 20px; line-height: 28px; font-weight: 500; color: var(--foreground); white-space: nowrap; }
+.d-fig__value small { font-size: 12px; line-height: 16px; font-weight: 500; }
+.d-rows { margin: 0; display: flex; flex-direction: column; gap: 12px; }
+.d-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; font-size: 14px; line-height: 20px; white-space: nowrap; }
+.d-row dt { color: var(--muted-foreground); }
+.d-row dd { margin: 0; font-weight: 500; color: var(--foreground); }
+.d-card__foot { display: flex; align-items: center; justify-content: space-between; }
+
+/* ---- CIBIL MSME Rank (476:200254) ---------------------------------------------------------- */
+.d-cmr { height: 272px; justify-content: space-between; }
+.d-cmr__head { display: flex; align-items: center; gap: 3px; padding: 16px; border-radius: 16px; background: var(--d-bg); }
+.d-cmr__title { flex: 1; display: flex; align-items: center; gap: 4px; font-size: 18px; line-height: 21px; font-weight: 500; color: var(--foreground); }
+.d-cmr__updated { font-size: 12px; line-height: 18px; color: var(--muted-foreground); white-space: nowrap; }
+.d-cmr__info { position: relative; display: inline-grid; place-items: center; border-radius: 999px; cursor: help; }
+.d-cmr__info .ico { transition: transform 200ms var(--d-ease); }
+.d-cmr__info:hover > .ico { transform: scale(1.12); }
+.d-cmr__body { height: 129px; display: flex; justify-content: center; padding: 12px 20px; border-radius: 14px; background: #fff; overflow: visible; }
+
+.d-gauge { position: relative; width: 180px; height: 118px; }
+.d-gauge__bars { width: 180px; height: 90px; }
+.d-gauge__bars svg { width: 180px; height: 90px; overflow: visible; }
+.d-gauge__bars path {
+  transform-box: view-box; transform-origin: 90px 90px;
+  opacity: 0; transform: scale(0.82) rotate(-8deg);
+  transition: opacity 340ms var(--d-ease) calc(var(--i) * 34ms), transform 560ms var(--ease-spring) calc(var(--i) * 34ms), filter 200ms;
+}
+.d-gauge.is-in .d-gauge__bars path { opacity: 1; transform: none; }
+/* hover: the business's rank stays lit, the rest of the scale steps back */
+.d-gauge.is-settled:hover .d-gauge__bars path { transition-delay: 0ms; }
+.d-gauge.is-settled:hover .d-gauge__bars path:not(.is-rank) { opacity: 0.32; }
+.d-gauge.is-settled:hover .d-gauge__bars path.is-rank { transform: scale(1.05); }
+.d-gauge__min, .d-gauge__max { position: absolute; font-size: 10px; line-height: normal; font-weight: 500; color: var(--tertiary-foreground); }
+.d-gauge__min { left: 10.5px; top: 96px; }
+.d-gauge__max { left: 160.5px; top: 98px; }
+/* needle: rotates about the gauge centre (90,90); 0° points at rank 1, 180° at rank 10 */
+.d-gauge__needle { position: absolute; left: 90px; top: 90px; width: 0; height: 0; transform: rotate(0deg); transition: transform 1100ms var(--ease-spring) 520ms; }
+.d-gauge.is-in .d-gauge__needle { transform: rotate(var(--rank-angle)); }
+.d-gauge__tri { position: absolute; left: -55.4px; top: -6px; width: 12px; height: 12px; transform: rotate(-90deg); opacity: 0; transition: opacity 240ms 480ms; }
+.d-gauge__tri .ico { position: absolute; left: 6.7%; right: 6.7%; top: 0; bottom: 25%; width: auto; height: auto; }
+.d-gauge.is-in .d-gauge__tri { opacity: 1; }
+.d-gauge__read { position: absolute; left: 50%; top: 50px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.d-gauge__rank { font-size: 30px; line-height: 36px; letter-spacing: -0.4px; font-weight: 600; color: #1e293b; opacity: 0; transform: translateY(6px) scale(0.9); transition: opacity 300ms 900ms, transform 520ms var(--ease-spring) 900ms; }
+.d-gauge__chip { padding: 6px 14px; border-radius: 999px; background: rgba(5, 150, 105, 0.1); font-size: 12px; line-height: 16px; font-weight: 600; color: #047857; white-space: nowrap; opacity: 0; transform: translateY(4px); transition: opacity 300ms 1100ms, transform 400ms var(--d-ease) 1100ms; }
+.d-gauge.is-in .d-gauge__rank, .d-gauge.is-in .d-gauge__chip { opacity: 1; transform: none; }
+.d-ai--card { padding: 16px 12px; }
+
+/* ---- Empty state (filters with no match; old frame "No matches" 357:100347) ---------------------- */
+.d-empty { grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 48px 24px; border-radius: 16px; background: var(--d-bg); box-shadow: inset 0 0 0 1px var(--border); text-align: center; animation: d-content-in 320ms var(--d-ease) both; }
+.d-empty__title { font-size: 16px; line-height: 24px; font-weight: 600; }
+.d-empty__body { font-size: 14px; line-height: 20px; color: var(--muted-foreground); margin-bottom: 12px; }
+
+/* ---- Panels (white, 1px slate-200, r16, Shadow/xs — 476:200583) --------------------------------- */
+.d-panel { position: relative; border-radius: 16px; background: #fff; box-shadow: inset 0 0 0 1px var(--border), var(--d-shadow-xs); overflow: hidden; }
+.d-panel__title { display: flex; align-items: center; gap: 10px; font-size: 18px; line-height: 28px; letter-spacing: -0.4px; font-weight: 500; color: var(--muted-foreground); }
