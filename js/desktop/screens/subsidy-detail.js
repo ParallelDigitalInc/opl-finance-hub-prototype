@@ -40,7 +40,16 @@
     title: "Govt. subsidies · Subsidy details",
     figma: { cover: "524:101843", blue: "524:101144" },
     timers: [],
-    leave() { this.timers.forEach(clearTimeout); this.timers = []; },
+    leave() {
+      this.timers.forEach(clearTimeout); this.timers = [];
+      const dr = this.estimate; this.estimate = null; dr && dr.close();
+    },
+
+    // Calculate estimate (mobile 416:76869) as a side drawer — js/desktop/screens/subsidy-estimate.js
+    openEstimate(page, opts) {
+      if (this.estimate && this.estimate.el.classList.contains("is-open")) return;
+      this.estimate = D.openEstimate(page, opts);
+    },
 
     render(page) {
       this.leave();
@@ -101,7 +110,7 @@
                     <section class="d-sd__blue" data-enter>
                       <div class="d-sd__blue-top">
                         <div><p class="d-sd__eyebrow">${est.eyebrow}${info(s.info)}</p><p class="d-sd__amount">${est.prefix}${est.amount}</p></div>
-                        ${D.btn({ label: est.cta, style: "outlined", size: "md", cls: "d-sd__calc", iconRight: OPL.icon("chevron-right-primary", 16), goto: "subsidy-estimate" })}
+                        ${D.btn({ label: est.cta, style: "outlined", size: "md", cls: "d-sd__calc", iconRight: OPL.icon("chevron-right-primary", 16), attrs: "data-estimate aria-haspopup=\"dialog\"" })}
                       </div>
                       <div class="d-sd__blue-panel">${ui.PolicyPeriod({ period: d.period })}</div>
                     </section>`}
@@ -117,7 +126,7 @@
                       <p class="d-sd__eyebrow">${est.eyebrow}${info(s.info)}</p>
                       <p class="d-sd__est-amt"><span>${est.prefix}</span>${est.amount}</p>
                       <div class="d-sd__est-actions">
-                        ${D.btn({ label: est.cta, style: "filled", size: "lg", cls: "d-btn--block", iconRight: D.icon("btn-arrow-white", 16), goto: "subsidy-estimate" })}
+                        ${D.btn({ label: est.cta, style: "filled", size: "lg", cls: "d-btn--block", iconRight: D.icon("btn-arrow-white", 16), attrs: "data-estimate aria-haspopup=\"dialog\"" })}
                         ${D.btn({ label: est.apply, style: "outlined", size: "lg", cls: "d-btn--block d-btn--neutral", iconRight: D.icon("arrow-up-right-primary", 16), goto: "application-portal" })}
                       </div>
                     </div>
@@ -140,6 +149,7 @@
       page.addEventListener("click", (e) => {
         const t = e.target.closest("[data-benefit]");
         if (t) return this.openBenefit(page, d, t.dataset.benefit);
+        if (e.target.closest("[data-estimate]")) return this.openEstimate(page);
       });
       page.addEventListener("keydown", (e) => {
         if ((e.key === "Enter" || e.key === " ") && e.target.matches("[data-benefit]")) { e.preventDefault(); this.openBenefit(page, d, e.target.dataset.benefit); }

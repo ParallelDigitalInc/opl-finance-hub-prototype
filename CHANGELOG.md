@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.15.4 — 23 Nov 2026 · Calculate estimate becomes a side drawer
+
+Shreya asked for the estimate as a side drawer, with the mobile design as inspiration. It replaces the v0.15.3 full page.
+
+- **"Calculate Estimate"** on either Subsidy details version now opens a **520 drawer over the policy page**. It's modelled on the mobile sheet (`416:76869`):
+  - The mobile benefit cards and "Add more benefits" chips scroll in the drawer.
+  - The footer is the mobile action bar: **Get Estimate**, then **Talk to an Expert**. One desktop addition sits above it: a live **"Your estimate"** line and Build-up bar that re-count as you type.
+  - Get Estimate still opens the first card with a gap, shakes the empty field and focuses it.
+- **The result plays in place in the drawer** (mobile `416:77363`, mobile spacing). Satin and rays bloom behind the header, a bundle lands for each benefit while the total climbs, and confetti bursts from the stack. "Add more" crossfades back to the form. Apply Online and Talk to an Expert close the drawer and go on.
+- The URL follows the drawer (`#screen=subsidy-estimate` / `subsidy-estimate-result`), so a reload or panel link reopens it over Subsidy details. Closing it returns the URL to `subsidy-detail`, and leaving the page closes it.
+
 ## v0.15.3 — 23 Nov 2026 · Desktop Calculate estimate
 
 Shreya asked for it. There's no desktop frame on *-> Final Desktop*, so this adapts the mobile flow (`416:76869` form, `416:77363` result). It's flagged in the README.
