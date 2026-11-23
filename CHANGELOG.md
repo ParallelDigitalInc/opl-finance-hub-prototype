@@ -1,5 +1,26 @@
 # Changelog
 
+## v0.15.0 — 23 Nov 2026 · Desktop Govt. subsidies + collapsible sidebar
+
+Synced from Figma page *-> Final Desktop* `476:199974`.
+
+**Added**
+
+- **Govt. subsidies home** (`524:98724`):
+  - "Up to ₹72 Lakhs" hero with Capital / Interest / Other benefits
+  - **Refine your matches** card
+  - Top subsidies: Central / State / Sector / Import & Export chips; **Schemes in Gujarat** state picker (`524:99394`) with search, "States fetched from your GST registration" and a tick on the current state; Sort menu
+  - three subsidy cards with Call an Expert and Check Details
+  - the "Planning a new unit…" promo, with the mobile illustration and its motion (ground rises, factory settles, pins drop, smoke drifts)
+- **Explore subsidies for your new unit** modal (`524:99050`): state, sector, activity and size, then Find Subsidies, which opens **Subsidies for your expansion** (`524:99743`): back link, your picks as chips, Edit (reopens the modal pre-filled), six cards.
+- **Subsidy details, both Figma versions**, switchable in the panel under *Figma frames* (`#dhero=cover|blue`):
+  - **Cover photo** (`524:101843`): loom cover with emblem and "Open till 30 Sep 2029" status. The rail holds the cream estimate spotlight, where the mobile money stack lands, and the expert help card.
+  - **Blue estimate hero** (`524:101144`): emblem header and a blue estimate hero holding the policy period. The rail holds the expert help card, Application portal and Official policy website.
+  - Shared: Policy Benefits 2×2, Other benefits 2×2 and How to apply. **Benefit tiles open the mobile benefit sheets in a side drawer**, with the Activity switch live.
+- **Collapsible sidebar.** The top-bar sidebar button (or **[**) collapses the nav to a 72px icon rail; labels show as tooltips on hover, and the choice is remembered. Shreya asked for it.
+
+**Not built** (opens the mobile-view fallback): Calculate Estimate and Refine your matches. There are no desktop frames for them yet.
+
 ## v0.14.2 — 23 Nov 2026 · Overview cards stay in their grid
 
 **Fixed**
