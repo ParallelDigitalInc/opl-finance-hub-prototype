@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.10.2 — 23 Nov 2026 · Bottom sheets close on phones
+
+- **The X on subsidy benefit sheets now closes them on touch.** The X sits inside the draggable header, so on a touchscreen, pressing it started drag-to-dismiss, which captures the pointer and retargets the tap to the header, and the close never fired. Buttons inside a sheet's grip no longer start a drag. This also fixes Filters "Clear all". Dragging the header still dismisses.
+- **Bottom buttons in sheets now work on iPhones.** The page uses `viewport-fit=cover`, but sheets didn't pad for the home-indicator area, so Cancel, Later, Done and "I'll come back later" sat where iOS treats a touch as the home gesture. Sheets now add `env(safe-area-inset-bottom)`. Nothing changes where there's no inset.
+- **Tapping the dimmed area closes sheets on iOS:** the scrim gets `cursor: pointer`, which iOS needs before it fires taps on a plain element.
+
 ## v0.10.1 — 23 Nov 2026 · Collapsible prototype panel
 
 - **The prototype panel collapses for presenting.**

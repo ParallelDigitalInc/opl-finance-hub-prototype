@@ -4,7 +4,7 @@
 
 (function () {
 const OPL = (window.OPL = window.OPL || {});
-OPL.VERSION = "0.10.1";
+OPL.VERSION = "0.10.2";
 OPL.FIGMA_FILE = "https://www.figma.com/design/GHuBkYGEQZvQppv3v55EaA/OPL----Internal-Playground--5-";
 OPL.figmaLink = (nodeId) => `${OPL.FIGMA_FILE}?node-id=${nodeId.replace(":", "-")}`;
 const esc = (v) =>
@@ -931,7 +931,7 @@ document.addEventListener("keydown", (e) => { if (e.key === "Escape" && current 
 let startY = 0, dy = 0, dragging = false, t0 = 0;
 page.addEventListener("pointerdown", (e) => {
 const grip = e.target.closest("[data-sheet-drag]");
-if (!grip || !current) return;
+if (!grip || !current || e.target.closest("button")) return;
 dragging = true; startY = e.clientY; dy = 0; t0 = performance.now();
 current.classList.add("is-dragging");
 grip.setPointerCapture?.(e.pointerId);
