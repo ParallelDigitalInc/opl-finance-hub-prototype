@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.9.2 — 23 Nov 2026 · Days-left tag corner
+
+- **The "2 days left" tag on application cards** (Loans overview and Track Loans) is now clipped to the tinted lender block's 13px corner, as in Figma (`416:121716` has overflow clip). Its square top-right corner used to poke out past the curve.
+
 ## v0.9.1 — 23 Nov 2026 · Home → Track Loans
 
 - **The "Track Loans" quick action on the Finance hub home** now opens the Track Loan Applications list (`382:41059`). It pointed at an unbuilt `track-loans` id and only showed a hotspot hint. The list shows your submitted applications, or the Figma state if you haven't applied in this session, and Back returns home.

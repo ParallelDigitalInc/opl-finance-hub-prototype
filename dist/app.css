@@ -701,7 +701,7 @@ html[data-frame="off"] .screen { border-radius: 16px; }
   box-shadow: var(--shadow-s);
   overflow: hidden;
 }
-.app-card__lender { position: relative; display: flex; align-items: center; gap: var(--s12); min-height: 72px; padding: 14px var(--s4) 14px var(--s16); border-radius: 13px; background: var(--app-tint, var(--tint-blue)); }
+.app-card__lender { position: relative; display: flex; align-items: center; gap: var(--s12); min-height: 72px; padding: 14px var(--s4) 14px var(--s16); border-radius: 13px; overflow: hidden; background: var(--app-tint, var(--tint-blue)); }   /* clips the days-left tag to the 13px corner (416:121716 overflow-clip) */
 .app-card__name { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: var(--s2); white-space: nowrap; }
 .app-card__title { font-size: 16px; line-height: 22px; font-weight: var(--fw-medium); color: var(--foreground); }
 .app-card__sub { font-size: 12px; line-height: 16px; color: var(--muted-foreground); }
