@@ -9,7 +9,7 @@
 (function () {
   const OPL = (window.OPL = window.OPL || {});
 
-  OPL.VERSION = "0.9.4";
+  OPL.VERSION = "0.9.5";
   OPL.FIGMA_FILE = "https://www.figma.com/design/GHuBkYGEQZvQppv3v55EaA/OPL----Internal-Playground--5-";
   OPL.figmaLink = (nodeId) => `${OPL.FIGMA_FILE}?node-id=${nodeId.replace(":", "-")}`;
 
@@ -935,7 +935,8 @@
     let startY = 0, dy = 0, dragging = false, t0 = 0;
     page.addEventListener("pointerdown", (e) => {
       const grip = e.target.closest("[data-sheet-drag]");
-      if (!grip || !current) return;
+      // buttons inside the grip (e.g. "Clear all") keep their tap: capturing the pointer would retarget the click
+      if (!grip || !current || e.target.closest("button")) return;
       dragging = true; startY = e.clientY; dy = 0; t0 = performance.now();
       current.classList.add("is-dragging");
       grip.setPointerCapture?.(e.pointerId);

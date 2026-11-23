@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.9.5 — 23 Nov 2026 · Bottom sheets close on phones
+
+- **Sheet buttons at the bottom now work on iPhones.** The page uses `viewport-fit=cover`, but bottom sheets didn't pad for the home-indicator area, so Cancel, Later, Done and "I'll come back later" sat in the bottom 34px, where iOS treats a touch as the home gesture. Sheets now add `env(safe-area-inset-bottom)` to their bottom padding. Nothing changes on desktop or Android without an inset (still 12px and 32px, as drawn).
+- **Tapping the dimmed area closes sheets on iOS:** the scrim gets `cursor: pointer`, which iOS needs before it fires taps on a plain element.
+- **Buttons inside a sheet's draggable header** (Filters "Clear all") no longer lose their tap to drag-to-dismiss on touch.
+
 ## v0.9.4 — 23 Nov 2026 · Footer morph between sections
 
 - **The bottom nav now visibly changes when you move between sections** (Finance hub tabs ↔ Loans tabs). It used to slide away with the page, so the switch went unnoticed.

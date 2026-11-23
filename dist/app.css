@@ -787,11 +787,11 @@ html[data-frame="off"] .screen { border-radius: 16px; }
 
 /* ---- Sheet (393:851) ---------------------------------------------------- */
 .sheet-layer { position: absolute; inset: 0; z-index: 50; }
-.sheet-scrim { position: absolute; inset: 0; background: var(--scrim); opacity: 0; transition: opacity 280ms ease; }
+.sheet-scrim { position: absolute; inset: 0; background: var(--scrim); opacity: 0; transition: opacity 280ms ease; cursor: pointer; -webkit-tap-highlight-color: transparent; }   /* cursor: iOS only fires taps on "clickable" elements */
 .sheet {
   position: absolute; left: 0; right: 0; bottom: 0;
   display: flex; flex-direction: column; align-items: center;
-  padding: var(--s8) 0 32px;
+  padding: var(--s8) 0 calc(32px + env(safe-area-inset-bottom, 0px));   /* clear the iPhone home-indicator zone (viewport-fit=cover) */
   border-radius: 24px 24px 0 0;
   background: var(--surface);
   transform: translateY(100%);
@@ -1130,7 +1130,7 @@ html[data-frame="off"] .screen { border-radius: 16px; }
 .note-row__text { flex: 1 1 0; min-width: 0; font-size: 14px; line-height: 20px; color: var(--foreground); }
 
 /* ---- Apply sheet (382:41022) — rendered in the Sheet shell ------------- */
-.sheet--bare { padding: 0 0 12px; }
+.sheet--bare { padding: 0 0 calc(12px + env(safe-area-inset-bottom, 0px)); }   /* 12 as drawn + home-indicator zone on phones */
 .sheet--bare > .sheet__bare-body { align-self: stretch; }   /* full width; content sets its own gutters */
 .sheet--bare > .sheet__grip { display: none; }
 .apply { width: 100%; display: flex; flex-direction: column; gap: var(--s20); }
