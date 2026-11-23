@@ -43,7 +43,7 @@
 
     quickActions: [
       { icon: "round-graph-bold-duotone", label: "CMR<br>score", goto: "cmr-score" },
-      { icon: "bill-list-bold-duotone", label: "Track<br>Loans", goto: "track-loans" },
+      { icon: "bill-list-bold-duotone", label: "Track<br>Loans", goto: "applications" },   // → Track Loan Applications (382:41059)
       { icon: "diploma-verified-bold-duotone", label: "Debt<br>Snapshot", goto: "debt-snapshot" },
       { icon: "calendar-bold-duotone", label: "View<br>EMIs", goto: "view-emis" },
     ],

@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.9.1 — 23 Nov 2026 · Home → Track Loans
+
+- **The "Track Loans" quick action on the Finance hub home** now opens the Track Loan Applications list (`382:41059`). It pointed at an unbuilt `track-loans` id and only showed a hotspot hint. The list shows your submitted applications, or the Figma state if you haven't applied in this session, and Back returns home.
+
 ## v0.9.0 — 23 Nov 2026 · Disbursal (group F), loan journey complete
 
 Synced from Figma `435:8001` (Money on its way) and `435:8572` (Money received + Disbursed milestone sheet).
