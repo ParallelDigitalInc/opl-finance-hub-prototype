@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.9.3 — 23 Nov 2026 · Compare from anywhere
+
+- **Ticking "Compare" in a Loan details sheet on Home or Loans overview now does something.** It used to add the loan to the compare selection silently, because those screens have no compare tray.
+  - The tick pops, the sheet closes, and **Loan offers** opens.
+  - The loan's card is ticked, the compare tray slides in ("Comparing 1 of 3 loans"), and the empty slot nudges for another pick.
+  - Tick a second loan from anywhere and "Compare" is ready.
+  - Unticking stays put.
+  - On Loan offers itself nothing changes: the tray is already there.
+
 ## v0.9.2 — 23 Nov 2026 · Days-left tag corner
 
 - **The "2 days left" tag on application cards** (Loans overview and Track Loans) is now clipped to the tinted lender block's 13px corner, as in Figma (`416:121716` has overflow clip). Its square top-right corner used to poke out past the curve.

@@ -103,7 +103,18 @@
       if (window.ResizeObserver) { this._ro = new ResizeObserver(sync); this._ro.observe(floating); }
       sync();
 
-      this.paintCompare(page, false);
+      // Arriving from a Loan details "Compare" tick elsewhere: the card ticks and the tray slides in
+      // once the page has pushed in, then the empty slot nudges for a second loan.
+      if (this.arriveWithTray && this.sel.length) {
+        this.arriveWithTray = false;
+        const keep = this.sel; this.sel = []; this.paintCompare(page, false); this.sel = keep;
+        this.timers.push(setTimeout(() => {
+          if (!page.isConnected) return;
+          this.paintCompare(page, true);
+          page.querySelectorAll("[data-offer].is-selected [data-compare]").forEach((b) => { b.classList.remove("is-popping"); void b.offsetWidth; b.classList.add("is-popping"); });
+          this.timers.push(setTimeout(() => { const add = page.querySelector(".tray__add"); if (add) { add.classList.remove("is-nudge"); void add.offsetWidth; add.classList.add("is-nudge"); } }, 520));
+        }, OPL.fx.motionOff() ? 0 : 480));
+      } else this.paintCompare(page, false);
 
       page.addEventListener("click", (e) => {
         const t = e.target;

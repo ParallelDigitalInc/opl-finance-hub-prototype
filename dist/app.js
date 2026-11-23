@@ -9,7 +9,7 @@
 (function () {
   const OPL = (window.OPL = window.OPL || {});
 
-  OPL.VERSION = "0.9.2";
+  OPL.VERSION = "0.9.3";
   OPL.FIGMA_FILE = "https://www.figma.com/design/GHuBkYGEQZvQppv3v55EaA/OPL----Internal-Playground--5-";
   OPL.figmaLink = (nodeId) => `${OPL.FIGMA_FILE}?node-id=${nodeId.replace(":", "-")}`;
 
@@ -1000,8 +1000,15 @@
       if (det) return open(det.dataset.detail);
       const dc = e.target.closest("[data-detail-compare]");
       if (dc) {
-        const changed = (onCompare || defaultToggle)(dc.dataset.detailCompare, dc);
+        const id = dc.dataset.detailCompare, was = lo().sel.includes(id);
+        const changed = (onCompare || defaultToggle)(id, dc);
         if (changed) { paintFoot(); page.querySelector("[data-detail-compare]")?.classList.add("is-popping"); }
+        // Outside Loan offers there's nothing on screen to compare against: ticking takes you to
+        // Loan offers, where the compare tray holds this loan and asks for another (382:35666).
+        if (changed && !onCompare && !was) {
+          lo().arriveWithTray = true;
+          setTimeout(() => { sheets.close(); setTimeout(() => OPL.go("loan-offers", { compare: null, sheet: null }), motionOff() ? 0 : 260); }, motionOff() ? 0 : 380);
+        }
       }
     });
     return { open, paintFoot };
@@ -2419,7 +2426,18 @@ OPL.ui.DisbursedHeroSvg = '<svg class="mss" viewBox="0 0 390 196" width="390" he
       if (window.ResizeObserver) { this._ro = new ResizeObserver(sync); this._ro.observe(floating); }
       sync();
 
-      this.paintCompare(page, false);
+      // Arriving from a Loan details "Compare" tick elsewhere: the card ticks and the tray slides in
+      // once the page has pushed in, then the empty slot nudges for a second loan.
+      if (this.arriveWithTray && this.sel.length) {
+        this.arriveWithTray = false;
+        const keep = this.sel; this.sel = []; this.paintCompare(page, false); this.sel = keep;
+        this.timers.push(setTimeout(() => {
+          if (!page.isConnected) return;
+          this.paintCompare(page, true);
+          page.querySelectorAll("[data-offer].is-selected [data-compare]").forEach((b) => { b.classList.remove("is-popping"); void b.offsetWidth; b.classList.add("is-popping"); });
+          this.timers.push(setTimeout(() => { const add = page.querySelector(".tray__add"); if (add) { add.classList.remove("is-nudge"); void add.offsetWidth; add.classList.add("is-nudge"); } }, 520));
+        }, OPL.fx.motionOff() ? 0 : 480));
+      } else this.paintCompare(page, false);
 
       page.addEventListener("click", (e) => {
         const t = e.target;

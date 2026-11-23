@@ -140,8 +140,15 @@
       if (det) return open(det.dataset.detail);
       const dc = e.target.closest("[data-detail-compare]");
       if (dc) {
-        const changed = (onCompare || defaultToggle)(dc.dataset.detailCompare, dc);
+        const id = dc.dataset.detailCompare, was = lo().sel.includes(id);
+        const changed = (onCompare || defaultToggle)(id, dc);
         if (changed) { paintFoot(); page.querySelector("[data-detail-compare]")?.classList.add("is-popping"); }
+        // Outside Loan offers there's nothing on screen to compare against: ticking takes you to
+        // Loan offers, where the compare tray holds this loan and asks for another (382:35666).
+        if (changed && !onCompare && !was) {
+          lo().arriveWithTray = true;
+          setTimeout(() => { sheets.close(); setTimeout(() => OPL.go("loan-offers", { compare: null, sheet: null }), motionOff() ? 0 : 260); }, motionOff() ? 0 : 380);
+        }
       }
     });
     return { open, paintFoot };
