@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.5.2 — 23 Nov 2026 · Loan cards clickable everywhere
+
+- **"Top loan matches" cards on Home and the Loans overview offer cards** now open the Loan details sheet instead of a hotspot hint.
+- **The sheet is now one shared helper** (`OPL.fx.loanDetail`) used by Home, Loans overview and Loan offers. `OPL.data.loanCatalog` maps card ids to their data; `MatchCard` takes a `detail` id.
+- **Compare in the sheet uses the Loan offers selection,** so a tick on Home appears on Loan offers (cards plus tray). Loans not in the Loan offers list hide Compare (`LoanDetailFoot({ compare: false })`).
+- **Bank of Baroda** has a detail record built from assumed placeholder values.
+
 ## v0.5.1 — 23 Nov 2026 · Loading guardrail
 
 Measured in the preview pane:

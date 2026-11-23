@@ -180,6 +180,9 @@ All of this is behaviour on existing elements. None of it adds UI:
    - a footer with Compare (synced with the card and tray) and "Apply now"
 
    Card values win where card and Compare data differ. Needs a Figma frame to become source of truth.
+   - **v0.5.2:** the same sheet (`OPL.fx.loanDetail`) opens from Home's "Top loan matches" and the Loans overview offer cards.
+   - Compare is one shared selection: ticking on Home shows up on Loan offers.
+   - Bank of Baroda isn't in the Loan offers list, so its sheet has no Compare, and its APR, EMI, fee, collateral and Money in are **assumed placeholders** (`match-bob`).
 
 ## Versioning
 

@@ -160,8 +160,8 @@
      MatchCard — "Top loan/subsidy matches" card (loan 382:34123, subsidy 382:34197)
      figures: [{label, value, unit?}]   size: "md" (Home, 16px title) | "lg" (Loans overview, 18px)
      ------------------------------------------------------------------------ */
-  ui.MatchCard = ({ kind, tag, tint, logo, title, subtitle, figures, goto, size = "md" }) => html`
-    <article class="${cx("match", `match--${kind}`, size === "lg" && "match--lg")}" style="--tint:${tint}" data-press ${goto ? OPL.raw(`data-goto="${goto}"`) : ""}>
+  ui.MatchCard = ({ kind, tag, tint, logo, title, subtitle, figures, goto, detail, size = "md" }) => html`
+    <article class="${cx("match", `match--${kind}`, size === "lg" && "match--lg")}" style="--tint:${tint}" data-press ${detail ? OPL.raw(`data-detail="${detail}"`) : goto ? OPL.raw(`data-goto="${goto}"`) : ""}>
       <div class="match__head">
         <span class="match__tag">${tag}</span>
         <div class="match__id">
@@ -323,12 +323,13 @@
         <div class="detail__rows">${rows.map(([l, v]) => OPL.raw(`<div class="offer__row"><span>${l}</span><span>${v}</span></div>`))}</div>
       </div>`;
   };
-  ui.LoanDetailFoot = ({ id, selected }) => html`
+  /* compare: false hides the checkbox (loan isn't in the Loan offers list) */
+  ui.LoanDetailFoot = ({ id, selected, compare = true }) => html`
     <div class="detail__foot">
-      <button class="offer__compare" data-detail-compare="${id}" aria-pressed="${selected}">
+      ${compare ? OPL.raw(`<button class="offer__compare" data-detail-compare="${id}" aria-pressed="${selected}">
         <img class="ico offer__check" src="assets/icons/${selected ? "check-square-checked" : "check-square"}.svg" width="24" height="24" alt="">
         <span>Compare</span>
-      </button>
+      </button>`) : ""}
       ${ui.Button({ label: "Apply now", trailing: "chevron-right-white", goto: "apply-loan", attrs: 'style="flex:1"' })}
     </div>`;
 

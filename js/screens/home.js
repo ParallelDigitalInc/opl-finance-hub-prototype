@@ -108,6 +108,9 @@
       let index = startIndex;
       const counted = new Set();
 
+      /* Loan details sheet from "Top loan matches" cards (shared with Loan offers) */
+      OPL.fx.loanDetail(screen, OPL.fx.sheets(screen));
+
       /* status bar surface on scroll */
       scroller.addEventListener("scroll", () => screen.classList.toggle("is-scrolled", scroller.scrollTop > 8), { passive: true });
 

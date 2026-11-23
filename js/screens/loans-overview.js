@@ -61,6 +61,7 @@
 
     wire(page, d) {
       OPL.fx.statusOnScroll(page);
+      OPL.fx.loanDetail(page, OPL.fx.sheets(page));   // offer cards open Loan details
       page.querySelectorAll(".rail").forEach(OPL.fx.mouseDrag);
       OPL.fx.playInView(page, ".tracker, .borrow");
       OPL.fx.nudge(page, this.timers);

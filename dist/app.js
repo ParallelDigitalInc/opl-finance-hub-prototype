@@ -9,7 +9,7 @@
 (function () {
   const OPL = (window.OPL = window.OPL || {});
 
-  OPL.VERSION = "0.5.1";
+  OPL.VERSION = "0.5.2";
   OPL.FIGMA_FILE = "https://www.figma.com/design/GHuBkYGEQZvQppv3v55EaA/OPL----Internal-Playground--5-";
   OPL.figmaLink = (nodeId) => `${OPL.FIGMA_FILE}?node-id=${nodeId.replace(":", "-")}`;
 
@@ -295,8 +295,8 @@
      MatchCard — "Top loan/subsidy matches" card (loan 382:34123, subsidy 382:34197)
      figures: [{label, value, unit?}]   size: "md" (Home, 16px title) | "lg" (Loans overview, 18px)
      ------------------------------------------------------------------------ */
-  ui.MatchCard = ({ kind, tag, tint, logo, title, subtitle, figures, goto, size = "md" }) => html`
-    <article class="${cx("match", `match--${kind}`, size === "lg" && "match--lg")}" style="--tint:${tint}" data-press ${goto ? OPL.raw(`data-goto="${goto}"`) : ""}>
+  ui.MatchCard = ({ kind, tag, tint, logo, title, subtitle, figures, goto, detail, size = "md" }) => html`
+    <article class="${cx("match", `match--${kind}`, size === "lg" && "match--lg")}" style="--tint:${tint}" data-press ${detail ? OPL.raw(`data-detail="${detail}"`) : goto ? OPL.raw(`data-goto="${goto}"`) : ""}>
       <div class="match__head">
         <span class="match__tag">${tag}</span>
         <div class="match__id">
@@ -458,12 +458,13 @@
         <div class="detail__rows">${rows.map(([l, v]) => OPL.raw(`<div class="offer__row"><span>${l}</span><span>${v}</span></div>`))}</div>
       </div>`;
   };
-  ui.LoanDetailFoot = ({ id, selected }) => html`
+  /* compare: false hides the checkbox (loan isn't in the Loan offers list) */
+  ui.LoanDetailFoot = ({ id, selected, compare = true }) => html`
     <div class="detail__foot">
-      <button class="offer__compare" data-detail-compare="${id}" aria-pressed="${selected}">
+      ${compare ? OPL.raw(`<button class="offer__compare" data-detail-compare="${id}" aria-pressed="${selected}">
         <img class="ico offer__check" src="assets/icons/${selected ? "check-square-checked" : "check-square"}.svg" width="24" height="24" alt="">
         <span>Compare</span>
-      </button>
+      </button>`) : ""}
       ${ui.Button({ label: "Apply now", trailing: "chevron-right-white", goto: "apply-loan", attrs: 'style="flex:1"' })}
     </div>`;
 
@@ -715,6 +716,56 @@
     return { open, close, isOpen: () => !!current };
   };
 
+  /* Loan details sheet (proposed), shared by Home, Loans overview and Loan offers.
+     Any [data-detail="<catalog id>"] opens it. Compare state is the Loan offers
+     selection, so ticking here shows up there. onCompare(id, btn) lets a screen
+     handle the toggle itself (Loan offers repaints its cards + tray); it returns
+     true if the selection changed. */
+  fx.loanDetail = (page, sheets, { onCompare } = {}) => {
+    const { ui } = OPL;
+    page.insertAdjacentHTML("beforeend", ui.Sheet({
+      id: "detail", title: "Loan details",
+      body: OPL.raw(`<div class="sheet-detail" data-detail-body></div>`),
+      footer: OPL.raw(`<div data-detail-foot></div>`),
+    }).toString());
+    const list = () => { const d = OPL.data.loanOffers; return [...d.picks, ...d.offers]; };
+    const lo = () => OPL.screens["loan-offers"];
+    let current = null;
+    const paintFoot = () => {
+      if (!current) return;
+      page.querySelector("[data-detail-foot]").innerHTML = ui.LoanDetailFoot({
+        id: current, selected: lo().sel.includes(current), compare: list().some((c) => c.id === current),
+      }).toString();
+    };
+    const defaultToggle = (id, btn) => {
+      const s = lo();
+      if (s.sel.includes(id)) { s.sel = s.sel.filter((x) => x !== id); return true; }
+      if (s.sel.length >= OPL.data.loanOffers.compareMax) { btn.classList.remove("is-shake"); void btn.offsetWidth; btn.classList.add("is-shake"); return false; }
+      s.sel = [...s.sel, id]; return true;
+    };
+    const open = (id) => {
+      const offer = OPL.data.loanCatalog[id];
+      if (!offer) return;
+      const cl = OPL.data.compareLoans;
+      const body = page.querySelector("[data-detail-body]");
+      body.innerHTML = ui.LoanDetail({ offer, record: cl.records[cl.aliases[id] || id] }).toString();
+      body.scrollTop = 0;
+      current = id;
+      paintFoot();
+      sheets.open("detail");
+    };
+    page.addEventListener("click", (e) => {
+      const det = e.target.closest("[data-detail]");
+      if (det) return open(det.dataset.detail);
+      const dc = e.target.closest("[data-detail-compare]");
+      if (dc) {
+        const changed = (onCompare || defaultToggle)(dc.dataset.detailCompare, dc);
+        if (changed) { paintFoot(); page.querySelector("[data-detail-compare]")?.classList.add("is-popping"); }
+      }
+    });
+    return { open, paintFoot };
+  };
+
   /* Drag-to-scroll with a mouse (presenting on a laptop). */
   fx.mouseDrag = (el) => {
     let down = false, sx = 0, sl = 0, moved = false;
@@ -938,20 +989,20 @@
           kind: "loan", tag: "Collateral-free", tint: "var(--tint-blue)", logo: "citi",
           title: "Citi Bank", subtitle: "Working Capital Loan",
           figures: [{ label: "Loan up to", value: "₹50 L" }, { label: "Interest", value: "9.45%", unit: "p.a." }],
-          goto: "loan-detail",
+          detail: "pick-citi",
         },
         {
           kind: "loan", tag: "Working Capital Loan", tint: "var(--tint-peach)", logo: "bob",
           title: "Bank of Baroda", subtitle: "Working Capital Loan",
           figures: [{ label: "Loan up to", value: "₹50 L" }, { label: "Interest", value: "9.45%", unit: "p.a." }],
-          goto: "loan-detail",
+          detail: "match-bob",
         },
         {
           // Loan offers "Top 3 picks" 382:35360
           kind: "loan", tag: "Collateral-free", tint: "var(--tint-pink)", logo: "axis",
           title: "Axis Bank", subtitle: "Working Capital Loan",
           figures: [{ label: "Loan up to", value: "₹50 L" }, { label: "Interest", value: "9.45%", unit: "p.a." }],
-          goto: "loan-detail",
+          detail: "pick-axis",
         },
       ],
     },
@@ -1044,20 +1095,20 @@
         kind: "loan", tag: "Collateral-free", tint: "var(--tint-blue)", logo: "citi",
         title: "Citi Bank", subtitle: "Working Capital Loan",
         figures: [{ label: "Loan up to", value: "₹50 L" }, { label: "Interest", value: "9.45%", unit: "p.a." }],
-        goto: "loan-detail",
+        detail: "pick-citi",
       },
       {
         kind: "loan", tag: "Working Capital Loan", tint: "var(--tint-peach)", logo: "bob",
         title: "Bank of Baroda", subtitle: "Working Capital Loan",
         figures: [{ label: "Loan up to", value: "₹50 L" }, { label: "Interest", value: "9.45%", unit: "p.a." }],
-        goto: "loan-detail",
+        detail: "match-bob",
       },
       {
         // Third card on request (23 Nov) — same Axis offer as Home / Loan offers 382:35360
         kind: "loan", tag: "Collateral-free", tint: "var(--tint-pink)", logo: "axis",
         title: "Axis Bank", subtitle: "Working Capital Loan",
         figures: [{ label: "Loan up to", value: "₹50 L" }, { label: "Interest", value: "9.45%", unit: "p.a." }],
-        goto: "loan-detail",
+        detail: "pick-axis",
       },
     ],
     offersCta: { label: "See all loans (7)", goto: "loan-offers" },
@@ -1242,6 +1293,13 @@
           emi: "₹1.51 L/mo", fee: "1%", collateral: ["Needed", "Property"], money: "~6-8 days" },
         assumed: ["apr", "fee", "collateral", "money"],
       },
+      // Bank of Baroda (Home / Loans overview card 382:34149). ASSUMED (placeholder): apr, emi, fee, collateral, money.
+      "match-bob": {
+        name: "Bank of Baroda", logo: "bob", tint: "var(--tint-peach)",
+        values: { type: "Working capital loan", amount: "Up to ₹50 L", interest: "9.45% p.a.", apr: "10.80%", tenure: "Renews yearly",
+          emi: "₹1.58 L/mo", fee: "1%", collateral: ["Not needed", "CGTMSE"], money: "~4-6 days" },
+        assumed: ["apr", "emi", "fee", "collateral", "money"],
+      },
       "offer-hdfc": {
         name: "HDFC Bank", logo: "hdfcMark", tint: "var(--tint-blue)",
         values: { type: "Cash credit limit", amount: "Up to ₹50 L", interest: "9.45% p.a.", apr: "10.95%", tenure: "Renews yearly",
@@ -1259,6 +1317,19 @@
     pickLabel: "Pick your loan",
     cta: (n) => `Apply to ${n} lender${n === 1 ? "" : "s"}`,
   };
+
+  /* Every loan card that can open "Loan details", by id. Loan offers cards + the
+     Bank of Baroda card that only appears on Home / Loans overview. */
+  const lo = OPL.data.loanOffers;
+  OPL.data.loanCatalog = Object.fromEntries([
+    ...lo.picks, ...lo.offers,
+    {
+      id: "match-bob", logo: "bob", tint: "var(--tint-peach)",
+      tags: [{ text: "Working Capital Loan", tone: "blue" }],
+      title: "Bank of Baroda", subtitle: "Working Capital Loan", figures: fig(),
+      details: [["Tenure", "Renews yearly"]],   // fee/EMI etc. come from the (assumed) record
+    },
+  ].map((c) => [c.id, c]));
 })();
 
 ;
@@ -1373,6 +1444,9 @@
       const startIndex = v.order === "subsidies" ? 1 : 0;
       let index = startIndex;
       const counted = new Set();
+
+      /* Loan details sheet from "Top loan matches" cards (shared with Loan offers) */
+      OPL.fx.loanDetail(screen, OPL.fx.sheets(screen));
 
       /* status bar surface on scroll */
       scroller.addEventListener("scroll", () => screen.classList.toggle("is-scrolled", scroller.scrollTop > 8), { passive: true });
@@ -1613,6 +1687,7 @@
 
     wire(page, d) {
       OPL.fx.statusOnScroll(page);
+      OPL.fx.loanDetail(page, OPL.fx.sheets(page));   // offer cards open Loan details
       page.querySelectorAll(".rail").forEach(OPL.fx.mouseDrag);
       OPL.fx.playInView(page, ".tracker, .borrow");
       OPL.fx.nudge(page, this.timers);
@@ -1665,7 +1740,9 @@
       // Presets reset the interactive state only when the preset itself changes.
       const presetKey = `${v.compare}|${v.sheet}`;
       if (presetKey !== this._lastPreset) {
-        this.sel = v.compare === "figma" ? [...d.compareFigmaSelected] : [];
+        // first visit keeps anything ticked from a Loan details sheet elsewhere
+        if (v.compare === "figma") this.sel = [...d.compareFigmaSelected];
+        else if (this._lastPreset !== null) this.sel = [];
         this.sort = this.sort || d.sortOptions[0];
         this.filters = new Set(d.filtersFigmaSelected);
         this._lastPreset = presetKey;
@@ -1713,7 +1790,7 @@
               <div class="filter-group__chips">${g.options.map((o) => ui.Chip({ label: o, bordered: true, selected: this.filters.has(o), attrs: `data-filter="${o}"` })).join("")}</div></div>`))}</div>`,
           footer: ui.Button({ label: d.filtersCta, block: true, attrs: "data-sheet-done" }),
         })}
-        ${ui.Sheet({ id: "detail", title: "Loan details", body: OPL.raw(`<div class="sheet-detail" data-detail-body></div>`), footer: OPL.raw(`<div data-detail-foot></div>`) })}`;
+`;
 
       this.wire(page, d, v);
     },
@@ -1724,6 +1801,9 @@
       OPL.fx.nudge(page, this.timers);
 
       const sheets = OPL.fx.sheets(page, { onClose: () => OPL.state.set({ sheet: null }, { silent: true }) });
+      OPL.fx.loanDetail(page, sheets, {
+        onCompare: (id, btn) => { const was = this.sel.includes(id); this.toggleCompare(page, id, btn); return this.sel.includes(id) !== was; },
+      });
       if (v.sheet !== "none") sheets.open(v.sheet, { instant: true });
 
       // keep the list clear of the floating bottom (172 → 167 as drawn; tray → +10)
@@ -1737,18 +1817,6 @@
 
       page.addEventListener("click", (e) => {
         const t = e.target;
-        const det = t.closest("[data-detail]");
-        if (det) return this.openDetail(page, det.dataset.detail, sheets);
-        const dc = t.closest("[data-detail-compare]");
-        if (dc) {
-          const id = dc.dataset.detailCompare, was = this.sel.includes(id);
-          this.toggleCompare(page, id, dc);          // full → shakes this button + the tray
-          if (this.sel.includes(id) !== was) {
-            this.paintDetailFoot(page);
-            page.querySelector("[data-detail-compare]").classList.add("is-popping");
-          }
-          return;
-        }
         const cmp = t.closest("[data-compare]");
         if (cmp) return this.toggleCompare(page, cmp.dataset.compare, cmp);
         const rm = t.closest("[data-compare-remove]");
@@ -1787,22 +1855,6 @@
         page.querySelector(".lof-chips"),
         ...[...page.querySelectorAll(".lof-list .offer")].slice(0, 2),
       ]);
-    },
-
-    /* Loan details sheet (proposed): the tapped card, expanded. */
-    openDetail(page, id, sheets) {
-      const offer = this.allCards().find((c) => c.id === id);
-      const cl = OPL.data.compareLoans;
-      const record = cl.records[cl.aliases[id] || id];
-      page.querySelector("[data-detail-body]").innerHTML = ui.LoanDetail({ offer, record }).toString();
-      page.querySelector("[data-detail-body]").scrollTop = 0;
-      this.detailId = id;
-      this.paintDetailFoot(page);
-      sheets.open("detail");
-    },
-    paintDetailFoot(page) {
-      if (!this.detailId) return;
-      page.querySelector("[data-detail-foot]").innerHTML = ui.LoanDetailFoot({ id: this.detailId, selected: this.sel.includes(this.detailId) }).toString();
     },
 
     toggleCompare(page, id, btn) {

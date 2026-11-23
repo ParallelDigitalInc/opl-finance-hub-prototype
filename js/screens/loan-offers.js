@@ -29,7 +29,9 @@
       // Presets reset the interactive state only when the preset itself changes.
       const presetKey = `${v.compare}|${v.sheet}`;
       if (presetKey !== this._lastPreset) {
-        this.sel = v.compare === "figma" ? [...d.compareFigmaSelected] : [];
+        // first visit keeps anything ticked from a Loan details sheet elsewhere
+        if (v.compare === "figma") this.sel = [...d.compareFigmaSelected];
+        else if (this._lastPreset !== null) this.sel = [];
         this.sort = this.sort || d.sortOptions[0];
         this.filters = new Set(d.filtersFigmaSelected);
         this._lastPreset = presetKey;
@@ -77,7 +79,7 @@
               <div class="filter-group__chips">${g.options.map((o) => ui.Chip({ label: o, bordered: true, selected: this.filters.has(o), attrs: `data-filter="${o}"` })).join("")}</div></div>`))}</div>`,
           footer: ui.Button({ label: d.filtersCta, block: true, attrs: "data-sheet-done" }),
         })}
-        ${ui.Sheet({ id: "detail", title: "Loan details", body: OPL.raw(`<div class="sheet-detail" data-detail-body></div>`), footer: OPL.raw(`<div data-detail-foot></div>`) })}`;
+`;
 
       this.wire(page, d, v);
     },
@@ -88,6 +90,9 @@
       OPL.fx.nudge(page, this.timers);
 
       const sheets = OPL.fx.sheets(page, { onClose: () => OPL.state.set({ sheet: null }, { silent: true }) });
+      OPL.fx.loanDetail(page, sheets, {
+        onCompare: (id, btn) => { const was = this.sel.includes(id); this.toggleCompare(page, id, btn); return this.sel.includes(id) !== was; },
+      });
       if (v.sheet !== "none") sheets.open(v.sheet, { instant: true });
 
       // keep the list clear of the floating bottom (172 → 167 as drawn; tray → +10)
@@ -101,18 +106,6 @@
 
       page.addEventListener("click", (e) => {
         const t = e.target;
-        const det = t.closest("[data-detail]");
-        if (det) return this.openDetail(page, det.dataset.detail, sheets);
-        const dc = t.closest("[data-detail-compare]");
-        if (dc) {
-          const id = dc.dataset.detailCompare, was = this.sel.includes(id);
-          this.toggleCompare(page, id, dc);          // full → shakes this button + the tray
-          if (this.sel.includes(id) !== was) {
-            this.paintDetailFoot(page);
-            page.querySelector("[data-detail-compare]").classList.add("is-popping");
-          }
-          return;
-        }
         const cmp = t.closest("[data-compare]");
         if (cmp) return this.toggleCompare(page, cmp.dataset.compare, cmp);
         const rm = t.closest("[data-compare-remove]");
@@ -151,22 +144,6 @@
         page.querySelector(".lof-chips"),
         ...[...page.querySelectorAll(".lof-list .offer")].slice(0, 2),
       ]);
-    },
-
-    /* Loan details sheet (proposed): the tapped card, expanded. */
-    openDetail(page, id, sheets) {
-      const offer = this.allCards().find((c) => c.id === id);
-      const cl = OPL.data.compareLoans;
-      const record = cl.records[cl.aliases[id] || id];
-      page.querySelector("[data-detail-body]").innerHTML = ui.LoanDetail({ offer, record }).toString();
-      page.querySelector("[data-detail-body]").scrollTop = 0;
-      this.detailId = id;
-      this.paintDetailFoot(page);
-      sheets.open("detail");
-    },
-    paintDetailFoot(page) {
-      if (!this.detailId) return;
-      page.querySelector("[data-detail-foot]").innerHTML = ui.LoanDetailFoot({ id: this.detailId, selected: this.sel.includes(this.detailId) }).toString();
     },
 
     toggleCompare(page, id, btn) {

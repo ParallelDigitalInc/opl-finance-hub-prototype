@@ -135,6 +135,13 @@
           emi: "₹1.51 L/mo", fee: "1%", collateral: ["Needed", "Property"], money: "~6-8 days" },
         assumed: ["apr", "fee", "collateral", "money"],
       },
+      // Bank of Baroda (Home / Loans overview card 382:34149). ASSUMED (placeholder): apr, emi, fee, collateral, money.
+      "match-bob": {
+        name: "Bank of Baroda", logo: "bob", tint: "var(--tint-peach)",
+        values: { type: "Working capital loan", amount: "Up to ₹50 L", interest: "9.45% p.a.", apr: "10.80%", tenure: "Renews yearly",
+          emi: "₹1.58 L/mo", fee: "1%", collateral: ["Not needed", "CGTMSE"], money: "~4-6 days" },
+        assumed: ["apr", "emi", "fee", "collateral", "money"],
+      },
       "offer-hdfc": {
         name: "HDFC Bank", logo: "hdfcMark", tint: "var(--tint-blue)",
         values: { type: "Cash credit limit", amount: "Up to ₹50 L", interest: "9.45% p.a.", apr: "10.95%", tenure: "Renews yearly",
@@ -152,4 +159,17 @@
     pickLabel: "Pick your loan",
     cta: (n) => `Apply to ${n} lender${n === 1 ? "" : "s"}`,
   };
+
+  /* Every loan card that can open "Loan details", by id. Loan offers cards + the
+     Bank of Baroda card that only appears on Home / Loans overview. */
+  const lo = OPL.data.loanOffers;
+  OPL.data.loanCatalog = Object.fromEntries([
+    ...lo.picks, ...lo.offers,
+    {
+      id: "match-bob", logo: "bob", tint: "var(--tint-peach)",
+      tags: [{ text: "Working Capital Loan", tone: "blue" }],
+      title: "Bank of Baroda", subtitle: "Working Capital Loan", figures: fig(),
+      details: [["Tenure", "Renews yearly"]],   // fee/EMI etc. come from the (assumed) record
+    },
+  ].map((c) => [c.id, c]));
 })();

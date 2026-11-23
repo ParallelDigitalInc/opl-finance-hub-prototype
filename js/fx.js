@@ -97,6 +97,56 @@
     return { open, close, isOpen: () => !!current };
   };
 
+  /* Loan details sheet (proposed), shared by Home, Loans overview and Loan offers.
+     Any [data-detail="<catalog id>"] opens it. Compare state is the Loan offers
+     selection, so ticking here shows up there. onCompare(id, btn) lets a screen
+     handle the toggle itself (Loan offers repaints its cards + tray); it returns
+     true if the selection changed. */
+  fx.loanDetail = (page, sheets, { onCompare } = {}) => {
+    const { ui } = OPL;
+    page.insertAdjacentHTML("beforeend", ui.Sheet({
+      id: "detail", title: "Loan details",
+      body: OPL.raw(`<div class="sheet-detail" data-detail-body></div>`),
+      footer: OPL.raw(`<div data-detail-foot></div>`),
+    }).toString());
+    const list = () => { const d = OPL.data.loanOffers; return [...d.picks, ...d.offers]; };
+    const lo = () => OPL.screens["loan-offers"];
+    let current = null;
+    const paintFoot = () => {
+      if (!current) return;
+      page.querySelector("[data-detail-foot]").innerHTML = ui.LoanDetailFoot({
+        id: current, selected: lo().sel.includes(current), compare: list().some((c) => c.id === current),
+      }).toString();
+    };
+    const defaultToggle = (id, btn) => {
+      const s = lo();
+      if (s.sel.includes(id)) { s.sel = s.sel.filter((x) => x !== id); return true; }
+      if (s.sel.length >= OPL.data.loanOffers.compareMax) { btn.classList.remove("is-shake"); void btn.offsetWidth; btn.classList.add("is-shake"); return false; }
+      s.sel = [...s.sel, id]; return true;
+    };
+    const open = (id) => {
+      const offer = OPL.data.loanCatalog[id];
+      if (!offer) return;
+      const cl = OPL.data.compareLoans;
+      const body = page.querySelector("[data-detail-body]");
+      body.innerHTML = ui.LoanDetail({ offer, record: cl.records[cl.aliases[id] || id] }).toString();
+      body.scrollTop = 0;
+      current = id;
+      paintFoot();
+      sheets.open("detail");
+    };
+    page.addEventListener("click", (e) => {
+      const det = e.target.closest("[data-detail]");
+      if (det) return open(det.dataset.detail);
+      const dc = e.target.closest("[data-detail-compare]");
+      if (dc) {
+        const changed = (onCompare || defaultToggle)(dc.dataset.detailCompare, dc);
+        if (changed) { paintFoot(); page.querySelector("[data-detail-compare]")?.classList.add("is-popping"); }
+      }
+    });
+    return { open, paintFoot };
+  };
+
   /* Drag-to-scroll with a mouse (presenting on a laptop). */
   fx.mouseDrag = (el) => {
     let down = false, sx = 0, sl = 0, moved = false;

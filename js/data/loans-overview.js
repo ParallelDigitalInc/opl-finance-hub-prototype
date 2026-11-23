@@ -21,20 +21,20 @@
         kind: "loan", tag: "Collateral-free", tint: "var(--tint-blue)", logo: "citi",
         title: "Citi Bank", subtitle: "Working Capital Loan",
         figures: [{ label: "Loan up to", value: "₹50 L" }, { label: "Interest", value: "9.45%", unit: "p.a." }],
-        goto: "loan-detail",
+        detail: "pick-citi",
       },
       {
         kind: "loan", tag: "Working Capital Loan", tint: "var(--tint-peach)", logo: "bob",
         title: "Bank of Baroda", subtitle: "Working Capital Loan",
         figures: [{ label: "Loan up to", value: "₹50 L" }, { label: "Interest", value: "9.45%", unit: "p.a." }],
-        goto: "loan-detail",
+        detail: "match-bob",
       },
       {
         // Third card on request (23 Nov) — same Axis offer as Home / Loan offers 382:35360
         kind: "loan", tag: "Collateral-free", tint: "var(--tint-pink)", logo: "axis",
         title: "Axis Bank", subtitle: "Working Capital Loan",
         figures: [{ label: "Loan up to", value: "₹50 L" }, { label: "Interest", value: "9.45%", unit: "p.a." }],
-        goto: "loan-detail",
+        detail: "pick-axis",
       },
     ],
     offersCta: { label: "See all loans (7)", goto: "loan-offers" },
