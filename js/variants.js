@@ -64,14 +64,14 @@
         {
           id: "note",
           label: "Page-end note",
-          default: "off",
+          default: "trust",
           options: [
-            { value: "off", label: "None" },
+            { value: "trust", label: "Trust" },
             { value: "indicative", label: "Indicative" },
             { value: "caughtup", label: "Caught up" },
-            { value: "trust", label: "Trust" },
+            { value: "off", label: "None" },
           ],
-          note: "Proposed copy — not in Figma yet.",
+          note: "Proposed — not in Figma yet. Trust claims need OPL sign-off.",
         },
         {
           id: "heroBg",

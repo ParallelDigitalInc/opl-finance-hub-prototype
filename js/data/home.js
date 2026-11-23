@@ -117,9 +117,9 @@
 
     // Page-end note options (picked in the panel; see variants.js)
     pageNotes: {
-      indicative: ["Rates and amounts are indicative", "Final terms are set by the lender after review"],
-      caughtup: ["You're all caught up", "New matches appear as your business profile grows"],
-      trust: ["Offers from RBI-regulated banks and NBFCs", "Your data is shared only with your consent"],
+      trust: { tone: "trust", icon: "shield-check-bold-duotone", lines: ["Offers from RBI-regulated banks and NBFCs", "Your data is shared only with your consent"] },
+      indicative: { lines: ["Rates and amounts are indicative", "Final terms are set by the lender after review"] },
+      caughtup: { lines: ["You're all caught up", "New matches appear as your business profile grows"] },
     },
 
     emi: {

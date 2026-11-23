@@ -41,6 +41,8 @@
   /* ---- Colour · status -------------------------------------------------- */
   --warning-bg: #ffedd5;              /* bg/warning-primary */
   --warning-fg: #a16207;              /* color-yellow-700 */
+  --trust: #16a34a;                   /* green-600 — trust icon (proposed, not in DS yet) */
+  --trust-fg: #15803d;                /* green-700 — trust line (proposed) */
 
   /* ---- Typography ------------------------------------------------------- */
   --font: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;

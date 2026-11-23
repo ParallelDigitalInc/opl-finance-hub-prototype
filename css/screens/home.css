@@ -84,10 +84,11 @@
 .home .help { margin: var(--section-gap) var(--gutter) 0; }
 
 /* ---- Page-end note (optional, see variants) -------------------------- */
-.home.has-note { padding-bottom: 196px; } /* clears the 172px floating bottom */
+.home.has-note { padding-bottom: calc(var(--floating-h, 172px) + 24px); transition: padding-bottom var(--dur-base) var(--ease-out); } /* clears the floating bottom (172, or 246 with the EMI banner) */
 .page-note { margin: 32px var(--gutter) 0; display: grid; gap: var(--s2); justify-items: center; text-align: center; }
 .page-note p { max-width: 300px; font-size: 12px; line-height: 16px; color: var(--tertiary-foreground); text-wrap: balance; }
-.page-note p:first-child { font-weight: var(--fw-medium); color: var(--muted-foreground); }
+.page-note .page-note__lead { display: inline-flex; align-items: center; gap: var(--s4); font-weight: var(--fw-medium); color: var(--muted-foreground); }
+.page-note--trust .page-note__lead { color: var(--trust-fg); }
 
 /* ---- Entrance choreography -------------------------------------------- */
 .enter { --i: 0; }

@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.2.1 — 23 Nov 2026 · Trust footer
+
+- The page-end note defaults to **Trust**: "Offers from RBI-regulated banks and NBFCs" · "Your data is shared only with your consent".
+- It uses the Solar *Shield Check* icon (Bold Duotone, from Iconify `solar:shield-check-bold-duotone`), with the back layer at 0.3 like the screen's other duotones.
+- New proposed tokens: `--trust #16A34A` (icon) and `--trust-fg #15803D` (lead line). The second line stays tertiary slate.
+- `PageNote` gains `tone` and `icon` props.
+- The footer's bottom spacing follows the floating bottom's height, so it clears the nav with or without the EMI banner.
+
 ## v0.2.0 — 23 Nov 2026 · Home: motion and content
 
 **Added**

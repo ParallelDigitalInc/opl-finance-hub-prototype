@@ -76,7 +76,7 @@
             <div class="quick">${d.quickActions.map((q) => ui.QuickAction(q))}</div>
             ${sections}
             ${ui.HelpCard(d.help)}
-            ${v.note !== "off" ? ui.PageNote({ lines: d.pageNotes[v.note] }) : ""}
+            ${v.note !== "off" ? ui.PageNote(d.pageNotes[v.note]) : ""}
           </main>
         </div>
         <div class="floating">
@@ -91,7 +91,10 @@
     },
 
     _timers: [],
-    _clearTimers() { this._timers.forEach((t) => { clearTimeout(t); clearInterval(t); }); this._timers = []; },
+    _clearTimers() {
+      this._timers.forEach((t) => { clearTimeout(t); clearInterval(t); }); this._timers = [];
+      (this._observers || []).forEach((o) => o.disconnect()); this._observers = [];
+    },
 
     wire(screen, v) {
       this._clearTimers();
@@ -157,6 +160,13 @@
           setTimeout(() => slot.classList.add("is-gone"), 180);
         });
       }
+
+      /* keep the page-end note clear of the floating bottom, whatever its height */
+      const floating = screen.querySelector(".floating");
+      const homeEl = screen.querySelector(".home");
+      const syncFloat = () => homeEl.style.setProperty("--floating-h", floating.offsetHeight + "px");
+      syncFloat();
+      if (window.ResizeObserver) { const ro = new ResizeObserver(syncFloat); ro.observe(floating); this._observers = [...(this._observers || []), ro]; }
 
       /* hero offer cards: cycle the stack on the visible slide */
       let heroHeld = false;

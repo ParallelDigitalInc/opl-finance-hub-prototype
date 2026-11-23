@@ -13,6 +13,7 @@
     "Surfaces & strokes": ["--surface", "--muted", "--tile", "--border", "--border-subtle", "--neutral-border", "--icon-subtle"],
     "Hero & tints": ["--hero-bg", "--hero-fact-bg", "--tint-blue", "--tint-peach", "--tint-peach-soft", "--help-bg", "--badge-bg"],
     "Status": ["--warning-bg", "--warning-fg"],
+    "Trust (proposed)": ["--trust", "--trust-fg"],
   };
   const TYPE = [
     ["h2 · hero amount", "600 30/36 −0.4", "font:600 30px/36px var(--font);letter-spacing:-0.4px", "₹72 Lakhs"],
@@ -30,7 +31,7 @@
   const ICONS = ["round-graph-bold-duotone", "bill-list-bold-duotone", "diploma-verified-bold-duotone", "calendar-bold-duotone",
     "settings-bold-duotone", "cpu-bold-duotone", "verified-check-bold-duotone", "money-bag-bold-duotone", "calendar-mark-bold",
     "phone-calling-bold", "bell-linear", "headphones-round-sound-linear", "home-angle-linear", "shop-linear", "course-up-linear",
-    "chevron-right-primary", "chevron-right-white", "x", "ai-mitra-logo"];
+    "chevron-right-primary", "chevron-right-white", "x", "ai-mitra-logo", "shield-check-bold-duotone"];
   // Logos: citi, bob, msme, gujarat (Figma, Finance Home); axis (Figma, Loan offers); gujaratGovt (Wikimedia Commons)
 
   const COMPONENTS = [
@@ -93,7 +94,7 @@
     },
     {
       name: "PageNote", node: "proposed", use: "Quiet sign-off at the end of a scrolling page. Proposed — not in Figma yet.",
-      demos: Object.entries(d.pageNotes).map(([k, lines]) => [k, ui.PageNote({ lines }), `ui.PageNote({ lines: [primary, secondary] })`]),
+      demos: Object.entries(d.pageNotes).map(([k, n]) => [k, ui.PageNote(n), n.tone === "trust" ? `ui.PageNote({ tone: "trust", icon: "shield-check-bold-duotone", lines })` : `ui.PageNote({ lines: [lead, secondary] })`]),
     },
     {
       name: "NoticeBanner", node: "382:36897", use: "Dismissible reminder that sits above the nav.",

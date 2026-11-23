@@ -221,9 +221,13 @@
       </button>
     </div>`;
 
-  /* PageNote — quiet sign-off at the end of a scrolling page */
-  ui.PageNote = ({ lines }) => html`
-    <footer class="page-note">${lines.map((l) => OPL.raw(`<p>${l}</p>`))}</footer>`;
+  /* PageNote — quiet sign-off at the end of a scrolling page.
+     tone: "neutral" | "trust" (green lead line); icon: optional, sits before the lead line. */
+  ui.PageNote = ({ lines, icon: name, tone = "neutral" }) => html`
+    <footer class="page-note page-note--${tone}">
+      <p class="page-note__lead">${name ? icon(name, 16) : ""}<span>${lines[0]}</span></p>
+      ${lines.slice(1).map((l) => OPL.raw(`<p>${l}</p>`))}
+    </footer>`;
 
   /* BottomNav — floating pill nav (382:34337) */
   ui.BottomNav = ({ items, active }) => html`
