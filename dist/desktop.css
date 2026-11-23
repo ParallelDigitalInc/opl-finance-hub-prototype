@@ -666,7 +666,16 @@
 .d-ms .ms__later:hover { opacity: 0.75; }
 
 /* Apply modal: the mobile "Proceed applying" body (382:41022) inside a 520 modal */
-.d-applym { padding: 8px 8px 4px; }
+/* spacing as Final Desktop 507:131176: pt8 pb32 · header p20, 44 under the title · body inset 40, gap 20 */
+.d-applym { padding: 8px 0 32px; }
+.d-applym .apply { gap: 20px; }
+.d-applym .apply__top { gap: 44px; padding: 20px; border-radius: 24px; }
+.d-applym .apply__notes { margin-top: -20px; padding: 0 40px; gap: 16px; }   /* header's own 20 is the gap here */
+.d-applym .apply__consent-wrap, .d-applym .apply__actions { padding: 0 40px; }
+.d-applym .apply__cancel { border-radius: 999px; transition: background 140ms; }
+.d-applym .apply__cancel:hover { background: var(--primary-tint, #eef2ff); }
+.d-applym .apply__consent { transition: background 140ms; }
+.d-applym .apply__consent:hover { background: #eef1f6; }
 .d-applym .sheet__grabber { display: none; }
 .d-modal-layer.is-open .d-applym > * > * { animation: enter-up 380ms var(--ease-out) both; }
 .d-applym .btn { transition: transform 120ms var(--d-ease), background 160ms, box-shadow 160ms, opacity 160ms; }

@@ -27,7 +27,7 @@
               <div class="apply__lender-text"><p>${l.name}</p><span>${l.type}</span></div>
               <p class="apply__amount">${l.amount}</p></div>`))}</div>
         </div>
-        <div class="apply__notes">${a.notes.map((n) => ui.NoteRow({ text: n }))}</div>
+        <div class="apply__notes">${(lenders.length === 1 && a.notesOne ? a.notesOne(lenders[0].name) : a.notes).map((n) => ui.NoteRow({ text: n }))}</div>
         <div class="apply__consent-wrap">
           <button class="apply__consent" data-consent aria-pressed="true">
             <img class="ico" src="assets/icons/check-square-22.svg" width="22" height="22" alt="">

@@ -14,6 +14,11 @@
       "Each lender runs a full credit check and verification",
       "A separate application goes to each lender at the same time. You can accept the KFS of only one of them this month.",
     ],
+    // one lender: the two-lender notes ("each lender", "a separate application…") don't apply — adapted, flagged
+    notesOne: (name) => [
+      `${name} runs a full credit check and verification`,
+      "You can accept the KFS of only one loan this month.",
+    ],
     consent: (names) => `I agree to share my business, GST, bank and bureau details with ${names} for this application.`,
     submit: (n) => (n === 1 ? "Submit application" : `Submit ${n} applications`),   // Figma's single sheet says "Submit 2 applications" — adapted
     cancel: "Cancel",

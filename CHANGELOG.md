@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.15.6 — 23 Nov 2026 · Apply modal spacing
+
+Shreya: "Looks a bit crammed."
+
+- **The desktop Apply modal now has Final Desktop's spacing** (`507:131176`). It had been using the mobile sheet's tighter spacing.
+  - The title has 44px under it. The header is padded 20.
+  - Notes, consent and buttons are inset 40, so the lender card at 20 stands proud.
+  - 32px at the bottom.
+  - Two lenders measure as Figma: title 28, card 100, notes 40 in.
+- Hover states on the consent row and Cancel.
+- **Applying to one lender, mobile too:** the notes no longer say "each lender" or "a separate application goes to each lender". They now read "SBI runs a full credit check and verification" and "You can accept the KFS of only one loan this month." This is adapted copy, flagged.
+
 ## v0.15.5 — 23 Nov 2026 · Sidebar and top bar cleanup
 
 Shreya's feedback on the collapsed sidebar:

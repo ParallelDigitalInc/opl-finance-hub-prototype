@@ -4,7 +4,7 @@
 
 (function () {
 const OPL = (window.OPL = window.OPL || {});
-OPL.VERSION = "0.15.5";
+OPL.VERSION = "0.15.6";
 OPL.FIGMA_FILE = "https://www.figma.com/design/GHuBkYGEQZvQppv3v55EaA/OPL----Internal-Playground--5-";
 OPL.figmaLink = (nodeId) => `${OPL.FIGMA_FILE}?node-id=${nodeId.replace(":", "-")}`;
 const esc = (v) =>
@@ -499,7 +499,7 @@ return html`
 <div class="apply__lender-text"><p>${l.name}</p><span>${l.type}</span></div>
 <p class="apply__amount">${l.amount}</p></div>`))}</div>
 </div>
-<div class="apply__notes">${a.notes.map((n) => ui.NoteRow({ text: n }))}</div>
+<div class="apply__notes">${(lenders.length === 1 && a.notesOne ? a.notesOne(lenders[0].name) : a.notes).map((n) => ui.NoteRow({ text: n }))}</div>
 <div class="apply__consent-wrap">
 <button class="apply__consent" data-consent aria-pressed="true">
 <img class="ico" src="assets/icons/check-square-22.svg" width="22" height="22" alt="">
@@ -1681,6 +1681,10 @@ titleOne: (name) => `Proceed applying to ${name} loan?`,
 notes: [
 "Each lender runs a full credit check and verification",
 "A separate application goes to each lender at the same time. You can accept the KFS of only one of them this month.",
+],
+notesOne: (name) => [
+`${name} runs a full credit check and verification`,
+"You can accept the KFS of only one loan this month.",
 ],
 consent: (names) => `I agree to share my business, GST, bank and bureau details with ${names} for this application.`,
 submit: (n) => (n === 1 ? "Submit application" : `Submit ${n} applications`),   // Figma's single sheet says "Submit 2 applications" — adapted
