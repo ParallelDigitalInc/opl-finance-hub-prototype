@@ -1184,7 +1184,7 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
     refreshCards(page) {
       const box = page.querySelector("[data-cards]");
       const before = new Map([...box.querySelectorAll("[data-offer]")].map((el) => [el.dataset.offer, el.getBoundingClientRect()]));
-      box.innerHTML = cardsFor(data().matches, this.st);
+      box.innerHTML = [].concat(cardsFor(data().matches, this.st)).join("");   // an array would stringify with commas
       if (D.motionOff()) return;
       box.querySelectorAll("[data-offer]").forEach((el, i) => {
         const b = before.get(el.dataset.offer);

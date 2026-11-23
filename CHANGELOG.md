@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.14.1 — 23 Nov 2026 · Overview cards stay in their grid
+
+**Fixed**
+
+- **Desktop Overview:** after a chip filter or a sort, the match cards scattered into a staggered layout with stray commas. Shreya spotted it. The re-render wrote the card list as an array, which turns into text with a "," between items, and each comma took a grid cell. The list is now joined properly. The sidebar link for Govt. subsidies points at `subsidies-overview`.
+
 ## v0.14.0 — 23 Nov 2026 · Desktop view lands on main
 
 Merges branch `flow/desktop` into main (which now has the subsidies flow, v0.10.0–v0.10.2). Its own version numbers (0.10.0–0.13.6) overlapped main's, so they're kept below as **flow/desktop** history, and this release is v0.14.0.
