@@ -34,7 +34,10 @@ starts the HTML component kit that later mobile flows reuse.
   - **Benefit sheets** (section `416:47994`): any Policy Benefits tile or "See other benefits" row opens its sheet.
     - Capital and Interest have an Activity 1 / 2 switch.
     - Each Figma frame is a panel preset, e.g. "Sheet · Capital · Activity 2".
-  - Hotspots for later: Calculate Estimate (`416:76869`), Talk to an Expert, Apply Now and the two links.
+- **Calculate estimate** (section `416:76869`), opened from "Calculate Estimate" on the policy page:
+  - **Form** `subsidy-estimate` (`416:77107`; preset "All benefits open" = `416:76872`): one card per benefit, live figures, Add more / Remove.
+  - **Result** `subsidy-estimate-result` (`416:77363`): replaces the form, so ✕ and Back return to the policy page. "Add more" swaps back to the form.
+  - Hotspots for later: Talk to an Expert, Apply Now / Apply Online and the two links.
 
 ## Run it
 
@@ -269,6 +272,57 @@ All of this is behaviour on existing elements. None of it adds UI:
 13. **Sheets: Power tariff and Payroll have no "Apply Now" link**, only Talk to an Expert. Kept as drawn.
 14. **Sheets: Apply Now is drawn in Figtree** (label/medium) and the primary button in Instrument Sans. Geist is used.
 15. **Sheets on a phone:** a sheet taller than the screen stops 12 below the status bar and its body scrolls. Capital, Interest and Payroll are 914–993 tall in Figma.
+
+## Figma flags · Calculate estimate (`416:76869`)
+
+1. **The estimate is calculated, not copied.**
+   - Figma's figures are placeholders: every card reads ₹87.5L, and the breakdown (87.5 + 36.5 + 12) doesn't add up to "Up to ₹87.5 L".
+   - The formulas use the benefit-sheet rates at the "Up to" end: Category 1 / PM MITRA Park, Activity 1.
+     - **Capital:** 35% of project cost, capped at ₹100 Cr.
+     - **Interest:** min(7%, rate − 2%) on each year's opening balance (annual instalments), for up to 8 years, capped at 3% of project cost a year when a project cost is entered.
+     - **Power:** ₹1/kWh × annual units × 5 years.
+     - **Payroll:** ₹5,000 per woman and ₹4,000 per man a month, for 5 years.
+     - **SHG:** ₹5,000 a member for 3 months of training, plus ₹5,000 a month for 5 years.
+     - **Quality:** 50%, up to ₹10 L.
+     - **Energy:** 75% of the audit, up to ₹50,000, plus 25% of equipment, up to ₹20 L.
+     - **Technology:** 65%, up to ₹50 L.
+   - With the drawn inputs (₹20 Cr loan at 9.45% over 15 years, ₹1.5 Cr project) plus 2,40,000 kWh, the result reads Capital ₹52.5 L, Interest ₹36 L, Power ₹12 L, Up to ₹1 Cr.
+   - **These formulas need a policy owner's check.**
+2. **The two form frames differ.**
+   - `416:76872`: "Calculate Estimate" in title case, Medium 44px inputs with Geist 14 labels, and the typo "Power Tariff Sabusidy".
+   - `416:77107`: sentence case, Small 38px inputs.
+   - Both presets use `416:77107`; the "All benefits open" preset only opens every card.
+3. **The chips list "Power tariff" even though Power is already added.** Here the chips are always the benefits not yet added: two are shown, plus "+ N more", which expands them all.
+4. **Copy:** the result line has a double space ("business is  applicable"); one space is used.
+5. **Proposed, not in Figma:**
+   - input fields for Payroll, SHG, Quality, Energy and Technology, so "Add more" works
+   - segment colours for those five, taken from their icons
+   - the "Calculating…" state
+   - the error state when an added benefit has no number (DS Input has an Error state)
+   - the result preset fills 2,40,000 kWh so Power shows, as in `416:77363`
+6. **The hatched "not added" segments** are drawn as CSS stripes, because the pattern fill didn't export.
+7. **Strokes on the cards and action bar are inside** (cards 336 / 56, bar 126).
+
+**Motion (Calculate estimate):**
+- **Form:**
+  - Each card's figure re-counts as you type, with a blue tick.
+  - Cards open by height.
+  - An added benefit drops in from its chip, its icon pops, and its first field takes focus.
+  - A removed card folds away and its chip returns.
+  - Get Estimate shows "Calculating…" before the result.
+- **Result: the cash arrives.** One bundle of cash falls onto the plinth for each benefit. With the three drawn benefits it ends as Figma's three-bundle stack; more benefits stack it higher.
+  - **Each landing:**
+    - the plinth takes the weight
+    - gold coins spark off the bundle
+    - that benefit's segment fills the Build-up bar, its row counts in, and the headline total climbs by its amount
+  - **Around it:** a warm OPL Yellow glow blooms behind the stack, the rays turn, sparkles twinkle, and "Congratulations" springs in letter by letter.
+  - **Finale (total complete):**
+    - a confetti burst from the stack, plus cannons from both sides
+    - an indigo-and-gold shine sweeps the total
+    - a nudge on "Add more"
+  - Android gets haptics on every landing and the finale.
+  - The celebration is `assets/lazy/subsidy/estimate/celebrate.js` (canvas, one-shot, about 9 KB). It loads only on this screen, outside the first-load budget. If it fails to load, the kit's milestone confetti plays instead.
+  - Reduced motion shows the final state.
 
 **Motion (prototype layer):**
 - **The benefits land:** the plinth settles, the notes drop onto it, the coins clink down, and "Up to ₹1.2Cr" counts up as they land.

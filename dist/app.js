@@ -3,99 +3,99 @@
 /* ==== js/core.js ==== */
 
 (function () {
-  const OPL = (window.OPL = window.OPL || {});
-  OPL.VERSION = "0.8.0";
-  OPL.FIGMA_FILE = "https://www.figma.com/design/GHuBkYGEQZvQppv3v55EaA/OPL----Internal-Playground--5-";
-  OPL.figmaLink = (nodeId) => `${OPL.FIGMA_FILE}?node-id=${nodeId.replace(":", "-")}`;
-  const esc = (v) =>
-    String(v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  class Raw { constructor(s) { this.s = s; } toString() { return this.s; } }
-  OPL.raw = (s) => new Raw(s);
-  OPL.html = (strings, ...vals) =>
-    OPL.raw(
-      strings.reduce((out, str, i) => {
-        if (i === 0) return str;
-        const v = vals[i - 1];
-        const s = v == null || v === false ? "" : Array.isArray(v) ? v.join("") : v instanceof Raw ? v.s : esc(v);
-        return out + s + str;
-      }, "")
-    );
-  OPL.cx = (...c) => c.filter(Boolean).join(" ");
-  OPL.icon = (name, size = 24, cls = "") =>
-    OPL.raw(`<img class="ico ${cls}" src="assets/icons/${name}.svg" width="${size}" height="${size}" alt="" draggable="false">`);
-  OPL.img = (name) => `assets/img/${name}`;
-  OPL.state = {
-    get() {
-      const p = new URLSearchParams(location.hash.replace(/^#\??/, ""));
-      return Object.fromEntries(p.entries());
-    },
-    set(patch, { silent = false } = {}) {
-      const next = { ...OPL.state.get(), ...patch };
-      Object.keys(next).forEach((k) => next[k] == null && delete next[k]);
-      history.replaceState(history.state, "", "#" + new URLSearchParams(next).toString());
-      if (!silent) window.dispatchEvent(new CustomEvent("opl:state", { detail: next }));
-    },
-  };
-  OPL.reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  function initPress(root = document) {
-    let active = null, startX = 0, startY = 0;
-    const release = () => { if (active) active.classList.remove("is-pressed"); active = null; };
-    root.addEventListener("pointerdown", (e) => {
-      const el = e.target.closest("[data-press]");
-      if (!el) return;
-      active = el; startX = e.clientX; startY = e.clientY;
-      el.classList.add("is-pressed");
-      if (navigator.vibrate && e.pointerType === "touch") navigator.vibrate(6);
-    });
-    root.addEventListener("pointermove", (e) => {
-      if (active && Math.hypot(e.clientX - startX, e.clientY - startY) > 8) release();
-    });
-    ["pointerup", "pointercancel", "pointerleave", "dragstart"].forEach((t) => root.addEventListener(t, release));
-    root.addEventListener("scroll", release, true);
-  }
-  function initHotspots(root = document) {
-    root.addEventListener("click", (e) => {
-      if (e.target.closest("[data-back]")) return OPL.back && OPL.back();
-      const el = e.target.closest("[data-goto]");
-      if (el) {
-        const target = el.getAttribute("data-goto");
-        if (OPL.screens && OPL.screens[target]) return OPL.go(target);
-        flash([el]);
-        return;
-      }
-      const screen = e.target.closest(".screen");
-      if (screen && !e.target.closest("[data-press],button,a,input")) {
-        flash(screen.querySelectorAll("[data-goto]"));
-      }
-    });
-  }
-  function flash(els) {
-    if (document.documentElement.dataset.hotspots === "off") return;
-    els.forEach((el) => {
-      el.classList.remove("hotspot-flash");
-      void el.offsetWidth;
-      el.classList.add("hotspot-flash");
-      setTimeout(() => el.classList.remove("hotspot-flash"), 700);
-    });
-  }
-  OPL._revealed = false;
-  const revealQueue = [];
-  OPL.afterReveal = (fn) => { if (OPL._revealed) fn(); else revealQueue.push(fn); };
-  OPL.markRevealed = () => { OPL._revealed = true; revealQueue.splice(0).forEach((fn) => fn()); };
-  OPL.countUp = (el, { to, prefix = "", suffix = "", duration = 900, delay = 0 } = {}) => {
-    if (OPL.reducedMotion() || OPL.state.get().motion === "off") { el.textContent = prefix + to + suffix; return; }
-    el.textContent = prefix + 0 + suffix;
-    OPL.afterReveal(() => setTimeout(() => {
-      const t0 = Date.now();
-      const step = () => {
-        const k = Math.min(1, (Date.now() - t0) / duration);
-        el.textContent = prefix + Math.round(to * (1 - Math.pow(1 - k, 3))) + suffix;
-        if (k < 1) setTimeout(step, 16);
-      };
-      step();
-    }, delay));
-  };
-  OPL.initInteractions = (root) => { initPress(root); initHotspots(root); };
+const OPL = (window.OPL = window.OPL || {});
+OPL.VERSION = "0.8.0";
+OPL.FIGMA_FILE = "https://www.figma.com/design/GHuBkYGEQZvQppv3v55EaA/OPL----Internal-Playground--5-";
+OPL.figmaLink = (nodeId) => `${OPL.FIGMA_FILE}?node-id=${nodeId.replace(":", "-")}`;
+const esc = (v) =>
+String(v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+class Raw { constructor(s) { this.s = s; } toString() { return this.s; } }
+OPL.raw = (s) => new Raw(s);
+OPL.html = (strings, ...vals) =>
+OPL.raw(
+strings.reduce((out, str, i) => {
+if (i === 0) return str;
+const v = vals[i - 1];
+const s = v == null || v === false ? "" : Array.isArray(v) ? v.join("") : v instanceof Raw ? v.s : esc(v);
+return out + s + str;
+}, "")
+);
+OPL.cx = (...c) => c.filter(Boolean).join(" ");
+OPL.icon = (name, size = 24, cls = "") =>
+OPL.raw(`<img class="ico ${cls}" src="assets/icons/${name}.svg" width="${size}" height="${size}" alt="" draggable="false">`);
+OPL.img = (name) => `assets/img/${name}`;
+OPL.state = {
+get() {
+const p = new URLSearchParams(location.hash.replace(/^#\??/, ""));
+return Object.fromEntries(p.entries());
+},
+set(patch, { silent = false } = {}) {
+const next = { ...OPL.state.get(), ...patch };
+Object.keys(next).forEach((k) => next[k] == null && delete next[k]);
+history.replaceState(history.state, "", "#" + new URLSearchParams(next).toString());
+if (!silent) window.dispatchEvent(new CustomEvent("opl:state", { detail: next }));
+},
+};
+OPL.reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function initPress(root = document) {
+let active = null, startX = 0, startY = 0;
+const release = () => { if (active) active.classList.remove("is-pressed"); active = null; };
+root.addEventListener("pointerdown", (e) => {
+const el = e.target.closest("[data-press]");
+if (!el) return;
+active = el; startX = e.clientX; startY = e.clientY;
+el.classList.add("is-pressed");
+if (navigator.vibrate && e.pointerType === "touch") navigator.vibrate(6);
+});
+root.addEventListener("pointermove", (e) => {
+if (active && Math.hypot(e.clientX - startX, e.clientY - startY) > 8) release();
+});
+["pointerup", "pointercancel", "pointerleave", "dragstart"].forEach((t) => root.addEventListener(t, release));
+root.addEventListener("scroll", release, true);
+}
+function initHotspots(root = document) {
+root.addEventListener("click", (e) => {
+if (e.target.closest("[data-back]")) return OPL.back && OPL.back();
+const el = e.target.closest("[data-goto]");
+if (el) {
+const target = el.getAttribute("data-goto");
+if (OPL.screens && OPL.screens[target]) return OPL.go(target);
+flash([el]);
+return;
+}
+const screen = e.target.closest(".screen");
+if (screen && !e.target.closest("[data-press],button,a,input")) {
+flash(screen.querySelectorAll("[data-goto]"));
+}
+});
+}
+function flash(els) {
+if (document.documentElement.dataset.hotspots === "off") return;
+els.forEach((el) => {
+el.classList.remove("hotspot-flash");
+void el.offsetWidth;
+el.classList.add("hotspot-flash");
+setTimeout(() => el.classList.remove("hotspot-flash"), 700);
+});
+}
+OPL._revealed = false;
+const revealQueue = [];
+OPL.afterReveal = (fn) => { if (OPL._revealed) fn(); else revealQueue.push(fn); };
+OPL.markRevealed = () => { OPL._revealed = true; revealQueue.splice(0).forEach((fn) => fn()); };
+OPL.countUp = (el, { to, prefix = "", suffix = "", duration = 900, delay = 0 } = {}) => {
+if (OPL.reducedMotion() || OPL.state.get().motion === "off") { el.textContent = prefix + to + suffix; return; }
+el.textContent = prefix + 0 + suffix;
+OPL.afterReveal(() => setTimeout(() => {
+const t0 = Date.now();
+const step = () => {
+const k = Math.min(1, (Date.now() - t0) / duration);
+el.textContent = prefix + Math.round(to * (1 - Math.pow(1 - k, 3))) + suffix;
+if (k < 1) setTimeout(step, 16);
+};
+step();
+}, delay));
+};
+OPL.initInteractions = (root) => { initPress(root); initHotspots(root); };
 })();
 
 ;
@@ -103,374 +103,374 @@
 /* ==== js/components.js ==== */
 
 (function () {
-  const { html, icon, img, cx } = OPL;
-  const ui = (OPL.ui = {});
-  ui.Button = ({ label, variant = "filled", size = "lg", leading, trailing, block = false, strong = false, goto, attrs = "" }) => html`
-    <button class="${cx("btn", `btn--${variant}`, `btn--${size}`, block && "btn--block", strong && "btn--strong")}" data-press
-      ${goto ? OPL.raw(`data-goto="${goto}"`) : ""} ${OPL.raw(attrs)}>
-      ${leading ? icon(leading, size === "sm" ? 14 : 16) : ""}
-      <span class="btn__label">${label}</span>
-      ${trailing ? icon(trailing, 16) : ""}
-    </button>`;
-  ui.IconButton = ({ icon: name, label, goto }) => html`
-    <button class="icon-btn" aria-label="${label}" data-press ${goto ? OPL.raw(`data-goto="${goto}"`) : ""}>
-      ${icon(name, 20)}
-    </button>`;
-  ui.Avatar = ({ goto } = {}) => html`
-    <button class="avatar" aria-label="Profile" data-press ${goto ? OPL.raw(`data-goto="${goto}"`) : ""}>
-      <img class="avatar__bg" src="${img("avatar-bg.jpg")}" alt="">
-      <img class="avatar__fg" src="${img("avatar-person.jpg")}" alt="">
-    </button>`;
-  const LOGOS = {
-    citi: { layers: [{ src: "logo-citi.png", crop: "width:270.83%;height:202.08%;left:-86.72%;top:-55.28%" }] },
-    citiApp: { layers: [{ src: "logo-citi.png", crop: "width:270.83%;height:202.08%;left:-85.42%;top:-51.04%" }] },
-    bob: { layers: [{ src: "logo-bob.png", cover: true }] },
-    axis: { bg: "#fff", layers: [{ src: "logo-axis.png", cover: true }] },
-    sidbiMark: { bg: "#fff", layers: [{ src: "mark-sidbi.svg", crop: "width:21.767px;height:26px;left:calc(50% - 11px);top:calc(50% - 13px)" }] },
-    hdfcMark: { bg: "#fff", layers: [{ src: "mark-hdfc.svg", crop: "left:22.5%;top:22.5%;width:53.06%;height:52.5%" }] },
-    sidbi: { bg: "#fff", layers: [{ src: "logo-sidbi.png", contain: true }] },
-    sbi: { bg: "#fff", layers: [{ src: "logo-sbi.png", contain: true }] },
-    gujaratGovt: { ring: 1, bg: "#fff", layers: [{ src: "logo-gujarat-govt.png", crop: "width:74%;height:auto;left:13%;top:9%" }] },
-    msme: {
-      ring: 1,
-      layers: [
-        { src: "logo-scheme-base.png", cover: true },
-        { src: "logo-msme-champions.png", crop: "width:120.66%;height:120.66%;left:-8.11%;top:-7.76%" },
-      ],
-    },
-    gujarat: {
-      ring: 2,
-      layers: [
-        { src: "logo-scheme-base.png", cover: true },
-        { src: "logo-msme-champions.png", crop: "width:120.66%;height:120.66%;left:-8.11%;top:-7.76%" },
-        { src: "logo-gujarat.png", crop: "width:77.46%;height:77.46%;left:11.27%;top:13.1%" },
-      ],
-    },
-  };
-  ui.Logo = ({ id, size = 40, ring }) => {
-    const def = LOGOS[id];
-    const r = ring ?? def.ring ?? 0;
-    return html`<span class="logo" style="--logo:${size}px;--ring:${r}px${def.bg ? `;--logo-bg:${def.bg}` : ""}">
-      <span class="logo__fill">${def.layers.map((l) =>
-        l.contain
-          ? OPL.raw(`<img class="logo__cover" style="object-fit:contain" src="${img(l.src)}" alt="">`)
-          : l.cover
-          ? OPL.raw(`<img class="logo__cover" src="${img(l.src)}" alt="">`)
-          : OPL.raw(`<img class="logo__crop" style="${l.crop}" src="${img(l.src)}" alt="">`)
-      )}</span></span>`;
-  };
-  ui.FactPill = ({ parts }) => html`
-    <span class="fact">${parts.map((p) =>
-      OPL.raw(`<span class="${cx(p.strong && "fact__strong", p.accent && "fact__accent")}">${p.text}</span>`)
-    )}</span>`;
-  ui.CarouselDots = ({ count, active }) => html`
-    <div class="dots" role="tablist">
-      ${Array.from({ length: count }, (_, i) =>
-        OPL.raw(`<button class="dot ${i === active ? "is-active" : ""}" role="tab" aria-label="Slide ${i + 1}" data-dot="${i}"><span class="dot__fill"></span></button>`)
-      )}
-    </div>`;
-  ui.HeroCard = ({ kind, logo, title, subtitle, tint, scale = 1, ring }) => html`
-    <div class="${cx("hero-card", `hero-card--${kind}`, scale < 1 && "hero-card--back")}" style="--s:${scale};--tint:${tint}">
-      <div class="hero-card__inner">
-        <div class="hero-card__row">
-          ${ui.Logo({ id: logo, size: 44 * scale, ring: ring != null ? ring * scale : undefined })}
-          <div class="hero-card__text">
-            <p class="hero-card__title">${OPL.raw(title)}</p>
-            <p class="hero-card__sub">${subtitle}</p>
-          </div>
-        </div>
-      </div>
-    </div>`;
-  ui.HeroStack = ({ kind, cards }) => html`
-    <div class="${cx("hero-stack", `hero-stack--${kind}`)}" data-stack>
-      ${cards.map((c, i) => OPL.raw(
-        `<div class="stack-item" data-pos="${i === 0 ? "front" : i === 1 ? "back" : "queue"}">${ui.HeroCard({ ...c, kind })}</div>`
-      ))}
-    </div>`;
-  ui.QuickAction = ({ icon: name, label, goto }) => html`
-    <button class="qa" data-press ${goto ? OPL.raw(`data-goto="${goto}"`) : ""}>
-      <span class="qa__tile">${icon(name, 40)}</span>
-      <span class="qa__label">${OPL.raw(label)}</span>
-    </button>`;
-  ui.SectionHeader = ({ title, action = "View all", goto }) => html`
-    <div class="section-head">
-      <h2 class="section-head__title">${title}</h2>
-      ${ui.Button({ label: action, variant: "text", trailing: "chevron-right-primary", goto })}
-    </div>`;
-  ui.Chip = ({ icon: name, label, count, selected = false, bordered = false, trailing, goto, attrs = "" }) => html`
-    <button class="${cx("chip", selected && "is-selected", bordered && "chip--bordered")}" data-press ${goto ? OPL.raw(`data-goto="${goto}"`) : ""} ${OPL.raw(attrs)}>
-      ${name ? icon(name, 18) : ""}
-      <span class="chip__label">${label}</span>
-      ${count != null ? OPL.raw(`<span class="badge">${count}</span>`) : ""}
-      ${trailing ? icon(trailing, 16) : ""}
-    </button>`;
-  ui.MatchCard = ({ kind, tag, tint, logo, title, subtitle, figures, goto, detail, size = "md" }) => html`
-    <article class="${cx("match", `match--${kind}`, size === "lg" && "match--lg")}" style="--tint:${tint}" data-press ${detail ? OPL.raw(`data-detail="${detail}"`) : goto ? OPL.raw(`data-goto="${goto}"`) : ""}>
-      <div class="match__head">
-        <span class="match__tag">${tag}</span>
-        <div class="match__id">
-          ${ui.Logo({ id: logo, size: 40 })}
-          <div class="match__text">
-            <p class="match__title">${OPL.raw(title)}</p>
-            <p class="match__sub">${subtitle}</p>
-          </div>
-        </div>
-      </div>
-      <div class="match__body">
-        ${figures.map((f) => OPL.raw(`
-          <div class="figure">
-            <span class="figure__label">${f.label}</span>
-            <span class="figure__value">${f.value}${f.unit ? `<span class="figure__unit">${f.unit}</span>` : ""}</span>
-          </div>`))}
-      </div>
-    </article>`;
-  ui.HelpCard = ({ title, subtitle, cta, goto }) => html`
-    <section class="help">
-      <div class="help__text">
-        <div class="help__copy">
-          <p class="help__title">${title}</p>
-          <p class="help__sub">${subtitle}</p>
-        </div>
-        ${ui.Button({ label: cta, size: "sm", leading: "phone-calling-bold", goto })}
-      </div>
-      <img class="help__art" src="${img("expert-illustration.png")}" alt="">
-    </section>`;
-  ui.NoticeBanner = ({ icon: name = "calendar-mark-bold", parts, goto }) => html`
-    <div class="notice" data-press ${goto ? OPL.raw(`data-goto="${goto}"`) : ""}>
-      <div class="notice__lead">
-        <span class="notice__icon">${icon(name, 16)}</span>
-        <p class="notice__text">${parts.map((p) => OPL.raw(p.strong ? `<strong>${p.text}</strong>` : p.text))}</p>
-      </div>
-      <button class="notice__close" aria-label="Dismiss" data-dismiss>${icon("x", 16)}</button>
-    </div>`;
-  ui.CmrPill = ({ label, risk, goto }) => html`
-    <button class="cmr" data-press ${goto ? OPL.raw(`data-goto="${goto}"`) : ""}>
-      <span class="cmr__lead"><span class="cmr__gauge">${icon("cmr-gauge", 24)}</span><span class="cmr__label">${label}</span></span>
-      <span class="cmr__trail"><span class="cmr__risk">${risk}</span><span class="cmr__chev">${icon("alt-arrow-left", 16)}</span></span>
-    </button>`;
-  ui.Tracker = ({ steps, style = "tint" }) => html`
-    <div class="tracker tracker--${style}">
-      <div class="tracker__track">${steps.map((s, i) => OPL.raw(
-        (i ? `<span class="tracker__line tracker__line--${steps[i - 1].state === "done" ? "done" : steps[i - 1].state === "progress" ? "progress" : "todo"}" style="--i:${i}"><i></i></span>` : "") +
-        `<span class="tracker__step tracker__step--${s.state}" style="--i:${i}">${icon(s.icon, 16)}</span>`
-      ))}</div>
-      <div class="tracker__labels">${steps.map((s) => OPL.raw(`<p class="tracker__label tracker__label--${s.state}">${s.label}</p>`))}</div>
-    </div>`;
-  ui.ApplicationCard = ({ logo, name, product, tag, figures, steps, cta, goto, tint, trackerStyle, ctaVariant = "filled", ctaAttrs = "", note, footnote, id }) => html`
-    <article class="app-card" ${tint ? OPL.raw(`style="--app-tint:${tint}"`) : ""} ${id ? OPL.raw(`data-app="${id}"`) : ""}>
-      <div class="app-card__lender" ${id ? OPL.raw(`data-app-open="${id}" data-press`) : ""}>
-        ${ui.Logo({ id: logo, size: 40 })}
-        <div class="app-card__name"><p class="app-card__title">${name}</p><p class="app-card__sub">${product}</p></div>
-        ${tag ? OPL.raw(`<span class="app-card__tag">${tag}</span>`) : ""}
-      </div>
-      <div class="app-card__body">
-        <div class="app-card__main">
-          <div class="app-card__figures">${figures.map((f) => OPL.raw(`
-            <div class="figure figure--app"><span class="figure__label">${f.label}</span>
-              <span class="figure__value">${f.value}${f.unit ? `<span class="figure__unit">${f.unit}</span>` : ""}</span></div>`))}</div>
-          ${ui.Tracker({ steps, style: trackerStyle })}
-        </div>
-        <div class="app-card__actions">
-          ${ui.Button({ label: cta, size: "md", block: true, goto, variant: ctaVariant, attrs: ctaAttrs })}
-          ${note ? OPL.raw(`<p class="app-card__note">${note}</p>`) : ""}
-        </div>
-      </div>
-      ${footnote ? OPL.raw(`<div class="app-card__foot">${icon("info-circle-amber", 16)}<span>${footnote}</span></div>`) : ""}
-    </article>`;
-  ui.BorrowingCard = ({ total, legend, available, goto }) => html`
-    <article class="borrow" data-press ${goto ? OPL.raw(`data-goto="${goto}"`) : ""}>
-      <div class="borrow__total"><span class="figure__label">${total.label}</span><span class="borrow__amount">${total.value}</span></div>
-      <div class="borrow__row">
-        <img class="borrow__donut" src="${img("donut-borrowing.svg")}" width="103" height="103" alt="">
-        <div class="borrow__side">
-          <div class="borrow__legend">${legend.map((l) => OPL.raw(`
-            <div class="borrow__item">${icon(l.dot, 8)}<span class="borrow__item-label">${l.label}</span><span class="borrow__item-value">${l.value}</span></div>`))}</div>
-          <div class="figure figure--avail"><span class="figure__label">${available.label}</span>
-            <span class="figure__value">${available.value}<span class="figure__unit">${available.unit}</span></span></div>
-        </div>
-      </div>
-    </article>`;
-  ui.OfferCard = ({ id, kind = "offer", logo, tint, tags = [], title, subtitle, figures, details, selected = false }) => html`
-    <article class="${cx("offer", `offer--${kind}`, selected && "is-selected")}" style="--tint:${tint}" data-offer="${id}">
-      <div class="offer__head" data-press data-detail="${id}">
-        <div class="offer__tags">${tags.map((t) => OPL.raw(`<span class="offer__tag offer__tag--${t.tone}">${t.text}</span>`))}</div>
-        <div class="offer__id">
-          ${ui.Logo({ id: logo, size: 40 })}
-          <div class="offer__text"><p class="offer__title">${title}</p><p class="offer__sub">${subtitle}</p></div>
-        </div>
-      </div>
-      <div class="offer__figs">
-        <div class="offer__figrow">${figures.map((f) => OPL.raw(`
-          <div class="figure"><span class="figure__label">${f.label}</span>
-            <span class="figure__value">${f.value}${f.unit ? `<span class="figure__unit">${f.unit}</span>` : ""}</span></div>`))}</div>
-        <span class="offer__divider"></span>
-      </div>
-      <div class="offer__details">${details.map(([l, v]) => OPL.raw(`<div class="offer__row"><span>${l}</span><span>${v}</span></div>`))}</div>
-      <div class="offer__foot">
-        <button class="offer__compare" data-compare="${id}" aria-pressed="${selected}">
-          <img class="ico offer__check" src="assets/icons/${selected ? "check-square-checked" : "check-square"}.svg" width="24" height="24" alt="">
-          <span>Compare</span>
-        </button>
-        ${ui.Button({ label: "Apply now", variant: "tonal", size: "md", trailing: "arrow-right-primary", attrs: `data-apply="${id}"` })}
-      </div>
-    </article>`;
-  ui.LoanDetail = ({ offer, record }) => {
-    const r = (record && record.values) || {};
-    const card = Object.fromEntries(offer.details);
-    const coll = Array.isArray(r.collateral) ? r.collateral : [];
-    const rows = [
-      ["Loan type", r.type],
-      ["Tenure", card["Tenure"] || r.tenure],
-      card["Pay on"] && ["Pay on", card["Pay on"]],
-      ["Processing fee", card["Fee"] || r.fee],
-      coll.length && ["Collateral", coll[1] ? `${coll[0]} · ${coll[1]}` : coll[0]],
-      ["Money in", r.money],
-    ].filter((x) => x && x[1]);
-    const figs = [
-      offer.figures[0],
-      offer.figures[1],
-      { label: "APR", value: r.apr },
-      { label: "Est. EMI", value: r.emi || card["Est. EMI"] },
-    ].filter((f) => f && f.value);
-    return html`
-      <div class="detail" style="--tint:${offer.tint}">
-        <div class="offer__head detail__head">
-          <div class="offer__tags">${offer.tags.map((t) => OPL.raw(`<span class="offer__tag offer__tag--${t.tone}">${t.text}</span>`))}</div>
-          <div class="offer__id detail__id">
-            ${ui.Logo({ id: offer.logo, size: 44 })}
-            <div class="offer__text"><p class="offer__title">${offer.title}</p><p class="offer__sub">${offer.subtitle}</p></div>
-          </div>
-        </div>
-        <div class="detail__figs">${figs.map((f) => OPL.raw(`
-          <div class="figure"><span class="figure__label">${f.label}</span>
-            <span class="figure__value">${f.value}${f.unit ? `<span class="figure__unit">${f.unit}</span>` : ""}</span></div>`))}</div>
-        <div class="detail__rows">${rows.map(([l, v]) => OPL.raw(`<div class="offer__row"><span>${l}</span><span>${v}</span></div>`))}</div>
-      </div>`;
-  };
-  ui.LoanDetailFoot = ({ id, selected, compare = true }) => html`
-    <div class="detail__foot">
-      ${compare ? OPL.raw(`<button class="offer__compare" data-detail-compare="${id}" aria-pressed="${selected}">
-        <img class="ico offer__check" src="assets/icons/${selected ? "check-square-checked" : "check-square"}.svg" width="24" height="24" alt="">
-        <span>Compare</span>
-      </button>`) : ""}
-      ${ui.Button({ label: "Apply now", trailing: "chevron-right-white", attrs: `style="flex:1" data-apply="${id}"` })}
-    </div>`;
-  ui.SortOption = ({ label, selected = false }) => html`
-    <button class="${cx("sort-opt", selected && "is-selected")}" data-sort="${label}" data-press>
-      <span class="sort-opt__label">${label}</span>
-      ${selected ? OPL.raw(`<img class="ico" src="assets/icons/radio-selected.svg" width="20" height="20" alt="">`) : OPL.raw(`<span class="sort-opt__radio"></span>`)}
-    </button>`;
-  ui.Sheet = ({ id, title, action, body, footer }) => html`
-    <div class="sheet-layer" data-sheet="${id}" hidden>
-      <div class="sheet-scrim" data-sheet-close></div>
-      <section class="sheet" role="dialog" aria-label="${title}">
-        <div class="sheet__grip" data-sheet-drag><span class="sheet__grabber"></span>
-          <div class="sheet__head"><h2 class="sheet__title">${title}</h2>${action ? OPL.raw(`<button class="sheet__action" data-sheet-action>${action}</button>`) : ""}</div>
-        </div>
-        ${OPL.raw(String(body))}
-        ${footer ? OPL.raw(`<div class="sheet__foot">${footer}</div>`) : ""}
-      </section>
-    </div>`;
-  ui.CompareTray = ({ selected, max = 3 }) => html`
-    <div class="tray">
-      <img class="tray__texture" src="${img("hero-texture.jpg")}" alt="">
-      <span class="tray__blur"></span>
-      <div class="tray__head">
-        <p class="tray__title">Comparing ${selected.length} of ${max} loans</p>
-        <button class="tray__clear" data-compare-clear>Clear all</button>
-      </div>
-      <div class="tray__row">
-        <div class="tray__logos">
-          ${selected.map((s) => OPL.raw(`<span class="tray__slot" data-slot="${s.id}">${ui.Logo({ id: s.logo, size: 44 })}
-            <button class="tray__remove" data-compare-remove="${s.id}" aria-label="Remove">${icon("close-circle", 20)}</button></span>`))}
-          ${Array.from({ length: Math.max(0, max - selected.length) }, () => OPL.raw(`<button class="tray__add" data-compare-add aria-label="Add a loan">${icon("add-circle", 44)}</button>`))}
-        </div>
-        ${ui.Button({ label: "Compare", variant: "white", size: "md", trailing: "arrow-right-primary", attrs: "data-compare-go" })}
-      </div>
-    </div>`;
-  ui.Toggle = ({ on = false, attrs = "" }) => html`
-    <button class="${cx("toggle", on && "is-on")}" role="switch" aria-checked="${on}" ${OPL.raw(attrs)}><span class="toggle__knob"></span></button>`;
-  ui.CompareAddCol = ({ rows, label = "Add loan" }) =>
-    OPL.raw(`<div class="ct-col ct-col--add" data-col="add">
-      <div class="ct-head"><button class="ct-add" data-compare-more data-press>${icon("add-circle", 28)}<span>${label}</span></button></div>
-      ${rows.map((r) => `<div class="ct-cell ct-value" data-row="${r.id}" style="--h:${r.h}px"></div>`).join("")}
-    </div>`);
-  ui.CompareTable = ({ rows, lenders, addSlot = false, addLabel }) => {
-    const label = (r) => `<div class="ct-cell ct-label" data-row="${r.id}" style="--h:${r.h}px">
-      <div class="ct-label__main" style="gap:${r.gap || 4}px"><span>${r.label}</span>${r.info ? icon("info-circle", 14) : ""}</div>
-      ${r.sub ? `<span class="ct-sub">${r.sub}</span>` : ""}</div>`;
-    const value = (l, r) => {
-      const v = l.values[r.id];
-      const best = (l.best || []).includes(r.id);
-      return `<div class="${cx("ct-cell ct-value", r.small && "ct-value--small", best && "is-best", v === "—" && "is-na")}" data-row="${r.id}" style="--h:${r.h}px">
-        ${Array.isArray(v) ? `<span>${v[0]}</span><span class="ct-sub">${v[1]}</span>` : `<span>${v}</span>`}</div>`;
-    };
-    return html`
-      <div class="ct">
-        <div class="ct-labels">
-          <div class="ct-cell ct-label ct-label--lender"><span>Lender</span></div>
-          ${rows.map((r) => OPL.raw(label(r)))}
-        </div>
-        <div class="ct-scroll" data-ct-scroll>
-          ${lenders.map((l) => OPL.raw(`<div class="ct-col" data-col="${l.id}">
-            <div class="ct-head"><div class="ct-card"><div class="ct-card__inner" style="background:${l.tint}">
-              <div class="ct-card__top">${ui.Logo({ id: l.logo, size: 28 })}<button class="ct-card__x" data-col-remove="${l.id}" aria-label="Remove ${l.name}">${icon("x-16", 16)}</button></div>
-              <p class="ct-card__name">${l.name}</p></div></div></div>
-            ${rows.map((r) => value(l, r)).join("")}
-          </div>`))}
-          ${addSlot ? ui.CompareAddCol({ rows, label: addLabel }) : ""}
-        </div>
-      </div>`;
-  };
-  ui.ComparePick = ({ label, lenders, addSlot = false }) => html`
-    <div class="ct-pick">
-      <div class="ct-pick__label">${label}</div>
-      <div class="ct-pick__scroll" data-ct-pick>
-        ${lenders.map((l) => OPL.raw(`<div class="ct-pick__cell" data-col="${l.id}">
-          ${ui.Button({ label: l.selected ? "Selected" : "Select", variant: l.selected ? "soft" : "outlined", size: "md", block: true, attrs: `data-pick="${l.id}"` })}</div>`))}
-        ${addSlot ? OPL.raw(`<div class="ct-pick__cell" data-col="add"></div>`) : ""}
-      </div>
-    </div>`;
-  ui.StatusBar = () => html`
-    <div class="status-bar">
-      <span class="status-bar__time">9:41</span>
-      <span class="status-bar__icons">${icon("status-signal", 17)}${icon("status-wifi", 17)}${icon("status-battery", 22)}</span>
-    </div>`;
-  ui.AppHeader = ({ title, back = false, backIcon = "arrow-left", compact = false, actions }) => html`
-    <header class="${cx("app-header", compact && "app-header--compact")}">
-      <div class="app-header__lead">
-        ${back ? OPL.raw(`<button class="app-header__back" aria-label="Back" data-press data-back>${icon(backIcon, 24)}</button>`) : ""}
-        <h1 class="app-header__title">${title}</h1>
-      </div>
-      <div class="app-header__actions">
-        ${actions
-          ? actions.map((a) => ui.IconButton(a))
-          : [ui.IconButton({ icon: "bell-linear", label: "Notifications", goto: "notifications" }),
-             ui.IconButton({ icon: "headphones-round-sound-linear", label: "Support", goto: "support" }),
-             ui.Avatar({ goto: "profile" })]}
-      </div>
-    </header>`;
-  ui.AiMitraFab = ({ nudge } = {}) => html`
-    <div class="fab-wrap">
-      ${nudge ? OPL.raw(`<button class="fab-nudge" data-goto="ai-mitra" tabindex="-1" aria-hidden="true">
-        <span class="fab-nudge__text">${nudge.lead} <strong>${nudge.topic}</strong></span></button>`) : ""}
-      <button class="fab" aria-label="Ask AI Mitra${nudge ? ` — ${nudge.lead} ${nudge.topic}` : ""}" data-press data-goto="ai-mitra">
-        ${icon("ai-mitra-logo", 24)}
-      </button>
-    </div>`;
-  ui.PageNote = ({ lines, icon: name, tone = "neutral" }) => html`
-    <footer class="page-note page-note--${tone}">
-      <p class="page-note__lead">${name ? icon(name, 16) : ""}<span>${lines[0]}</span></p>
-      ${lines.slice(1).map((l) => OPL.raw(`<p>${l}</p>`))}
-    </footer>`;
-  ui.BottomNav = ({ items, active, variant = "main" }) => html`
-    <nav class="nav nav--${variant}">
-      ${items.map((it) => OPL.raw(`
-        <button class="nav__item ${it.id === active ? "is-active" : ""}" data-press ${it.id === active ? "" : `data-goto="${it.goto || it.id}"`}>
-          <span class="nav__pill">${icon(it.id === active ? it.iconActive : it.icon, 24)}</span>
-          <span class="nav__label">${it.label}</span>
-        </button>`))}
-    </nav>`;
+const { html, icon, img, cx } = OPL;
+const ui = (OPL.ui = {});
+ui.Button = ({ label, variant = "filled", size = "lg", leading, trailing, block = false, strong = false, goto, attrs = "" }) => html`
+<button class="${cx("btn", `btn--${variant}`, `btn--${size}`, block && "btn--block", strong && "btn--strong")}" data-press
+${goto ? OPL.raw(`data-goto="${goto}"`) : ""} ${OPL.raw(attrs)}>
+${leading ? icon(leading, size === "sm" ? 14 : 16) : ""}
+<span class="btn__label">${label}</span>
+${trailing ? icon(trailing, 16) : ""}
+</button>`;
+ui.IconButton = ({ icon: name, label, goto }) => html`
+<button class="icon-btn" aria-label="${label}" data-press ${goto ? OPL.raw(`data-goto="${goto}"`) : ""}>
+${icon(name, 20)}
+</button>`;
+ui.Avatar = ({ goto } = {}) => html`
+<button class="avatar" aria-label="Profile" data-press ${goto ? OPL.raw(`data-goto="${goto}"`) : ""}>
+<img class="avatar__bg" src="${img("avatar-bg.jpg")}" alt="">
+<img class="avatar__fg" src="${img("avatar-person.jpg")}" alt="">
+</button>`;
+const LOGOS = {
+citi: { layers: [{ src: "logo-citi.png", crop: "width:270.83%;height:202.08%;left:-86.72%;top:-55.28%" }] },
+citiApp: { layers: [{ src: "logo-citi.png", crop: "width:270.83%;height:202.08%;left:-85.42%;top:-51.04%" }] },
+bob: { layers: [{ src: "logo-bob.png", cover: true }] },
+axis: { bg: "#fff", layers: [{ src: "logo-axis.png", cover: true }] },
+sidbiMark: { bg: "#fff", layers: [{ src: "mark-sidbi.svg", crop: "width:21.767px;height:26px;left:calc(50% - 11px);top:calc(50% - 13px)" }] },
+hdfcMark: { bg: "#fff", layers: [{ src: "mark-hdfc.svg", crop: "left:22.5%;top:22.5%;width:53.06%;height:52.5%" }] },
+sidbi: { bg: "#fff", layers: [{ src: "logo-sidbi.png", contain: true }] },
+sbi: { bg: "#fff", layers: [{ src: "logo-sbi.png", contain: true }] },
+gujaratGovt: { ring: 1, bg: "#fff", layers: [{ src: "logo-gujarat-govt.png", crop: "width:74%;height:auto;left:13%;top:9%" }] },
+msme: {
+ring: 1,
+layers: [
+{ src: "logo-scheme-base.png", cover: true },
+{ src: "logo-msme-champions.png", crop: "width:120.66%;height:120.66%;left:-8.11%;top:-7.76%" },
+],
+},
+gujarat: {
+ring: 2,
+layers: [
+{ src: "logo-scheme-base.png", cover: true },
+{ src: "logo-msme-champions.png", crop: "width:120.66%;height:120.66%;left:-8.11%;top:-7.76%" },
+{ src: "logo-gujarat.png", crop: "width:77.46%;height:77.46%;left:11.27%;top:13.1%" },
+],
+},
+};
+ui.Logo = ({ id, size = 40, ring }) => {
+const def = LOGOS[id];
+const r = ring ?? def.ring ?? 0;
+return html`<span class="logo" style="--logo:${size}px;--ring:${r}px${def.bg ? `;--logo-bg:${def.bg}` : ""}">
+<span class="logo__fill">${def.layers.map((l) =>
+l.contain
+? OPL.raw(`<img class="logo__cover" style="object-fit:contain" src="${img(l.src)}" alt="">`)
+: l.cover
+? OPL.raw(`<img class="logo__cover" src="${img(l.src)}" alt="">`)
+: OPL.raw(`<img class="logo__crop" style="${l.crop}" src="${img(l.src)}" alt="">`)
+)}</span></span>`;
+};
+ui.FactPill = ({ parts }) => html`
+<span class="fact">${parts.map((p) =>
+OPL.raw(`<span class="${cx(p.strong && "fact__strong", p.accent && "fact__accent")}">${p.text}</span>`)
+)}</span>`;
+ui.CarouselDots = ({ count, active }) => html`
+<div class="dots" role="tablist">
+${Array.from({ length: count }, (_, i) =>
+OPL.raw(`<button class="dot ${i === active ? "is-active" : ""}" role="tab" aria-label="Slide ${i + 1}" data-dot="${i}"><span class="dot__fill"></span></button>`)
+)}
+</div>`;
+ui.HeroCard = ({ kind, logo, title, subtitle, tint, scale = 1, ring }) => html`
+<div class="${cx("hero-card", `hero-card--${kind}`, scale < 1 && "hero-card--back")}" style="--s:${scale};--tint:${tint}">
+<div class="hero-card__inner">
+<div class="hero-card__row">
+${ui.Logo({ id: logo, size: 44 * scale, ring: ring != null ? ring * scale : undefined })}
+<div class="hero-card__text">
+<p class="hero-card__title">${OPL.raw(title)}</p>
+<p class="hero-card__sub">${subtitle}</p>
+</div>
+</div>
+</div>
+</div>`;
+ui.HeroStack = ({ kind, cards }) => html`
+<div class="${cx("hero-stack", `hero-stack--${kind}`)}" data-stack>
+${cards.map((c, i) => OPL.raw(
+`<div class="stack-item" data-pos="${i === 0 ? "front" : i === 1 ? "back" : "queue"}">${ui.HeroCard({ ...c, kind })}</div>`
+))}
+</div>`;
+ui.QuickAction = ({ icon: name, label, goto }) => html`
+<button class="qa" data-press ${goto ? OPL.raw(`data-goto="${goto}"`) : ""}>
+<span class="qa__tile">${icon(name, 40)}</span>
+<span class="qa__label">${OPL.raw(label)}</span>
+</button>`;
+ui.SectionHeader = ({ title, action = "View all", goto }) => html`
+<div class="section-head">
+<h2 class="section-head__title">${title}</h2>
+${ui.Button({ label: action, variant: "text", trailing: "chevron-right-primary", goto })}
+</div>`;
+ui.Chip = ({ icon: name, label, count, selected = false, bordered = false, trailing, goto, attrs = "" }) => html`
+<button class="${cx("chip", selected && "is-selected", bordered && "chip--bordered")}" data-press ${goto ? OPL.raw(`data-goto="${goto}"`) : ""} ${OPL.raw(attrs)}>
+${name ? icon(name, 18) : ""}
+<span class="chip__label">${label}</span>
+${count != null ? OPL.raw(`<span class="badge">${count}</span>`) : ""}
+${trailing ? icon(trailing, 16) : ""}
+</button>`;
+ui.MatchCard = ({ kind, tag, tint, logo, title, subtitle, figures, goto, detail, size = "md" }) => html`
+<article class="${cx("match", `match--${kind}`, size === "lg" && "match--lg")}" style="--tint:${tint}" data-press ${detail ? OPL.raw(`data-detail="${detail}"`) : goto ? OPL.raw(`data-goto="${goto}"`) : ""}>
+<div class="match__head">
+<span class="match__tag">${tag}</span>
+<div class="match__id">
+${ui.Logo({ id: logo, size: 40 })}
+<div class="match__text">
+<p class="match__title">${OPL.raw(title)}</p>
+<p class="match__sub">${subtitle}</p>
+</div>
+</div>
+</div>
+<div class="match__body">
+${figures.map((f) => OPL.raw(`
+<div class="figure">
+<span class="figure__label">${f.label}</span>
+<span class="figure__value">${f.value}${f.unit ? `<span class="figure__unit">${f.unit}</span>` : ""}</span>
+</div>`))}
+</div>
+</article>`;
+ui.HelpCard = ({ title, subtitle, cta, goto }) => html`
+<section class="help">
+<div class="help__text">
+<div class="help__copy">
+<p class="help__title">${title}</p>
+<p class="help__sub">${subtitle}</p>
+</div>
+${ui.Button({ label: cta, size: "sm", leading: "phone-calling-bold", goto })}
+</div>
+<img class="help__art" src="${img("expert-illustration.png")}" alt="">
+</section>`;
+ui.NoticeBanner = ({ icon: name = "calendar-mark-bold", parts, goto }) => html`
+<div class="notice" data-press ${goto ? OPL.raw(`data-goto="${goto}"`) : ""}>
+<div class="notice__lead">
+<span class="notice__icon">${icon(name, 16)}</span>
+<p class="notice__text">${parts.map((p) => OPL.raw(p.strong ? `<strong>${p.text}</strong>` : p.text))}</p>
+</div>
+<button class="notice__close" aria-label="Dismiss" data-dismiss>${icon("x", 16)}</button>
+</div>`;
+ui.CmrPill = ({ label, risk, goto }) => html`
+<button class="cmr" data-press ${goto ? OPL.raw(`data-goto="${goto}"`) : ""}>
+<span class="cmr__lead"><span class="cmr__gauge">${icon("cmr-gauge", 24)}</span><span class="cmr__label">${label}</span></span>
+<span class="cmr__trail"><span class="cmr__risk">${risk}</span><span class="cmr__chev">${icon("alt-arrow-left", 16)}</span></span>
+</button>`;
+ui.Tracker = ({ steps, style = "tint" }) => html`
+<div class="tracker tracker--${style}">
+<div class="tracker__track">${steps.map((s, i) => OPL.raw(
+(i ? `<span class="tracker__line tracker__line--${steps[i - 1].state === "done" ? "done" : steps[i - 1].state === "progress" ? "progress" : "todo"}" style="--i:${i}"><i></i></span>` : "") +
+`<span class="tracker__step tracker__step--${s.state}" style="--i:${i}">${icon(s.icon, 16)}</span>`
+))}</div>
+<div class="tracker__labels">${steps.map((s) => OPL.raw(`<p class="tracker__label tracker__label--${s.state}">${s.label}</p>`))}</div>
+</div>`;
+ui.ApplicationCard = ({ logo, name, product, tag, figures, steps, cta, goto, tint, trackerStyle, ctaVariant = "filled", ctaAttrs = "", note, footnote, id }) => html`
+<article class="app-card" ${tint ? OPL.raw(`style="--app-tint:${tint}"`) : ""} ${id ? OPL.raw(`data-app="${id}"`) : ""}>
+<div class="app-card__lender" ${id ? OPL.raw(`data-app-open="${id}" data-press`) : ""}>
+${ui.Logo({ id: logo, size: 40 })}
+<div class="app-card__name"><p class="app-card__title">${name}</p><p class="app-card__sub">${product}</p></div>
+${tag ? OPL.raw(`<span class="app-card__tag">${tag}</span>`) : ""}
+</div>
+<div class="app-card__body">
+<div class="app-card__main">
+<div class="app-card__figures">${figures.map((f) => OPL.raw(`
+<div class="figure figure--app"><span class="figure__label">${f.label}</span>
+<span class="figure__value">${f.value}${f.unit ? `<span class="figure__unit">${f.unit}</span>` : ""}</span></div>`))}</div>
+${ui.Tracker({ steps, style: trackerStyle })}
+</div>
+<div class="app-card__actions">
+${ui.Button({ label: cta, size: "md", block: true, goto, variant: ctaVariant, attrs: ctaAttrs })}
+${note ? OPL.raw(`<p class="app-card__note">${note}</p>`) : ""}
+</div>
+</div>
+${footnote ? OPL.raw(`<div class="app-card__foot">${icon("info-circle-amber", 16)}<span>${footnote}</span></div>`) : ""}
+</article>`;
+ui.BorrowingCard = ({ total, legend, available, goto }) => html`
+<article class="borrow" data-press ${goto ? OPL.raw(`data-goto="${goto}"`) : ""}>
+<div class="borrow__total"><span class="figure__label">${total.label}</span><span class="borrow__amount">${total.value}</span></div>
+<div class="borrow__row">
+<img class="borrow__donut" src="${img("donut-borrowing.svg")}" width="103" height="103" alt="">
+<div class="borrow__side">
+<div class="borrow__legend">${legend.map((l) => OPL.raw(`
+<div class="borrow__item">${icon(l.dot, 8)}<span class="borrow__item-label">${l.label}</span><span class="borrow__item-value">${l.value}</span></div>`))}</div>
+<div class="figure figure--avail"><span class="figure__label">${available.label}</span>
+<span class="figure__value">${available.value}<span class="figure__unit">${available.unit}</span></span></div>
+</div>
+</div>
+</article>`;
+ui.OfferCard = ({ id, kind = "offer", logo, tint, tags = [], title, subtitle, figures, details, selected = false }) => html`
+<article class="${cx("offer", `offer--${kind}`, selected && "is-selected")}" style="--tint:${tint}" data-offer="${id}">
+<div class="offer__head" data-press data-detail="${id}">
+<div class="offer__tags">${tags.map((t) => OPL.raw(`<span class="offer__tag offer__tag--${t.tone}">${t.text}</span>`))}</div>
+<div class="offer__id">
+${ui.Logo({ id: logo, size: 40 })}
+<div class="offer__text"><p class="offer__title">${title}</p><p class="offer__sub">${subtitle}</p></div>
+</div>
+</div>
+<div class="offer__figs">
+<div class="offer__figrow">${figures.map((f) => OPL.raw(`
+<div class="figure"><span class="figure__label">${f.label}</span>
+<span class="figure__value">${f.value}${f.unit ? `<span class="figure__unit">${f.unit}</span>` : ""}</span></div>`))}</div>
+<span class="offer__divider"></span>
+</div>
+<div class="offer__details">${details.map(([l, v]) => OPL.raw(`<div class="offer__row"><span>${l}</span><span>${v}</span></div>`))}</div>
+<div class="offer__foot">
+<button class="offer__compare" data-compare="${id}" aria-pressed="${selected}">
+<img class="ico offer__check" src="assets/icons/${selected ? "check-square-checked" : "check-square"}.svg" width="24" height="24" alt="">
+<span>Compare</span>
+</button>
+${ui.Button({ label: "Apply now", variant: "tonal", size: "md", trailing: "arrow-right-primary", attrs: `data-apply="${id}"` })}
+</div>
+</article>`;
+ui.LoanDetail = ({ offer, record }) => {
+const r = (record && record.values) || {};
+const card = Object.fromEntries(offer.details);
+const coll = Array.isArray(r.collateral) ? r.collateral : [];
+const rows = [
+["Loan type", r.type],
+["Tenure", card["Tenure"] || r.tenure],
+card["Pay on"] && ["Pay on", card["Pay on"]],
+["Processing fee", card["Fee"] || r.fee],
+coll.length && ["Collateral", coll[1] ? `${coll[0]} · ${coll[1]}` : coll[0]],
+["Money in", r.money],
+].filter((x) => x && x[1]);
+const figs = [
+offer.figures[0],
+offer.figures[1],
+{ label: "APR", value: r.apr },
+{ label: "Est. EMI", value: r.emi || card["Est. EMI"] },
+].filter((f) => f && f.value);
+return html`
+<div class="detail" style="--tint:${offer.tint}">
+<div class="offer__head detail__head">
+<div class="offer__tags">${offer.tags.map((t) => OPL.raw(`<span class="offer__tag offer__tag--${t.tone}">${t.text}</span>`))}</div>
+<div class="offer__id detail__id">
+${ui.Logo({ id: offer.logo, size: 44 })}
+<div class="offer__text"><p class="offer__title">${offer.title}</p><p class="offer__sub">${offer.subtitle}</p></div>
+</div>
+</div>
+<div class="detail__figs">${figs.map((f) => OPL.raw(`
+<div class="figure"><span class="figure__label">${f.label}</span>
+<span class="figure__value">${f.value}${f.unit ? `<span class="figure__unit">${f.unit}</span>` : ""}</span></div>`))}</div>
+<div class="detail__rows">${rows.map(([l, v]) => OPL.raw(`<div class="offer__row"><span>${l}</span><span>${v}</span></div>`))}</div>
+</div>`;
+};
+ui.LoanDetailFoot = ({ id, selected, compare = true }) => html`
+<div class="detail__foot">
+${compare ? OPL.raw(`<button class="offer__compare" data-detail-compare="${id}" aria-pressed="${selected}">
+<img class="ico offer__check" src="assets/icons/${selected ? "check-square-checked" : "check-square"}.svg" width="24" height="24" alt="">
+<span>Compare</span>
+</button>`) : ""}
+${ui.Button({ label: "Apply now", trailing: "chevron-right-white", attrs: `style="flex:1" data-apply="${id}"` })}
+</div>`;
+ui.SortOption = ({ label, selected = false }) => html`
+<button class="${cx("sort-opt", selected && "is-selected")}" data-sort="${label}" data-press>
+<span class="sort-opt__label">${label}</span>
+${selected ? OPL.raw(`<img class="ico" src="assets/icons/radio-selected.svg" width="20" height="20" alt="">`) : OPL.raw(`<span class="sort-opt__radio"></span>`)}
+</button>`;
+ui.Sheet = ({ id, title, action, body, footer }) => html`
+<div class="sheet-layer" data-sheet="${id}" hidden>
+<div class="sheet-scrim" data-sheet-close></div>
+<section class="sheet" role="dialog" aria-label="${title}">
+<div class="sheet__grip" data-sheet-drag><span class="sheet__grabber"></span>
+<div class="sheet__head"><h2 class="sheet__title">${title}</h2>${action ? OPL.raw(`<button class="sheet__action" data-sheet-action>${action}</button>`) : ""}</div>
+</div>
+${OPL.raw(String(body))}
+${footer ? OPL.raw(`<div class="sheet__foot">${footer}</div>`) : ""}
+</section>
+</div>`;
+ui.CompareTray = ({ selected, max = 3 }) => html`
+<div class="tray">
+<img class="tray__texture" src="${img("hero-texture.jpg")}" alt="">
+<span class="tray__blur"></span>
+<div class="tray__head">
+<p class="tray__title">Comparing ${selected.length} of ${max} loans</p>
+<button class="tray__clear" data-compare-clear>Clear all</button>
+</div>
+<div class="tray__row">
+<div class="tray__logos">
+${selected.map((s) => OPL.raw(`<span class="tray__slot" data-slot="${s.id}">${ui.Logo({ id: s.logo, size: 44 })}
+<button class="tray__remove" data-compare-remove="${s.id}" aria-label="Remove">${icon("close-circle", 20)}</button></span>`))}
+${Array.from({ length: Math.max(0, max - selected.length) }, () => OPL.raw(`<button class="tray__add" data-compare-add aria-label="Add a loan">${icon("add-circle", 44)}</button>`))}
+</div>
+${ui.Button({ label: "Compare", variant: "white", size: "md", trailing: "arrow-right-primary", attrs: "data-compare-go" })}
+</div>
+</div>`;
+ui.Toggle = ({ on = false, attrs = "" }) => html`
+<button class="${cx("toggle", on && "is-on")}" role="switch" aria-checked="${on}" ${OPL.raw(attrs)}><span class="toggle__knob"></span></button>`;
+ui.CompareAddCol = ({ rows, label = "Add loan" }) =>
+OPL.raw(`<div class="ct-col ct-col--add" data-col="add">
+<div class="ct-head"><button class="ct-add" data-compare-more data-press>${icon("add-circle", 28)}<span>${label}</span></button></div>
+${rows.map((r) => `<div class="ct-cell ct-value" data-row="${r.id}" style="--h:${r.h}px"></div>`).join("")}
+</div>`);
+ui.CompareTable = ({ rows, lenders, addSlot = false, addLabel }) => {
+const label = (r) => `<div class="ct-cell ct-label" data-row="${r.id}" style="--h:${r.h}px">
+<div class="ct-label__main" style="gap:${r.gap || 4}px"><span>${r.label}</span>${r.info ? icon("info-circle", 14) : ""}</div>
+${r.sub ? `<span class="ct-sub">${r.sub}</span>` : ""}</div>`;
+const value = (l, r) => {
+const v = l.values[r.id];
+const best = (l.best || []).includes(r.id);
+return `<div class="${cx("ct-cell ct-value", r.small && "ct-value--small", best && "is-best", v === "—" && "is-na")}" data-row="${r.id}" style="--h:${r.h}px">
+${Array.isArray(v) ? `<span>${v[0]}</span><span class="ct-sub">${v[1]}</span>` : `<span>${v}</span>`}</div>`;
+};
+return html`
+<div class="ct">
+<div class="ct-labels">
+<div class="ct-cell ct-label ct-label--lender"><span>Lender</span></div>
+${rows.map((r) => OPL.raw(label(r)))}
+</div>
+<div class="ct-scroll" data-ct-scroll>
+${lenders.map((l) => OPL.raw(`<div class="ct-col" data-col="${l.id}">
+<div class="ct-head"><div class="ct-card"><div class="ct-card__inner" style="background:${l.tint}">
+<div class="ct-card__top">${ui.Logo({ id: l.logo, size: 28 })}<button class="ct-card__x" data-col-remove="${l.id}" aria-label="Remove ${l.name}">${icon("x-16", 16)}</button></div>
+<p class="ct-card__name">${l.name}</p></div></div></div>
+${rows.map((r) => value(l, r)).join("")}
+</div>`))}
+${addSlot ? ui.CompareAddCol({ rows, label: addLabel }) : ""}
+</div>
+</div>`;
+};
+ui.ComparePick = ({ label, lenders, addSlot = false }) => html`
+<div class="ct-pick">
+<div class="ct-pick__label">${label}</div>
+<div class="ct-pick__scroll" data-ct-pick>
+${lenders.map((l) => OPL.raw(`<div class="ct-pick__cell" data-col="${l.id}">
+${ui.Button({ label: l.selected ? "Selected" : "Select", variant: l.selected ? "soft" : "outlined", size: "md", block: true, attrs: `data-pick="${l.id}"` })}</div>`))}
+${addSlot ? OPL.raw(`<div class="ct-pick__cell" data-col="add"></div>`) : ""}
+</div>
+</div>`;
+ui.StatusBar = () => html`
+<div class="status-bar">
+<span class="status-bar__time">9:41</span>
+<span class="status-bar__icons">${icon("status-signal", 17)}${icon("status-wifi", 17)}${icon("status-battery", 22)}</span>
+</div>`;
+ui.AppHeader = ({ title, back = false, backIcon = "arrow-left", compact = false, actions }) => html`
+<header class="${cx("app-header", compact && "app-header--compact")}">
+<div class="app-header__lead">
+${back ? OPL.raw(`<button class="app-header__back" aria-label="Back" data-press data-back>${icon(backIcon, 24)}</button>`) : ""}
+<h1 class="app-header__title">${title}</h1>
+</div>
+<div class="app-header__actions">
+${actions
+? actions.map((a) => ui.IconButton(a))
+: [ui.IconButton({ icon: "bell-linear", label: "Notifications", goto: "notifications" }),
+ui.IconButton({ icon: "headphones-round-sound-linear", label: "Support", goto: "support" }),
+ui.Avatar({ goto: "profile" })]}
+</div>
+</header>`;
+ui.AiMitraFab = ({ nudge } = {}) => html`
+<div class="fab-wrap">
+${nudge ? OPL.raw(`<button class="fab-nudge" data-goto="ai-mitra" tabindex="-1" aria-hidden="true">
+<span class="fab-nudge__text">${nudge.lead} <strong>${nudge.topic}</strong></span></button>`) : ""}
+<button class="fab" aria-label="Ask AI Mitra${nudge ? ` — ${nudge.lead} ${nudge.topic}` : ""}" data-press data-goto="ai-mitra">
+${icon("ai-mitra-logo", 24)}
+</button>
+</div>`;
+ui.PageNote = ({ lines, icon: name, tone = "neutral" }) => html`
+<footer class="page-note page-note--${tone}">
+<p class="page-note__lead">${name ? icon(name, 16) : ""}<span>${lines[0]}</span></p>
+${lines.slice(1).map((l) => OPL.raw(`<p>${l}</p>`))}
+</footer>`;
+ui.BottomNav = ({ items, active, variant = "main" }) => html`
+<nav class="nav nav--${variant}">
+${items.map((it) => OPL.raw(`
+<button class="nav__item ${it.id === active ? "is-active" : ""}" data-press ${it.id === active ? "" : `data-goto="${it.goto || it.id}"`}>
+<span class="nav__pill">${icon(it.id === active ? it.iconActive : it.icon, 24)}</span>
+<span class="nav__label">${it.label}</span>
+</button>`))}
+</nav>`;
 })();
 
 ;
@@ -478,171 +478,171 @@
 /* ==== js/components-flow.js ==== */
 
 (function () {
-  const { html, icon, img, cx, ui } = OPL;
-  const NOTE_ICON = { neutral: "info-circle-neutral", info: "info-circle-primary", warning: "danger-circle" };
-  ui.NoteRow = ({ text, tone = "neutral" }) => html`
-    <div class="note-row note-row--${tone}">
-      <span class="note-row__tile">${icon(NOTE_ICON[tone], 18)}</span>
-      <p class="note-row__text">${OPL.raw(text)}</p>
-    </div>`;
-  ui.ApplySheetBody = ({ lenders }) => {
-    const a = OPL.data.apply;
-    const names = lenders.map((l) => l.name).join(" and ");
-    return html`
-      <div class="apply">
-        <div class="apply__top">
-          <img class="apply__texture" src="${img("hero-texture.jpg")}" alt="">
-          <span class="sheet__grabber apply__grabber" data-sheet-drag></span>
-          <h2 class="apply__title">${lenders.length === 1 ? a.titleOne(lenders[0].name) : a.titleMany(lenders.length)}</h2>
-          <div class="apply__lenders">${lenders.map((l) => OPL.raw(`
-            <div class="apply__lender">${ui.Logo({ id: l.logo, size: 32 })}
-              <div class="apply__lender-text"><p>${l.name}</p><span>${l.type}</span></div>
-              <p class="apply__amount">${l.amount}</p></div>`))}</div>
-        </div>
-        <div class="apply__notes">${a.notes.map((n) => ui.NoteRow({ text: n }))}</div>
-        <div class="apply__consent-wrap">
-          <button class="apply__consent" data-consent aria-pressed="true">
-            <img class="ico" src="assets/icons/check-square-22.svg" width="22" height="22" alt="">
-            <span>${a.consent(names)}</span>
-          </button>
-        </div>
-        <div class="apply__actions">
-          ${ui.Button({ label: a.submit(lenders.length), block: true, strong: true, attrs: "data-apply-submit" })}
-          <button class="apply__cancel" data-sheet-close>${a.cancel}</button>
-        </div>
-      </div>`;
-  };
-  ui.Timeline = ({ items }) => html`
-    <div class="tl">${items.map((it, i) => OPL.raw(`
-      <div class="tl__item tl__item--${it.state}">
-        <div class="tl__rail"><span class="tl__node tl__node--${it.state}" style="--i:${i}">${icon(it.icon, 16)}</span>
-          ${i < items.length - 1 ? `<span class="tl__line ${it.line === "fade" ? "tl__line--fade" : it.state === "done" ? "tl__line--done" : ""}"></span>` : ""}</div>
-        <div class="tl__text"><p class="tl__title${it.strong ? " tl__title--strong" : ""}">${it.title}</p>${it.sub ? `<p class="tl__sub ${it.subTone ? `tl__sub--${it.subTone}` : ""}">${it.sub}</p>` : ""}</div>
-      </div>`))}</div>`;
-  ui.InfoCard = ({ title, body }) => html`
-    <section class="info-card is-open">
-      <button class="info-card__head" data-accordion><span>${title}</span>${icon("alt-arrow-right", 16, "info-card__chev")}</button>
-      <div class="info-card__body"><div class="info-card__inner">${OPL.raw(String(body))}</div></div>
-    </section>`;
-  ui.DocList = ({ items }) => OPL.raw(items.map((t) => `<div class="doc-row">${icon("document-text-20", 20)}<span>${t}</span></div>`).join(""));
-  ui.ContactList = ({ phone, email }) => OPL.raw(`
-    <div class="contact-row"><span class="contact-row__tile">${icon("phone-rounded", 20)}</span><span class="contact-row__value">${phone}</span>
-      <button class="copy-btn" data-copy="${phone}" aria-label="Copy">${icon("copy", 16)}</button></div>
-    <div class="contact-row"><span class="contact-row__tile">${icon("letter", 20)}</span><span class="contact-row__value">${email}</span>
-      <button class="copy-btn" data-copy="${email}" aria-label="Copy">${icon("copy", 16)}</button></div>`);
-  ui.DetailRows = ({ rows }) => OPL.raw(rows.map(([l, v, copy]) => `
-    <div class="detail-row"><span>${l}</span><span class="detail-row__v">${v}${copy ? `<button class="copy-btn" data-copy="${v}" aria-label="Copy">${icon("copy", 16)}</button>` : ""}</span></div>`).join(""));
-  ui.WhatsAppRow = ({ label, on = true }) => html`
-    <div class="wa-row"><img class="wa-row__logo" src="${img("whatsapp.png")}" width="24" height="24" alt=""><span>${label}</span>
-      ${ui.Toggle({ on, attrs: "data-wa" })}</div>`;
-  ui.AprCard = ({ s, chip }) => html`
-    <div class="kfs-apr">
-      <div class="kfs-apr__head"><img class="kfs-apr__tex" src="${img("hero-texture.jpg")}" alt=""><p>APR</p><p class="kfs-apr__v">${s.apr}</p>
-        ${chip ? OPL.raw(`<span class="ok-chip kfs-apr__chip">${icon("check-circle-chip", 14)}<span>${chip}</span></span>`) : ""}</div>
-      <div class="kfs-apr__grid">
-        <div><span>Loan amount</span><b>${s.loanAmount}</b></div>
-        <div><span>Tenure</span><b>${s.tenure}<i> months</i></b></div>
-        <div><span>Interest rate</span><b>${s.rate}<i> p.a.</i></b></div>
-        <div><span>Monthly EMI</span><b>${s.emi}</b></div>
-      </div>
-    </div>`;
-  ui.KeyValueCard = ({ rows }) => html`
-    <div class="kv-card">${rows.map(([k, v]) => OPL.raw(`<div class="kv-card__row"><span>${k}</span><b>${v}</b></div>`))}</div>`;
-  ui.KfsSummary = ({ s }) => html`
-    <div class="kfs-sum">
-      <h3 class="kfs-sum__title">KFS Summary</h3>
-      ${ui.AprCard({ s })}
-      <div class="kfs-repay">
-        <div class="kfs-repay__head"><span>You repay</span><b>${s.repay}</b></div>
-        <div class="kfs-repay__bar">${s.split.map((p) => OPL.raw(`<span style="flex:${p.w} 0 0;background:${p.color}"></span>`))}</div>
-        <div class="kfs-repay__legend">${s.split.map((p) => OPL.raw(`<div>${icon(p.dot, 8)}<span>${p.label}</span><b>${p.value}</b></div>`))}</div>
-      </div>
-      <div class="kfs-facts">${s.facts.map((f) => OPL.raw(`<span>${f}</span>`))}</div>
-    </div>`;
-  const CONFETTI = [
-    { t: "r", x: 352.367, y: 69.4755, rot: -10, fill: "#3858E5", cx: 354.87, cy: 75.48 },
-    { t: "r", x: 330.166, y: 23.7718, rot: 11, fill: "#3858E5", cx: 332.67, cy: 29.77 },
-    { t: "r", x: 70.9786, y: 18.4614, rot: -16, fill: "#14B8A6", cx: 73.48, cy: 24.46 },
-    { t: "r", x: 67.6425, y: 79.1371, rot: -51, fill: "#A5B4FC", cx: 70.14, cy: 85.14 },
-    { t: "c", cx: 334.204, cy: 153.199, r: 3.5, fill: "#14B8A6" },
-    { t: "r", x: 19.7542, y: 45.727, rot: -14, fill: "#3858E5", cx: 22.25, cy: 51.73 },
-    { t: "c", cx: 103.075, cy: 124.51, r: 3, fill: "#FFBB00" },
-    { t: "r", x: 100.188, y: 65.8312, rot: 1, fill: "#14B8A6", cx: 102.69, cy: 71.83 },
-    { t: "c", cx: 20.5939, cy: 151.894, r: 2.5, fill: "#A5B4FC" },
-    { t: "c", cx: 84.2341, cy: 165.148, r: 3, fill: "#A5B4FC" },
-    { t: "c", cx: 95.4787, cy: 97.9172, r: 3.5, fill: "#3858E5" },
-    { t: "c", cx: 54.4103, cy: 158.598, r: 4, fill: "#3858E5" },
-    { t: "c", cx: 335.002, cy: 147.873, r: 3.5, fill: "#14B8A6" },
-    { t: "r", x: 104.861, y: 122.427, rot: 32, fill: "#14B8A6", cx: 107.36, cy: 128.43 },
-    { t: "c", cx: 133.229, cy: 163.184, r: 4, fill: "#14B8A6" },
-    { t: "r", x: 87.4348, y: 109.234, rot: -7, fill: "#3858E5", cx: 89.93, cy: 115.23 }
-  ];
-  const ORIGIN = { x: 195, y: 90 };   // centre of the lender mark
-  ui.Confetti = () => OPL.raw(`<svg class="ms__confetti" viewBox="0 0 390 176" width="390" height="176" aria-hidden="true">${CONFETTI.map((p, i) => {
-    const dx = (ORIGIN.x - p.cx).toFixed(1), dy = (ORIGIN.y - p.cy).toFixed(1);
-    const spin = (i % 2 ? 1 : -1) * (180 + (i * 37) % 200);
-    const shape = p.t === "r"
-      ? `<rect x="${p.x}" y="${p.y}" width="5" height="12" rx="1.5" transform="rotate(${p.rot} ${p.x} ${p.y})" fill="${p.fill}"/>`
-      : `<circle cx="${p.cx}" cy="${p.cy}" r="${p.r}" fill="${p.fill}"/>`;
-    const fall = 150 + (i * 53) % 90;                      // falls out past the hero's bottom edge
-    const drift = ((i * 29) % 40) - 20;                    // a little sideways wander
-    return `<g class="cf" style="--dx:${dx}px;--dy:${dy}px;--spin:${spin}deg;--fall:${fall}px;--drift:${drift}px;--i:${i}">${shape}</g>`;
-  }).join("")}</svg>`);
-  ui.MilestoneApproved = ({ lender, logo, type, figures, title, body, note }) => html`
-    <div class="ms">
-      <span class="sheet__grabber" data-sheet-drag></span>
-      <div class="ms__hero">
-        ${ui.Confetti()}
-        <img class="ms__ripple" src="${img("milestone-ripple.svg")}" alt="">
-        <img class="ms__glow1" src="${img("milestone-glow-1.svg")}" alt="">
-        <img class="ms__glow2" src="${img("milestone-glow-2.svg")}" alt="">
-        <span class="ms__core"><img src="${img("milestone-core.svg")}" alt=""></span>
-        <span class="ms__mark">${ui.Logo({ id: logo, size: 52 })}</span>
-        <img class="ms__badge-bg" src="${img("milestone-badge-bg.svg")}" alt="">
-        <img class="ms__badge" src="${img("milestone-badge.svg")}" alt="">
-      </div>
-      <div class="ms__content">
-        <div class="ms__msg"><h2>${title}</h2><p>${body}</p></div>
-        <div class="ms__card">
-          <div class="ms__lender">${ui.Logo({ id: logo, size: 36 })}<div><p>${lender}</p><span>${type}</span></div></div>
-          <span class="ms__divider"></span>
-          <div class="ms__figs">${figures.map((f) => OPL.raw(`<div><span>${f.label}</span><b>${f.value}${f.unit ? `<i> ${f.unit}</i>` : ""}</b></div>`))}</div>
-        </div>
-        ${ui.NoteRow({ text: note, tone: "warning" })}
-        <div class="ms__actions">
-          ${ui.Button({ label: "Review KFS", block: true, attrs: "data-ms-review" })}
-          <button class="ms__later" data-sheet-close>Later</button>
-        </div>
-      </div>
-    </div>`;
-  ui.NeslSheetBody = ({ d }) => html`
-    <div class="nesl-sheet">
-      <span class="sheet__grabber" data-sheet-drag></span>
-      <div class="nesl-sheet__head">
-        <div class="nesl-sheet__progress"><span class="ok-chip">${icon("check-circle-green", 14)}<span>${d.chip}</span></span><span class="nesl-sheet__step">${d.step}</span></div>
-        <h2 class="nesl-sheet__title">${d.title}</h2>
-      </div>
-      <ol class="nesl-steps">${d.steps.map((t, i) => OPL.raw(`
-        <li class="nesl-steps__item" style="--i:${i}"><span class="nesl-steps__rail"><span class="nesl-steps__no">${i + 1}</span>${i < d.steps.length - 1 ? '<span class="nesl-steps__line"></span>' : ""}</span><span class="nesl-steps__text">${t}</span></li>`))}</ol>
-      ${ui.NoteRow({ text: d.note, tone: "warning" })}
-      <div class="nesl-sheet__actions">
-        ${ui.Button({ label: d.cta, trailing: "arrow-square-out-white", block: true, attrs: "data-nesl-go" })}
-        <button class="ms__later" data-nesl-later>${d.later}</button>
-      </div>
-    </div>`;
-  ui.MilestoneSigned = ({ title, body, rows, cta, done }) => html`
-    <div class="ms ms--signed">
-      <span class="sheet__grabber" data-sheet-drag></span>
-      <div class="ms__hero">${OPL.raw(ui.SignedHeroSvg)}</div>
-      <div class="ms__content">
-        <div class="ms__msg"><h2>${title}</h2><p>${OPL.raw(body)}</p></div>
-        <div class="ms__card ms__card--rows">${rows.map(([k, v]) => OPL.raw(`<div class="ms__row"><span>${k}</span><b>${v}</b></div>`))}</div>
-        <div class="ms__actions">
-          ${ui.Button({ label: cta, block: true, attrs: "data-ms-view" })}
-          <button class="ms__later" data-ms-done>${done}</button>
-        </div>
-      </div>
-    </div>`;
+const { html, icon, img, cx, ui } = OPL;
+const NOTE_ICON = { neutral: "info-circle-neutral", info: "info-circle-primary", warning: "danger-circle" };
+ui.NoteRow = ({ text, tone = "neutral" }) => html`
+<div class="note-row note-row--${tone}">
+<span class="note-row__tile">${icon(NOTE_ICON[tone], 18)}</span>
+<p class="note-row__text">${OPL.raw(text)}</p>
+</div>`;
+ui.ApplySheetBody = ({ lenders }) => {
+const a = OPL.data.apply;
+const names = lenders.map((l) => l.name).join(" and ");
+return html`
+<div class="apply">
+<div class="apply__top">
+<img class="apply__texture" src="${img("hero-texture.jpg")}" alt="">
+<span class="sheet__grabber apply__grabber" data-sheet-drag></span>
+<h2 class="apply__title">${lenders.length === 1 ? a.titleOne(lenders[0].name) : a.titleMany(lenders.length)}</h2>
+<div class="apply__lenders">${lenders.map((l) => OPL.raw(`
+<div class="apply__lender">${ui.Logo({ id: l.logo, size: 32 })}
+<div class="apply__lender-text"><p>${l.name}</p><span>${l.type}</span></div>
+<p class="apply__amount">${l.amount}</p></div>`))}</div>
+</div>
+<div class="apply__notes">${a.notes.map((n) => ui.NoteRow({ text: n }))}</div>
+<div class="apply__consent-wrap">
+<button class="apply__consent" data-consent aria-pressed="true">
+<img class="ico" src="assets/icons/check-square-22.svg" width="22" height="22" alt="">
+<span>${a.consent(names)}</span>
+</button>
+</div>
+<div class="apply__actions">
+${ui.Button({ label: a.submit(lenders.length), block: true, strong: true, attrs: "data-apply-submit" })}
+<button class="apply__cancel" data-sheet-close>${a.cancel}</button>
+</div>
+</div>`;
+};
+ui.Timeline = ({ items }) => html`
+<div class="tl">${items.map((it, i) => OPL.raw(`
+<div class="tl__item tl__item--${it.state}">
+<div class="tl__rail"><span class="tl__node tl__node--${it.state}" style="--i:${i}">${icon(it.icon, 16)}</span>
+${i < items.length - 1 ? `<span class="tl__line ${it.line === "fade" ? "tl__line--fade" : it.state === "done" ? "tl__line--done" : ""}"></span>` : ""}</div>
+<div class="tl__text"><p class="tl__title${it.strong ? " tl__title--strong" : ""}">${it.title}</p>${it.sub ? `<p class="tl__sub ${it.subTone ? `tl__sub--${it.subTone}` : ""}">${it.sub}</p>` : ""}</div>
+</div>`))}</div>`;
+ui.InfoCard = ({ title, body }) => html`
+<section class="info-card is-open">
+<button class="info-card__head" data-accordion><span>${title}</span>${icon("alt-arrow-right", 16, "info-card__chev")}</button>
+<div class="info-card__body"><div class="info-card__inner">${OPL.raw(String(body))}</div></div>
+</section>`;
+ui.DocList = ({ items }) => OPL.raw(items.map((t) => `<div class="doc-row">${icon("document-text-20", 20)}<span>${t}</span></div>`).join(""));
+ui.ContactList = ({ phone, email }) => OPL.raw(`
+<div class="contact-row"><span class="contact-row__tile">${icon("phone-rounded", 20)}</span><span class="contact-row__value">${phone}</span>
+<button class="copy-btn" data-copy="${phone}" aria-label="Copy">${icon("copy", 16)}</button></div>
+<div class="contact-row"><span class="contact-row__tile">${icon("letter", 20)}</span><span class="contact-row__value">${email}</span>
+<button class="copy-btn" data-copy="${email}" aria-label="Copy">${icon("copy", 16)}</button></div>`);
+ui.DetailRows = ({ rows }) => OPL.raw(rows.map(([l, v, copy]) => `
+<div class="detail-row"><span>${l}</span><span class="detail-row__v">${v}${copy ? `<button class="copy-btn" data-copy="${v}" aria-label="Copy">${icon("copy", 16)}</button>` : ""}</span></div>`).join(""));
+ui.WhatsAppRow = ({ label, on = true }) => html`
+<div class="wa-row"><img class="wa-row__logo" src="${img("whatsapp.png")}" width="24" height="24" alt=""><span>${label}</span>
+${ui.Toggle({ on, attrs: "data-wa" })}</div>`;
+ui.AprCard = ({ s, chip }) => html`
+<div class="kfs-apr">
+<div class="kfs-apr__head"><img class="kfs-apr__tex" src="${img("hero-texture.jpg")}" alt=""><p>APR</p><p class="kfs-apr__v">${s.apr}</p>
+${chip ? OPL.raw(`<span class="ok-chip kfs-apr__chip">${icon("check-circle-chip", 14)}<span>${chip}</span></span>`) : ""}</div>
+<div class="kfs-apr__grid">
+<div><span>Loan amount</span><b>${s.loanAmount}</b></div>
+<div><span>Tenure</span><b>${s.tenure}<i> months</i></b></div>
+<div><span>Interest rate</span><b>${s.rate}<i> p.a.</i></b></div>
+<div><span>Monthly EMI</span><b>${s.emi}</b></div>
+</div>
+</div>`;
+ui.KeyValueCard = ({ rows }) => html`
+<div class="kv-card">${rows.map(([k, v]) => OPL.raw(`<div class="kv-card__row"><span>${k}</span><b>${v}</b></div>`))}</div>`;
+ui.KfsSummary = ({ s }) => html`
+<div class="kfs-sum">
+<h3 class="kfs-sum__title">KFS Summary</h3>
+${ui.AprCard({ s })}
+<div class="kfs-repay">
+<div class="kfs-repay__head"><span>You repay</span><b>${s.repay}</b></div>
+<div class="kfs-repay__bar">${s.split.map((p) => OPL.raw(`<span style="flex:${p.w} 0 0;background:${p.color}"></span>`))}</div>
+<div class="kfs-repay__legend">${s.split.map((p) => OPL.raw(`<div>${icon(p.dot, 8)}<span>${p.label}</span><b>${p.value}</b></div>`))}</div>
+</div>
+<div class="kfs-facts">${s.facts.map((f) => OPL.raw(`<span>${f}</span>`))}</div>
+</div>`;
+const CONFETTI = [
+{ t: "r", x: 352.367, y: 69.4755, rot: -10, fill: "#3858E5", cx: 354.87, cy: 75.48 },
+{ t: "r", x: 330.166, y: 23.7718, rot: 11, fill: "#3858E5", cx: 332.67, cy: 29.77 },
+{ t: "r", x: 70.9786, y: 18.4614, rot: -16, fill: "#14B8A6", cx: 73.48, cy: 24.46 },
+{ t: "r", x: 67.6425, y: 79.1371, rot: -51, fill: "#A5B4FC", cx: 70.14, cy: 85.14 },
+{ t: "c", cx: 334.204, cy: 153.199, r: 3.5, fill: "#14B8A6" },
+{ t: "r", x: 19.7542, y: 45.727, rot: -14, fill: "#3858E5", cx: 22.25, cy: 51.73 },
+{ t: "c", cx: 103.075, cy: 124.51, r: 3, fill: "#FFBB00" },
+{ t: "r", x: 100.188, y: 65.8312, rot: 1, fill: "#14B8A6", cx: 102.69, cy: 71.83 },
+{ t: "c", cx: 20.5939, cy: 151.894, r: 2.5, fill: "#A5B4FC" },
+{ t: "c", cx: 84.2341, cy: 165.148, r: 3, fill: "#A5B4FC" },
+{ t: "c", cx: 95.4787, cy: 97.9172, r: 3.5, fill: "#3858E5" },
+{ t: "c", cx: 54.4103, cy: 158.598, r: 4, fill: "#3858E5" },
+{ t: "c", cx: 335.002, cy: 147.873, r: 3.5, fill: "#14B8A6" },
+{ t: "r", x: 104.861, y: 122.427, rot: 32, fill: "#14B8A6", cx: 107.36, cy: 128.43 },
+{ t: "c", cx: 133.229, cy: 163.184, r: 4, fill: "#14B8A6" },
+{ t: "r", x: 87.4348, y: 109.234, rot: -7, fill: "#3858E5", cx: 89.93, cy: 115.23 }
+];
+const ORIGIN = { x: 195, y: 90 };   // centre of the lender mark
+ui.Confetti = () => OPL.raw(`<svg class="ms__confetti" viewBox="0 0 390 176" width="390" height="176" aria-hidden="true">${CONFETTI.map((p, i) => {
+const dx = (ORIGIN.x - p.cx).toFixed(1), dy = (ORIGIN.y - p.cy).toFixed(1);
+const spin = (i % 2 ? 1 : -1) * (180 + (i * 37) % 200);
+const shape = p.t === "r"
+? `<rect x="${p.x}" y="${p.y}" width="5" height="12" rx="1.5" transform="rotate(${p.rot} ${p.x} ${p.y})" fill="${p.fill}"/>`
+: `<circle cx="${p.cx}" cy="${p.cy}" r="${p.r}" fill="${p.fill}"/>`;
+const fall = 150 + (i * 53) % 90;                      // falls out past the hero's bottom edge
+const drift = ((i * 29) % 40) - 20;                    // a little sideways wander
+return `<g class="cf" style="--dx:${dx}px;--dy:${dy}px;--spin:${spin}deg;--fall:${fall}px;--drift:${drift}px;--i:${i}">${shape}</g>`;
+}).join("")}</svg>`);
+ui.MilestoneApproved = ({ lender, logo, type, figures, title, body, note }) => html`
+<div class="ms">
+<span class="sheet__grabber" data-sheet-drag></span>
+<div class="ms__hero">
+${ui.Confetti()}
+<img class="ms__ripple" src="${img("milestone-ripple.svg")}" alt="">
+<img class="ms__glow1" src="${img("milestone-glow-1.svg")}" alt="">
+<img class="ms__glow2" src="${img("milestone-glow-2.svg")}" alt="">
+<span class="ms__core"><img src="${img("milestone-core.svg")}" alt=""></span>
+<span class="ms__mark">${ui.Logo({ id: logo, size: 52 })}</span>
+<img class="ms__badge-bg" src="${img("milestone-badge-bg.svg")}" alt="">
+<img class="ms__badge" src="${img("milestone-badge.svg")}" alt="">
+</div>
+<div class="ms__content">
+<div class="ms__msg"><h2>${title}</h2><p>${body}</p></div>
+<div class="ms__card">
+<div class="ms__lender">${ui.Logo({ id: logo, size: 36 })}<div><p>${lender}</p><span>${type}</span></div></div>
+<span class="ms__divider"></span>
+<div class="ms__figs">${figures.map((f) => OPL.raw(`<div><span>${f.label}</span><b>${f.value}${f.unit ? `<i> ${f.unit}</i>` : ""}</b></div>`))}</div>
+</div>
+${ui.NoteRow({ text: note, tone: "warning" })}
+<div class="ms__actions">
+${ui.Button({ label: "Review KFS", block: true, attrs: "data-ms-review" })}
+<button class="ms__later" data-sheet-close>Later</button>
+</div>
+</div>
+</div>`;
+ui.NeslSheetBody = ({ d }) => html`
+<div class="nesl-sheet">
+<span class="sheet__grabber" data-sheet-drag></span>
+<div class="nesl-sheet__head">
+<div class="nesl-sheet__progress"><span class="ok-chip">${icon("check-circle-green", 14)}<span>${d.chip}</span></span><span class="nesl-sheet__step">${d.step}</span></div>
+<h2 class="nesl-sheet__title">${d.title}</h2>
+</div>
+<ol class="nesl-steps">${d.steps.map((t, i) => OPL.raw(`
+<li class="nesl-steps__item" style="--i:${i}"><span class="nesl-steps__rail"><span class="nesl-steps__no">${i + 1}</span>${i < d.steps.length - 1 ? '<span class="nesl-steps__line"></span>' : ""}</span><span class="nesl-steps__text">${t}</span></li>`))}</ol>
+${ui.NoteRow({ text: d.note, tone: "warning" })}
+<div class="nesl-sheet__actions">
+${ui.Button({ label: d.cta, trailing: "arrow-square-out-white", block: true, attrs: "data-nesl-go" })}
+<button class="ms__later" data-nesl-later>${d.later}</button>
+</div>
+</div>`;
+ui.MilestoneSigned = ({ title, body, rows, cta, done }) => html`
+<div class="ms ms--signed">
+<span class="sheet__grabber" data-sheet-drag></span>
+<div class="ms__hero">${OPL.raw(ui.SignedHeroSvg)}</div>
+<div class="ms__content">
+<div class="ms__msg"><h2>${title}</h2><p>${OPL.raw(body)}</p></div>
+<div class="ms__card ms__card--rows">${rows.map(([k, v]) => OPL.raw(`<div class="ms__row"><span>${k}</span><b>${v}</b></div>`))}</div>
+<div class="ms__actions">
+${ui.Button({ label: cta, block: true, attrs: "data-ms-view" })}
+<button class="ms__later" data-ms-done>${done}</button>
+</div>
+</div>
+</div>`;
 })();
 
 ;
@@ -650,200 +650,200 @@
 /* ==== js/components-subsidy.js ==== */
 
 (function () {
-  const { html, cx, raw } = OPL;
-  const ui = OPL.ui;
-  const LAZY = "assets/lazy/subsidy/";
-  const sicon = (OPL.sicon = (name, size = 24, cls = "") =>
-    raw(`<img class="ico ${cls}" src="${LAZY}icons/${name}.svg" width="${size}" height="${size}" alt="" draggable="false">`));
-  OPL.simg = (name) => LAZY + name;
-  const goto = (g) => (g ? raw(`data-goto="${g}"`) : "");
-  ui.CountBadge = ({ n }) => html`<span class="count-badge">${n}</span>`;
-  const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  const fmt = (d) => `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
-  const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
-  OPL.policyPeriod = ({ start, end, warnMonths = 6 }, today = new Date()) => {
-    const s = new Date(start + "T00:00:00"), e = new Date(end + "T00:00:00");
-    const t = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    let months = (e.getFullYear() - t.getFullYear()) * 12 + (e.getMonth() - t.getMonth());
-    if (e.getDate() < t.getDate()) months -= 1;
-    months = Math.max(0, months);
-    const y = Math.floor(months / 12), m = months % 12;
-    const left = t >= e ? "Closed" : months === 0 ? "Less than a month left"
-      : [y && plural(y, "year"), m && plural(m, "month")].filter(Boolean).join(" ") + " left";
-    const elapsed = Math.min(1, Math.max(0, (t - s) / (e - s)));
-    return { endLabel: fmt(e), startLabel: fmt(s), left, elapsed, warn: months < warnMonths };
-  };
-  ui.PolicyPeriod = ({ period }) => {
-    const p = OPL.policyPeriod(period);
-    return html`
-      <section class="period" style="--elapsed:${p.elapsed.toFixed(4)}">
-        <div class="period__head">
-          <span class="icon-tile">${sicon("calendar-widget", 24)}</span>
-          <div class="period__text">
-            <p class="period__title">Open till ${p.endLabel}</p>
-            <p class="period__sub">Operative period started ${p.startLabel}</p>
-          </div>
-        </div>
-        <div class="period__meter">
-          <div class="period__track" role="progressbar" aria-label="Policy period elapsed"
-            aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(p.elapsed * 100)}"><span class="period__fill"></span></div>
-          <span class="${cx("period__left", p.warn && "is-warn")}">${sicon(p.warn ? "clock-circle-amber" : "clock-circle-14", 14)}<span>${p.left}</span></span>
-        </div>
-      </section>`;
-  };
-  ui.BenefitTile = ({ id, icon, title, value, label }) => html`
-    <button class="benefit" data-press data-benefit="${id}" aria-haspopup="dialog" aria-label="${title}, ${value} ${label}">
-      <span class="benefit__top">
-        ${sicon(icon, 24)}
-        <span class="benefit__title">${title}</span>
-        <span class="benefit__corner" aria-hidden="true">${sicon("alt-arrow-corner", 19.2)}</span>
-      </span>
-      <span class="benefit__figure">
-        <span class="benefit__value">${value}</span>
-        <span class="benefit__label">${label}</span>
-      </span>
-    </button>`;
-  ui.ListRow = ({ icon, title, sub, trailing = "chevron", goto: g, attrs = "" }) => html`
-    <button class="${cx("lrow", `lrow--${trailing}`)}" data-press ${goto(g)} ${raw(attrs)}>
-      <span class="icon-tile">${sicon(icon, 24)}</span>
-      <span class="lrow__text">
-        <span class="lrow__title">${title}</span>
-        <span class="lrow__sub">${raw(sub)}</span>
-      </span>
-      ${trailing === "external" ? sicon("arrow-right-up-20", 20, "lrow__trail") : sicon("chevron-down-20", 20, "lrow__trail lrow__chev")}
-    </button>`;
-  ui.Disclosure = ({ id, label, count, open = false, body }) => html`
-    <section class="${cx("disclosure", open && "is-open")}" data-disclosure="${id}">
-      <button class="disclosure__head" data-press aria-expanded="${open}" aria-controls="dz-${id}">
-        <span class="disclosure__label">${label}</span>
-        ${ui.CountBadge({ n: count })}
-        ${sicon("chevron-down-20", 20, "disclosure__chev")}
-      </button>
-      <div class="disclosure__panel" id="dz-${id}" ${open ? "" : raw("inert")}><div class="disclosure__inner">${body}</div></div>
-    </section>`;
-  ui.HelpCardExpert = ({ title, cta, goto: g }) => html`
-    <div class="xhelp">
-      <section class="xhelp__card">
-        <img class="xhelp__texture" src="${OPL.simg("satin-texture.jpg")}" alt="">
-        <div class="xhelp__copy">
-          <p class="xhelp__title">${title[0]}<br>${title[1]}</p>
-          <button class="btn btn--md btn--line" data-press ${goto(g)}>${sicon("headset-primary", 16)}<span class="btn__label">${cta}</span></button>
-        </div>
-        <img class="xhelp__photo" src="${OPL.simg("expert-photo.png")}" alt="">
-      </section>
-      <img class="xhelp__stamp" src="${OPL.simg("opl-verified-stamp.png")}" alt="OPL Verified">
-    </div>`;
-  ui.HowStep = ({ n, title, body, deadline, inset, last = false }) => html`
-    <li class="${cx("hstep", last && "hstep--last")}" style="--n:${n - 1}">
-      <span class="hstep__rail"><span class="hstep__num">${n}</span>${last ? "" : raw(`<span class="hstep__line"></span>`)}</span>
-      <div class="hstep__content">
-        <div class="hstep__head">
-          <p class="hstep__title">${title}</p>
-          ${body ? raw(`<p class="hstep__body">${body}</p>`) : ""}
-        </div>
-        ${deadline ? html`<span class="deadline-chip">${sicon("clock-circle-amber", 14)}<span>${deadline}</span></span>` : ""}
-        ${inset ? html`
-          <div class="hstep__inset">
-            <p class="hstep__inset-head">${inset.title}</p>
-            ${inset.rows.map((r) => html`<div class="hstep__inset-row"><p class="hstep__inset-value">${r.value}</p><p class="hstep__inset-label">${r.label}</p></div>`)}
-          </div>` : ""}
-      </div>
-    </li>`;
-  ui.HowItWorks = ({ title, headerDeadline, items, share, open = false }) => html`
-    <section class="${cx("how", open && "is-open")}" data-disclosure="how">
-      <button class="how__head" data-press aria-expanded="${open}" aria-controls="dz-how">
-        <span class="how__head-text">
-          <span class="how__title">${title}</span>
-          <span class="how__chip-slot"><span><span class="deadline-chip">${sicon("clock-circle-amber", 14)}<span>${headerDeadline}</span></span></span></span>
-        </span>
-        ${sicon("chevron-down-20", 20, "disclosure__chev")}
-      </button>
-      <div class="disclosure__panel" id="dz-how" ${open ? "" : raw("inert")}><div class="disclosure__inner">
-        <div class="how__steps">
-          <ol class="how__list">${items.map((s, i) => ui.HowStep({ n: i + 1, ...s, last: i === items.length - 1 }))}</ol>
-          <button class="how__share" data-press data-share-steps>${sicon("share-primary", 18)}<span class="how__share-label">${share}</span></button>
-        </div>
-      </div></div>
-    </section>`;
-  ui.SubsidyFoot = ({ secondary, primary, note }) => html`
-    <footer class="sfoot">
-      <div class="sfoot__row">
-        <button class="btn btn--lg btn--line btn--strong" data-press ${goto(secondary.goto)}><span class="btn__label">${secondary.label}</span>${sicon("arrow-right-up-primary", 16)}</button>
-        <button class="btn btn--lg btn--filled btn--strong" data-press ${goto(primary.goto)}>${sicon("headset-white", 16)}<span class="btn__label">${primary.label}</span></button>
-      </div>
-      <p class="sfoot__note">${note}</p>
-    </footer>`;
-  ui.RateRows = ({ rows }) => OPL.raw(rows.map(([label, value, sub], i) => `
-    <div class="rrow" style="--i:${i}">
-      <p class="rrow__label">${OPL.html`${label}`}</p>
-      <p class="rrow__fig"><span class="rrow__value">${OPL.html`${value}`}</span><span class="rrow__sub">${OPL.html`${sub}`}</span></p>
-    </div>`).join(""));
-  ui.ActivitySwitch = ({ options, selected = 0 }) => html`
-    <div class="aswitch" role="tablist" style="--sel:${selected}">
-      <span class="aswitch__thumb" aria-hidden="true"></span>
-      ${options.map((o, i) => html`<button class="${cx("aswitch__opt", i === selected && "is-on")}" role="tab" aria-selected="${i === selected}" data-activity="${i}">${o}</button>`)}
-    </div>`;
-  ui.SheetCondition = ({ text, exclude = false }, i = 0) => html`
-    <div class="${cx("cond", exclude && "cond--exclude")}" style="--i:${i}">
-      <span class="cond__tile">${sicon(exclude ? "cond-exclude" : "cond-check", 16)}</span>
-      <p class="cond__text">${text}</p>
-    </div>`;
-  ui.BenefitSheetBody = ({ s, activity = 0, actions }) => {
-    const r = s.rates;
-    const act = r && r.activities ? r.activities[Math.min(activity, r.activities.length - 1)] : null;
-    return html`
-      <div class="bsheet__grip" data-sheet-drag>
-        <span class="bsheet__grabber"></span>
-        <div class="bsheet__head">
-          <h2 class="bsheet__title">${s.title}</h2>
-          <button class="bsheet__close" aria-label="Close" data-press data-sheet-close>${sicon("sheet-x", 16)}</button>
-        </div>
-      </div>
-      <div class="bsheet__body">
-        <div class="bsheet__sec bsheet__hero-block" style="--s:0">
-          <div class="bhero">
-            <span class="bhero__tile">${sicon(s.hero.icon, 28)}</span>
-            <div class="bhero__fig"><p class="bhero__value">${s.hero.value}</p><p class="bhero__label">${s.hero.label}</p></div>
-          </div>
-          ${s.note ? html`<p class="bsheet__note">${s.note}</p>` : ""}
-        </div>
-        <div class="bsheet__sec bsheet__facts" style="--s:1">
-          ${s.facts.map((f) => html`
-            <div class="sfact">
-              <span class="sfact__tile">${sicon(f.icon, 22)}</span>
-              <div class="sfact__text"><p class="sfact__label">${f.label}</p><p class="sfact__value">${f.value}</p></div>
-            </div>`)}
-        </div>
-        ${r ? html`
-          <div class="bsheet__sec bsheet__rates" style="--s:2">
-            <p class="bsheet__h">Rates</p>
-            ${act ? html`
-              <div class="bsheet__rates-content">
-                <div class="bsheet__picker">
-                  ${ui.ActivitySwitch({ options: r.activities.map((a) => a.label), selected: activity })}
-                  <p class="bsheet__act-note" data-act-note>${act.note}</p>
-                </div>
-                <div class="rlist" data-rate-list>${ui.RateRows({ rows: act.rows })}</div>
-              </div>` : html`
-              <div class="bsheet__groups">
-                ${r.groups.map((g) => html`<div class="rlist"><p class="rlist__group">${g.title}</p>${ui.RateRows({ rows: g.rows })}</div>`)}
-              </div>`}
-          </div>` : ""}
-        <div class="bsheet__sec bsheet__conds" style="--s:${r ? 3 : 2}">
-          <p class="bsheet__h">Conditions</p>
-          <div class="clist">${s.conditions.map((c, i) => ui.SheetCondition(c, i))}</div>
-        </div>
-        <div class="bsheet__sec bsheet__actions" style="--s:${r ? 4 : 3}">
-          <button class="btn btn--lg btn--filled btn--strong btn--block" data-press ${goto(actions.expert.goto)}>${sicon("sheet-headset-white", 16)}<span class="btn__label">${actions.expert.label}</span></button>
-          ${s.apply ? html`<button class="btn btn--md btn--ghost btn--block" data-press ${goto(actions.apply.goto)}><span class="btn__label">${actions.apply.label}</span>${sicon("arrow-right-up-primary", 16)}</button>` : ""}
-        </div>
-      </div>`;
-  };
-  ui.BenefitSheetLayer = () => html`
-    <div class="sheet-layer" data-sheet="benefit" hidden>
-      <div class="sheet-scrim" data-sheet-close></div>
-      <section class="sheet bsheet" role="dialog" aria-modal="true" aria-label="Benefit details" data-bsheet></section>
-    </div>`;
+const { html, cx, raw } = OPL;
+const ui = OPL.ui;
+const LAZY = "assets/lazy/subsidy/";
+const sicon = (OPL.sicon = (name, size = 24, cls = "") =>
+raw(`<img class="ico ${cls}" src="${LAZY}icons/${name}.svg" width="${size}" height="${size}" alt="" draggable="false">`));
+OPL.simg = (name) => LAZY + name;
+const goto = (g) => (g ? raw(`data-goto="${g}"`) : "");
+ui.CountBadge = ({ n }) => html`<span class="count-badge">${n}</span>`;
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const fmt = (d) => `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
+OPL.policyPeriod = ({ start, end, warnMonths = 6 }, today = new Date()) => {
+const s = new Date(start + "T00:00:00"), e = new Date(end + "T00:00:00");
+const t = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+let months = (e.getFullYear() - t.getFullYear()) * 12 + (e.getMonth() - t.getMonth());
+if (e.getDate() < t.getDate()) months -= 1;
+months = Math.max(0, months);
+const y = Math.floor(months / 12), m = months % 12;
+const left = t >= e ? "Closed" : months === 0 ? "Less than a month left"
+: [y && plural(y, "year"), m && plural(m, "month")].filter(Boolean).join(" ") + " left";
+const elapsed = Math.min(1, Math.max(0, (t - s) / (e - s)));
+return { endLabel: fmt(e), startLabel: fmt(s), left, elapsed, warn: months < warnMonths };
+};
+ui.PolicyPeriod = ({ period }) => {
+const p = OPL.policyPeriod(period);
+return html`
+<section class="period" style="--elapsed:${p.elapsed.toFixed(4)}">
+<div class="period__head">
+<span class="icon-tile">${sicon("calendar-widget", 24)}</span>
+<div class="period__text">
+<p class="period__title">Open till ${p.endLabel}</p>
+<p class="period__sub">Operative period started ${p.startLabel}</p>
+</div>
+</div>
+<div class="period__meter">
+<div class="period__track" role="progressbar" aria-label="Policy period elapsed"
+aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(p.elapsed * 100)}"><span class="period__fill"></span></div>
+<span class="${cx("period__left", p.warn && "is-warn")}">${sicon(p.warn ? "clock-circle-amber" : "clock-circle-14", 14)}<span>${p.left}</span></span>
+</div>
+</section>`;
+};
+ui.BenefitTile = ({ id, icon, title, value, label }) => html`
+<button class="benefit" data-press data-benefit="${id}" aria-haspopup="dialog" aria-label="${title}, ${value} ${label}">
+<span class="benefit__top">
+${sicon(icon, 24)}
+<span class="benefit__title">${title}</span>
+<span class="benefit__corner" aria-hidden="true">${sicon("alt-arrow-corner", 19.2)}</span>
+</span>
+<span class="benefit__figure">
+<span class="benefit__value">${value}</span>
+<span class="benefit__label">${label}</span>
+</span>
+</button>`;
+ui.ListRow = ({ icon, title, sub, trailing = "chevron", goto: g, attrs = "" }) => html`
+<button class="${cx("lrow", `lrow--${trailing}`)}" data-press ${goto(g)} ${raw(attrs)}>
+<span class="icon-tile">${sicon(icon, 24)}</span>
+<span class="lrow__text">
+<span class="lrow__title">${title}</span>
+<span class="lrow__sub">${raw(sub)}</span>
+</span>
+${trailing === "external" ? sicon("arrow-right-up-20", 20, "lrow__trail") : sicon("chevron-down-20", 20, "lrow__trail lrow__chev")}
+</button>`;
+ui.Disclosure = ({ id, label, count, open = false, body }) => html`
+<section class="${cx("disclosure", open && "is-open")}" data-disclosure="${id}">
+<button class="disclosure__head" data-press aria-expanded="${open}" aria-controls="dz-${id}">
+<span class="disclosure__label">${label}</span>
+${ui.CountBadge({ n: count })}
+${sicon("chevron-down-20", 20, "disclosure__chev")}
+</button>
+<div class="disclosure__panel" id="dz-${id}" ${open ? "" : raw("inert")}><div class="disclosure__inner">${body}</div></div>
+</section>`;
+ui.HelpCardExpert = ({ title, cta, goto: g }) => html`
+<div class="xhelp">
+<section class="xhelp__card">
+<img class="xhelp__texture" src="${OPL.simg("satin-texture.jpg")}" alt="">
+<div class="xhelp__copy">
+<p class="xhelp__title">${title[0]}<br>${title[1]}</p>
+<button class="btn btn--md btn--line" data-press ${goto(g)}>${sicon("headset-primary", 16)}<span class="btn__label">${cta}</span></button>
+</div>
+<img class="xhelp__photo" src="${OPL.simg("expert-photo.png")}" alt="">
+</section>
+<img class="xhelp__stamp" src="${OPL.simg("opl-verified-stamp.png")}" alt="OPL Verified">
+</div>`;
+ui.HowStep = ({ n, title, body, deadline, inset, last = false }) => html`
+<li class="${cx("hstep", last && "hstep--last")}" style="--n:${n - 1}">
+<span class="hstep__rail"><span class="hstep__num">${n}</span>${last ? "" : raw(`<span class="hstep__line"></span>`)}</span>
+<div class="hstep__content">
+<div class="hstep__head">
+<p class="hstep__title">${title}</p>
+${body ? raw(`<p class="hstep__body">${body}</p>`) : ""}
+</div>
+${deadline ? html`<span class="deadline-chip">${sicon("clock-circle-amber", 14)}<span>${deadline}</span></span>` : ""}
+${inset ? html`
+<div class="hstep__inset">
+<p class="hstep__inset-head">${inset.title}</p>
+${inset.rows.map((r) => html`<div class="hstep__inset-row"><p class="hstep__inset-value">${r.value}</p><p class="hstep__inset-label">${r.label}</p></div>`)}
+</div>` : ""}
+</div>
+</li>`;
+ui.HowItWorks = ({ title, headerDeadline, items, share, open = false }) => html`
+<section class="${cx("how", open && "is-open")}" data-disclosure="how">
+<button class="how__head" data-press aria-expanded="${open}" aria-controls="dz-how">
+<span class="how__head-text">
+<span class="how__title">${title}</span>
+<span class="how__chip-slot"><span><span class="deadline-chip">${sicon("clock-circle-amber", 14)}<span>${headerDeadline}</span></span></span></span>
+</span>
+${sicon("chevron-down-20", 20, "disclosure__chev")}
+</button>
+<div class="disclosure__panel" id="dz-how" ${open ? "" : raw("inert")}><div class="disclosure__inner">
+<div class="how__steps">
+<ol class="how__list">${items.map((s, i) => ui.HowStep({ n: i + 1, ...s, last: i === items.length - 1 }))}</ol>
+<button class="how__share" data-press data-share-steps>${sicon("share-primary", 18)}<span class="how__share-label">${share}</span></button>
+</div>
+</div></div>
+</section>`;
+ui.SubsidyFoot = ({ secondary, primary, note }) => html`
+<footer class="sfoot">
+<div class="sfoot__row">
+<button class="btn btn--lg btn--line btn--strong" data-press ${goto(secondary.goto)}><span class="btn__label">${secondary.label}</span>${sicon("arrow-right-up-primary", 16)}</button>
+<button class="btn btn--lg btn--filled btn--strong" data-press ${goto(primary.goto)}>${sicon("headset-white", 16)}<span class="btn__label">${primary.label}</span></button>
+</div>
+<p class="sfoot__note">${note}</p>
+</footer>`;
+ui.RateRows = ({ rows }) => OPL.raw(rows.map(([label, value, sub], i) => `
+<div class="rrow" style="--i:${i}">
+<p class="rrow__label">${OPL.html`${label}`}</p>
+<p class="rrow__fig"><span class="rrow__value">${OPL.html`${value}`}</span><span class="rrow__sub">${OPL.html`${sub}`}</span></p>
+</div>`).join(""));
+ui.ActivitySwitch = ({ options, selected = 0 }) => html`
+<div class="aswitch" role="tablist" style="--sel:${selected}">
+<span class="aswitch__thumb" aria-hidden="true"></span>
+${options.map((o, i) => html`<button class="${cx("aswitch__opt", i === selected && "is-on")}" role="tab" aria-selected="${i === selected}" data-activity="${i}">${o}</button>`)}
+</div>`;
+ui.SheetCondition = ({ text, exclude = false }, i = 0) => html`
+<div class="${cx("cond", exclude && "cond--exclude")}" style="--i:${i}">
+<span class="cond__tile">${sicon(exclude ? "cond-exclude" : "cond-check", 16)}</span>
+<p class="cond__text">${text}</p>
+</div>`;
+ui.BenefitSheetBody = ({ s, activity = 0, actions }) => {
+const r = s.rates;
+const act = r && r.activities ? r.activities[Math.min(activity, r.activities.length - 1)] : null;
+return html`
+<div class="bsheet__grip" data-sheet-drag>
+<span class="bsheet__grabber"></span>
+<div class="bsheet__head">
+<h2 class="bsheet__title">${s.title}</h2>
+<button class="bsheet__close" aria-label="Close" data-press data-sheet-close>${sicon("sheet-x", 16)}</button>
+</div>
+</div>
+<div class="bsheet__body">
+<div class="bsheet__sec bsheet__hero-block" style="--s:0">
+<div class="bhero">
+<span class="bhero__tile">${sicon(s.hero.icon, 28)}</span>
+<div class="bhero__fig"><p class="bhero__value">${s.hero.value}</p><p class="bhero__label">${s.hero.label}</p></div>
+</div>
+${s.note ? html`<p class="bsheet__note">${s.note}</p>` : ""}
+</div>
+<div class="bsheet__sec bsheet__facts" style="--s:1">
+${s.facts.map((f) => html`
+<div class="sfact">
+<span class="sfact__tile">${sicon(f.icon, 22)}</span>
+<div class="sfact__text"><p class="sfact__label">${f.label}</p><p class="sfact__value">${f.value}</p></div>
+</div>`)}
+</div>
+${r ? html`
+<div class="bsheet__sec bsheet__rates" style="--s:2">
+<p class="bsheet__h">Rates</p>
+${act ? html`
+<div class="bsheet__rates-content">
+<div class="bsheet__picker">
+${ui.ActivitySwitch({ options: r.activities.map((a) => a.label), selected: activity })}
+<p class="bsheet__act-note" data-act-note>${act.note}</p>
+</div>
+<div class="rlist" data-rate-list>${ui.RateRows({ rows: act.rows })}</div>
+</div>` : html`
+<div class="bsheet__groups">
+${r.groups.map((g) => html`<div class="rlist"><p class="rlist__group">${g.title}</p>${ui.RateRows({ rows: g.rows })}</div>`)}
+</div>`}
+</div>` : ""}
+<div class="bsheet__sec bsheet__conds" style="--s:${r ? 3 : 2}">
+<p class="bsheet__h">Conditions</p>
+<div class="clist">${s.conditions.map((c, i) => ui.SheetCondition(c, i))}</div>
+</div>
+<div class="bsheet__sec bsheet__actions" style="--s:${r ? 4 : 3}">
+<button class="btn btn--lg btn--filled btn--strong btn--block" data-press ${goto(actions.expert.goto)}>${sicon("sheet-headset-white", 16)}<span class="btn__label">${actions.expert.label}</span></button>
+${s.apply ? html`<button class="btn btn--md btn--ghost btn--block" data-press ${goto(actions.apply.goto)}><span class="btn__label">${actions.apply.label}</span>${sicon("arrow-right-up-primary", 16)}</button>` : ""}
+</div>
+</div>`;
+};
+ui.BenefitSheetLayer = () => html`
+<div class="sheet-layer" data-sheet="benefit" hidden>
+<div class="sheet-scrim" data-sheet-close></div>
+<section class="sheet bsheet" role="dialog" aria-modal="true" aria-label="Benefit details" data-bsheet></section>
+</div>`;
 })();
 
 ;
@@ -851,199 +851,199 @@
 /* ==== js/fx.js ==== */
 
 (function () {
-  const fx = (OPL.fx = {});
-  const motionOff = () => OPL.state.get().motion === "off" || OPL.reducedMotion();
-  fx.motionOff = motionOff;
-  fx.statusOnScroll = (page) => {
-    const sc = page.querySelector(".scroller");
-    sc.addEventListener("scroll", () => page.classList.toggle("is-scrolled", sc.scrollTop > 8), { passive: true });
-  };
-  fx.nudge = (page, timers, { delay = 1900, hold = 4200 } = {}) => {
-    const wrap = page.querySelector(".fab-wrap");
-    if (!wrap || !wrap.querySelector(".fab-nudge") || motionOff()) return;
-    const hide = () => wrap.classList.remove("is-nudging");
-    OPL.afterReveal(() => timers.push(setTimeout(() => {
-      wrap.classList.add("is-nudging");
-      timers.push(setTimeout(hide, hold));
-      page.querySelector(".scroller").addEventListener("scroll", hide, { once: true, passive: true });
-    }, delay)));
-  };
-  fx.playInView = (page, selector) => {
-    if (motionOff()) return;
-    const els = page.querySelectorAll(selector);
-    if (!("IntersectionObserver" in window)) return els.forEach((e) => e.classList.add("is-playing"));
-    const io = new IntersectionObserver((entries) => entries.forEach((en) => {
-      if (en.isIntersecting) { en.target.classList.add("is-playing"); io.unobserve(en.target); }
-    }), { root: page.querySelector(".scroller"), threshold: 0.4 });
-    els.forEach((e) => io.observe(e));
-  };
-  fx.enter = (page, els, { holdMs = 4400 } = {}) => {
-    if (motionOff()) return;
-    els.filter(Boolean).forEach((el, i) => { el.classList.add("enter"); el.style.setProperty("--i", Math.min(i, 16)); });
-    page.classList.remove("is-entering"); void page.offsetWidth; page.classList.add("is-entering");
-    OPL.afterReveal(() => setTimeout(() => page.classList.remove("is-entering"), holdMs));
-  };
-  fx.sheets = (page, { onClose } = {}) => {
-    let current = null;
-    const open = (id, { instant = false } = {}) => {
-      const layer = page.querySelector(`[data-sheet="${id}"]`);
-      if (!layer) return;
-      if (current && current !== layer) close({ silent: true });
-      current = layer;
-      layer.hidden = false;
-      layer.style.setProperty("--drag", "0px");
-      if (instant || motionOff()) { layer.classList.add("is-open"); return; }
-      requestAnimationFrame(() => requestAnimationFrame(() => layer.classList.add("is-open")));
-      setTimeout(() => layer.classList.add("is-open"), 40);
-    };
-    const close = ({ silent = false } = {}) => {
-      const layer = current;
-      if (!layer) return;
-      current = null;
-      layer.classList.remove("is-open", "is-dragging");
-      layer.style.setProperty("--drag", "0px");
-      setTimeout(() => { layer.hidden = true; if (!silent && onClose) onClose(layer.dataset.sheet); }, motionOff() ? 0 : 420);
-    };
-    page.addEventListener("click", (e) => { if (e.target.closest("[data-sheet-close]")) close(); });
-    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && current && page.isConnected) close(); });
-    let startY = 0, dy = 0, dragging = false, t0 = 0;
-    page.addEventListener("pointerdown", (e) => {
-      const grip = e.target.closest("[data-sheet-drag]");
-      if (!grip || !current) return;
-      dragging = true; startY = e.clientY; dy = 0; t0 = performance.now();
-      current.classList.add("is-dragging");
-      grip.setPointerCapture?.(e.pointerId);
-    });
-    page.addEventListener("pointermove", (e) => {
-      if (!dragging || !current) return;
-      dy = Math.max(0, e.clientY - startY);
-      current.style.setProperty("--drag", dy + "px");
-    });
-    const end = () => {
-      if (!dragging || !current) return;
-      dragging = false;
-      current.classList.remove("is-dragging");
-      const v = dy / Math.max(1, performance.now() - t0);
-      if (dy > 90 || v > 0.6) close(); else current.style.setProperty("--drag", "0px");
-    };
-    page.addEventListener("pointerup", end);
-    page.addEventListener("pointercancel", end);
-    return { open, close, isOpen: () => !!current };
-  };
-  fx.loanDetail = (page, sheets, { onCompare } = {}) => {
-    const { ui } = OPL;
-    page.insertAdjacentHTML("beforeend", ui.Sheet({
-      id: "detail", title: "Loan details",
-      body: OPL.raw(`<div class="sheet-detail" data-detail-body></div>`),
-      footer: OPL.raw(`<div data-detail-foot></div>`),
-    }).toString());
-    const list = () => { const d = OPL.data.loanOffers; return [...d.picks, ...d.offers]; };
-    const lo = () => OPL.screens["loan-offers"];
-    let current = null;
-    const paintFoot = () => {
-      if (!current) return;
-      page.querySelector("[data-detail-foot]").innerHTML = ui.LoanDetailFoot({
-        id: current, selected: lo().sel.includes(current), compare: list().some((c) => c.id === current),
-      }).toString();
-    };
-    const defaultToggle = (id, btn) => {
-      const s = lo();
-      if (s.sel.includes(id)) { s.sel = s.sel.filter((x) => x !== id); return true; }
-      if (s.sel.length >= OPL.data.loanOffers.compareMax) { btn.classList.remove("is-shake"); void btn.offsetWidth; btn.classList.add("is-shake"); return false; }
-      s.sel = [...s.sel, id]; return true;
-    };
-    const open = (id) => {
-      const offer = OPL.data.loanCatalog[id];
-      if (!offer) return;
-      const cl = OPL.data.compareLoans;
-      const body = page.querySelector("[data-detail-body]");
-      body.innerHTML = ui.LoanDetail({ offer, record: cl.records[cl.aliases[id] || id] }).toString();
-      body.scrollTop = 0;
-      current = id;
-      paintFoot();
-      sheets.open("detail");
-    };
-    page.addEventListener("click", (e) => {
-      const det = e.target.closest("[data-detail]");
-      if (det) return open(det.dataset.detail);
-      const dc = e.target.closest("[data-detail-compare]");
-      if (dc) {
-        const changed = (onCompare || defaultToggle)(dc.dataset.detailCompare, dc);
-        if (changed) { paintFoot(); page.querySelector("[data-detail-compare]")?.classList.add("is-popping"); }
-      }
-    });
-    return { open, paintFoot };
-  };
-  fx.bareSheet = (page, id) => {
-    page.insertAdjacentHTML("beforeend", `<div class="sheet-layer" data-sheet="${id}" hidden>
-      <div class="sheet-scrim" data-sheet-close></div>
-      <section class="sheet sheet--bare" role="dialog"><div class="sheet__bare-body" data-${id}-body></div></section></div>`);
-    return page.querySelector(`[data-${id}-body]`);
-  };
-  fx.longAmount = (v) => String(v || "").replace(/₹([\d.]+)\s*L$/, "₹$1 Lakhs");
-  fx.applySheet = (page, sheets) => {
-    const { ui } = OPL;
-    const body = fx.bareSheet(page, "apply");
-    let ids = [];
-    const lenderOf = (id) => {
-      const cl = OPL.data.compareLoans;
-      const rec = cl.records[cl.aliases[id] || id];
-      const card = OPL.data.loanCatalog[id];
-      return { id, name: rec ? rec.name : card.title, logo: rec ? rec.logo : card.logo,
-        type: rec ? rec.values.type : card.subtitle, amount: fx.longAmount(rec ? rec.values.amount : `Up to ${card.figures[0].value}`) };
-    };
-    const open = (list) => {
-      ids = list.filter(Boolean);
-      if (!ids.length) return;
-      body.innerHTML = ui.ApplySheetBody({ lenders: ids.map(lenderOf) }).toString();
-      sheets.open("apply");
-    };
-    page.addEventListener("click", (e) => {
-      const one = e.target.closest("[data-apply]");
-      if (one) { e.stopPropagation(); return open([one.dataset.apply]); }
-      const c = e.target.closest("[data-consent]");
-      if (c) {
-        const on = c.getAttribute("aria-pressed") !== "true";
-        c.setAttribute("aria-pressed", on);
-        c.querySelector("img").src = `assets/icons/${on ? "check-square-22" : "check-square"}.svg`;
-        c.classList.remove("is-popping"); void c.offsetWidth; c.classList.add("is-popping");
-        body.querySelector("[data-apply-submit]").disabled = !on;
-        return;
-      }
-      const sub = e.target.closest("[data-apply-submit]");
-      if (sub) {
-        sub.classList.add("is-loading");
-        setTimeout(() => {
-          const apps = OPL.screens.applications;
-          apps.apps = ids.map((id) => ({ id, status: "verifying" }));
-          apps.fresh = true;                       // lets the list play the approval moment
-          sheets.close();
-          setTimeout(() => OPL.go("applications"), motionOff() ? 0 : 260);
-        }, motionOff() ? 0 : 900);
-      }
-    });
-    return { open };
-  };
-  fx.mouseDrag = (el) => {
-    let down = false, sx = 0, sl = 0, moved = false;
-    el.addEventListener("pointerdown", (e) => {
-      if (e.pointerType !== "mouse") return;
-      down = true; moved = false; sx = e.clientX; sl = el.scrollLeft;
-      el.style.scrollSnapType = "none";
-    });
-    window.addEventListener("pointermove", (e) => {
-      if (!down) return;
-      const dx = e.clientX - sx;
-      if (Math.abs(dx) > 4) moved = true;
-      el.scrollLeft = sl - dx;
-    });
-    window.addEventListener("pointerup", () => {
-      if (!down) return;
-      down = false;
-      el.style.scrollSnapType = "";
-      if (moved) el.addEventListener("click", (e) => { e.stopPropagation(); e.preventDefault(); }, { capture: true, once: true });
-    });
-  };
+const fx = (OPL.fx = {});
+const motionOff = () => OPL.state.get().motion === "off" || OPL.reducedMotion();
+fx.motionOff = motionOff;
+fx.statusOnScroll = (page) => {
+const sc = page.querySelector(".scroller");
+sc.addEventListener("scroll", () => page.classList.toggle("is-scrolled", sc.scrollTop > 8), { passive: true });
+};
+fx.nudge = (page, timers, { delay = 1900, hold = 4200 } = {}) => {
+const wrap = page.querySelector(".fab-wrap");
+if (!wrap || !wrap.querySelector(".fab-nudge") || motionOff()) return;
+const hide = () => wrap.classList.remove("is-nudging");
+OPL.afterReveal(() => timers.push(setTimeout(() => {
+wrap.classList.add("is-nudging");
+timers.push(setTimeout(hide, hold));
+page.querySelector(".scroller").addEventListener("scroll", hide, { once: true, passive: true });
+}, delay)));
+};
+fx.playInView = (page, selector) => {
+if (motionOff()) return;
+const els = page.querySelectorAll(selector);
+if (!("IntersectionObserver" in window)) return els.forEach((e) => e.classList.add("is-playing"));
+const io = new IntersectionObserver((entries) => entries.forEach((en) => {
+if (en.isIntersecting) { en.target.classList.add("is-playing"); io.unobserve(en.target); }
+}), { root: page.querySelector(".scroller"), threshold: 0.4 });
+els.forEach((e) => io.observe(e));
+};
+fx.enter = (page, els, { holdMs = 4400 } = {}) => {
+if (motionOff()) return;
+els.filter(Boolean).forEach((el, i) => { el.classList.add("enter"); el.style.setProperty("--i", Math.min(i, 16)); });
+page.classList.remove("is-entering"); void page.offsetWidth; page.classList.add("is-entering");
+OPL.afterReveal(() => setTimeout(() => page.classList.remove("is-entering"), holdMs));
+};
+fx.sheets = (page, { onClose } = {}) => {
+let current = null;
+const open = (id, { instant = false } = {}) => {
+const layer = page.querySelector(`[data-sheet="${id}"]`);
+if (!layer) return;
+if (current && current !== layer) close({ silent: true });
+current = layer;
+layer.hidden = false;
+layer.style.setProperty("--drag", "0px");
+if (instant || motionOff()) { layer.classList.add("is-open"); return; }
+requestAnimationFrame(() => requestAnimationFrame(() => layer.classList.add("is-open")));
+setTimeout(() => layer.classList.add("is-open"), 40);
+};
+const close = ({ silent = false } = {}) => {
+const layer = current;
+if (!layer) return;
+current = null;
+layer.classList.remove("is-open", "is-dragging");
+layer.style.setProperty("--drag", "0px");
+setTimeout(() => { layer.hidden = true; if (!silent && onClose) onClose(layer.dataset.sheet); }, motionOff() ? 0 : 420);
+};
+page.addEventListener("click", (e) => { if (e.target.closest("[data-sheet-close]")) close(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && current && page.isConnected) close(); });
+let startY = 0, dy = 0, dragging = false, t0 = 0;
+page.addEventListener("pointerdown", (e) => {
+const grip = e.target.closest("[data-sheet-drag]");
+if (!grip || !current) return;
+dragging = true; startY = e.clientY; dy = 0; t0 = performance.now();
+current.classList.add("is-dragging");
+grip.setPointerCapture?.(e.pointerId);
+});
+page.addEventListener("pointermove", (e) => {
+if (!dragging || !current) return;
+dy = Math.max(0, e.clientY - startY);
+current.style.setProperty("--drag", dy + "px");
+});
+const end = () => {
+if (!dragging || !current) return;
+dragging = false;
+current.classList.remove("is-dragging");
+const v = dy / Math.max(1, performance.now() - t0);
+if (dy > 90 || v > 0.6) close(); else current.style.setProperty("--drag", "0px");
+};
+page.addEventListener("pointerup", end);
+page.addEventListener("pointercancel", end);
+return { open, close, isOpen: () => !!current };
+};
+fx.loanDetail = (page, sheets, { onCompare } = {}) => {
+const { ui } = OPL;
+page.insertAdjacentHTML("beforeend", ui.Sheet({
+id: "detail", title: "Loan details",
+body: OPL.raw(`<div class="sheet-detail" data-detail-body></div>`),
+footer: OPL.raw(`<div data-detail-foot></div>`),
+}).toString());
+const list = () => { const d = OPL.data.loanOffers; return [...d.picks, ...d.offers]; };
+const lo = () => OPL.screens["loan-offers"];
+let current = null;
+const paintFoot = () => {
+if (!current) return;
+page.querySelector("[data-detail-foot]").innerHTML = ui.LoanDetailFoot({
+id: current, selected: lo().sel.includes(current), compare: list().some((c) => c.id === current),
+}).toString();
+};
+const defaultToggle = (id, btn) => {
+const s = lo();
+if (s.sel.includes(id)) { s.sel = s.sel.filter((x) => x !== id); return true; }
+if (s.sel.length >= OPL.data.loanOffers.compareMax) { btn.classList.remove("is-shake"); void btn.offsetWidth; btn.classList.add("is-shake"); return false; }
+s.sel = [...s.sel, id]; return true;
+};
+const open = (id) => {
+const offer = OPL.data.loanCatalog[id];
+if (!offer) return;
+const cl = OPL.data.compareLoans;
+const body = page.querySelector("[data-detail-body]");
+body.innerHTML = ui.LoanDetail({ offer, record: cl.records[cl.aliases[id] || id] }).toString();
+body.scrollTop = 0;
+current = id;
+paintFoot();
+sheets.open("detail");
+};
+page.addEventListener("click", (e) => {
+const det = e.target.closest("[data-detail]");
+if (det) return open(det.dataset.detail);
+const dc = e.target.closest("[data-detail-compare]");
+if (dc) {
+const changed = (onCompare || defaultToggle)(dc.dataset.detailCompare, dc);
+if (changed) { paintFoot(); page.querySelector("[data-detail-compare]")?.classList.add("is-popping"); }
+}
+});
+return { open, paintFoot };
+};
+fx.bareSheet = (page, id) => {
+page.insertAdjacentHTML("beforeend", `<div class="sheet-layer" data-sheet="${id}" hidden>
+<div class="sheet-scrim" data-sheet-close></div>
+<section class="sheet sheet--bare" role="dialog"><div class="sheet__bare-body" data-${id}-body></div></section></div>`);
+return page.querySelector(`[data-${id}-body]`);
+};
+fx.longAmount = (v) => String(v || "").replace(/₹([\d.]+)\s*L$/, "₹$1 Lakhs");
+fx.applySheet = (page, sheets) => {
+const { ui } = OPL;
+const body = fx.bareSheet(page, "apply");
+let ids = [];
+const lenderOf = (id) => {
+const cl = OPL.data.compareLoans;
+const rec = cl.records[cl.aliases[id] || id];
+const card = OPL.data.loanCatalog[id];
+return { id, name: rec ? rec.name : card.title, logo: rec ? rec.logo : card.logo,
+type: rec ? rec.values.type : card.subtitle, amount: fx.longAmount(rec ? rec.values.amount : `Up to ${card.figures[0].value}`) };
+};
+const open = (list) => {
+ids = list.filter(Boolean);
+if (!ids.length) return;
+body.innerHTML = ui.ApplySheetBody({ lenders: ids.map(lenderOf) }).toString();
+sheets.open("apply");
+};
+page.addEventListener("click", (e) => {
+const one = e.target.closest("[data-apply]");
+if (one) { e.stopPropagation(); return open([one.dataset.apply]); }
+const c = e.target.closest("[data-consent]");
+if (c) {
+const on = c.getAttribute("aria-pressed") !== "true";
+c.setAttribute("aria-pressed", on);
+c.querySelector("img").src = `assets/icons/${on ? "check-square-22" : "check-square"}.svg`;
+c.classList.remove("is-popping"); void c.offsetWidth; c.classList.add("is-popping");
+body.querySelector("[data-apply-submit]").disabled = !on;
+return;
+}
+const sub = e.target.closest("[data-apply-submit]");
+if (sub) {
+sub.classList.add("is-loading");
+setTimeout(() => {
+const apps = OPL.screens.applications;
+apps.apps = ids.map((id) => ({ id, status: "verifying" }));
+apps.fresh = true;                       // lets the list play the approval moment
+sheets.close();
+setTimeout(() => OPL.go("applications"), motionOff() ? 0 : 260);
+}, motionOff() ? 0 : 900);
+}
+});
+return { open };
+};
+fx.mouseDrag = (el) => {
+let down = false, sx = 0, sl = 0, moved = false;
+el.addEventListener("pointerdown", (e) => {
+if (e.pointerType !== "mouse") return;
+down = true; moved = false; sx = e.clientX; sl = el.scrollLeft;
+el.style.scrollSnapType = "none";
+});
+window.addEventListener("pointermove", (e) => {
+if (!down) return;
+const dx = e.clientX - sx;
+if (Math.abs(dx) > 4) moved = true;
+el.scrollLeft = sl - dx;
+});
+window.addEventListener("pointerup", () => {
+if (!down) return;
+down = false;
+el.style.scrollSnapType = "";
+if (moved) el.addEventListener("click", (e) => { e.stopPropagation(); e.preventDefault(); }, { capture: true, once: true });
+});
+};
 })();
 
 ;
@@ -1051,198 +1051,209 @@
 /* ==== js/variants.js ==== */
 
 (function () {
-  OPL.variants = {
-    home: {
-      presets: [
-        { id: "loans", label: "Loans first", figma: "382:34093", set: { order: "loans", emi: "off" } },
-        { id: "subsidies", label: "Subsidies first", figma: "382:33823", set: { order: "subsidies", emi: "off" } },
-        { id: "subsidies-emi", label: "Subsidies + EMI due", figma: "382:36681", set: { order: "subsidies", emi: "on" } },
-      ],
-      groups: [
-        {
-          id: "order",
-          label: "Section order",
-          default: "loans",
-          options: [
-            { value: "loans", label: "Loans first" },
-            { value: "subsidies", label: "Subsidies first" },
-          ],
-        },
-        {
-          id: "emi",
-          label: "EMI due banner",
-          default: "off",
-          options: [
-            { value: "off", label: "Hidden" },
-            { value: "on", label: "Shown" },
-          ],
-        },
-        {
-          id: "autoplay",
-          label: "Hero carousel",
-          default: "off",
-          options: [
-            { value: "off", label: "Manual swipe" },
-            { value: "on", label: "Auto-advance" },
-          ],
-          note: "Prototype behaviour. Off matches Figma's static dot.",
-        },
-        {
-          id: "stack",
-          label: "Hero offer cards",
-          default: "cycle",
-          options: [
-            { value: "cycle", label: "Cycling" },
-            { value: "static", label: "Static (Figma)" },
-          ],
-        },
-        {
-          id: "nudge",
-          label: "AI Mitra nudge",
-          default: "on",
-          options: [
-            { value: "on", label: "Shows once" },
-            { value: "off", label: "Off" },
-          ],
-        },
-        {
-          id: "note",
-          label: "Page-end note",
-          default: "trust",
-          options: [
-            { value: "trust", label: "Trust" },
-            { value: "indicative", label: "Indicative" },
-            { value: "caughtup", label: "Caught up" },
-            { value: "off", label: "None" },
-          ],
-          note: "Proposed — not in Figma yet. Trust claims need OPL sign-off.",
-        },
-        {
-          id: "heroBg",
-          label: "Hero background",
-          default: "ice",
-          options: [{ value: "ice", label: "Ice blue #EBF3FF", css: { "--hero-bg": "#ebf3ff" } }],
-        },
-      ],
-    },
-  };
-  OPL.variants["loans-overview"] = {
-    presets: [{ id: "default", label: "Loans overview", figma: "382:36150", set: {} }],
-    groups: [
-      {
-        id: "nudge",
-        label: "AI Mitra nudge",
-        default: "on",
-        options: [
-          { value: "on", label: "Shows once" },
-          { value: "off", label: "Off" },
-        ],
-      },
-    ],
-  };
-  OPL.variants["subsidy-detail"] = {
-    presets: [
-      { id: "collapsed", label: "Collapsed", figma: "416:44853", set: { others: "closed", steps: "closed", sheet: "none" } },
-      { id: "expanded", label: "Expanded", figma: "416:45617", set: { others: "open", steps: "open", sheet: "none" } },
-      ...[
-        ["capital-1", "Capital · Activity 1", "416:47995"], ["capital-2", "Capital · Activity 2", "416:48787"],
-        ["interest-1", "Interest · Activity 1", "416:49579"], ["interest-2", "Interest · Activity 2", "416:50370"],
-        ["power", "Power tariff", "416:51161"], ["payroll", "Payroll assistance", "416:51939"],
-        ["shg", "SHG job work", "416:52730"], ["quality", "Quality certification", "416:53511"],
-        ["energy", "Energy & water saving", "416:54292"], ["tech", "Technology acquisition", "416:55073"],
-      ].map(([sheet, label, figma]) => ({ id: `sheet-${sheet}`, label: `Sheet · ${label}`, figma, set: { others: "closed", steps: "closed", sheet } })),
-    ],
-    groups: [
-      { id: "sheet", hidden: true, default: "none", options: ["none", "capital-1", "capital-2", "interest-1", "interest-2", "power", "payroll", "shg", "quality", "energy", "tech"].map((value) => ({ value })) },
-      { id: "others", hidden: true, default: "closed", options: [{ value: "closed" }, { value: "open" }] },
-      { id: "steps", hidden: true, default: "closed", options: [{ value: "closed" }, { value: "open" }] },
-      {
-        id: "nudge", label: "AI Mitra nudge", default: "on",
-        options: [{ value: "on", label: "Shows once" }, { value: "off", label: "Off" }],
-        note: "Proposed line: “Ask anything about this policy”. Not in Figma.",
-      },
-    ],
-  };
-  OPL.variants["loan-offers"] = {
-    presets: [
-      { id: "list", label: "Offers list", figma: "382:35324", set: { compare: "none", sheet: "none" } },
-      { id: "compare", label: "Comparing 2 loans", figma: "382:35666", set: { compare: "figma", sheet: "none" } },
-      { id: "sort", label: "Sort sheet", figma: "393:505", set: { compare: "none", sheet: "sort" } },
-      { id: "filters", label: "Filters sheet", figma: "393:869", set: { compare: "none", sheet: "filters" } },
-    ],
-    groups: [
-      { id: "compare", hidden: true, default: "none", options: [{ value: "none" }, { value: "figma" }] },
-      { id: "sheet", hidden: true, default: "none", options: [{ value: "none" }, { value: "sort" }, { value: "filters" }] },
-      {
-        id: "nudge", label: "AI Mitra nudge", default: "on",
-        options: [{ value: "on", label: "Shows once" }, { value: "off", label: "Off" }],
-      },
-    ],
-  };
-  OPL.variants["compare-loans"] = {
-    presets: [{ id: "default", label: "Compare loans", figma: "382:37839", set: {} }],
-    groups: [],
-  };
-  OPL.variants.applications = {
-    presets: [
-      { id: "figma", label: "Figma state", figma: "382:41059", set: { apps: "figma", ms: "off" } },
-      { id: "approved", label: "Approved sheet", figma: "416:43921", set: { apps: "figma", ms: "on" } },
-      { id: "live", label: "My submitted applications", figma: "382:41059", set: { apps: "live", ms: "off" } },
-    ],
-    groups: [
-      { id: "apps", hidden: true, default: "live", options: [{ value: "live" }, { value: "figma" }] },
-      { id: "ms", hidden: true, default: "off", options: [{ value: "off" }, { value: "on" }] },
-    ],
-  };
-  OPL.variants.application = {
-    presets: [
-      { id: "verifying", label: "Verifying (SIDBI)", figma: "382:42423", set: { app: "offer-sidbi", apps: "figma", st: "", ms: "off" } },
-      { id: "kfs", label: "KFS ready (Citi)", figma: "382:42689", set: { app: "pick-citi", apps: "figma", st: "", ms: "off" } },
-      { id: "sign", label: "Sign letter (resume)", figma: "431:7803", set: { app: "pick-citi", apps: "figma", st: "sign", ms: "off" } },
-      { id: "signed", label: "Letter signed + sheet", figma: "431:8486", set: { app: "pick-citi", apps: "figma", st: "signed", ms: "on" } },
-    ],
-    groups: [
-      { id: "app", hidden: true, default: "", options: [{ value: "" }, { value: "offer-sidbi" }, { value: "pick-citi" }] },
-      { id: "st", hidden: true, default: "", options: [{ value: "" }, { value: "sign" }, { value: "signed" }] },
-      { id: "ms", hidden: true, default: "off", options: [{ value: "off" }, { value: "on" }] },
-      { id: "apps", hidden: true, default: "live", options: [{ value: "live" }, { value: "figma" }] },
-    ],
-  };
-  OPL.variants.kfs = {
-    presets: [
-      { id: "start", label: "Reading (page 1)", figma: "416:43474", set: { read: "start", sheet: "off" } },
-      { id: "end", label: "Read to the end", figma: "416:43604", set: { read: "end", sheet: "off" } },
-      { id: "accepted", label: "Accepted → NeSL sheet", figma: "433:7980", set: { read: "end", sheet: "nesl" } },
-    ],
-    groups: [
-      { id: "read", hidden: true, default: "start", options: [{ value: "start" }, { value: "end" }] },
-      { id: "sheet", hidden: true, default: "off", options: [{ value: "off" }, { value: "nesl" }] },
-    ],
-  };
-  OPL.variants.nesl = {
-    presets: [
-      { id: "redirect", label: "1 · Redirecting", figma: "433:8115", set: { step: "0" } },
-      { id: "otp", label: "2 · OTP", figma: "416:83009", set: { step: "1" } },
-      { id: "agreement", label: "3 · Agreement", figma: "416:83028", set: { step: "2" } },
-      { id: "estamp", label: "4 · E-stamp", figma: "416:83058", set: { step: "3" } },
-      { id: "method", label: "5 · Signing method", figma: "416:83077", set: { step: "4" } },
-      { id: "aadhaar", label: "6 · Aadhaar eSign", figma: "416:83101", set: { step: "5" } },
-      { id: "confirm", label: "Confirming signature", figma: "416:82947", set: { step: "6" } },
-    ],
-    groups: [
-      { id: "step", hidden: true, default: "0", options: ["0", "1", "2", "3", "4", "5", "6"].map((value) => ({ value })) },
-    ],
-  };
-  OPL.variantValues = (screen) => {
-    const reg = OPL.variants[screen];
-    const st = OPL.state.get();
-    const out = {};
-    reg.groups.forEach((g) => {
-      const v = st[g.id];
-      out[g.id] = g.options.some((o) => o.value === v) ? v : g.default;
-    });
-    return out;
-  };
+OPL.variants = {
+home: {
+presets: [
+{ id: "loans", label: "Loans first", figma: "382:34093", set: { order: "loans", emi: "off" } },
+{ id: "subsidies", label: "Subsidies first", figma: "382:33823", set: { order: "subsidies", emi: "off" } },
+{ id: "subsidies-emi", label: "Subsidies + EMI due", figma: "382:36681", set: { order: "subsidies", emi: "on" } },
+],
+groups: [
+{
+id: "order",
+label: "Section order",
+default: "loans",
+options: [
+{ value: "loans", label: "Loans first" },
+{ value: "subsidies", label: "Subsidies first" },
+],
+},
+{
+id: "emi",
+label: "EMI due banner",
+default: "off",
+options: [
+{ value: "off", label: "Hidden" },
+{ value: "on", label: "Shown" },
+],
+},
+{
+id: "autoplay",
+label: "Hero carousel",
+default: "off",
+options: [
+{ value: "off", label: "Manual swipe" },
+{ value: "on", label: "Auto-advance" },
+],
+note: "Prototype behaviour. Off matches Figma's static dot.",
+},
+{
+id: "stack",
+label: "Hero offer cards",
+default: "cycle",
+options: [
+{ value: "cycle", label: "Cycling" },
+{ value: "static", label: "Static (Figma)" },
+],
+},
+{
+id: "nudge",
+label: "AI Mitra nudge",
+default: "on",
+options: [
+{ value: "on", label: "Shows once" },
+{ value: "off", label: "Off" },
+],
+},
+{
+id: "note",
+label: "Page-end note",
+default: "trust",
+options: [
+{ value: "trust", label: "Trust" },
+{ value: "indicative", label: "Indicative" },
+{ value: "caughtup", label: "Caught up" },
+{ value: "off", label: "None" },
+],
+note: "Proposed — not in Figma yet. Trust claims need OPL sign-off.",
+},
+{
+id: "heroBg",
+label: "Hero background",
+default: "ice",
+options: [{ value: "ice", label: "Ice blue #EBF3FF", css: { "--hero-bg": "#ebf3ff" } }],
+},
+],
+},
+};
+OPL.variants["loans-overview"] = {
+presets: [{ id: "default", label: "Loans overview", figma: "382:36150", set: {} }],
+groups: [
+{
+id: "nudge",
+label: "AI Mitra nudge",
+default: "on",
+options: [
+{ value: "on", label: "Shows once" },
+{ value: "off", label: "Off" },
+],
+},
+],
+};
+OPL.variants["subsidy-detail"] = {
+presets: [
+{ id: "collapsed", label: "Collapsed", figma: "416:44853", set: { others: "closed", steps: "closed", sheet: "none" } },
+{ id: "expanded", label: "Expanded", figma: "416:45617", set: { others: "open", steps: "open", sheet: "none" } },
+...[
+["capital-1", "Capital · Activity 1", "416:47995"], ["capital-2", "Capital · Activity 2", "416:48787"],
+["interest-1", "Interest · Activity 1", "416:49579"], ["interest-2", "Interest · Activity 2", "416:50370"],
+["power", "Power tariff", "416:51161"], ["payroll", "Payroll assistance", "416:51939"],
+["shg", "SHG job work", "416:52730"], ["quality", "Quality certification", "416:53511"],
+["energy", "Energy & water saving", "416:54292"], ["tech", "Technology acquisition", "416:55073"],
+].map(([sheet, label, figma]) => ({ id: `sheet-${sheet}`, label: `Sheet · ${label}`, figma, set: { others: "closed", steps: "closed", sheet } })),
+],
+groups: [
+{ id: "sheet", hidden: true, default: "none", options: ["none", "capital-1", "capital-2", "interest-1", "interest-2", "power", "payroll", "shg", "quality", "energy", "tech"].map((value) => ({ value })) },
+{ id: "others", hidden: true, default: "closed", options: [{ value: "closed" }, { value: "open" }] },
+{ id: "steps", hidden: true, default: "closed", options: [{ value: "closed" }, { value: "open" }] },
+{
+id: "nudge", label: "AI Mitra nudge", default: "on",
+options: [{ value: "on", label: "Shows once" }, { value: "off", label: "Off" }],
+note: "Proposed line: “Ask anything about this policy”. Not in Figma.",
+},
+],
+};
+OPL.variants["subsidy-estimate"] = {
+presets: [
+{ id: "one", label: "One benefit open", figma: "416:77107", set: { open: "one" } },
+{ id: "all", label: "All benefits open", figma: "416:76872", set: { open: "all" } },
+],
+groups: [{ id: "open", hidden: true, default: "one", options: [{ value: "one" }, { value: "all" }] }],
+};
+OPL.variants["subsidy-estimate-result"] = {
+presets: [{ id: "result", label: "Estimate result", figma: "416:77363", set: {} }],
+groups: [],
+};
+OPL.variants["loan-offers"] = {
+presets: [
+{ id: "list", label: "Offers list", figma: "382:35324", set: { compare: "none", sheet: "none" } },
+{ id: "compare", label: "Comparing 2 loans", figma: "382:35666", set: { compare: "figma", sheet: "none" } },
+{ id: "sort", label: "Sort sheet", figma: "393:505", set: { compare: "none", sheet: "sort" } },
+{ id: "filters", label: "Filters sheet", figma: "393:869", set: { compare: "none", sheet: "filters" } },
+],
+groups: [
+{ id: "compare", hidden: true, default: "none", options: [{ value: "none" }, { value: "figma" }] },
+{ id: "sheet", hidden: true, default: "none", options: [{ value: "none" }, { value: "sort" }, { value: "filters" }] },
+{
+id: "nudge", label: "AI Mitra nudge", default: "on",
+options: [{ value: "on", label: "Shows once" }, { value: "off", label: "Off" }],
+},
+],
+};
+OPL.variants["compare-loans"] = {
+presets: [{ id: "default", label: "Compare loans", figma: "382:37839", set: {} }],
+groups: [],
+};
+OPL.variants.applications = {
+presets: [
+{ id: "figma", label: "Figma state", figma: "382:41059", set: { apps: "figma", ms: "off" } },
+{ id: "approved", label: "Approved sheet", figma: "416:43921", set: { apps: "figma", ms: "on" } },
+{ id: "live", label: "My submitted applications", figma: "382:41059", set: { apps: "live", ms: "off" } },
+],
+groups: [
+{ id: "apps", hidden: true, default: "live", options: [{ value: "live" }, { value: "figma" }] },
+{ id: "ms", hidden: true, default: "off", options: [{ value: "off" }, { value: "on" }] },
+],
+};
+OPL.variants.application = {
+presets: [
+{ id: "verifying", label: "Verifying (SIDBI)", figma: "382:42423", set: { app: "offer-sidbi", apps: "figma", st: "", ms: "off" } },
+{ id: "kfs", label: "KFS ready (Citi)", figma: "382:42689", set: { app: "pick-citi", apps: "figma", st: "", ms: "off" } },
+{ id: "sign", label: "Sign letter (resume)", figma: "431:7803", set: { app: "pick-citi", apps: "figma", st: "sign", ms: "off" } },
+{ id: "signed", label: "Letter signed + sheet", figma: "431:8486", set: { app: "pick-citi", apps: "figma", st: "signed", ms: "on" } },
+],
+groups: [
+{ id: "app", hidden: true, default: "", options: [{ value: "" }, { value: "offer-sidbi" }, { value: "pick-citi" }] },
+{ id: "st", hidden: true, default: "", options: [{ value: "" }, { value: "sign" }, { value: "signed" }] },
+{ id: "ms", hidden: true, default: "off", options: [{ value: "off" }, { value: "on" }] },
+{ id: "apps", hidden: true, default: "live", options: [{ value: "live" }, { value: "figma" }] },
+],
+};
+OPL.variants.kfs = {
+presets: [
+{ id: "start", label: "Reading (page 1)", figma: "416:43474", set: { read: "start", sheet: "off" } },
+{ id: "end", label: "Read to the end", figma: "416:43604", set: { read: "end", sheet: "off" } },
+{ id: "accepted", label: "Accepted → NeSL sheet", figma: "433:7980", set: { read: "end", sheet: "nesl" } },
+],
+groups: [
+{ id: "read", hidden: true, default: "start", options: [{ value: "start" }, { value: "end" }] },
+{ id: "sheet", hidden: true, default: "off", options: [{ value: "off" }, { value: "nesl" }] },
+],
+};
+OPL.variants.nesl = {
+presets: [
+{ id: "redirect", label: "1 · Redirecting", figma: "433:8115", set: { step: "0" } },
+{ id: "otp", label: "2 · OTP", figma: "416:83009", set: { step: "1" } },
+{ id: "agreement", label: "3 · Agreement", figma: "416:83028", set: { step: "2" } },
+{ id: "estamp", label: "4 · E-stamp", figma: "416:83058", set: { step: "3" } },
+{ id: "method", label: "5 · Signing method", figma: "416:83077", set: { step: "4" } },
+{ id: "aadhaar", label: "6 · Aadhaar eSign", figma: "416:83101", set: { step: "5" } },
+{ id: "confirm", label: "Confirming signature", figma: "416:82947", set: { step: "6" } },
+],
+groups: [
+{ id: "step", hidden: true, default: "0", options: ["0", "1", "2", "3", "4", "5", "6"].map((value) => ({ value })) },
+],
+};
+OPL.variantValues = (screen) => {
+const reg = OPL.variants[screen];
+const st = OPL.state.get();
+const out = {};
+reg.groups.forEach((g) => {
+const v = st[g.id];
+out[g.id] = g.options.some((o) => o.value === v) ? v : g.default;
+});
+return out;
+};
 })();
 
 ;
@@ -1250,120 +1261,120 @@
 /* ==== js/data/home.js ==== */
 
 (function () {
-  OPL.data = OPL.data || {};
-  OPL.data.home = {
-    header: { title: "Get Financing" },
-    hero: {
-      loans: {
-        eyebrow: "Get a loan up to",
-        amount: { prefix: "₹", value: 50, suffix: " Lakhs" },
-        facts: [
-          [{ text: "From", strong: false }, { text: " " }, { text: "9.45% p.a.", strong: true, accent: true }],
-          [{ text: "7 offers", strong: true, accent: true }],
-        ],
-        stack: [
-          { logo: "citi", title: "Citi Bank", subtitle: "Working Capital Loan", tint: "var(--tint-blue)" },
-          { logo: "bob", title: "Bank of Baroda", subtitle: "Working Capital Loan", tint: "var(--tint-peach-soft)" },
-          { logo: "axis", title: "Axis Bank", subtitle: "Working Capital Loan", tint: "var(--tint-pink)" },
-        ],
-        cta: "Explore Loans",          // Figma updated 23 Nov (was "See all loans (7)")
-        goto: "loans-overview",
-      },
-      subsidies: {
-        eyebrow: "Get assistance up to",
-        amount: { prefix: "₹", value: 1, suffix: " Crore", static: true },
-        facts: null,
-        stack: [
-          { logo: "msme", ring: 1, title: "MSME Competitive<br>Lean Scheme", subtitle: "MSME Champions Scheme", tint: "var(--tint-peach)" },
-          { logo: "gujarat", ring: 2, title: "Gujarat Electronics Policy<br>(2022 - 28)", subtitle: "Science and Technology Department", tint: "var(--tint-blue)" },
-          { logo: "gujaratGovt", ring: 1, title: "Aatmanirbhar<br>Gujarat 2022", subtitle: "Industries and Mines Department", tint: "var(--tint-peach)" },
-        ],
-        cta: "Explore Subsidies",      // 382:33823; 382:36681 still reads "See all subsidies (3)"
-        goto: "subsidies-overview",
-      },
-    },
-    quickActions: [
-      { icon: "round-graph-bold-duotone", label: "CMR<br>score", goto: "cmr-score" },
-      { icon: "bill-list-bold-duotone", label: "Track<br>Loans", goto: "track-loans" },
-      { icon: "diploma-verified-bold-duotone", label: "Debt<br>Snapshot", goto: "debt-snapshot" },
-      { icon: "calendar-bold-duotone", label: "View<br>EMIs", goto: "view-emis" },
-    ],
-    loans: {
-      title: "Top loan matches",
-      goto: "loan-offers",
-      cards: [
-        {
-          kind: "loan", tag: "Collateral-free", tint: "var(--tint-blue)", logo: "citi",
-          title: "Citi Bank", subtitle: "Working Capital Loan",
-          figures: [{ label: "Loan up to", value: "₹50 L" }, { label: "Interest", value: "9.45%", unit: "p.a." }],
-          detail: "pick-citi",
-        },
-        {
-          kind: "loan", tag: "Working Capital Loan", tint: "var(--tint-peach)", logo: "bob",
-          title: "Bank of Baroda", subtitle: "Working Capital Loan",
-          figures: [{ label: "Loan up to", value: "₹50 L" }, { label: "Interest", value: "9.45%", unit: "p.a." }],
-          detail: "match-bob",
-        },
-        {
-          kind: "loan", tag: "Collateral-free", tint: "var(--tint-pink)", logo: "axis",
-          title: "Axis Bank", subtitle: "Working Capital Loan",
-          figures: [{ label: "Loan up to", value: "₹50 L" }, { label: "Interest", value: "9.45%", unit: "p.a." }],
-          detail: "pick-axis",
-        },
-      ],
-    },
-    subsidies: {
-      title: "Top subsidy matches",
-      goto: "subsidy-list",
-      chips: [
-        { icon: "settings-bold-duotone", label: "Machinery" },
-        { icon: "cpu-bold-duotone", label: "Technology" },
-        { icon: "verified-check-bold-duotone", label: "Quality & Lean", count: 3 },
-      ],
-      cards: [
-        {
-          kind: "subsidy", tag: "State Government", tint: "var(--tint-peach)", logo: "msme",
-          title: "MSME Competitive<br>Lean Scheme", subtitle: "MSME Champions Scheme",
-          figures: [{ label: "Assistance up to", value: "Up to ₹2.4L" }],
-          goto: "subsidy-detail",
-        },
-        {
-          kind: "subsidy", tag: "Central Government", tint: "var(--tint-blue)", logo: "gujarat",
-          title: "Gujarat Electronics Policy<br>(2022 - 28)", subtitle: "Science and Technology Department",
-          figures: [{ label: "Assistance up to", value: "Up to ₹2.4L" }],
-          goto: "subsidy-detail",
-        },
-        {
-          kind: "subsidy", tag: "State Government", tint: "var(--tint-peach)", logo: "gujaratGovt",
-          title: "Aatmanirbhar<br>Gujarat 2022", subtitle: "Industries and Mines Department",
-          figures: [{ label: "Assistance up to", value: "Up to ₹1.2Cr" }],
-          goto: "subsidy-detail",
-        },
-      ],
-    },
-    help: {
-      title: "Need help? We're here for you!",
-      subtitle: "Get help with loans and subsidies",
-      cta: "Request a Call",
-      goto: "request-call",
-    },
-    aiNudge: { lead: "Ask anything about", topic: "loans & subsidies" },
-    pageNotes: {
-      trust: { tone: "trust", icon: "shield-check-bold-duotone", lines: ["Offers from RBI-regulated banks and NBFCs", "Your data is shared only with your consent"] },
-      indicative: { lines: ["Rates and amounts are indicative", "Final terms are set by the lender after review"] },
-      caughtup: { lines: ["You're all caught up", "New matches appear as your business profile grows"] },
-    },
-    emi: {
-      parts: [{ text: "EMI of " }, { text: "₹45,899", strong: true }, { text: " due on " }, { text: "12 Nov", strong: true }],
-      goto: "view-emis",
-    },
-    nav: [
-      { id: "home", label: "Home", icon: "home-angle-linear" },
-      { id: "business", label: "Business", icon: "shop-linear" },
-      { id: "finance", label: "Finance", icon: "money-bag-bold-duotone", iconActive: "money-bag-bold-duotone" },
-      { id: "grow", label: "Grow", icon: "course-up-linear" },
-    ],
-  };
+OPL.data = OPL.data || {};
+OPL.data.home = {
+header: { title: "Get Financing" },
+hero: {
+loans: {
+eyebrow: "Get a loan up to",
+amount: { prefix: "₹", value: 50, suffix: " Lakhs" },
+facts: [
+[{ text: "From", strong: false }, { text: " " }, { text: "9.45% p.a.", strong: true, accent: true }],
+[{ text: "7 offers", strong: true, accent: true }],
+],
+stack: [
+{ logo: "citi", title: "Citi Bank", subtitle: "Working Capital Loan", tint: "var(--tint-blue)" },
+{ logo: "bob", title: "Bank of Baroda", subtitle: "Working Capital Loan", tint: "var(--tint-peach-soft)" },
+{ logo: "axis", title: "Axis Bank", subtitle: "Working Capital Loan", tint: "var(--tint-pink)" },
+],
+cta: "Explore Loans",          // Figma updated 23 Nov (was "See all loans (7)")
+goto: "loans-overview",
+},
+subsidies: {
+eyebrow: "Get assistance up to",
+amount: { prefix: "₹", value: 1, suffix: " Crore", static: true },
+facts: null,
+stack: [
+{ logo: "msme", ring: 1, title: "MSME Competitive<br>Lean Scheme", subtitle: "MSME Champions Scheme", tint: "var(--tint-peach)" },
+{ logo: "gujarat", ring: 2, title: "Gujarat Electronics Policy<br>(2022 - 28)", subtitle: "Science and Technology Department", tint: "var(--tint-blue)" },
+{ logo: "gujaratGovt", ring: 1, title: "Aatmanirbhar<br>Gujarat 2022", subtitle: "Industries and Mines Department", tint: "var(--tint-peach)" },
+],
+cta: "Explore Subsidies",      // 382:33823; 382:36681 still reads "See all subsidies (3)"
+goto: "subsidies-overview",
+},
+},
+quickActions: [
+{ icon: "round-graph-bold-duotone", label: "CMR<br>score", goto: "cmr-score" },
+{ icon: "bill-list-bold-duotone", label: "Track<br>Loans", goto: "track-loans" },
+{ icon: "diploma-verified-bold-duotone", label: "Debt<br>Snapshot", goto: "debt-snapshot" },
+{ icon: "calendar-bold-duotone", label: "View<br>EMIs", goto: "view-emis" },
+],
+loans: {
+title: "Top loan matches",
+goto: "loan-offers",
+cards: [
+{
+kind: "loan", tag: "Collateral-free", tint: "var(--tint-blue)", logo: "citi",
+title: "Citi Bank", subtitle: "Working Capital Loan",
+figures: [{ label: "Loan up to", value: "₹50 L" }, { label: "Interest", value: "9.45%", unit: "p.a." }],
+detail: "pick-citi",
+},
+{
+kind: "loan", tag: "Working Capital Loan", tint: "var(--tint-peach)", logo: "bob",
+title: "Bank of Baroda", subtitle: "Working Capital Loan",
+figures: [{ label: "Loan up to", value: "₹50 L" }, { label: "Interest", value: "9.45%", unit: "p.a." }],
+detail: "match-bob",
+},
+{
+kind: "loan", tag: "Collateral-free", tint: "var(--tint-pink)", logo: "axis",
+title: "Axis Bank", subtitle: "Working Capital Loan",
+figures: [{ label: "Loan up to", value: "₹50 L" }, { label: "Interest", value: "9.45%", unit: "p.a." }],
+detail: "pick-axis",
+},
+],
+},
+subsidies: {
+title: "Top subsidy matches",
+goto: "subsidy-list",
+chips: [
+{ icon: "settings-bold-duotone", label: "Machinery" },
+{ icon: "cpu-bold-duotone", label: "Technology" },
+{ icon: "verified-check-bold-duotone", label: "Quality & Lean", count: 3 },
+],
+cards: [
+{
+kind: "subsidy", tag: "State Government", tint: "var(--tint-peach)", logo: "msme",
+title: "MSME Competitive<br>Lean Scheme", subtitle: "MSME Champions Scheme",
+figures: [{ label: "Assistance up to", value: "Up to ₹2.4L" }],
+goto: "subsidy-detail",
+},
+{
+kind: "subsidy", tag: "Central Government", tint: "var(--tint-blue)", logo: "gujarat",
+title: "Gujarat Electronics Policy<br>(2022 - 28)", subtitle: "Science and Technology Department",
+figures: [{ label: "Assistance up to", value: "Up to ₹2.4L" }],
+goto: "subsidy-detail",
+},
+{
+kind: "subsidy", tag: "State Government", tint: "var(--tint-peach)", logo: "gujaratGovt",
+title: "Aatmanirbhar<br>Gujarat 2022", subtitle: "Industries and Mines Department",
+figures: [{ label: "Assistance up to", value: "Up to ₹1.2Cr" }],
+goto: "subsidy-detail",
+},
+],
+},
+help: {
+title: "Need help? We're here for you!",
+subtitle: "Get help with loans and subsidies",
+cta: "Request a Call",
+goto: "request-call",
+},
+aiNudge: { lead: "Ask anything about", topic: "loans & subsidies" },
+pageNotes: {
+trust: { tone: "trust", icon: "shield-check-bold-duotone", lines: ["Offers from RBI-regulated banks and NBFCs", "Your data is shared only with your consent"] },
+indicative: { lines: ["Rates and amounts are indicative", "Final terms are set by the lender after review"] },
+caughtup: { lines: ["You're all caught up", "New matches appear as your business profile grows"] },
+},
+emi: {
+parts: [{ text: "EMI of " }, { text: "₹45,899", strong: true }, { text: " due on " }, { text: "12 Nov", strong: true }],
+goto: "view-emis",
+},
+nav: [
+{ id: "home", label: "Home", icon: "home-angle-linear" },
+{ id: "business", label: "Business", icon: "shop-linear" },
+{ id: "finance", label: "Finance", icon: "money-bag-bold-duotone", iconActive: "money-bag-bold-duotone" },
+{ id: "grow", label: "Grow", icon: "course-up-linear" },
+],
+};
 })();
 
 ;
@@ -1371,73 +1382,73 @@
 /* ==== js/data/loans-overview.js ==== */
 
 (function () {
-  OPL.data = OPL.data || {};
-  OPL.data.loansOverview = {
-    header: {
-      title: "Loans",
-      actions: [
-        { icon: "magnifer-zoom-in-linear", label: "Search", goto: "loan-search" },
-        { icon: "headphones-round-sound-linear", label: "Support", goto: "support" },
-      ],
-    },
-    limit: { eyebrow: "Safe borrowing limit", prefix: "Up to ₹", value: 50, suffix: " Lakhs" },
-    cmr: { label: "CMR - 2", risk: "Low risk", goto: "cmr-score" },
-    offers: [
-      {
-        kind: "loan", tag: "Collateral-free", tint: "var(--tint-blue)", logo: "citi",
-        title: "Citi Bank", subtitle: "Working Capital Loan",
-        figures: [{ label: "Loan up to", value: "₹50 L" }, { label: "Interest", value: "9.45%", unit: "p.a." }],
-        detail: "pick-citi",
-      },
-      {
-        kind: "loan", tag: "Working Capital Loan", tint: "var(--tint-peach)", logo: "bob",
-        title: "Bank of Baroda", subtitle: "Working Capital Loan",
-        figures: [{ label: "Loan up to", value: "₹50 L" }, { label: "Interest", value: "9.45%", unit: "p.a." }],
-        detail: "match-bob",
-      },
-      {
-        kind: "loan", tag: "Collateral-free", tint: "var(--tint-pink)", logo: "axis",
-        title: "Axis Bank", subtitle: "Working Capital Loan",
-        figures: [{ label: "Loan up to", value: "₹50 L" }, { label: "Interest", value: "9.45%", unit: "p.a." }],
-        detail: "pick-axis",
-      },
-    ],
-    offersCta: { label: "See all loans (7)", goto: "loan-offers" },
-    applications: {
-      title: "Your loan applications",
-      card: {
-        logo: "citiApp", name: "Citi Bank", product: "Working capital loan", tag: "2 days left",
-        figures: [{ label: "Final offer", value: "₹45 L" }, { label: "Interest", value: "9.45%", unit: "p.a." }],
-        steps: [
-          { icon: "plain-2", label: "Application<br>Sent", state: "done" },
-          { icon: "buildings", label: "Lender Verification", state: "done" },
-          { icon: "document-text", label: "Sign KFS<br>and Sanction", state: "action" },
-        ],
-        cta: "Review KFS",
-        ctaAttrs: 'data-app-open="pick-citi"',   // → Application detail, KFS ready (382:42689)
-      },
-    },
-    borrowing: {
-      title: "Your Borrowing",
-      card: {
-        total: { label: "Total outstanding", value: "₹64.92 L" },
-        legend: [
-          { dot: "dot-indigo", label: "Loans on EMI", value: "₹50.22 L" },
-          { dot: "dot-green", label: "Credit line used", value: "₹14.70 L" },
-        ],
-        available: { label: "Credit line available", value: "₹18.30 L", unit: "of ₹33 L" },
-        goto: "my-loans",
-      },
-    },
-    help: OPL.data.home.help,
-    aiNudge: { lead: "Ask anything about", topic: "your loans" },
-    nav: [
-      { id: "overview", label: "Overview", icon: "widget", iconActive: "widget-active", goto: "loans-overview" },
-      { id: "loan-offers", label: "Offers", icon: "banknote-2" },
-      { id: "applications", label: "Track Loans", overviewLabel: "Applications", icon: "clipboard-list", iconActive: "clipboard-list-active" },
-      { id: "my-loans", label: "My Loans", icon: "wallet-2" },
-    ],
-  };
+OPL.data = OPL.data || {};
+OPL.data.loansOverview = {
+header: {
+title: "Loans",
+actions: [
+{ icon: "magnifer-zoom-in-linear", label: "Search", goto: "loan-search" },
+{ icon: "headphones-round-sound-linear", label: "Support", goto: "support" },
+],
+},
+limit: { eyebrow: "Safe borrowing limit", prefix: "Up to ₹", value: 50, suffix: " Lakhs" },
+cmr: { label: "CMR - 2", risk: "Low risk", goto: "cmr-score" },
+offers: [
+{
+kind: "loan", tag: "Collateral-free", tint: "var(--tint-blue)", logo: "citi",
+title: "Citi Bank", subtitle: "Working Capital Loan",
+figures: [{ label: "Loan up to", value: "₹50 L" }, { label: "Interest", value: "9.45%", unit: "p.a." }],
+detail: "pick-citi",
+},
+{
+kind: "loan", tag: "Working Capital Loan", tint: "var(--tint-peach)", logo: "bob",
+title: "Bank of Baroda", subtitle: "Working Capital Loan",
+figures: [{ label: "Loan up to", value: "₹50 L" }, { label: "Interest", value: "9.45%", unit: "p.a." }],
+detail: "match-bob",
+},
+{
+kind: "loan", tag: "Collateral-free", tint: "var(--tint-pink)", logo: "axis",
+title: "Axis Bank", subtitle: "Working Capital Loan",
+figures: [{ label: "Loan up to", value: "₹50 L" }, { label: "Interest", value: "9.45%", unit: "p.a." }],
+detail: "pick-axis",
+},
+],
+offersCta: { label: "See all loans (7)", goto: "loan-offers" },
+applications: {
+title: "Your loan applications",
+card: {
+logo: "citiApp", name: "Citi Bank", product: "Working capital loan", tag: "2 days left",
+figures: [{ label: "Final offer", value: "₹45 L" }, { label: "Interest", value: "9.45%", unit: "p.a." }],
+steps: [
+{ icon: "plain-2", label: "Application<br>Sent", state: "done" },
+{ icon: "buildings", label: "Lender Verification", state: "done" },
+{ icon: "document-text", label: "Sign KFS<br>and Sanction", state: "action" },
+],
+cta: "Review KFS",
+ctaAttrs: 'data-app-open="pick-citi"',   // → Application detail, KFS ready (382:42689)
+},
+},
+borrowing: {
+title: "Your Borrowing",
+card: {
+total: { label: "Total outstanding", value: "₹64.92 L" },
+legend: [
+{ dot: "dot-indigo", label: "Loans on EMI", value: "₹50.22 L" },
+{ dot: "dot-green", label: "Credit line used", value: "₹14.70 L" },
+],
+available: { label: "Credit line available", value: "₹18.30 L", unit: "of ₹33 L" },
+goto: "my-loans",
+},
+},
+help: OPL.data.home.help,
+aiNudge: { lead: "Ask anything about", topic: "your loans" },
+nav: [
+{ id: "overview", label: "Overview", icon: "widget", iconActive: "widget-active", goto: "loans-overview" },
+{ id: "loan-offers", label: "Offers", icon: "banknote-2" },
+{ id: "applications", label: "Track Loans", overviewLabel: "Applications", icon: "clipboard-list", iconActive: "clipboard-list-active" },
+{ id: "my-loans", label: "My Loans", icon: "wallet-2" },
+],
+};
 })();
 
 ;
@@ -1445,148 +1456,148 @@
 /* ==== js/data/loan-offers.js ==== */
 
 (function () {
-  OPL.data = OPL.data || {};
-  const fig = (amount = "₹50 L", rate = "9.45%") => [
-    { label: "Loan up to", value: amount },
-    { label: "Interest", value: rate, unit: "p.a." },
-  ];
-  OPL.data.loanOffers = {
-    header: {
-      title: "Loan offers",
-      actions: [
-        { icon: "magnifer-zoom-in-linear", label: "Search", goto: "loan-search" },
-        { icon: "headphones-round-sound-linear", label: "Support", goto: "support" },
-      ],
-    },
-    picksTitle: "Top 3 picks",
-    picks: [
-      {
-        id: "pick-axis", logo: "axis", tint: "var(--tint-pink)",
-        tags: [{ text: "Collateral-free", tone: "blue" }],
-        title: "Axis Bank", subtitle: "Working Capital Loan", figures: fig(),
-        details: [["Tenure", "Renews yearly"], ["Pay on", "Used amount"], ["Fee", "0.75%"]],
-      },
-      {
-        id: "pick-citi", logo: "citi", tint: "var(--tint-blue)",
-        tags: [{ text: "Lowest interest", tone: "green" }, { text: "Collateral-free", tone: "blue" }],
-        title: "Citi Bank", subtitle: "Working Capital Loan", figures: fig(),
-        details: [["Tenure", "Renews yearly"], ["Pay on", "Used amount"], ["Fee", "0.75%"]],
-      },
-      {
-        id: "pick-sidbi", logo: "sidbiMark", tint: "var(--tint-olive)",
-        tags: [{ text: "Lowest interest", tone: "green" }],
-        title: "SIDBI", subtitle: "Cash credit limit", figures: fig(),
-        details: [["Tenure", "Renews yearly"], ["Est. EMI", "₹1,50,690 /month"], ["Fee", "0.5%"]],
-      },
-    ],
-    allTitle: "All offers (6)",
-    offers: [
-      {
-        id: "offer-sidbi", logo: "sidbiMark", tint: "var(--tint-olive)",
-        tags: [{ text: "Lowest interest", tone: "green" }],
-        title: "SIDBI", subtitle: "Cash credit limit", figures: fig(),
-        details: [["Tenure", "Renews yearly"], ["Est. EMI", "₹1,50,690 /month"]],
-      },
-      {
-        id: "offer-axis", logo: "axis", tint: "var(--tint-pink)",
-        tags: [{ text: "Needs collateral", tone: "amber" }],
-        title: "Axis Bank", subtitle: "Cash credit limit", figures: fig(),
-        details: [["Tenure", "Renews yearly"], ["Est. EMI", "₹1,50,690 /month"]],
-      },
-      {
-        id: "offer-hdfc", logo: "hdfcMark", tint: "var(--tint-blue)",
-        tags: [{ text: "Needs collateral", tone: "amber" }],
-        title: "HDFC Bank", subtitle: "Cash credit limit", figures: fig(),
-        details: [["Tenure", "Renews yearly"], ["Est. EMI", "₹1,50,690 /month"]],
-      },
-    ],
-    quickFilters: ["Working capital", "Term loan", "Collateral-free"],
-    sortOptions: ["Lowest interest", "Highest loan amount", "Lowest EMI", "Lowest processing fee"],
-    filterGroups: [
-      { label: "Loan type", options: ["Working capital", "Term loan", "Cash credit limit"] },
-      { label: "Collateral", options: ["Collateral-free", "Needs collateral"] },
-      { label: "Loan amount", options: ["Up to ₹10 L", "₹10 L – ₹50 L", "Above ₹50 L"] },
-      { label: "Lender type", options: ["Bank", "NBFC", "Government"] },
-    ],
-    filtersFigmaSelected: ["Working capital"],
-    filtersCta: "Show 4 offers",
-    compareMax: 3,
-    compareFigmaSelected: ["offer-sidbi", "offer-axis"],
-    aiNudge: { lead: "Ask anything about", topic: "these loan offers" },
-  };
-  OPL.data.compareLoans = {
-    title: "Compare loans",
-    diffLabel: "Show differences only",
-    rows: [
-      { id: "type", label: "Loan type", h: 64, small: true },
-      { id: "amount", label: "Loan amount", h: 52 },
-      { id: "interest", label: "Interest", sub: "Floating · RBLR-linked", info: true, h: 68 },
-      { id: "apr", label: "APR", sub: "yearly cost incl. fees", info: true, h: 68, gap: 6 },
-      { id: "tenure", label: "Tenure", h: 52 },
-      { id: "emi", label: "Estimated EMI", h: 52 },
-      { id: "fee", label: "Processing fee", sub: "one time, incl. GST", h: 68 },
-      { id: "collateral", label: "Collateral", h: 68 },
-      { id: "money", label: "Money in", sub: "estimate, after signing", h: 68 },
-    ],
-    records: {
-      "pick-citi": {
-        name: "Citi Bank", logo: "citiApp", tint: "var(--tint-blue)",
-        values: { type: "Working capital loan", amount: "Up to ₹50 L", interest: "9.45% p.a.", apr: "10.54%", tenure: "3 years",
-          emi: "₹1.60 L/mo", fee: "1.5%", collateral: ["Not needed", "CGTMSE"], money: "~3-4 days" },
-      },
-      "offer-sidbi": {
-        name: "SIDBI", logo: "sidbi", tint: "#f6f8e2",
-        values: { type: "Working capital term loan", amount: "Up to ₹50 L", interest: "9.45% p.a.", apr: "9.81%", tenure: "3 years",
-          emi: "₹1.60 L/mo", fee: "0.5%", collateral: ["Not needed", "CGTMSE"], money: "~5-7 days" },
-      },
-      sbi: {
-        name: "SBI", logo: "sbi", tint: "#eceefc",
-        values: { type: "Term loan · CGTMSE", amount: "Up to ₹45 L", interest: "9.75% p.a.", apr: "10.07%", tenure: "3 years",
-          emi: "₹1.45 L/mo", fee: "0.44%", collateral: ["Not needed", "CGTMSE"], money: "~7-10 days" },
-      },
-      "pick-axis": {
-        name: "Axis Bank", logo: "axis", tint: "var(--tint-pink)",
-        values: { type: "Working capital loan", amount: "Up to ₹50 L", interest: "9.45% p.a.", apr: "10.62%", tenure: "Renews yearly",
-          emi: "₹1.58 L/mo", fee: "0.75%", collateral: ["Not needed", "CGTMSE"], money: "~4-6 days" },
-        assumed: ["apr", "emi", "money"],
-      },
-      "offer-axis": {
-        name: "Axis Bank", logo: "axis", tint: "var(--tint-pink)",
-        values: { type: "Cash credit limit", amount: "Up to ₹50 L", interest: "9.45% p.a.", apr: "11.20%", tenure: "Renews yearly",
-          emi: "₹1.51 L/mo", fee: "1%", collateral: ["Needed", "Property"], money: "~6-8 days" },
-        assumed: ["apr", "fee", "collateral", "money"],
-      },
-      "match-bob": {
-        name: "Bank of Baroda", logo: "bob", tint: "var(--tint-peach)",
-        values: { type: "Working capital loan", amount: "Up to ₹50 L", interest: "9.45% p.a.", apr: "10.80%", tenure: "Renews yearly",
-          emi: "₹1.58 L/mo", fee: "1%", collateral: ["Not needed", "CGTMSE"], money: "~4-6 days" },
-        assumed: ["apr", "emi", "fee", "collateral", "money"],
-      },
-      "offer-hdfc": {
-        name: "HDFC Bank", logo: "hdfcMark", tint: "var(--tint-blue)",
-        values: { type: "Cash credit limit", amount: "Up to ₹50 L", interest: "9.45% p.a.", apr: "10.95%", tenure: "Renews yearly",
-          emi: "₹1.51 L/mo", fee: "0.9%", collateral: ["Needed", "Property / FD"], money: "~5-7 days" },
-        assumed: ["apr", "fee", "collateral", "money"],
-      },
-    },
-    aliases: { "pick-sidbi": "offer-sidbi" },  // same SIDBI product
-    bestRules: { amount: "max", interest: "min", apr: "min", fee: "min", money: "min" },
-    figmaDefault: [{ id: "pick-citi", selected: true }, { id: "offer-sidbi", selected: true }, { id: "sbi", selected: false }],
-    max: 3,
-    addLabel: "Add loan",
-    pickLabel: "Pick your loan",
-    cta: (n) => `Apply to ${n} lender${n === 1 ? "" : "s"}`,
-  };
-  const lo = OPL.data.loanOffers;
-  OPL.data.loanCatalog = Object.fromEntries([
-    ...lo.picks, ...lo.offers,
-    {
-      id: "match-bob", logo: "bob", tint: "var(--tint-peach)",
-      tags: [{ text: "Working Capital Loan", tone: "blue" }],
-      title: "Bank of Baroda", subtitle: "Working Capital Loan", figures: fig(),
-      details: [["Tenure", "Renews yearly"]],   // fee/EMI etc. come from the (assumed) record
-    },
-  ].map((c) => [c.id, c]));
+OPL.data = OPL.data || {};
+const fig = (amount = "₹50 L", rate = "9.45%") => [
+{ label: "Loan up to", value: amount },
+{ label: "Interest", value: rate, unit: "p.a." },
+];
+OPL.data.loanOffers = {
+header: {
+title: "Loan offers",
+actions: [
+{ icon: "magnifer-zoom-in-linear", label: "Search", goto: "loan-search" },
+{ icon: "headphones-round-sound-linear", label: "Support", goto: "support" },
+],
+},
+picksTitle: "Top 3 picks",
+picks: [
+{
+id: "pick-axis", logo: "axis", tint: "var(--tint-pink)",
+tags: [{ text: "Collateral-free", tone: "blue" }],
+title: "Axis Bank", subtitle: "Working Capital Loan", figures: fig(),
+details: [["Tenure", "Renews yearly"], ["Pay on", "Used amount"], ["Fee", "0.75%"]],
+},
+{
+id: "pick-citi", logo: "citi", tint: "var(--tint-blue)",
+tags: [{ text: "Lowest interest", tone: "green" }, { text: "Collateral-free", tone: "blue" }],
+title: "Citi Bank", subtitle: "Working Capital Loan", figures: fig(),
+details: [["Tenure", "Renews yearly"], ["Pay on", "Used amount"], ["Fee", "0.75%"]],
+},
+{
+id: "pick-sidbi", logo: "sidbiMark", tint: "var(--tint-olive)",
+tags: [{ text: "Lowest interest", tone: "green" }],
+title: "SIDBI", subtitle: "Cash credit limit", figures: fig(),
+details: [["Tenure", "Renews yearly"], ["Est. EMI", "₹1,50,690 /month"], ["Fee", "0.5%"]],
+},
+],
+allTitle: "All offers (6)",
+offers: [
+{
+id: "offer-sidbi", logo: "sidbiMark", tint: "var(--tint-olive)",
+tags: [{ text: "Lowest interest", tone: "green" }],
+title: "SIDBI", subtitle: "Cash credit limit", figures: fig(),
+details: [["Tenure", "Renews yearly"], ["Est. EMI", "₹1,50,690 /month"]],
+},
+{
+id: "offer-axis", logo: "axis", tint: "var(--tint-pink)",
+tags: [{ text: "Needs collateral", tone: "amber" }],
+title: "Axis Bank", subtitle: "Cash credit limit", figures: fig(),
+details: [["Tenure", "Renews yearly"], ["Est. EMI", "₹1,50,690 /month"]],
+},
+{
+id: "offer-hdfc", logo: "hdfcMark", tint: "var(--tint-blue)",
+tags: [{ text: "Needs collateral", tone: "amber" }],
+title: "HDFC Bank", subtitle: "Cash credit limit", figures: fig(),
+details: [["Tenure", "Renews yearly"], ["Est. EMI", "₹1,50,690 /month"]],
+},
+],
+quickFilters: ["Working capital", "Term loan", "Collateral-free"],
+sortOptions: ["Lowest interest", "Highest loan amount", "Lowest EMI", "Lowest processing fee"],
+filterGroups: [
+{ label: "Loan type", options: ["Working capital", "Term loan", "Cash credit limit"] },
+{ label: "Collateral", options: ["Collateral-free", "Needs collateral"] },
+{ label: "Loan amount", options: ["Up to ₹10 L", "₹10 L – ₹50 L", "Above ₹50 L"] },
+{ label: "Lender type", options: ["Bank", "NBFC", "Government"] },
+],
+filtersFigmaSelected: ["Working capital"],
+filtersCta: "Show 4 offers",
+compareMax: 3,
+compareFigmaSelected: ["offer-sidbi", "offer-axis"],
+aiNudge: { lead: "Ask anything about", topic: "these loan offers" },
+};
+OPL.data.compareLoans = {
+title: "Compare loans",
+diffLabel: "Show differences only",
+rows: [
+{ id: "type", label: "Loan type", h: 64, small: true },
+{ id: "amount", label: "Loan amount", h: 52 },
+{ id: "interest", label: "Interest", sub: "Floating · RBLR-linked", info: true, h: 68 },
+{ id: "apr", label: "APR", sub: "yearly cost incl. fees", info: true, h: 68, gap: 6 },
+{ id: "tenure", label: "Tenure", h: 52 },
+{ id: "emi", label: "Estimated EMI", h: 52 },
+{ id: "fee", label: "Processing fee", sub: "one time, incl. GST", h: 68 },
+{ id: "collateral", label: "Collateral", h: 68 },
+{ id: "money", label: "Money in", sub: "estimate, after signing", h: 68 },
+],
+records: {
+"pick-citi": {
+name: "Citi Bank", logo: "citiApp", tint: "var(--tint-blue)",
+values: { type: "Working capital loan", amount: "Up to ₹50 L", interest: "9.45% p.a.", apr: "10.54%", tenure: "3 years",
+emi: "₹1.60 L/mo", fee: "1.5%", collateral: ["Not needed", "CGTMSE"], money: "~3-4 days" },
+},
+"offer-sidbi": {
+name: "SIDBI", logo: "sidbi", tint: "#f6f8e2",
+values: { type: "Working capital term loan", amount: "Up to ₹50 L", interest: "9.45% p.a.", apr: "9.81%", tenure: "3 years",
+emi: "₹1.60 L/mo", fee: "0.5%", collateral: ["Not needed", "CGTMSE"], money: "~5-7 days" },
+},
+sbi: {
+name: "SBI", logo: "sbi", tint: "#eceefc",
+values: { type: "Term loan · CGTMSE", amount: "Up to ₹45 L", interest: "9.75% p.a.", apr: "10.07%", tenure: "3 years",
+emi: "₹1.45 L/mo", fee: "0.44%", collateral: ["Not needed", "CGTMSE"], money: "~7-10 days" },
+},
+"pick-axis": {
+name: "Axis Bank", logo: "axis", tint: "var(--tint-pink)",
+values: { type: "Working capital loan", amount: "Up to ₹50 L", interest: "9.45% p.a.", apr: "10.62%", tenure: "Renews yearly",
+emi: "₹1.58 L/mo", fee: "0.75%", collateral: ["Not needed", "CGTMSE"], money: "~4-6 days" },
+assumed: ["apr", "emi", "money"],
+},
+"offer-axis": {
+name: "Axis Bank", logo: "axis", tint: "var(--tint-pink)",
+values: { type: "Cash credit limit", amount: "Up to ₹50 L", interest: "9.45% p.a.", apr: "11.20%", tenure: "Renews yearly",
+emi: "₹1.51 L/mo", fee: "1%", collateral: ["Needed", "Property"], money: "~6-8 days" },
+assumed: ["apr", "fee", "collateral", "money"],
+},
+"match-bob": {
+name: "Bank of Baroda", logo: "bob", tint: "var(--tint-peach)",
+values: { type: "Working capital loan", amount: "Up to ₹50 L", interest: "9.45% p.a.", apr: "10.80%", tenure: "Renews yearly",
+emi: "₹1.58 L/mo", fee: "1%", collateral: ["Not needed", "CGTMSE"], money: "~4-6 days" },
+assumed: ["apr", "emi", "fee", "collateral", "money"],
+},
+"offer-hdfc": {
+name: "HDFC Bank", logo: "hdfcMark", tint: "var(--tint-blue)",
+values: { type: "Cash credit limit", amount: "Up to ₹50 L", interest: "9.45% p.a.", apr: "10.95%", tenure: "Renews yearly",
+emi: "₹1.51 L/mo", fee: "0.9%", collateral: ["Needed", "Property / FD"], money: "~5-7 days" },
+assumed: ["apr", "fee", "collateral", "money"],
+},
+},
+aliases: { "pick-sidbi": "offer-sidbi" },  // same SIDBI product
+bestRules: { amount: "max", interest: "min", apr: "min", fee: "min", money: "min" },
+figmaDefault: [{ id: "pick-citi", selected: true }, { id: "offer-sidbi", selected: true }, { id: "sbi", selected: false }],
+max: 3,
+addLabel: "Add loan",
+pickLabel: "Pick your loan",
+cta: (n) => `Apply to ${n} lender${n === 1 ? "" : "s"}`,
+};
+const lo = OPL.data.loanOffers;
+OPL.data.loanCatalog = Object.fromEntries([
+...lo.picks, ...lo.offers,
+{
+id: "match-bob", logo: "bob", tint: "var(--tint-peach)",
+tags: [{ text: "Working Capital Loan", tone: "blue" }],
+title: "Bank of Baroda", subtitle: "Working Capital Loan", figures: fig(),
+details: [["Tenure", "Renews yearly"]],   // fee/EMI etc. come from the (assumed) record
+},
+].map((c) => [c.id, c]));
 })();
 
 ;
@@ -1594,176 +1605,176 @@
 /* ==== js/data/applications.js ==== */
 
 (function () {
-  OPL.data = OPL.data || {};
-  OPL.data.apply = {
-    titleMany: (n) => `Proceed applying to ${n} lenders?`,
-    titleOne: (name) => `Proceed applying to ${name} loan?`,
-    notes: [
-      "Each lender runs a full credit check and verification",
-      "A separate application goes to each lender at the same time. You can accept the KFS of only one of them this month.",
-    ],
-    consent: (names) => `I agree to share my business, GST, bank and bureau details with ${names} for this application.`,
-    submit: (n) => (n === 1 ? "Submit application" : `Submit ${n} applications`),   // Figma's single sheet says "Submit 2 applications" — adapted
-    cancel: "Cancel",
-  };
-  OPL.data.applications = {
-    title: (n) => `Track Loan Applications (${n})`,
-    note: "You can accept one KFS this month.<br>The other application closes when you do.",
-    figmaPreset: [{ id: "offer-sidbi", status: "verifying" }, { id: "pick-citi", status: "kfs" }],
-    sentAt: "22 Nov, 11:40 am",
-    verifiedOn: "Verified on 24 Nov",
-    tints: { "offer-sidbi": "#f4f7e4", "pick-sidbi": "#f4f7e4", "pick-citi": "var(--tint-blue)" },
-    verifying: {
-      title: (name) => `${name} is verifying your application`,
-      cardNote: (name) => `${name} may call you and visit your unit. This usually takes 5 to 7 working days. We will notify you.`,
-      progress: "In progress · Takes ~5 to 7 working days",
-      todo: "Final offer & KFS Signing",
-      expect: (name) => [`${name} will call you on ••••6789.`, "They may visit your unit on Ring Road, Surat."],
-      docs: ["Latest stock statement", "Partner KYC (Aadhaar, PAN)", "Factory rent agreement"],
-      appNo: "LA-2026-11-2232",
-    },
-    kfs: {
-      title: "Review KFS and Sanction Letter",
-      daysLeft: "2 days left",
-      cardNote: "Sign the KFS and sanction letter before 25 Nov ‘26",
-      approvedTitle: (name) => `${name} approved your loan`,
-      approvedBody: "Your final offer is ready. Read the Key Fact Statement, then accept the offer to sign.",
-      approvedNote: "Accept and sign before 25 Nov 2026.",
-      finalOffer: "₹45 L",
-      summary: {
-        apr: "10.54%",
-        loanAmount: "₹45,00,000", tenure: "36", rate: "9.45%", emi: "₹1,44,043",
-        repay: "₹51,85,548",
-        split: [
-          { label: "Final Loan Amount", value: "₹44,32,500", w: 268.401, color: "#3858e5", dot: "dot-primary" },
-          { label: "Interest", value: "₹6,85,548", w: 41.512, color: "#14b8a6", dot: "dot-teal" },
-          { label: "Processing fee", value: "₹67,500", w: 4.087, color: "#ffbb00", dot: "dot-yellow" },
-        ],
-        facts: ["Floating rate", "No collateral", "3-day cooling-off"],
-      },
-      cta: "Review Full KFS & Accept",
-    },
-    branch: (lenderSlug) => ({ phone: "0261 2345 678", email: `ringroad.surat@${lenderSlug}.example` }),
-    whatsapp: "Get WhatsApp updates",
-    withdraw: "Withdraw application",
-    aiNudge: { lead: "Ask anything about", topic: "your application" },
-  };
-  OPL.data.kfsDoc = {
-    step: "Step 1 of 2 · Accept KFS",
-    end: "End of Key Fact Statement",
-    consent: "I have read and understood the<br>Key Fact Statement",
-    hint: "Read to the last page to accept",
-    cta: "Accept KFS",
-    letterhead: { "pick-citi": "Citi Bank N.A. · Commercial Bank" },
-    pages: (l) => [
-      {
-        title: "Key Fact Statement",
-        meta: "Loan no. LA-2026-11-2231 · Issued 22 Nov 2026 · Valid till 25 Nov 2026",
-        part: "Part 1 · Interest rate and fees/charges",
-        rows: [
-          [1, "Loan proposal / account no.", "LA-2026-11-2231"],
-          [2, "Type of loan", "Working capital term loan"],
-          [3, "Sanctioned loan amount", "₹45,00,000"],
-          [4, "Disbursal schedule", "100% upfront"],
-          [5, "Loan term", "36 months"],
-          [6, "Instalments", "36 EMIs of ₹1,44,043"],
-          [7, "First instalment due", "5 Jan 2027"],
-          [8, "Interest rate (floating)", "9.45% p.a."],
-          [9, "Reference benchmark", "RBLR"],
-          [10, "Processing fee", "₹67,500 (incl. GST)"],
-          [11, "Annual Percentage Rate (APR)", "10.54%"],
-          [12, "Total interest payable", "₹6,85,548"],
-        ],
-        note: "APR is the yearly cost of credit to the borrower, including the interest rate and all fees and charges. Figures are computed on the sanctioned amount.",
-      },
-      {
-        part: "Part 1 (continued) · Contingent charges",
-        rows: [
-          [13, "Penal charges, if any", "See Annex A"],
-          [14, "Cheque / NACH bounce", "See Annex A"],
-          [15, "Foreclosure / prepayment", "See Annex A"],
-          [16, "Switch from floating to fixed rate", "See Annex A"],
-          [17, "Other charges", "See Annex A"],
-        ],
-      },
-      {
-        assumed: true,   // not in Figma
-        part: "Annex A · Contingent charges",
-        rows: [
-          [13, "Penal charges, if any", "2% p.a. on the overdue instalment"],
-          [14, "Cheque / NACH bounce", "₹500 per instance + GST"],
-          [15, "Foreclosure / prepayment", "Nil (floating rate)"],
-          [16, "Switch from floating to fixed rate", "0.5% of principal outstanding"],
-          [17, "Other charges", "Stamp duty as per state law"],
-        ],
-      },
-      {
-        part: "Part 2 · Other qualitative information",
-        rows: [
-          [1, "Recovery agents", "Engaged only as per RBI guidelines. List on the lender’s website."],
-          [2, "Grievance redressal officer", `Nodal Officer, ${l.name}, Mumbai · nodal.officer@${l.slug}.example`],
-          [3, "Cooling-off / look-up period", "3 days from disbursal, no penalty"],
-          [4, "Loan servicing agent", `${l.name} (no LSP)`],
-        ],
-        ack: {
-          title: "Borrower acknowledgement",
-          text: "I confirm that I have read and understood this Key Fact Statement, and that its contents were explained to me in a language I understand.",
-          lines: ["Borrower signature", "Date"],
-          foot: "To be signed electronically through OPL.",
-        },
-      },
-    ],
-  };
-  OPL.data.nesl = {
-    sheet: {
-      chip: "KFS accepted", step: "Step 2 of 2", title: "Sign your sanction letter on NeSL",
-      steps: ["Verify OTP", "Read the Sanction Letter", "Confirm e-stamp", "eSign with Aadhaar"],
-      note: "Sign sanction letter before 25 Nov 2026",
-      cta: "Continue to NeSL", later: "I’ll come back later",
-    },
-    portal: [
-      { id: "redirect", figma: "433:8115", auto: 1800 },
-      { id: "otp", figma: "416:83009", dim: true, next: [138, 464, 52, 34], cancel: [202, 464, 54, 34] },   // frame fill #676D8E, white status bar
-      { id: "agreement", figma: "416:83028", next: [8, 16, 374, 488], cancel: [176, 591, 56, 32] },
-      { id: "estamp", figma: "416:83058", next: [166, 443, 58, 70] },
-      { id: "method", figma: "416:83077", next: [164, 700, 62, 23] },
-      { id: "aadhaar", figma: "416:83101", next: [198, 321, 183, 46] },
-    ],
-    confirm: {
-      figma: "416:82947", wait: 2400,
-      title: "Confirming your signature",
-      sub: "Checking with NeSL. This takes a few seconds.",
-      foot: "Do not press back, or close the application",
-    },
-  };
-  Object.assign(OPL.data.applications, {
-    sign: {
-      title: "Sign Sanction Letter",
-      step3: "Review KFS and Sanction Letter",
-      step3Sub: "KFS accepted on 24 Nov · Sign by 25 Nov",
-      cta: "Sign on NeSL",
-    },
-    signed: {
-      title: "Sanction Letter Signed",
-      step3: "Review KFS and Sanction Letter",
-      step3Sub: "Signed on NeSL, 24 Nov",
-      summaryTitle: "Sanction Summary",
-      aprChip: "Same as KFS",
-      rows: [
-        ["Sanction letter no.", "SL/SRT/2026/1187"],
-        ["Sanction date", "24 Nov 2026"],
-        ["Final Loan Amount", "₹44,32,500"],
-        ["Security", "Collateral-free · CGTMSE cover"],
-        ["Money in", "3–4 working days after KYC"],
-      ],
-      sheet: {
-        title: "Sanction letter signed",
-        body: (name) => `${name} will reach out to you for<br>next steps on money disbursal.`,
-        rows: [["Final Loan Amount", "₹44,32,500"], ["Into account", "•••• 4521"], ["Money in", "3–4 working days"]],
-        cta: "View application", done: "Done",
-      },
-    },
-  });
+OPL.data = OPL.data || {};
+OPL.data.apply = {
+titleMany: (n) => `Proceed applying to ${n} lenders?`,
+titleOne: (name) => `Proceed applying to ${name} loan?`,
+notes: [
+"Each lender runs a full credit check and verification",
+"A separate application goes to each lender at the same time. You can accept the KFS of only one of them this month.",
+],
+consent: (names) => `I agree to share my business, GST, bank and bureau details with ${names} for this application.`,
+submit: (n) => (n === 1 ? "Submit application" : `Submit ${n} applications`),   // Figma's single sheet says "Submit 2 applications" — adapted
+cancel: "Cancel",
+};
+OPL.data.applications = {
+title: (n) => `Track Loan Applications (${n})`,
+note: "You can accept one KFS this month.<br>The other application closes when you do.",
+figmaPreset: [{ id: "offer-sidbi", status: "verifying" }, { id: "pick-citi", status: "kfs" }],
+sentAt: "22 Nov, 11:40 am",
+verifiedOn: "Verified on 24 Nov",
+tints: { "offer-sidbi": "#f4f7e4", "pick-sidbi": "#f4f7e4", "pick-citi": "var(--tint-blue)" },
+verifying: {
+title: (name) => `${name} is verifying your application`,
+cardNote: (name) => `${name} may call you and visit your unit. This usually takes 5 to 7 working days. We will notify you.`,
+progress: "In progress · Takes ~5 to 7 working days",
+todo: "Final offer & KFS Signing",
+expect: (name) => [`${name} will call you on ••••6789.`, "They may visit your unit on Ring Road, Surat."],
+docs: ["Latest stock statement", "Partner KYC (Aadhaar, PAN)", "Factory rent agreement"],
+appNo: "LA-2026-11-2232",
+},
+kfs: {
+title: "Review KFS and Sanction Letter",
+daysLeft: "2 days left",
+cardNote: "Sign the KFS and sanction letter before 25 Nov ‘26",
+approvedTitle: (name) => `${name} approved your loan`,
+approvedBody: "Your final offer is ready. Read the Key Fact Statement, then accept the offer to sign.",
+approvedNote: "Accept and sign before 25 Nov 2026.",
+finalOffer: "₹45 L",
+summary: {
+apr: "10.54%",
+loanAmount: "₹45,00,000", tenure: "36", rate: "9.45%", emi: "₹1,44,043",
+repay: "₹51,85,548",
+split: [
+{ label: "Final Loan Amount", value: "₹44,32,500", w: 268.401, color: "#3858e5", dot: "dot-primary" },
+{ label: "Interest", value: "₹6,85,548", w: 41.512, color: "#14b8a6", dot: "dot-teal" },
+{ label: "Processing fee", value: "₹67,500", w: 4.087, color: "#ffbb00", dot: "dot-yellow" },
+],
+facts: ["Floating rate", "No collateral", "3-day cooling-off"],
+},
+cta: "Review Full KFS & Accept",
+},
+branch: (lenderSlug) => ({ phone: "0261 2345 678", email: `ringroad.surat@${lenderSlug}.example` }),
+whatsapp: "Get WhatsApp updates",
+withdraw: "Withdraw application",
+aiNudge: { lead: "Ask anything about", topic: "your application" },
+};
+OPL.data.kfsDoc = {
+step: "Step 1 of 2 · Accept KFS",
+end: "End of Key Fact Statement",
+consent: "I have read and understood the<br>Key Fact Statement",
+hint: "Read to the last page to accept",
+cta: "Accept KFS",
+letterhead: { "pick-citi": "Citi Bank N.A. · Commercial Bank" },
+pages: (l) => [
+{
+title: "Key Fact Statement",
+meta: "Loan no. LA-2026-11-2231 · Issued 22 Nov 2026 · Valid till 25 Nov 2026",
+part: "Part 1 · Interest rate and fees/charges",
+rows: [
+[1, "Loan proposal / account no.", "LA-2026-11-2231"],
+[2, "Type of loan", "Working capital term loan"],
+[3, "Sanctioned loan amount", "₹45,00,000"],
+[4, "Disbursal schedule", "100% upfront"],
+[5, "Loan term", "36 months"],
+[6, "Instalments", "36 EMIs of ₹1,44,043"],
+[7, "First instalment due", "5 Jan 2027"],
+[8, "Interest rate (floating)", "9.45% p.a."],
+[9, "Reference benchmark", "RBLR"],
+[10, "Processing fee", "₹67,500 (incl. GST)"],
+[11, "Annual Percentage Rate (APR)", "10.54%"],
+[12, "Total interest payable", "₹6,85,548"],
+],
+note: "APR is the yearly cost of credit to the borrower, including the interest rate and all fees and charges. Figures are computed on the sanctioned amount.",
+},
+{
+part: "Part 1 (continued) · Contingent charges",
+rows: [
+[13, "Penal charges, if any", "See Annex A"],
+[14, "Cheque / NACH bounce", "See Annex A"],
+[15, "Foreclosure / prepayment", "See Annex A"],
+[16, "Switch from floating to fixed rate", "See Annex A"],
+[17, "Other charges", "See Annex A"],
+],
+},
+{
+assumed: true,   // not in Figma
+part: "Annex A · Contingent charges",
+rows: [
+[13, "Penal charges, if any", "2% p.a. on the overdue instalment"],
+[14, "Cheque / NACH bounce", "₹500 per instance + GST"],
+[15, "Foreclosure / prepayment", "Nil (floating rate)"],
+[16, "Switch from floating to fixed rate", "0.5% of principal outstanding"],
+[17, "Other charges", "Stamp duty as per state law"],
+],
+},
+{
+part: "Part 2 · Other qualitative information",
+rows: [
+[1, "Recovery agents", "Engaged only as per RBI guidelines. List on the lender’s website."],
+[2, "Grievance redressal officer", `Nodal Officer, ${l.name}, Mumbai · nodal.officer@${l.slug}.example`],
+[3, "Cooling-off / look-up period", "3 days from disbursal, no penalty"],
+[4, "Loan servicing agent", `${l.name} (no LSP)`],
+],
+ack: {
+title: "Borrower acknowledgement",
+text: "I confirm that I have read and understood this Key Fact Statement, and that its contents were explained to me in a language I understand.",
+lines: ["Borrower signature", "Date"],
+foot: "To be signed electronically through OPL.",
+},
+},
+],
+};
+OPL.data.nesl = {
+sheet: {
+chip: "KFS accepted", step: "Step 2 of 2", title: "Sign your sanction letter on NeSL",
+steps: ["Verify OTP", "Read the Sanction Letter", "Confirm e-stamp", "eSign with Aadhaar"],
+note: "Sign sanction letter before 25 Nov 2026",
+cta: "Continue to NeSL", later: "I’ll come back later",
+},
+portal: [
+{ id: "redirect", figma: "433:8115", auto: 1800 },
+{ id: "otp", figma: "416:83009", dim: true, next: [138, 464, 52, 34], cancel: [202, 464, 54, 34] },   // frame fill #676D8E, white status bar
+{ id: "agreement", figma: "416:83028", next: [8, 16, 374, 488], cancel: [176, 591, 56, 32] },
+{ id: "estamp", figma: "416:83058", next: [166, 443, 58, 70] },
+{ id: "method", figma: "416:83077", next: [164, 700, 62, 23] },
+{ id: "aadhaar", figma: "416:83101", next: [198, 321, 183, 46] },
+],
+confirm: {
+figma: "416:82947", wait: 2400,
+title: "Confirming your signature",
+sub: "Checking with NeSL. This takes a few seconds.",
+foot: "Do not press back, or close the application",
+},
+};
+Object.assign(OPL.data.applications, {
+sign: {
+title: "Sign Sanction Letter",
+step3: "Review KFS and Sanction Letter",
+step3Sub: "KFS accepted on 24 Nov · Sign by 25 Nov",
+cta: "Sign on NeSL",
+},
+signed: {
+title: "Sanction Letter Signed",
+step3: "Review KFS and Sanction Letter",
+step3Sub: "Signed on NeSL, 24 Nov",
+summaryTitle: "Sanction Summary",
+aprChip: "Same as KFS",
+rows: [
+["Sanction letter no.", "SL/SRT/2026/1187"],
+["Sanction date", "24 Nov 2026"],
+["Final Loan Amount", "₹44,32,500"],
+["Security", "Collateral-free · CGTMSE cover"],
+["Money in", "3–4 working days after KYC"],
+],
+sheet: {
+title: "Sanction letter signed",
+body: (name) => `${name} will reach out to you for<br>next steps on money disbursal.`,
+rows: [["Final Loan Amount", "₹44,32,500"], ["Into account", "•••• 4521"], ["Money in", "3–4 working days"]],
+cta: "View application", done: "Done",
+},
+},
+});
 })();
 
 ;
@@ -1778,205 +1789,337 @@ OPL.ui.SignedHeroSvg = '<svg class="mss" viewBox="0 0 390 176" width="390" heigh
 /* ==== js/data/subsidy-detail.js ==== */
 
 (function () {
-  OPL.data = OPL.data || {};
-  OPL.data.subsidyDetail = {
-    title: "Gujarat Textile Policy 2024",
-    hero: {
-      eyebrow: "Estimated benefits",
-      prefix: "Up to ₹", value: 1.2, suffix: "Cr",
-      cta: { label: "Calculate Estimate", goto: "subsidy-estimate" },   // flow 416:76869, not built yet
-    },
-    period: { start: "2024-10-01", end: "2029-09-30", warnMonths: 6 },
-    benefits: {
-      title: "Policy Benefits",
-      count: 8,
-      tiles: [
-        { id: "capital", icon: "settings-duotone-benefit", title: "Capital Subsidy", value: "10–35%", label: "on eFCI" },
-        { id: "interest", icon: "sale-duotone", title: "Interest Subsidy", value: "5–7%", label: "on term loan" },
-        { id: "power", icon: "bolt-circle-duotone", title: "Power Tariff Subsidy", value: "₹1/kWh", label: "per unit" },
-        { id: "payroll", icon: "wallet-money-duotone", title: "Payroll Assistance", value: "~₹5,000", label: "per worker a month" },
-      ],
-      others: {
-        label: "See other benefits",
-        count: 4,
-        rows: [
-          { id: "shg", icon: "case-round-duotone", title: "SHG job work assistance", sub: "₹5,000 per member a month" },
-          { id: "quality", icon: "diploma-duotone", title: "Quality Certification", sub: "50% of fee and testing<br>equipment cost" },
-          { id: "energy", icon: "waterdrops-duotone", title: "Energy and Water Saving", sub: "75% of audit cost" },
-          { id: "tech", icon: "cpu-duotone", title: "Technology Acquisition", sub: "65% of technology cost" },
-        ],
-      },
-    },
-    apply: {
-      title: "Apply",
-      help: { title: ["Get help from", "our subsidy expert"], cta: "Talk to an Expert", goto: "expert" },
-      links: [
-        { icon: "document-add-duotone", title: "Application portal", sub: "Apply online", goto: "application-portal" },
-        { icon: "global-duotone", title: "Official policy website", sub: "Read the full policy", goto: "policy-website" },
-      ],
-    },
-    steps: {
-      title: "How it works",
-      headerDeadline: "Apply within 1 year of production",       // collapsed header chip (416:45566)
-      items: [
-        { title: "Start commercial production", deadline: "Apply within 1yr of production" },
-        {
-          title: "Apply for an eligibility certificate",
-          body: "Your CA and a Chartered Engineer certify your investment.",
-          inset: {
-            title: "Apply at",
-            rows: [
-              { value: "District Industries Centre (DIC)", label: "If you invest up to ₹10 Cr" },
-              { value: "MSME Commissioner", label: "If you invest ₹10 Cr to ₹50 Cr" },
-            ],
-          },
-        },
-        { title: "Get your investment verified", body: "Officials check the assets you invested in." },
-        { title: "Receive your sanction", body: "You get an eligibility certificate for the approved amount." },
-      ],
-      share: "Share these steps with my CA",
-    },
-    foot: {
-      secondary: { label: "Apply Now", goto: "application-portal" },
-      primary: { label: "Talk to an Expert", goto: "expert" },
-      note: "Estimates are indicative. The final amount depends on policy terms and department procedures.",
-    },
-    aiNudge: { lead: "Ask anything about", topic: "this policy" },   // proposed, same pattern as Home
-  };
-  const ACT1 = "Activity 1: garments, apparel, made-ups and technical textiles.";
-  const ACT2 = "Activity 2: weaving, knitting, dyeing and processing, texturising, twisting, embroidery and MMF spinning.";
-  const CAT1 = "Category 1 and PM MITRA Park";
-  OPL.data.subsidyDetail.sheets = {
-    capital: {
-      figma: { 1: "416:47995", 2: "416:48787" },
-      title: "Capital subsidy",
-      hero: { icon: "hero-settings", value: "10–35%", label: "of eFCI" },
-      note: "eFCI is Eligible Fixed Capital Investment: new building, plant and machinery. Land is not counted.",
-      facts: [
-        { icon: "fact-safe-square", label: "Limit", value: "₹40 Cr to ₹100 Cr" },
-        { icon: "fact-calendar", label: "Paid in", value: "5 equal annual instalments" },
-      ],
-      rates: {
-        activities: [
-          { label: "Activity 1", note: ACT1, rows: [[CAT1, "35%", "up to ₹100 Cr"], ["Category 2", "30%", "up to ₹100 Cr"], ["Category 3", "20%", "up to ₹50 Cr"]] },
-          { label: "Activity 2", note: ACT2, rows: [[CAT1, "20%", "up to ₹50 Cr"], ["Category 2", "18%", "up to ₹50 Cr"], ["Category 3", "10%", "up to ₹40 Cr"]] },
-        ],
-      },
-      conditions: [
-        { text: "Only for units with a term loan from a bank or financial institution." },
-        { text: "Paid after commercial production starts." },
-      ],
-      apply: true,
-    },
-    interest: {
-      figma: { 1: "416:49579", 2: "416:50370" },
-      title: "Interest subsidy",
-      hero: { icon: "hero-sale", value: "5–7%", label: "on term loan" },
-      facts: [
-        { icon: "fact-safe-square", label: "Limit", value: "2% to 3% of eFCI a year" },
-        { icon: "fact-calendar", label: "Period", value: "5 to 8 years" },
-      ],
-      rates: {
-        activities: [
-          { label: "Activity 1", note: ACT1, rows: [[CAT1, "7% for 8 years", "up to 3% of eFCI a year"], ["Category 2", "7% for 8 years", "up to 2.5% of eFCI a year"], ["Category 3", "5% for 6 years", "up to 2% of eFCI a year"]] },
-          { label: "Activity 2", note: ACT2, rows: [[CAT1, "7% for 7 years", "up to 2% of eFCI a year"], ["Category 2", "7% for 7 years", "up to 2% of eFCI a year"], ["Category 3", "5% for 5 years", "up to 2% of eFCI a year"]] },
-        ],
-      },
-      conditions: [
-        { text: "You bear at least 2% interest." },
-        { text: "Paid back on the interest you have paid to the lender." },
-      ],
-      apply: true,
-    },
-    power: {
-      figma: { 1: "416:51161" },
-      title: "Power tariff subsidy",
-      hero: { icon: "hero-bolt", value: "₹1/kWh", label: "per unit" },
-      facts: [{ icon: "fact-calendar", label: "Period", value: "5 years from commercial production" }],
-      conditions: [
-        { text: "For power from the DISCOM, or renewable power through open access." },
-        { text: "Power from your own captive plant is not covered.", exclude: true },
-      ],
-      apply: false,
-    },
-    payroll: {
-      figma: { 1: "416:51939" },
-      title: "Payroll assistance",
-      hero: { icon: "hero-wallet", value: "Up to ₹5,000", label: "per worker a month" },
-      facts: [
-        { icon: "fact-users", label: "For", value: "Garment, apparel, made-ups and technical textile units" },
-        { icon: "fact-calendar", label: "Period", value: "5 years from commercial production" },
-      ],
-      rates: {
-        groups: [
-          { title: "Garment, apparel and made-ups", rows: [["Female worker", "₹5,000", "a month"], ["Male worker", "₹4,000", "a month"]] },
-          { title: "Technical textile", rows: [["Female worker", "₹3,000", "a month"], ["Male worker", "₹2,000", "a month"]] },
-        ],
-      },
-      conditions: [{ text: "For workers domiciled in Gujarat and registered under EPF." }],
-      apply: false,
-    },
-    shg: {
-      figma: { 1: "416:52730" },
-      title: "SHG job work assistance",
-      hero: { icon: "hero-case", value: "₹5,000", label: "per member a month" },
-      facts: [
-        { icon: "fact-academic-cap", label: "Training", value: "₹5,000 per member a month, for 3 months" },
-        { icon: "fact-wallet", label: "Payroll", value: "25% of job work value, up to ₹5,000 per member a month, for 5 years" },
-      ],
-      conditions: [
-        { text: "For SHGs with 25 or more women who do job work for the unit." },
-        { text: "The unit pays the SHG and claims it back." },
-      ],
-      apply: true,
-    },
-    quality: {
-      figma: { 1: "416:53511" },
-      title: "Quality certification",
-      hero: { icon: "hero-diploma", value: "50%", label: "of fee and testing equipment cost" },
-      facts: [
-        { icon: "fact-safe-square", label: "Limit", value: "₹10 L" },
-        { icon: "fact-calendar", label: "Period", value: "During the policy period" },
-      ],
-      conditions: [
-        { text: "For national and international certifications such as BIS, ISI, WHO-GMP and Hallmark." },
-        { text: "Renewals are not covered.", exclude: true },
-      ],
-      apply: true,
-    },
-    energy: {
-      figma: { 1: "416:54292" },
-      title: "Energy and water saving",
-      hero: { icon: "hero-waterdrops", value: "75%", label: "of audit cost" },
-      facts: [
-        { icon: "fact-clipboard-check", label: "Audit", value: "75% of cost, up to ₹50,000 an audit, once" },
-        { icon: "fact-box", label: "Equipment", value: "25% of cost, up to ₹20 L, once" },
-      ],
-      conditions: [
-        { text: "The audit has to come from a recognised institution or consultant." },
-        { text: "Equipment support needs a 10% saving in energy or water use." },
-      ],
-      apply: true,
-    },
-    tech: {
-      figma: { 1: "416:55073" },
-      title: "Technology acquisition",
-      hero: { icon: "hero-cpu", value: "65%", label: "of technology cost" },
-      facts: [
-        { icon: "fact-safe-square", label: "Limit", value: "₹50 L, including royalty for the first 2 years" },
-        { icon: "fact-calendar", label: "Period", value: "During the policy period" },
-      ],
-      conditions: [
-        { text: "Needs prior approval from the Industries Commissionerate." },
-        { text: "Plant, machinery and equipment purchases are not covered.", exclude: true },
-      ],
-      apply: true,
-    },
-  };
-  OPL.data.subsidyDetail.sheetActions = {
-    expert: { label: "Talk to an Expert", goto: "expert" },
-    apply: { label: "Apply Now", goto: "application-portal" },
-  };
+OPL.data = OPL.data || {};
+OPL.data.subsidyDetail = {
+title: "Gujarat Textile Policy 2024",
+hero: {
+eyebrow: "Estimated benefits",
+prefix: "Up to ₹", value: 1.2, suffix: "Cr",
+cta: { label: "Calculate Estimate", goto: "subsidy-estimate" },   // flow 416:76869, not built yet
+},
+period: { start: "2024-10-01", end: "2029-09-30", warnMonths: 6 },
+benefits: {
+title: "Policy Benefits",
+count: 8,
+tiles: [
+{ id: "capital", icon: "settings-duotone-benefit", title: "Capital Subsidy", value: "10–35%", label: "on eFCI" },
+{ id: "interest", icon: "sale-duotone", title: "Interest Subsidy", value: "5–7%", label: "on term loan" },
+{ id: "power", icon: "bolt-circle-duotone", title: "Power Tariff Subsidy", value: "₹1/kWh", label: "per unit" },
+{ id: "payroll", icon: "wallet-money-duotone", title: "Payroll Assistance", value: "~₹5,000", label: "per worker a month" },
+],
+others: {
+label: "See other benefits",
+count: 4,
+rows: [
+{ id: "shg", icon: "case-round-duotone", title: "SHG job work assistance", sub: "₹5,000 per member a month" },
+{ id: "quality", icon: "diploma-duotone", title: "Quality Certification", sub: "50% of fee and testing<br>equipment cost" },
+{ id: "energy", icon: "waterdrops-duotone", title: "Energy and Water Saving", sub: "75% of audit cost" },
+{ id: "tech", icon: "cpu-duotone", title: "Technology Acquisition", sub: "65% of technology cost" },
+],
+},
+},
+apply: {
+title: "Apply",
+help: { title: ["Get help from", "our subsidy expert"], cta: "Talk to an Expert", goto: "expert" },
+links: [
+{ icon: "document-add-duotone", title: "Application portal", sub: "Apply online", goto: "application-portal" },
+{ icon: "global-duotone", title: "Official policy website", sub: "Read the full policy", goto: "policy-website" },
+],
+},
+steps: {
+title: "How it works",
+headerDeadline: "Apply within 1 year of production",       // collapsed header chip (416:45566)
+items: [
+{ title: "Start commercial production", deadline: "Apply within 1yr of production" },
+{
+title: "Apply for an eligibility certificate",
+body: "Your CA and a Chartered Engineer certify your investment.",
+inset: {
+title: "Apply at",
+rows: [
+{ value: "District Industries Centre (DIC)", label: "If you invest up to ₹10 Cr" },
+{ value: "MSME Commissioner", label: "If you invest ₹10 Cr to ₹50 Cr" },
+],
+},
+},
+{ title: "Get your investment verified", body: "Officials check the assets you invested in." },
+{ title: "Receive your sanction", body: "You get an eligibility certificate for the approved amount." },
+],
+share: "Share these steps with my CA",
+},
+foot: {
+secondary: { label: "Apply Now", goto: "application-portal" },
+primary: { label: "Talk to an Expert", goto: "expert" },
+note: "Estimates are indicative. The final amount depends on policy terms and department procedures.",
+},
+aiNudge: { lead: "Ask anything about", topic: "this policy" },   // proposed, same pattern as Home
+};
+const ACT1 = "Activity 1: garments, apparel, made-ups and technical textiles.";
+const ACT2 = "Activity 2: weaving, knitting, dyeing and processing, texturising, twisting, embroidery and MMF spinning.";
+const CAT1 = "Category 1 and PM MITRA Park";
+OPL.data.subsidyDetail.sheets = {
+capital: {
+figma: { 1: "416:47995", 2: "416:48787" },
+title: "Capital subsidy",
+hero: { icon: "hero-settings", value: "10–35%", label: "of eFCI" },
+note: "eFCI is Eligible Fixed Capital Investment: new building, plant and machinery. Land is not counted.",
+facts: [
+{ icon: "fact-safe-square", label: "Limit", value: "₹40 Cr to ₹100 Cr" },
+{ icon: "fact-calendar", label: "Paid in", value: "5 equal annual instalments" },
+],
+rates: {
+activities: [
+{ label: "Activity 1", note: ACT1, rows: [[CAT1, "35%", "up to ₹100 Cr"], ["Category 2", "30%", "up to ₹100 Cr"], ["Category 3", "20%", "up to ₹50 Cr"]] },
+{ label: "Activity 2", note: ACT2, rows: [[CAT1, "20%", "up to ₹50 Cr"], ["Category 2", "18%", "up to ₹50 Cr"], ["Category 3", "10%", "up to ₹40 Cr"]] },
+],
+},
+conditions: [
+{ text: "Only for units with a term loan from a bank or financial institution." },
+{ text: "Paid after commercial production starts." },
+],
+apply: true,
+},
+interest: {
+figma: { 1: "416:49579", 2: "416:50370" },
+title: "Interest subsidy",
+hero: { icon: "hero-sale", value: "5–7%", label: "on term loan" },
+facts: [
+{ icon: "fact-safe-square", label: "Limit", value: "2% to 3% of eFCI a year" },
+{ icon: "fact-calendar", label: "Period", value: "5 to 8 years" },
+],
+rates: {
+activities: [
+{ label: "Activity 1", note: ACT1, rows: [[CAT1, "7% for 8 years", "up to 3% of eFCI a year"], ["Category 2", "7% for 8 years", "up to 2.5% of eFCI a year"], ["Category 3", "5% for 6 years", "up to 2% of eFCI a year"]] },
+{ label: "Activity 2", note: ACT2, rows: [[CAT1, "7% for 7 years", "up to 2% of eFCI a year"], ["Category 2", "7% for 7 years", "up to 2% of eFCI a year"], ["Category 3", "5% for 5 years", "up to 2% of eFCI a year"]] },
+],
+},
+conditions: [
+{ text: "You bear at least 2% interest." },
+{ text: "Paid back on the interest you have paid to the lender." },
+],
+apply: true,
+},
+power: {
+figma: { 1: "416:51161" },
+title: "Power tariff subsidy",
+hero: { icon: "hero-bolt", value: "₹1/kWh", label: "per unit" },
+facts: [{ icon: "fact-calendar", label: "Period", value: "5 years from commercial production" }],
+conditions: [
+{ text: "For power from the DISCOM, or renewable power through open access." },
+{ text: "Power from your own captive plant is not covered.", exclude: true },
+],
+apply: false,
+},
+payroll: {
+figma: { 1: "416:51939" },
+title: "Payroll assistance",
+hero: { icon: "hero-wallet", value: "Up to ₹5,000", label: "per worker a month" },
+facts: [
+{ icon: "fact-users", label: "For", value: "Garment, apparel, made-ups and technical textile units" },
+{ icon: "fact-calendar", label: "Period", value: "5 years from commercial production" },
+],
+rates: {
+groups: [
+{ title: "Garment, apparel and made-ups", rows: [["Female worker", "₹5,000", "a month"], ["Male worker", "₹4,000", "a month"]] },
+{ title: "Technical textile", rows: [["Female worker", "₹3,000", "a month"], ["Male worker", "₹2,000", "a month"]] },
+],
+},
+conditions: [{ text: "For workers domiciled in Gujarat and registered under EPF." }],
+apply: false,
+},
+shg: {
+figma: { 1: "416:52730" },
+title: "SHG job work assistance",
+hero: { icon: "hero-case", value: "₹5,000", label: "per member a month" },
+facts: [
+{ icon: "fact-academic-cap", label: "Training", value: "₹5,000 per member a month, for 3 months" },
+{ icon: "fact-wallet", label: "Payroll", value: "25% of job work value, up to ₹5,000 per member a month, for 5 years" },
+],
+conditions: [
+{ text: "For SHGs with 25 or more women who do job work for the unit." },
+{ text: "The unit pays the SHG and claims it back." },
+],
+apply: true,
+},
+quality: {
+figma: { 1: "416:53511" },
+title: "Quality certification",
+hero: { icon: "hero-diploma", value: "50%", label: "of fee and testing equipment cost" },
+facts: [
+{ icon: "fact-safe-square", label: "Limit", value: "₹10 L" },
+{ icon: "fact-calendar", label: "Period", value: "During the policy period" },
+],
+conditions: [
+{ text: "For national and international certifications such as BIS, ISI, WHO-GMP and Hallmark." },
+{ text: "Renewals are not covered.", exclude: true },
+],
+apply: true,
+},
+energy: {
+figma: { 1: "416:54292" },
+title: "Energy and water saving",
+hero: { icon: "hero-waterdrops", value: "75%", label: "of audit cost" },
+facts: [
+{ icon: "fact-clipboard-check", label: "Audit", value: "75% of cost, up to ₹50,000 an audit, once" },
+{ icon: "fact-box", label: "Equipment", value: "25% of cost, up to ₹20 L, once" },
+],
+conditions: [
+{ text: "The audit has to come from a recognised institution or consultant." },
+{ text: "Equipment support needs a 10% saving in energy or water use." },
+],
+apply: true,
+},
+tech: {
+figma: { 1: "416:55073" },
+title: "Technology acquisition",
+hero: { icon: "hero-cpu", value: "65%", label: "of technology cost" },
+facts: [
+{ icon: "fact-safe-square", label: "Limit", value: "₹50 L, including royalty for the first 2 years" },
+{ icon: "fact-calendar", label: "Period", value: "During the policy period" },
+],
+conditions: [
+{ text: "Needs prior approval from the Industries Commissionerate." },
+{ text: "Plant, machinery and equipment purchases are not covered.", exclude: true },
+],
+apply: true,
+},
+};
+OPL.data.subsidyDetail.sheetActions = {
+expert: { label: "Talk to an Expert", goto: "expert" },
+apply: { label: "Apply Now", goto: "application-portal" },
+};
+})();
+
+;
+
+/* ==== js/data/subsidy-estimate.js ==== */
+
+(function () {
+OPL.data = OPL.data || {};
+const CR = 1e7, L = 1e5;
+const parseMoney = (raw, unit = "inr") => {
+const s = String(raw || "").toLowerCase().replace(/[₹,\s]/g, "");
+const m = s.match(/^(\d*\.?\d+)(cr|crore|crores|l|lakh|lakhs|lac|k)?$/);
+if (!m) return NaN;
+const n = parseFloat(m[1]);
+const u = m[2] || unit;
+return n * (/^cr/.test(u) ? CR : /^(l|lakh|lac)/.test(u) ? L : u === "k" ? 1e3 : 1);
+};
+const parseNum = (raw) => {
+const s = String(raw || "").replace(/[,\s%]/g, "");
+return /^\d*\.?\d+$/.test(s) ? parseFloat(s) : NaN;
+};
+const trim = (n, d) => n.toFixed(d).replace(/\.?0+$/, "");
+const indian = (n) => Math.round(n).toString().replace(/(\d)(?=(\d\d)+\d$)/g, "$1,");
+const fmt = (r, { tight = false } = {}) => {
+const sp = tight ? "" : " ";
+if (!(r > 0)) return "₹0";
+if (r >= CR) return `₹${trim(Math.round(r / CR * 100) / 100, 2)}${sp}Cr`;
+if (r >= L) return `₹${trim(Math.round(r / L * 10) / 10, 1)}${sp}L`;
+return `₹${indian(r)}`;
+};
+const tidyMoney = (raw, unit) => {
+const r = parseMoney(raw, unit);
+if (!(r > 0)) return raw;
+if (r >= CR) return `₹${trim(r / CR, 2)} Cr`;
+if (r >= L) return `₹${trim(r / L, 2)} L`;
+return `₹${indian(r)}`;
+};
+const tidyCount = (raw) => { const n = parseNum(raw); return n > 0 ? indian(n) : raw; };
+const interestSubsidy = ({ loan, rate, tenure }, efci) => {
+const sv = Math.max(0, Math.min(7, rate - 2)) / 100;
+if (!(sv > 0) || !(tenure > 0)) return 0;
+const i = rate / 100, n = Math.round(tenure);
+const emi = loan * i / (1 - Math.pow(1 + i, -n));
+let bal = loan, total = 0;
+for (let y = 1; y <= Math.min(8, n); y++) {
+let year = sv * bal;
+if (efci > 0) year = Math.min(year, 0.03 * efci);
+total += year;
+bal = bal * (1 + i) - emi;
+}
+return total;
+};
+const B = [
+{
+id: "capital", title: "Capital Subsidy", short: "Capital subsidy", chip: "Capital subsidy",
+icon: "settings-duotone-benefit", color: "linear-gradient(90deg, #3858E5, #667EEB)", key: "#3858E5",
+fields: [{ key: "cost", label: "Project Cost", kind: "money", unit: "cr", value: "₹1.5 Cr" }],
+calc: (v) => Math.min(0.35 * v.cost, 100 * CR),
+},
+{
+id: "interest", title: "Interest Subsidy", short: "Interest subsidy", chip: "Interest subsidy",
+icon: "sale-duotone", color: "#148FB8", key: "#148FB8",
+fields: [
+{ key: "loan", label: "Term Loan Amount", kind: "money", unit: "cr", value: "₹20 Cr" },
+{ key: "rate", label: "Interest Rate (%)", kind: "pct", value: "9.45" },
+{ key: "tenure", label: "Tenure (yrs)", kind: "years", value: "15" },
+],
+calc: (v, all) => interestSubsidy(v, all.capital && all.capital.cost),
+},
+{
+id: "power", title: "Power Tariff", short: "Power tariff subsidy", chip: "Power tariff",
+icon: "bolt-circle-24", color: "#66B814", key: "#66B814",
+fields: [{ key: "kwh", label: "Annual power consumption", kind: "count", placeholder: "Enter units consumed per year (kWh)", value: "" }],
+calc: (v) => v.kwh * 1 * 5,                           // ₹1/kWh for 5 years
+},
+{
+id: "payroll", title: "Payroll Assistance", short: "Payroll assistance", chip: "Payroll Assistance",
+icon: "wallet-money-duotone", color: "#C2410C", key: "#C2410C", proposed: true,
+fields: [
+{ key: "female", label: "Women employed", kind: "count", placeholder: "Number of women workers", value: "" },
+{ key: "male", label: "Men employed", kind: "count", placeholder: "Number of men workers", value: "", optional: true },
+],
+calc: (v) => ((v.female || 0) * 5000 + (v.male || 0) * 4000) * 12 * 5,
+},
+{
+id: "shg", title: "SHG Job Work", short: "SHG job work assistance", chip: "SHG job work",
+icon: "case-round-duotone", color: "#CA8A04", key: "#CA8A04", proposed: true,
+fields: [{ key: "members", label: "SHG members", kind: "count", placeholder: "Women doing job work for you", value: "" }],
+calc: (v) => v.members * (5000 * 3 + 5000 * 12 * 5),  // training 3 months + payroll 5 years, at the cap
+},
+{
+id: "quality", title: "Quality Certification", short: "Quality certification", chip: "Quality certification",
+icon: "diploma-duotone", color: "#0D9488", key: "#0D9488", proposed: true,
+fields: [{ key: "cost", label: "Certification and testing cost", kind: "money", unit: "l", placeholder: "e.g. ₹8 L", value: "" }],
+calc: (v) => Math.min(0.5 * v.cost, 10 * L),
+},
+{
+id: "energy", title: "Energy and Water Saving", short: "Energy and water saving", chip: "Energy and water saving",
+icon: "waterdrops-duotone", color: "#0EA5E9", key: "#0EA5E9", proposed: true,
+fields: [
+{ key: "audit", label: "Audit cost", kind: "money", unit: "inr", placeholder: "e.g. ₹60,000", value: "" },
+{ key: "equipment", label: "Saving equipment cost", kind: "money", unit: "l", placeholder: "e.g. ₹40 L", value: "", optional: true },
+],
+calc: (v) => Math.min(0.75 * v.audit, 50000) + Math.min(0.25 * (v.equipment || 0), 20 * L),
+},
+{
+id: "tech", title: "Technology Acquisition", short: "Technology acquisition", chip: "Technology acquisition",
+icon: "cpu-duotone", color: "#64748B", key: "#64748B", proposed: true,
+fields: [{ key: "cost", label: "Technology cost", kind: "money", unit: "l", placeholder: "e.g. ₹60 L", value: "" }],
+calc: (v) => Math.min(0.65 * v.cost, 50 * L),
+},
+];
+OPL.data.subsidyEstimate = {
+title: "Calculate estimate",                    // 416:77107 (416:76872 reads "Calculate Estimate")
+benefits: B,
+byId: Object.fromEntries(B.map((b) => [b.id, b])),
+start: ["interest", "capital", "power"],        // the list as drawn
+demo: { power: { kwh: "2,40,000" } },           // result preset only (416:77363 shows power ₹12 L)
+addMore: "Add more benefits",
+cta: { label: "Get Estimate", busy: "Calculating" },
+remove: "Remove Benefit",
+result: {
+title: "Congratulations",
+sub: "Your business is applicable for an estimate subsidy amount of",   // Figma has a double space after "is"
+lead: "Up to",
+addMore: "Add more",
+apply: { label: "Apply Online", goto: "application-portal" },
+note: "Estimates are indicative. The final amount depends on policy terms and department procedures.",
+},
+expert: { label: "Talk to an Expert", goto: "expert" },
+parseMoney, parseNum, fmt, tidyMoney, tidyCount,
+};
 })();
 
 ;
@@ -1984,245 +2127,245 @@ OPL.ui.SignedHeroSvg = '<svg class="mss" viewBox="0 0 390 176" width="390" heigh
 /* ==== js/screens/home.js ==== */
 
 (function () {
-  const { html, ui } = OPL;
-  OPL.screens = OPL.screens || {};
-  const heroSlide = (key, d) => html`
-    <div class="hero__slide hero__slide--${key}" data-slide="${key}">
-      <div class="hero__content">
-        <div class="hero__titleblock">
-          <div>
-            <p class="hero__eyebrow">${d.eyebrow}</p>
-            <p class="hero__amount" data-amount="${d.amount.value}" data-prefix="${d.amount.prefix}" data-suffix="${d.amount.suffix}"
-               ${d.amount.static ? OPL.raw("data-static") : ""}>${d.amount.prefix}${d.amount.value}${d.amount.suffix}</p>
-          </div>
-          ${d.facts ? OPL.raw(`<div class="hero__facts">${d.facts.map((parts) => ui.FactPill({ parts })).join("")}</div>`) : ""}
-        </div>
-        <div class="hero__stack">
-          ${ui.HeroStack({ kind: key === "loans" ? "loan" : "subsidy", cards: d.stack })}
-          ${ui.Button({ label: d.cta, trailing: "chevron-right-white", block: true, goto: d.goto })}
-        </div>
-      </div>
-    </div>`;
-  const loansSection = (d) => html`
-    <section class="home-section" data-section="loans">
-      ${ui.SectionHeader({ title: d.title, goto: d.goto })}
-      <div class="rail">${d.cards.map((c) => ui.MatchCard(c))}</div>
-    </section>`;
-  const subsidiesSection = (d) => html`
-    <section class="home-section" data-section="subsidies">
-      ${ui.SectionHeader({ title: d.title, goto: d.goto })}
-      <div class="home-section__body">
-        <div class="rail rail--chips">${d.chips.map((c) => ui.Chip({ ...c, goto: "subsidy-list" }))}</div>
-        <div class="rail">${d.cards.map((c) => ui.MatchCard(c))}</div>
-      </div>
-    </section>`;
-  OPL.screens.home = {
-    title: "Finance Hub · Home",
-    figma: { loans: "382:34093", subsidies: "382:33823", "subsidies-emi": "382:36681" },
-    render(screen) {
-      const d = OPL.data.home;
-      const v = OPL.variantValues("home");
-      const reg = OPL.variants.home;
-      const cssVars = reg.groups
-        .flatMap((g) => g.options.filter((o) => o.value === v[g.id] && o.css).map((o) => Object.entries(o.css)))
-        .flat()
-        .map(([k, val]) => `${k}:${val}`)
-        .join(";");
-      const sections = v.order === "subsidies"
-        ? [subsidiesSection(d.subsidies), loansSection(d.loans)]
-        : [loansSection(d.loans), subsidiesSection(d.subsidies)];
-      screen.innerHTML = html`
-        ${ui.StatusBar()}
-        <div class="scroller">
-          <main class="${OPL.cx("home", v.note !== "off" && "has-note")}" style="${cssVars}">
-            <section class="hero">
-              <div class="hero__bg">
-                <img class="hero__ellipse" src="${OPL.img("hero-ellipse.svg")}" alt="">
-                <img class="hero__texture" src="${OPL.img("hero-texture.jpg")}" alt="">
-              </div>
-              <div class="hero__blur"></div>
-              ${ui.AppHeader(d.header)}
-              <div class="hero__track">
-                ${heroSlide("loans", d.hero.loans)}
-                ${heroSlide("subsidies", d.hero.subsidies)}
-              </div>
-            </section>
-            ${ui.CarouselDots({ count: 2, active: v.order === "subsidies" ? 1 : 0 })}
-            <div class="quick">${d.quickActions.map((q) => ui.QuickAction(q))}</div>
-            ${sections}
-            ${ui.HelpCard(d.help)}
-            ${v.note !== "off" ? ui.PageNote(d.pageNotes[v.note]) : ""}
-          </main>
-        </div>
-        <div class="floating">
-          ${ui.AiMitraFab({ nudge: v.nudge === "on" ? d.aiNudge : null })}
-          ${v.emi === "on"
-            ? OPL.raw(`<div class="floating__slot"><div><div class="floating__slot-inner">${ui.NoticeBanner(d.emi)}</div></div></div>`)
-            : ""}
-          ${ui.BottomNav({ items: d.nav, active: "finance" })}
-        </div>`;
-      this.wire(screen, v);
-    },
-    _timers: [],
-    leave() { this._clearTimers(); },
-    _clearTimers() {
-      this._timers.forEach((t) => { clearTimeout(t); clearInterval(t); }); this._timers = [];
-      (this._observers || []).forEach((o) => o.disconnect()); this._observers = [];
-    },
-    wire(screen, v) {
-      this._clearTimers();
-      const motionOff = OPL.state.get().motion === "off" || OPL.reducedMotion();
-      const scroller = screen.querySelector(".scroller");
-      const track = screen.querySelector(".hero__track");
-      const slides = [...track.children];
-      const dots = screen.querySelector(".dots");
-      const startIndex = v.order === "subsidies" ? 1 : 0;
-      let index = startIndex;
-      const counted = new Set();
-      { const sh = OPL.fx.sheets(screen); OPL.fx.applySheet(screen, sh); OPL.fx.loanDetail(screen, sh); }
-      scroller.addEventListener("scroll", () => screen.classList.toggle("is-scrolled", scroller.scrollTop > 8), { passive: true });
-      const setDots = (i) => {
-        dots.querySelectorAll(".dot").forEach((d, k) => d.classList.toggle("is-active", k === i));
-      };
-      const countHero = (i, delay = 0) => {
-        const amt = slides[i] && slides[i].querySelector(".hero__amount");
-        if (!amt || counted.has(i) || amt.hasAttribute("data-static")) return;
-        counted.add(i);
-        OPL.countUp(amt, { to: +amt.dataset.amount, prefix: amt.dataset.prefix, suffix: amt.dataset.suffix, duration: 1000, delay });
-      };
-      const onTrackScroll = () => {
-        const w = track.clientWidth;
-        if (!w) return;
-        slides.forEach((s, k) => s.style.setProperty("--p", ((k * w - track.scrollLeft) / w).toFixed(3)));
-        const i = Math.max(0, Math.min(slides.length - 1, Math.round(track.scrollLeft / w)));
-        if (i !== index) { index = i; setDots(i); restartAuto(); countHero(i); }
-      };
-      track.addEventListener("scroll", onTrackScroll, { passive: true });
-      const goTo = (i, smooth = true) => track.scrollTo({ left: i * track.clientWidth, behavior: smooth && !OPL.reducedMotion() ? "smooth" : "auto" });
-      dots.addEventListener("click", (e) => { const d = e.target.closest("[data-dot]"); if (d) goTo(+d.dataset.dot); });
-      const auto = v.autoplay === "on";
-      dots.classList.toggle("is-auto", auto);
-      function restartAuto() {
-        if (!auto) return;
-        const f = dots.querySelector(".dot.is-active .dot__fill");
-        if (!f) return;
-        f.style.animation = "none"; void f.offsetWidth; f.style.animation = "";
-      }
-      dots.addEventListener("animationend", (e) => {
-        if (auto && e.animationName === "dot-progress") goTo((index + 1) % slides.length);
-      });
-      track.addEventListener("pointerdown", () => dots.classList.add("is-paused"));
-      ["pointerup", "pointercancel", "pointerleave"].forEach((t) => track.addEventListener(t, () => dots.classList.remove("is-paused")));
-      track.scrollLeft = startIndex * track.clientWidth;
-      onTrackScroll();
-      const slot = screen.querySelector(".floating__slot");
-      if (slot) {
-        slot.querySelector("[data-dismiss]").addEventListener("click", (e) => {
-          e.stopPropagation();
-          slot.classList.add("is-leaving");
-          setTimeout(() => slot.classList.add("is-gone"), 180);
-        });
-      }
-      const floating = screen.querySelector(".floating");
-      const homeEl = screen.querySelector(".home");
-      const syncFloat = () => homeEl.style.setProperty("--floating-h", floating.offsetHeight + "px");
-      syncFloat();
-      if (window.ResizeObserver) { const ro = new ResizeObserver(syncFloat); ro.observe(floating); this._observers = [...(this._observers || []), ro]; }
-      let heroHeld = false;
-      track.addEventListener("pointerdown", () => (heroHeld = true));
-      ["pointerup", "pointercancel", "pointerleave"].forEach((t) => track.addEventListener(t, () => (heroHeld = false)));
-      if (v.stack === "cycle" && !motionOff) {
-        slides.forEach((slide, k) => {
-          const el = slide.querySelector("[data-stack]");
-          const cycle = makeStack(el);
-          const tick = () => { if (index === k && !heroHeld && !document.hidden) cycle(); };
-          OPL.afterReveal(() => this._timers.push(setTimeout(() => this._timers.push(setInterval(tick, 3200)), 2200)));
-        });
-      }
-      const fabWrap = screen.querySelector(".fab-wrap");
-      if (fabWrap && fabWrap.querySelector(".fab-nudge") && !motionOff) {
-        const hide = () => fabWrap.classList.remove("is-nudging");
-        this._timers.push(setTimeout(() => {
-          fabWrap.classList.add("is-nudging");
-          this._timers.push(setTimeout(hide, 4200));
-          scroller.addEventListener("scroll", hide, { once: true, passive: true });
-        }, 1900));
-      }
-      screen.querySelectorAll(".rail, .hero__track").forEach(enableMouseDrag);
-      this.enter(screen, startIndex, countHero);
-    },
-    enter(screen, startIndex = 0, countHero) {
-      if (OPL.state.get().motion === "off") return;
-      const home = screen.querySelector(".home");
-      const slide = screen.querySelectorAll(".hero__slide")[startIndex];
-      const order = [
-        slide.querySelector(".hero__titleblock"),
-        slide.querySelector('.stack-item[data-pos="back"] > .hero-card'),
-        slide.querySelector('.stack-item[data-pos="front"] > .hero-card'),
-        slide.querySelector(".btn"),
-        screen.querySelector(".dots"),
-        ...screen.querySelectorAll(".qa"),
-        ...[...screen.querySelectorAll(".home-section")].flatMap((s) => [
-          s.querySelector(".section-head"),
-          ...s.querySelectorAll(".chip"),
-          ...[...s.querySelectorAll(".match")].slice(0, 2),
-        ]),
-        screen.querySelector(".help"),
-      ].filter(Boolean);
-      order.forEach((el, i) => { el.classList.add("enter"); el.style.setProperty("--i", Math.min(i, 16)); });
-      screen.classList.remove("is-entering"); home.classList.remove("is-entering");
-      void home.offsetWidth;
-      screen.classList.add("is-entering"); home.classList.add("is-entering");
-      OPL.afterReveal(() => setTimeout(() => { screen.classList.remove("is-entering"); home.classList.remove("is-entering"); }, 4400));
-      if (countHero) countHero(startIndex, 150);
-    },
-  };
-  function makeStack(el) {
-    const items = [...el.querySelectorAll(".stack-item")];
-    const order = items.map((_, i) => i);
-    const assign = () => items.forEach((it, k) => {
-      const r = order.indexOf(k);
-      it.dataset.pos = r === 0 ? "front" : r === 1 ? "back" : "queue";
-    });
-    let busy = false;
-    return function step() {
-      if (busy || items.length < 2) return;
-      busy = true;
-      const leaving = items[order[0]];
-      leaving.dataset.pos = "leave";
-      order.push(order.shift());
-      items[order[0]].dataset.pos = "front";
-      if (items.length > 2) items[order[1]].dataset.pos = "back";
-      setTimeout(() => {
-        leaving.classList.add("is-instant");
-        leaving.dataset.pos = "queue";
-        void leaving.offsetWidth;
-        leaving.classList.remove("is-instant");
-        assign();
-        busy = false;
-      }, 700);
-    };
-  }
-  function enableMouseDrag(el) {
-    let down = false, sx = 0, sl = 0, moved = false;
-    el.addEventListener("pointerdown", (e) => {
-      if (e.pointerType !== "mouse") return;
-      down = true; moved = false; sx = e.clientX; sl = el.scrollLeft;
-      el.style.scrollSnapType = "none";
-    });
-    window.addEventListener("pointermove", (e) => {
-      if (!down) return;
-      const dx = e.clientX - sx;
-      if (Math.abs(dx) > 4) moved = true;
-      el.scrollLeft = sl - dx;
-    });
-    window.addEventListener("pointerup", () => {
-      if (!down) return;
-      down = false;
-      el.style.scrollSnapType = "";
-      if (moved) el.addEventListener("click", (e) => { e.stopPropagation(); e.preventDefault(); }, { capture: true, once: true });
-    });
-  }
+const { html, ui } = OPL;
+OPL.screens = OPL.screens || {};
+const heroSlide = (key, d) => html`
+<div class="hero__slide hero__slide--${key}" data-slide="${key}">
+<div class="hero__content">
+<div class="hero__titleblock">
+<div>
+<p class="hero__eyebrow">${d.eyebrow}</p>
+<p class="hero__amount" data-amount="${d.amount.value}" data-prefix="${d.amount.prefix}" data-suffix="${d.amount.suffix}"
+${d.amount.static ? OPL.raw("data-static") : ""}>${d.amount.prefix}${d.amount.value}${d.amount.suffix}</p>
+</div>
+${d.facts ? OPL.raw(`<div class="hero__facts">${d.facts.map((parts) => ui.FactPill({ parts })).join("")}</div>`) : ""}
+</div>
+<div class="hero__stack">
+${ui.HeroStack({ kind: key === "loans" ? "loan" : "subsidy", cards: d.stack })}
+${ui.Button({ label: d.cta, trailing: "chevron-right-white", block: true, goto: d.goto })}
+</div>
+</div>
+</div>`;
+const loansSection = (d) => html`
+<section class="home-section" data-section="loans">
+${ui.SectionHeader({ title: d.title, goto: d.goto })}
+<div class="rail">${d.cards.map((c) => ui.MatchCard(c))}</div>
+</section>`;
+const subsidiesSection = (d) => html`
+<section class="home-section" data-section="subsidies">
+${ui.SectionHeader({ title: d.title, goto: d.goto })}
+<div class="home-section__body">
+<div class="rail rail--chips">${d.chips.map((c) => ui.Chip({ ...c, goto: "subsidy-list" }))}</div>
+<div class="rail">${d.cards.map((c) => ui.MatchCard(c))}</div>
+</div>
+</section>`;
+OPL.screens.home = {
+title: "Finance Hub · Home",
+figma: { loans: "382:34093", subsidies: "382:33823", "subsidies-emi": "382:36681" },
+render(screen) {
+const d = OPL.data.home;
+const v = OPL.variantValues("home");
+const reg = OPL.variants.home;
+const cssVars = reg.groups
+.flatMap((g) => g.options.filter((o) => o.value === v[g.id] && o.css).map((o) => Object.entries(o.css)))
+.flat()
+.map(([k, val]) => `${k}:${val}`)
+.join(";");
+const sections = v.order === "subsidies"
+? [subsidiesSection(d.subsidies), loansSection(d.loans)]
+: [loansSection(d.loans), subsidiesSection(d.subsidies)];
+screen.innerHTML = html`
+${ui.StatusBar()}
+<div class="scroller">
+<main class="${OPL.cx("home", v.note !== "off" && "has-note")}" style="${cssVars}">
+<section class="hero">
+<div class="hero__bg">
+<img class="hero__ellipse" src="${OPL.img("hero-ellipse.svg")}" alt="">
+<img class="hero__texture" src="${OPL.img("hero-texture.jpg")}" alt="">
+</div>
+<div class="hero__blur"></div>
+${ui.AppHeader(d.header)}
+<div class="hero__track">
+${heroSlide("loans", d.hero.loans)}
+${heroSlide("subsidies", d.hero.subsidies)}
+</div>
+</section>
+${ui.CarouselDots({ count: 2, active: v.order === "subsidies" ? 1 : 0 })}
+<div class="quick">${d.quickActions.map((q) => ui.QuickAction(q))}</div>
+${sections}
+${ui.HelpCard(d.help)}
+${v.note !== "off" ? ui.PageNote(d.pageNotes[v.note]) : ""}
+</main>
+</div>
+<div class="floating">
+${ui.AiMitraFab({ nudge: v.nudge === "on" ? d.aiNudge : null })}
+${v.emi === "on"
+? OPL.raw(`<div class="floating__slot"><div><div class="floating__slot-inner">${ui.NoticeBanner(d.emi)}</div></div></div>`)
+: ""}
+${ui.BottomNav({ items: d.nav, active: "finance" })}
+</div>`;
+this.wire(screen, v);
+},
+_timers: [],
+leave() { this._clearTimers(); },
+_clearTimers() {
+this._timers.forEach((t) => { clearTimeout(t); clearInterval(t); }); this._timers = [];
+(this._observers || []).forEach((o) => o.disconnect()); this._observers = [];
+},
+wire(screen, v) {
+this._clearTimers();
+const motionOff = OPL.state.get().motion === "off" || OPL.reducedMotion();
+const scroller = screen.querySelector(".scroller");
+const track = screen.querySelector(".hero__track");
+const slides = [...track.children];
+const dots = screen.querySelector(".dots");
+const startIndex = v.order === "subsidies" ? 1 : 0;
+let index = startIndex;
+const counted = new Set();
+{ const sh = OPL.fx.sheets(screen); OPL.fx.applySheet(screen, sh); OPL.fx.loanDetail(screen, sh); }
+scroller.addEventListener("scroll", () => screen.classList.toggle("is-scrolled", scroller.scrollTop > 8), { passive: true });
+const setDots = (i) => {
+dots.querySelectorAll(".dot").forEach((d, k) => d.classList.toggle("is-active", k === i));
+};
+const countHero = (i, delay = 0) => {
+const amt = slides[i] && slides[i].querySelector(".hero__amount");
+if (!amt || counted.has(i) || amt.hasAttribute("data-static")) return;
+counted.add(i);
+OPL.countUp(amt, { to: +amt.dataset.amount, prefix: amt.dataset.prefix, suffix: amt.dataset.suffix, duration: 1000, delay });
+};
+const onTrackScroll = () => {
+const w = track.clientWidth;
+if (!w) return;
+slides.forEach((s, k) => s.style.setProperty("--p", ((k * w - track.scrollLeft) / w).toFixed(3)));
+const i = Math.max(0, Math.min(slides.length - 1, Math.round(track.scrollLeft / w)));
+if (i !== index) { index = i; setDots(i); restartAuto(); countHero(i); }
+};
+track.addEventListener("scroll", onTrackScroll, { passive: true });
+const goTo = (i, smooth = true) => track.scrollTo({ left: i * track.clientWidth, behavior: smooth && !OPL.reducedMotion() ? "smooth" : "auto" });
+dots.addEventListener("click", (e) => { const d = e.target.closest("[data-dot]"); if (d) goTo(+d.dataset.dot); });
+const auto = v.autoplay === "on";
+dots.classList.toggle("is-auto", auto);
+function restartAuto() {
+if (!auto) return;
+const f = dots.querySelector(".dot.is-active .dot__fill");
+if (!f) return;
+f.style.animation = "none"; void f.offsetWidth; f.style.animation = "";
+}
+dots.addEventListener("animationend", (e) => {
+if (auto && e.animationName === "dot-progress") goTo((index + 1) % slides.length);
+});
+track.addEventListener("pointerdown", () => dots.classList.add("is-paused"));
+["pointerup", "pointercancel", "pointerleave"].forEach((t) => track.addEventListener(t, () => dots.classList.remove("is-paused")));
+track.scrollLeft = startIndex * track.clientWidth;
+onTrackScroll();
+const slot = screen.querySelector(".floating__slot");
+if (slot) {
+slot.querySelector("[data-dismiss]").addEventListener("click", (e) => {
+e.stopPropagation();
+slot.classList.add("is-leaving");
+setTimeout(() => slot.classList.add("is-gone"), 180);
+});
+}
+const floating = screen.querySelector(".floating");
+const homeEl = screen.querySelector(".home");
+const syncFloat = () => homeEl.style.setProperty("--floating-h", floating.offsetHeight + "px");
+syncFloat();
+if (window.ResizeObserver) { const ro = new ResizeObserver(syncFloat); ro.observe(floating); this._observers = [...(this._observers || []), ro]; }
+let heroHeld = false;
+track.addEventListener("pointerdown", () => (heroHeld = true));
+["pointerup", "pointercancel", "pointerleave"].forEach((t) => track.addEventListener(t, () => (heroHeld = false)));
+if (v.stack === "cycle" && !motionOff) {
+slides.forEach((slide, k) => {
+const el = slide.querySelector("[data-stack]");
+const cycle = makeStack(el);
+const tick = () => { if (index === k && !heroHeld && !document.hidden) cycle(); };
+OPL.afterReveal(() => this._timers.push(setTimeout(() => this._timers.push(setInterval(tick, 3200)), 2200)));
+});
+}
+const fabWrap = screen.querySelector(".fab-wrap");
+if (fabWrap && fabWrap.querySelector(".fab-nudge") && !motionOff) {
+const hide = () => fabWrap.classList.remove("is-nudging");
+this._timers.push(setTimeout(() => {
+fabWrap.classList.add("is-nudging");
+this._timers.push(setTimeout(hide, 4200));
+scroller.addEventListener("scroll", hide, { once: true, passive: true });
+}, 1900));
+}
+screen.querySelectorAll(".rail, .hero__track").forEach(enableMouseDrag);
+this.enter(screen, startIndex, countHero);
+},
+enter(screen, startIndex = 0, countHero) {
+if (OPL.state.get().motion === "off") return;
+const home = screen.querySelector(".home");
+const slide = screen.querySelectorAll(".hero__slide")[startIndex];
+const order = [
+slide.querySelector(".hero__titleblock"),
+slide.querySelector('.stack-item[data-pos="back"] > .hero-card'),
+slide.querySelector('.stack-item[data-pos="front"] > .hero-card'),
+slide.querySelector(".btn"),
+screen.querySelector(".dots"),
+...screen.querySelectorAll(".qa"),
+...[...screen.querySelectorAll(".home-section")].flatMap((s) => [
+s.querySelector(".section-head"),
+...s.querySelectorAll(".chip"),
+...[...s.querySelectorAll(".match")].slice(0, 2),
+]),
+screen.querySelector(".help"),
+].filter(Boolean);
+order.forEach((el, i) => { el.classList.add("enter"); el.style.setProperty("--i", Math.min(i, 16)); });
+screen.classList.remove("is-entering"); home.classList.remove("is-entering");
+void home.offsetWidth;
+screen.classList.add("is-entering"); home.classList.add("is-entering");
+OPL.afterReveal(() => setTimeout(() => { screen.classList.remove("is-entering"); home.classList.remove("is-entering"); }, 4400));
+if (countHero) countHero(startIndex, 150);
+},
+};
+function makeStack(el) {
+const items = [...el.querySelectorAll(".stack-item")];
+const order = items.map((_, i) => i);
+const assign = () => items.forEach((it, k) => {
+const r = order.indexOf(k);
+it.dataset.pos = r === 0 ? "front" : r === 1 ? "back" : "queue";
+});
+let busy = false;
+return function step() {
+if (busy || items.length < 2) return;
+busy = true;
+const leaving = items[order[0]];
+leaving.dataset.pos = "leave";
+order.push(order.shift());
+items[order[0]].dataset.pos = "front";
+if (items.length > 2) items[order[1]].dataset.pos = "back";
+setTimeout(() => {
+leaving.classList.add("is-instant");
+leaving.dataset.pos = "queue";
+void leaving.offsetWidth;
+leaving.classList.remove("is-instant");
+assign();
+busy = false;
+}, 700);
+};
+}
+function enableMouseDrag(el) {
+let down = false, sx = 0, sl = 0, moved = false;
+el.addEventListener("pointerdown", (e) => {
+if (e.pointerType !== "mouse") return;
+down = true; moved = false; sx = e.clientX; sl = el.scrollLeft;
+el.style.scrollSnapType = "none";
+});
+window.addEventListener("pointermove", (e) => {
+if (!down) return;
+const dx = e.clientX - sx;
+if (Math.abs(dx) > 4) moved = true;
+el.scrollLeft = sl - dx;
+});
+window.addEventListener("pointerup", () => {
+if (!down) return;
+down = false;
+el.style.scrollSnapType = "";
+if (moved) el.addEventListener("click", (e) => { e.stopPropagation(); e.preventDefault(); }, { capture: true, once: true });
+});
+}
 })();
 
 ;
@@ -2230,77 +2373,77 @@ OPL.ui.SignedHeroSvg = '<svg class="mss" viewBox="0 0 390 176" width="390" heigh
 /* ==== js/screens/loans-overview.js ==== */
 
 (function () {
-  const { html, ui } = OPL;
-  OPL.screens = OPL.screens || {};
-  OPL.screens["loans-overview"] = {
-    title: "Loans overview",
-    figma: { default: "382:36150" },
-    timers: [],
-    leave() { this.timers.forEach((t) => { clearTimeout(t); clearInterval(t); }); this.timers = []; },
-    render(page) {
-      this.leave();
-      const d = OPL.data.loansOverview;
-      const v = OPL.variantValues("loans-overview");
-      page.innerHTML = html`
-        ${ui.StatusBar()}
-        <div class="scroller">
-          <main class="lo">
-            <section class="lo-hero">
-              <div class="lo-hero__bg">
-                <img class="lo-hero__ellipse" src="${OPL.img("hero-ellipse.svg")}" alt="">
-                <img class="lo-hero__texture" src="${OPL.img("hero-texture.jpg")}" alt="">
-              </div>
-              <img class="lo-hero__glow" src="${OPL.img("cmr-glow.svg")}" alt="">
-              <div class="lo-hero__header">${ui.AppHeader({ title: d.header.title, back: true, actions: d.header.actions })}</div>
-              <div class="lo-hero__title">
-                <p class="lo-hero__eyebrow">${d.limit.eyebrow}</p>
-                <p class="lo-hero__amount" data-amount="${d.limit.value}">${d.limit.prefix}${d.limit.value}${d.limit.suffix}</p>
-              </div>
-              ${ui.CmrPill(d.cmr)}
-              <div class="rail lo-hero__rail">${d.offers.map((c) => ui.MatchCard({ ...c, size: "lg" }))}</div>
-              <div class="lo-hero__cta">${ui.Button({ label: d.offersCta.label, trailing: "chevron-right-white", block: true, goto: d.offersCta.goto })}</div>
-            </section>
-            <div class="lo-body">
-              <section class="lo-section">
-                <h2 class="lo-section__title">${d.applications.title}</h2>
-                ${ui.ApplicationCard(d.applications.card)}
-              </section>
-              <section class="lo-section">
-                <h2 class="lo-section__title">${d.borrowing.title}</h2>
-                ${ui.BorrowingCard(d.borrowing.card)}
-              </section>
-              ${ui.HelpCard(d.help)}
-            </div>
-          </main>
-        </div>
-        <div class="floating">
-          ${ui.AiMitraFab({ nudge: v.nudge === "on" ? d.aiNudge : null })}
-          ${ui.BottomNav({ items: d.nav.map((it) => ({ ...it, label: it.overviewLabel || it.label })), active: "overview", variant: "section" })}
-        </div>`;
-      this.wire(page, d);
-    },
-    wire(page, d) {
-      OPL.fx.statusOnScroll(page);
-      page.addEventListener("click", (e) => {
-        const o = e.target.closest("[data-app-open]");
-        if (o) OPL.go("application", { app: o.dataset.appOpen });
-      });
-      { const sh = OPL.fx.sheets(page); OPL.fx.applySheet(page, sh); OPL.fx.loanDetail(page, sh); }   // offer cards → details → apply
-      page.querySelectorAll(".rail").forEach(OPL.fx.mouseDrag);
-      OPL.fx.playInView(page, ".tracker, .borrow");
-      OPL.fx.nudge(page, this.timers);
-      const amt = page.querySelector(".lo-hero__amount");
-      OPL.fx.enter(page, [
-        page.querySelector(".lo-hero__title"),
-        page.querySelector(".cmr"),
-        ...page.querySelectorAll(".lo-hero__rail .match"),
-        page.querySelector(".lo-hero__cta"),
-        ...page.querySelectorAll(".lo-section"),
-        page.querySelector(".help"),
-      ]);
-      OPL.countUp(amt, { to: d.limit.value, prefix: d.limit.prefix, suffix: d.limit.suffix, duration: 1000, delay: 150 });
-    },
-  };
+const { html, ui } = OPL;
+OPL.screens = OPL.screens || {};
+OPL.screens["loans-overview"] = {
+title: "Loans overview",
+figma: { default: "382:36150" },
+timers: [],
+leave() { this.timers.forEach((t) => { clearTimeout(t); clearInterval(t); }); this.timers = []; },
+render(page) {
+this.leave();
+const d = OPL.data.loansOverview;
+const v = OPL.variantValues("loans-overview");
+page.innerHTML = html`
+${ui.StatusBar()}
+<div class="scroller">
+<main class="lo">
+<section class="lo-hero">
+<div class="lo-hero__bg">
+<img class="lo-hero__ellipse" src="${OPL.img("hero-ellipse.svg")}" alt="">
+<img class="lo-hero__texture" src="${OPL.img("hero-texture.jpg")}" alt="">
+</div>
+<img class="lo-hero__glow" src="${OPL.img("cmr-glow.svg")}" alt="">
+<div class="lo-hero__header">${ui.AppHeader({ title: d.header.title, back: true, actions: d.header.actions })}</div>
+<div class="lo-hero__title">
+<p class="lo-hero__eyebrow">${d.limit.eyebrow}</p>
+<p class="lo-hero__amount" data-amount="${d.limit.value}">${d.limit.prefix}${d.limit.value}${d.limit.suffix}</p>
+</div>
+${ui.CmrPill(d.cmr)}
+<div class="rail lo-hero__rail">${d.offers.map((c) => ui.MatchCard({ ...c, size: "lg" }))}</div>
+<div class="lo-hero__cta">${ui.Button({ label: d.offersCta.label, trailing: "chevron-right-white", block: true, goto: d.offersCta.goto })}</div>
+</section>
+<div class="lo-body">
+<section class="lo-section">
+<h2 class="lo-section__title">${d.applications.title}</h2>
+${ui.ApplicationCard(d.applications.card)}
+</section>
+<section class="lo-section">
+<h2 class="lo-section__title">${d.borrowing.title}</h2>
+${ui.BorrowingCard(d.borrowing.card)}
+</section>
+${ui.HelpCard(d.help)}
+</div>
+</main>
+</div>
+<div class="floating">
+${ui.AiMitraFab({ nudge: v.nudge === "on" ? d.aiNudge : null })}
+${ui.BottomNav({ items: d.nav.map((it) => ({ ...it, label: it.overviewLabel || it.label })), active: "overview", variant: "section" })}
+</div>`;
+this.wire(page, d);
+},
+wire(page, d) {
+OPL.fx.statusOnScroll(page);
+page.addEventListener("click", (e) => {
+const o = e.target.closest("[data-app-open]");
+if (o) OPL.go("application", { app: o.dataset.appOpen });
+});
+{ const sh = OPL.fx.sheets(page); OPL.fx.applySheet(page, sh); OPL.fx.loanDetail(page, sh); }   // offer cards → details → apply
+page.querySelectorAll(".rail").forEach(OPL.fx.mouseDrag);
+OPL.fx.playInView(page, ".tracker, .borrow");
+OPL.fx.nudge(page, this.timers);
+const amt = page.querySelector(".lo-hero__amount");
+OPL.fx.enter(page, [
+page.querySelector(".lo-hero__title"),
+page.querySelector(".cmr"),
+...page.querySelectorAll(".lo-hero__rail .match"),
+page.querySelector(".lo-hero__cta"),
+...page.querySelectorAll(".lo-section"),
+page.querySelector(".help"),
+]);
+OPL.countUp(amt, { to: d.limit.value, prefix: d.limit.prefix, suffix: d.limit.suffix, duration: 1000, delay: 150 });
+},
+};
 })();
 
 ;
@@ -2308,165 +2451,165 @@ OPL.ui.SignedHeroSvg = '<svg class="mss" viewBox="0 0 390 176" width="390" heigh
 /* ==== js/screens/loan-offers.js ==== */
 
 (function () {
-  const { html, ui } = OPL;
-  OPL.screens = OPL.screens || {};
-  OPL.screens["loan-offers"] = {
-    title: "Loan offers",
-    figma: { list: "382:35324" },
-    timers: [],
-    sel: [],
-    sort: null,
-    filters: null,
-    quick: [],
-    _lastPreset: null,
-    leave() { this.timers.forEach((t) => { clearTimeout(t); clearInterval(t); }); this.timers = []; (this._ro || {}).disconnect?.(); },
-    allCards() { const d = OPL.data.loanOffers; return [...d.picks, ...d.offers]; },
-    render(page) {
-      this.leave();
-      const d = OPL.data.loanOffers;
-      const v = OPL.variantValues("loan-offers");
-      const presetKey = `${v.compare}|${v.sheet}`;
-      if (presetKey !== this._lastPreset) {
-        if (v.compare === "figma") this.sel = [...d.compareFigmaSelected];
-        else if (this._lastPreset !== null) this.sel = [];
-        this.sort = this.sort || d.sortOptions[0];
-        this.filters = new Set(d.filtersFigmaSelected);
-        this._lastPreset = presetKey;
-      }
-      page.innerHTML = html`
-        ${ui.StatusBar()}
-        <div class="scroller">
-          <main class="lof">
-            <div class="lof-bg">
-              <img class="lof-bg__ellipse" src="${OPL.img("hero-ellipse.svg")}" alt="">
-              <img class="lof-bg__texture" src="${OPL.img("hero-texture.jpg")}" alt="">
-            </div>
-            <div class="lof-header">${ui.AppHeader({ title: d.header.title, back: true, actions: d.header.actions })}</div>
-            <section class="lof-picks">
-              <h2 class="lof-title">${d.picksTitle}</h2>
-              <div class="rail lof-rail">${d.picks.map((c) => ui.OfferCard({ ...c, kind: "pick", selected: this.sel.includes(c.id) }))}</div>
-            </section>
-            <section class="lof-all">
-              <h2 class="lof-title" data-all-title>${d.allTitle}</h2>
-              <div class="rail rail--chips lof-chips">
-                ${ui.Chip({ icon: "tuning-2", label: "Filters", bordered: true, attrs: 'data-open-sheet="filters"' })}
-                ${ui.Chip({ icon: "sort-vertical", label: this.sort, bordered: true, trailing: "chevron-down", attrs: 'data-open-sheet="sort" data-sort-chip' })}
-                <span class="chip-divider"></span>
-                ${d.quickFilters.map((q) => ui.Chip({ label: q, selected: this.quick.includes(q), attrs: `data-quick="${q}"` }))}
-              </div>
-              <div class="lof-list">${d.offers.map((c) => ui.OfferCard({ ...c, kind: "offer", selected: this.sel.includes(c.id) }))}</div>
-            </section>
-          </main>
-        </div>
-        <div class="floating">
-          ${ui.AiMitraFab({ nudge: v.nudge === "on" ? d.aiNudge : null })}
-          <div class="floating__tray" data-tray></div>
-          ${ui.BottomNav({ items: OPL.data.home.nav, active: "finance" })}
-        </div>
-        ${ui.Sheet({ id: "sort", title: "Sort by", body: html`<div class="sheet-sort" data-sort-list>${d.sortOptions.map((o) => ui.SortOption({ label: o, selected: o === this.sort }))}</div>` })}
-        ${ui.Sheet({
-          id: "filters", title: "Filters", action: "Clear all",
-          body: html`<div class="sheet-filters">${d.filterGroups.map((g) => OPL.raw(`
-            <div class="filter-group"><p class="filter-group__label">${g.label}</p>
-              <div class="filter-group__chips">${g.options.map((o) => ui.Chip({ label: o, bordered: true, selected: this.filters.has(o), attrs: `data-filter="${o}"` })).join("")}</div></div>`))}</div>`,
-          footer: ui.Button({ label: d.filtersCta, block: true, attrs: "data-sheet-done" }),
-        })}
+const { html, ui } = OPL;
+OPL.screens = OPL.screens || {};
+OPL.screens["loan-offers"] = {
+title: "Loan offers",
+figma: { list: "382:35324" },
+timers: [],
+sel: [],
+sort: null,
+filters: null,
+quick: [],
+_lastPreset: null,
+leave() { this.timers.forEach((t) => { clearTimeout(t); clearInterval(t); }); this.timers = []; (this._ro || {}).disconnect?.(); },
+allCards() { const d = OPL.data.loanOffers; return [...d.picks, ...d.offers]; },
+render(page) {
+this.leave();
+const d = OPL.data.loanOffers;
+const v = OPL.variantValues("loan-offers");
+const presetKey = `${v.compare}|${v.sheet}`;
+if (presetKey !== this._lastPreset) {
+if (v.compare === "figma") this.sel = [...d.compareFigmaSelected];
+else if (this._lastPreset !== null) this.sel = [];
+this.sort = this.sort || d.sortOptions[0];
+this.filters = new Set(d.filtersFigmaSelected);
+this._lastPreset = presetKey;
+}
+page.innerHTML = html`
+${ui.StatusBar()}
+<div class="scroller">
+<main class="lof">
+<div class="lof-bg">
+<img class="lof-bg__ellipse" src="${OPL.img("hero-ellipse.svg")}" alt="">
+<img class="lof-bg__texture" src="${OPL.img("hero-texture.jpg")}" alt="">
+</div>
+<div class="lof-header">${ui.AppHeader({ title: d.header.title, back: true, actions: d.header.actions })}</div>
+<section class="lof-picks">
+<h2 class="lof-title">${d.picksTitle}</h2>
+<div class="rail lof-rail">${d.picks.map((c) => ui.OfferCard({ ...c, kind: "pick", selected: this.sel.includes(c.id) }))}</div>
+</section>
+<section class="lof-all">
+<h2 class="lof-title" data-all-title>${d.allTitle}</h2>
+<div class="rail rail--chips lof-chips">
+${ui.Chip({ icon: "tuning-2", label: "Filters", bordered: true, attrs: 'data-open-sheet="filters"' })}
+${ui.Chip({ icon: "sort-vertical", label: this.sort, bordered: true, trailing: "chevron-down", attrs: 'data-open-sheet="sort" data-sort-chip' })}
+<span class="chip-divider"></span>
+${d.quickFilters.map((q) => ui.Chip({ label: q, selected: this.quick.includes(q), attrs: `data-quick="${q}"` }))}
+</div>
+<div class="lof-list">${d.offers.map((c) => ui.OfferCard({ ...c, kind: "offer", selected: this.sel.includes(c.id) }))}</div>
+</section>
+</main>
+</div>
+<div class="floating">
+${ui.AiMitraFab({ nudge: v.nudge === "on" ? d.aiNudge : null })}
+<div class="floating__tray" data-tray></div>
+${ui.BottomNav({ items: OPL.data.home.nav, active: "finance" })}
+</div>
+${ui.Sheet({ id: "sort", title: "Sort by", body: html`<div class="sheet-sort" data-sort-list>${d.sortOptions.map((o) => ui.SortOption({ label: o, selected: o === this.sort }))}</div>` })}
+${ui.Sheet({
+id: "filters", title: "Filters", action: "Clear all",
+body: html`<div class="sheet-filters">${d.filterGroups.map((g) => OPL.raw(`
+<div class="filter-group"><p class="filter-group__label">${g.label}</p>
+<div class="filter-group__chips">${g.options.map((o) => ui.Chip({ label: o, bordered: true, selected: this.filters.has(o), attrs: `data-filter="${o}"` })).join("")}</div></div>`))}</div>`,
+footer: ui.Button({ label: d.filtersCta, block: true, attrs: "data-sheet-done" }),
+})}
 `;
-      this.wire(page, d, v);
-    },
-    wire(page, d, v) {
-      OPL.fx.statusOnScroll(page);
-      page.querySelectorAll(".rail").forEach(OPL.fx.mouseDrag);
-      OPL.fx.nudge(page, this.timers);
-      const sheets = OPL.fx.sheets(page, { onClose: () => OPL.state.set({ sheet: null }, { silent: true }) });
-      OPL.fx.applySheet(page, sheets);   // card / sheet "Apply now"
-      OPL.fx.loanDetail(page, sheets, {
-        onCompare: (id, btn) => { const was = this.sel.includes(id); this.toggleCompare(page, id, btn); return this.sel.includes(id) !== was; },
-      });
-      if (v.sheet !== "none") sheets.open(v.sheet, { instant: true });
-      const floating = page.querySelector(".floating");
-      const main = page.querySelector(".lof");
-      const sync = () => { const h = floating.offsetHeight; main.style.setProperty("--lof-pad", (h <= 172 ? h - 5 : h + 10) + "px"); };
-      if (window.ResizeObserver) { this._ro = new ResizeObserver(sync); this._ro.observe(floating); }
-      sync();
-      this.paintCompare(page, false);
-      page.addEventListener("click", (e) => {
-        const t = e.target;
-        const cmp = t.closest("[data-compare]");
-        if (cmp) return this.toggleCompare(page, cmp.dataset.compare, cmp);
-        const rm = t.closest("[data-compare-remove]");
-        if (rm) { this.sel = this.sel.filter((x) => x !== rm.dataset.compareRemove); return this.paintCompare(page); }
-        if (t.closest("[data-compare-clear]")) { this.sel = []; return this.paintCompare(page); }
-        if (t.closest("[data-compare-add]")) {
-          return page.querySelector(".scroller").scrollTo({ top: page.querySelector("[data-all-title]").offsetTop - 120, behavior: "smooth" });
-        }
-        if (t.closest("[data-compare-go]")) {
-          if (this.sel.length >= 2) return OPL.go("compare-loans");
-          const add = page.querySelector(".tray__add");
-          if (add) { add.classList.remove("is-nudge"); void add.offsetWidth; add.classList.add("is-nudge"); }
-          return;
-        }
-        const open = t.closest("[data-open-sheet]");
-        if (open) return sheets.open(open.dataset.openSheet);
-        const so = t.closest("[data-sort]");
-        if (so) {
-          this.sort = so.dataset.sort;
-          page.querySelectorAll("[data-sort]").forEach((b) => (b.outerHTML = ui.SortOption({ label: b.dataset.sort, selected: b.dataset.sort === this.sort }).toString()));
-          page.querySelector("[data-sort-chip] .chip__label").textContent = this.sort;
-          return this.timers.push(setTimeout(() => sheets.close(), 220));   // radio rows apply on tap, no CTA
-        }
-        const f = t.closest("[data-filter]");
-        if (f) { const k = f.dataset.filter; this.filters.has(k) ? this.filters.delete(k) : this.filters.add(k); return f.classList.toggle("is-selected", this.filters.has(k)); }
-        if (t.closest("[data-sheet-action]")) { this.filters.clear(); return page.querySelectorAll("[data-filter]").forEach((c) => c.classList.remove("is-selected")); }
-        if (t.closest("[data-sheet-done]")) return sheets.close();
-        const q = t.closest("[data-quick]");
-        if (q) { const k = q.dataset.quick; this.quick = this.quick.includes(k) ? this.quick.filter((x) => x !== k) : [...this.quick, k]; return q.classList.toggle("is-selected"); }
-      });
-      OPL.fx.enter(page, [
-        page.querySelector(".lof-picks .lof-title"),
-        ...[...page.querySelectorAll(".lof-rail .offer")].slice(0, 2),
-        page.querySelector("[data-all-title]"),
-        page.querySelector(".lof-chips"),
-        ...[...page.querySelectorAll(".lof-list .offer")].slice(0, 2),
-      ]);
-    },
-    toggleCompare(page, id, btn) {
-      const d = OPL.data.loanOffers;
-      if (this.sel.includes(id)) this.sel = this.sel.filter((x) => x !== id);
-      else if (this.sel.length >= d.compareMax) {
-        const tray = page.querySelector(".tray"), card = btn.closest(".offer") || btn;
-        [tray, card].forEach((el) => { if (!el) return; el.classList.remove("is-shake"); void el.offsetWidth; el.classList.add("is-shake"); });
-        if (navigator.vibrate) navigator.vibrate([8, 40, 8]);
-        return;
-      } else this.sel = [...this.sel, id];
-      btn.classList.remove("is-popping"); void btn.offsetWidth; btn.classList.add("is-popping");
-      this.paintCompare(page);
-    },
-    paintCompare(page, animate = true) {
-      const d = OPL.data.loanOffers;
-      const byId = Object.fromEntries(this.allCards().map((c) => [c.id, c]));
-      page.querySelectorAll("[data-offer]").forEach((card) => {
-        const on = this.sel.includes(card.dataset.offer);
-        card.classList.toggle("is-selected", on);
-        const b = card.querySelector("[data-compare]");
-        b.setAttribute("aria-pressed", on);
-        b.querySelector("img").src = `assets/icons/${on ? "check-square-checked" : "check-square"}.svg`;
-      });
-      const floating = page.querySelector(".floating");
-      const slot = page.querySelector("[data-tray]");
-      const had = new Set([...slot.querySelectorAll("[data-slot]")].map((s) => s.dataset.slot));
-      const wasOpen = floating.classList.contains("has-tray");
-      if (this.sel.length) {
-        slot.innerHTML = ui.CompareTray({ selected: this.sel.map((id) => ({ id, logo: byId[id].logo })), max: d.compareMax }).toString();
-        slot.querySelectorAll("[data-slot]").forEach((s) => { if (had.has(s.dataset.slot) || !animate) s.style.animation = "none"; });
-        floating.classList.add("has-tray");
-        if (!wasOpen && animate && !OPL.fx.motionOff()) { slot.classList.remove("is-in"); void slot.offsetWidth; slot.classList.add("is-in"); }
-      } else {
-        floating.classList.remove("has-tray");
-        slot.innerHTML = "";
-      }
-    },
-  };
+this.wire(page, d, v);
+},
+wire(page, d, v) {
+OPL.fx.statusOnScroll(page);
+page.querySelectorAll(".rail").forEach(OPL.fx.mouseDrag);
+OPL.fx.nudge(page, this.timers);
+const sheets = OPL.fx.sheets(page, { onClose: () => OPL.state.set({ sheet: null }, { silent: true }) });
+OPL.fx.applySheet(page, sheets);   // card / sheet "Apply now"
+OPL.fx.loanDetail(page, sheets, {
+onCompare: (id, btn) => { const was = this.sel.includes(id); this.toggleCompare(page, id, btn); return this.sel.includes(id) !== was; },
+});
+if (v.sheet !== "none") sheets.open(v.sheet, { instant: true });
+const floating = page.querySelector(".floating");
+const main = page.querySelector(".lof");
+const sync = () => { const h = floating.offsetHeight; main.style.setProperty("--lof-pad", (h <= 172 ? h - 5 : h + 10) + "px"); };
+if (window.ResizeObserver) { this._ro = new ResizeObserver(sync); this._ro.observe(floating); }
+sync();
+this.paintCompare(page, false);
+page.addEventListener("click", (e) => {
+const t = e.target;
+const cmp = t.closest("[data-compare]");
+if (cmp) return this.toggleCompare(page, cmp.dataset.compare, cmp);
+const rm = t.closest("[data-compare-remove]");
+if (rm) { this.sel = this.sel.filter((x) => x !== rm.dataset.compareRemove); return this.paintCompare(page); }
+if (t.closest("[data-compare-clear]")) { this.sel = []; return this.paintCompare(page); }
+if (t.closest("[data-compare-add]")) {
+return page.querySelector(".scroller").scrollTo({ top: page.querySelector("[data-all-title]").offsetTop - 120, behavior: "smooth" });
+}
+if (t.closest("[data-compare-go]")) {
+if (this.sel.length >= 2) return OPL.go("compare-loans");
+const add = page.querySelector(".tray__add");
+if (add) { add.classList.remove("is-nudge"); void add.offsetWidth; add.classList.add("is-nudge"); }
+return;
+}
+const open = t.closest("[data-open-sheet]");
+if (open) return sheets.open(open.dataset.openSheet);
+const so = t.closest("[data-sort]");
+if (so) {
+this.sort = so.dataset.sort;
+page.querySelectorAll("[data-sort]").forEach((b) => (b.outerHTML = ui.SortOption({ label: b.dataset.sort, selected: b.dataset.sort === this.sort }).toString()));
+page.querySelector("[data-sort-chip] .chip__label").textContent = this.sort;
+return this.timers.push(setTimeout(() => sheets.close(), 220));   // radio rows apply on tap, no CTA
+}
+const f = t.closest("[data-filter]");
+if (f) { const k = f.dataset.filter; this.filters.has(k) ? this.filters.delete(k) : this.filters.add(k); return f.classList.toggle("is-selected", this.filters.has(k)); }
+if (t.closest("[data-sheet-action]")) { this.filters.clear(); return page.querySelectorAll("[data-filter]").forEach((c) => c.classList.remove("is-selected")); }
+if (t.closest("[data-sheet-done]")) return sheets.close();
+const q = t.closest("[data-quick]");
+if (q) { const k = q.dataset.quick; this.quick = this.quick.includes(k) ? this.quick.filter((x) => x !== k) : [...this.quick, k]; return q.classList.toggle("is-selected"); }
+});
+OPL.fx.enter(page, [
+page.querySelector(".lof-picks .lof-title"),
+...[...page.querySelectorAll(".lof-rail .offer")].slice(0, 2),
+page.querySelector("[data-all-title]"),
+page.querySelector(".lof-chips"),
+...[...page.querySelectorAll(".lof-list .offer")].slice(0, 2),
+]);
+},
+toggleCompare(page, id, btn) {
+const d = OPL.data.loanOffers;
+if (this.sel.includes(id)) this.sel = this.sel.filter((x) => x !== id);
+else if (this.sel.length >= d.compareMax) {
+const tray = page.querySelector(".tray"), card = btn.closest(".offer") || btn;
+[tray, card].forEach((el) => { if (!el) return; el.classList.remove("is-shake"); void el.offsetWidth; el.classList.add("is-shake"); });
+if (navigator.vibrate) navigator.vibrate([8, 40, 8]);
+return;
+} else this.sel = [...this.sel, id];
+btn.classList.remove("is-popping"); void btn.offsetWidth; btn.classList.add("is-popping");
+this.paintCompare(page);
+},
+paintCompare(page, animate = true) {
+const d = OPL.data.loanOffers;
+const byId = Object.fromEntries(this.allCards().map((c) => [c.id, c]));
+page.querySelectorAll("[data-offer]").forEach((card) => {
+const on = this.sel.includes(card.dataset.offer);
+card.classList.toggle("is-selected", on);
+const b = card.querySelector("[data-compare]");
+b.setAttribute("aria-pressed", on);
+b.querySelector("img").src = `assets/icons/${on ? "check-square-checked" : "check-square"}.svg`;
+});
+const floating = page.querySelector(".floating");
+const slot = page.querySelector("[data-tray]");
+const had = new Set([...slot.querySelectorAll("[data-slot]")].map((s) => s.dataset.slot));
+const wasOpen = floating.classList.contains("has-tray");
+if (this.sel.length) {
+slot.innerHTML = ui.CompareTray({ selected: this.sel.map((id) => ({ id, logo: byId[id].logo })), max: d.compareMax }).toString();
+slot.querySelectorAll("[data-slot]").forEach((s) => { if (had.has(s.dataset.slot) || !animate) s.style.animation = "none"; });
+floating.classList.add("has-tray");
+if (!wasOpen && animate && !OPL.fx.motionOff()) { slot.classList.remove("is-in"); void slot.offsetWidth; slot.classList.add("is-in"); }
+} else {
+floating.classList.remove("has-tray");
+slot.innerHTML = "";
+}
+},
+};
 })();
 
 ;
@@ -2474,121 +2617,121 @@ OPL.ui.SignedHeroSvg = '<svg class="mss" viewBox="0 0 390 176" width="390" heigh
 /* ==== js/screens/compare-loans.js ==== */
 
 (function () {
-  const { html, ui } = OPL;
-  OPL.screens = OPL.screens || {};
-  OPL.screens["compare-loans"] = {
-    title: "Compare loans",
-    figma: { default: "382:37839" },
-    timers: [],
-    leave() { this.timers.forEach((t) => clearTimeout(t)); this.timers = []; },
-    render(page) {
-      this.leave();
-      const d = OPL.data.compareLoans;
-      const sel = (OPL.screens["loan-offers"] && OPL.screens["loan-offers"].sel) || [];
-      const picks = sel.length ? sel.map((id) => ({ id, selected: true })) : d.figmaDefault;
-      this.cols = picks.map(({ id, selected }) => {
-        const key = d.aliases[id] || id;
-        return { id, ...d.records[key], selected };
-      });
-      this.computeBest(d);
-      this.diff = false;
-      page.innerHTML = html`
-        ${ui.StatusBar()}
-        <div class="scroller">
-          <main class="cl">
-            <div class="cl-head">
-              ${ui.AppHeader({ title: d.title, back: true, backIcon: "arrow-left-b", compact: true,
-                actions: [{ icon: "headphones-round-sound-linear", label: "Support", goto: "support" }] })}
-              <div class="cl-diff"><span>${d.diffLabel}</span>${ui.Toggle({ on: false, attrs: "data-diff" })}</div>
-            </div>
-            <div class="cl-table">${ui.CompareTable({ rows: d.rows, lenders: this.cols, addSlot: this.cols.length < d.max, addLabel: d.addLabel })}</div>
-          </main>
-        </div>
-        <div class="cl-foot">
-          ${ui.ComparePick({ label: d.pickLabel, lenders: this.cols, addSlot: this.cols.length < d.max })}
-          <div class="cl-cta">${ui.Button({ label: d.cta(this.selectedCount()), block: true, strong: true, attrs: "data-cta" })}</div>
-        </div>`;
-      this.wire(page, d);
-    },
-    selectedCount() { return this.cols.filter((c) => c.selected).length; },
-    computeBest(d) {
-      const num = (v) => { const m = String(Array.isArray(v) ? v[0] : v).match(/[\d.]+/); return m ? parseFloat(m[0]) : null; };
-      this.cols.forEach((c) => (c.best = []));
-      Object.entries(d.bestRules).forEach(([row, dir]) => {
-        const vals = this.cols.map((c) => num(c.values[row]));
-        const known = vals.filter((x) => x != null);
-        if (known.length < 2 || known.every((x) => x === known[0])) return;
-        const target = dir === "max" ? Math.max(...known) : Math.min(...known);
-        this.cols.forEach((c, i) => { if (vals[i] === target) c.best.push(row); });
-      });
-    },
-    wire(page, d) {
-      OPL.fx.statusOnScroll(page);
-      const scroll = page.querySelector("[data-ct-scroll]");
-      const pick = page.querySelector("[data-ct-pick]");
-      scroll.addEventListener("scroll", () => { pick.scrollLeft = scroll.scrollLeft; }, { passive: true });
-      OPL.fx.mouseDrag(scroll);
-      const apply = OPL.fx.applySheet(page, OPL.fx.sheets(page));
-      page.addEventListener("click", (e) => {
-        const t = e.target;
-        if (t.closest("[data-cta]")) return apply.open(this.cols.filter((c) => c.selected).map((c) => c.id));
-        if (t.closest("[data-compare-more]")) return OPL.back();   // back to the list to tick another
-        if (t.closest("[data-diff]")) {
-          this.diff = !this.diff;
-          const tg = t.closest("[data-diff]");
-          tg.classList.toggle("is-on", this.diff); tg.setAttribute("aria-checked", this.diff);
-          return this.paintDiff(page, d);
-        }
-        const p = t.closest("[data-pick]");
-        if (p) {
-          const col = this.cols.find((c) => c.id === p.dataset.pick);
-          col.selected = !col.selected;
-          p.outerHTML = ui.Button({ label: col.selected ? "Selected" : "Select", variant: col.selected ? "soft" : "outlined", size: "md", block: true, attrs: `data-pick="${col.id}"` }).toString();
-          return this.paintCta(page, d);
-        }
-        const x = t.closest("[data-col-remove]");
-        if (x) {
-          if (this.cols.length <= 1) return;
-          const id = x.dataset.colRemove;
-          page.querySelectorAll(`[data-col="${id}"]`).forEach((el) => el.classList.add("is-removing"));
-          this.cols = this.cols.filter((c) => c.id !== id);
-          const lo = OPL.screens["loan-offers"];
-          if (lo && lo.sel) lo.sel = lo.sel.filter((x) => x !== id);
-          this.timers.push(setTimeout(() => {
-            page.querySelectorAll(`[data-col="${id}"]`).forEach((el) => el.remove());
-            this.computeBest(d); this.paintBest(page);
-            if (this.cols.length < d.max && !page.querySelector(".ct-col--add")) {
-              const scrollEl = page.querySelector("[data-ct-scroll]"), pickEl = page.querySelector("[data-ct-pick]");
-              scrollEl.insertAdjacentHTML("beforeend", ui.CompareAddCol({ rows: d.rows, label: d.addLabel }).toString());
-              pickEl.insertAdjacentHTML("beforeend", `<div class="ct-pick__cell" data-col="add"></div>`);
-              page.querySelectorAll('[data-col="add"]').forEach((el) => el.classList.add("is-adding"));
-              if (this.diff) this.paintDiff(page, d);
-            }
-            this.paintCta(page, d); this.paintDiff(page, d);
-            if (this.cols.length <= 1) page.querySelectorAll(".ct-card__x").forEach((b) => (b.style.visibility = "hidden"));
-          }, OPL.fx.motionOff() ? 0 : 320));
-        }
-      });
-      OPL.fx.enter(page, [...page.querySelectorAll(".ct-col")], { holdMs: 2000 });
-    },
-    paintBest(page) {
-      this.cols.forEach((c) => page.querySelectorAll(`.ct-col[data-col="${c.id}"] .ct-value`).forEach((cell) =>
-        cell.classList.toggle("is-best", c.best.includes(cell.dataset.row))));
-    },
-    paintCta(page, d) {
-      const n = this.selectedCount();
-      const btn = page.querySelector("[data-cta]");
-      btn.querySelector(".btn__label").textContent = d.cta(n);
-      btn.disabled = n === 0;
-    },
-    paintDiff(page, d) {
-      d.rows.forEach((r) => {
-        const vals = this.cols.map((c) => JSON.stringify(c.values[r.id]));
-        const same = vals.every((x) => x === vals[0]);
-        page.querySelectorAll(`[data-row="${r.id}"]`).forEach((cell) => cell.classList.toggle("is-hidden", this.diff && same));
-      });
-    },
-  };
+const { html, ui } = OPL;
+OPL.screens = OPL.screens || {};
+OPL.screens["compare-loans"] = {
+title: "Compare loans",
+figma: { default: "382:37839" },
+timers: [],
+leave() { this.timers.forEach((t) => clearTimeout(t)); this.timers = []; },
+render(page) {
+this.leave();
+const d = OPL.data.compareLoans;
+const sel = (OPL.screens["loan-offers"] && OPL.screens["loan-offers"].sel) || [];
+const picks = sel.length ? sel.map((id) => ({ id, selected: true })) : d.figmaDefault;
+this.cols = picks.map(({ id, selected }) => {
+const key = d.aliases[id] || id;
+return { id, ...d.records[key], selected };
+});
+this.computeBest(d);
+this.diff = false;
+page.innerHTML = html`
+${ui.StatusBar()}
+<div class="scroller">
+<main class="cl">
+<div class="cl-head">
+${ui.AppHeader({ title: d.title, back: true, backIcon: "arrow-left-b", compact: true,
+actions: [{ icon: "headphones-round-sound-linear", label: "Support", goto: "support" }] })}
+<div class="cl-diff"><span>${d.diffLabel}</span>${ui.Toggle({ on: false, attrs: "data-diff" })}</div>
+</div>
+<div class="cl-table">${ui.CompareTable({ rows: d.rows, lenders: this.cols, addSlot: this.cols.length < d.max, addLabel: d.addLabel })}</div>
+</main>
+</div>
+<div class="cl-foot">
+${ui.ComparePick({ label: d.pickLabel, lenders: this.cols, addSlot: this.cols.length < d.max })}
+<div class="cl-cta">${ui.Button({ label: d.cta(this.selectedCount()), block: true, strong: true, attrs: "data-cta" })}</div>
+</div>`;
+this.wire(page, d);
+},
+selectedCount() { return this.cols.filter((c) => c.selected).length; },
+computeBest(d) {
+const num = (v) => { const m = String(Array.isArray(v) ? v[0] : v).match(/[\d.]+/); return m ? parseFloat(m[0]) : null; };
+this.cols.forEach((c) => (c.best = []));
+Object.entries(d.bestRules).forEach(([row, dir]) => {
+const vals = this.cols.map((c) => num(c.values[row]));
+const known = vals.filter((x) => x != null);
+if (known.length < 2 || known.every((x) => x === known[0])) return;
+const target = dir === "max" ? Math.max(...known) : Math.min(...known);
+this.cols.forEach((c, i) => { if (vals[i] === target) c.best.push(row); });
+});
+},
+wire(page, d) {
+OPL.fx.statusOnScroll(page);
+const scroll = page.querySelector("[data-ct-scroll]");
+const pick = page.querySelector("[data-ct-pick]");
+scroll.addEventListener("scroll", () => { pick.scrollLeft = scroll.scrollLeft; }, { passive: true });
+OPL.fx.mouseDrag(scroll);
+const apply = OPL.fx.applySheet(page, OPL.fx.sheets(page));
+page.addEventListener("click", (e) => {
+const t = e.target;
+if (t.closest("[data-cta]")) return apply.open(this.cols.filter((c) => c.selected).map((c) => c.id));
+if (t.closest("[data-compare-more]")) return OPL.back();   // back to the list to tick another
+if (t.closest("[data-diff]")) {
+this.diff = !this.diff;
+const tg = t.closest("[data-diff]");
+tg.classList.toggle("is-on", this.diff); tg.setAttribute("aria-checked", this.diff);
+return this.paintDiff(page, d);
+}
+const p = t.closest("[data-pick]");
+if (p) {
+const col = this.cols.find((c) => c.id === p.dataset.pick);
+col.selected = !col.selected;
+p.outerHTML = ui.Button({ label: col.selected ? "Selected" : "Select", variant: col.selected ? "soft" : "outlined", size: "md", block: true, attrs: `data-pick="${col.id}"` }).toString();
+return this.paintCta(page, d);
+}
+const x = t.closest("[data-col-remove]");
+if (x) {
+if (this.cols.length <= 1) return;
+const id = x.dataset.colRemove;
+page.querySelectorAll(`[data-col="${id}"]`).forEach((el) => el.classList.add("is-removing"));
+this.cols = this.cols.filter((c) => c.id !== id);
+const lo = OPL.screens["loan-offers"];
+if (lo && lo.sel) lo.sel = lo.sel.filter((x) => x !== id);
+this.timers.push(setTimeout(() => {
+page.querySelectorAll(`[data-col="${id}"]`).forEach((el) => el.remove());
+this.computeBest(d); this.paintBest(page);
+if (this.cols.length < d.max && !page.querySelector(".ct-col--add")) {
+const scrollEl = page.querySelector("[data-ct-scroll]"), pickEl = page.querySelector("[data-ct-pick]");
+scrollEl.insertAdjacentHTML("beforeend", ui.CompareAddCol({ rows: d.rows, label: d.addLabel }).toString());
+pickEl.insertAdjacentHTML("beforeend", `<div class="ct-pick__cell" data-col="add"></div>`);
+page.querySelectorAll('[data-col="add"]').forEach((el) => el.classList.add("is-adding"));
+if (this.diff) this.paintDiff(page, d);
+}
+this.paintCta(page, d); this.paintDiff(page, d);
+if (this.cols.length <= 1) page.querySelectorAll(".ct-card__x").forEach((b) => (b.style.visibility = "hidden"));
+}, OPL.fx.motionOff() ? 0 : 320));
+}
+});
+OPL.fx.enter(page, [...page.querySelectorAll(".ct-col")], { holdMs: 2000 });
+},
+paintBest(page) {
+this.cols.forEach((c) => page.querySelectorAll(`.ct-col[data-col="${c.id}"] .ct-value`).forEach((cell) =>
+cell.classList.toggle("is-best", c.best.includes(cell.dataset.row))));
+},
+paintCta(page, d) {
+const n = this.selectedCount();
+const btn = page.querySelector("[data-cta]");
+btn.querySelector(".btn__label").textContent = d.cta(n);
+btn.disabled = n === 0;
+},
+paintDiff(page, d) {
+d.rows.forEach((r) => {
+const vals = this.cols.map((c) => JSON.stringify(c.values[r.id]));
+const same = vals.every((x) => x === vals[0]);
+page.querySelectorAll(`[data-row="${r.id}"]`).forEach((cell) => cell.classList.toggle("is-hidden", this.diff && same));
+});
+},
+};
 })();
 
 ;
@@ -2596,247 +2739,247 @@ OPL.ui.SignedHeroSvg = '<svg class="mss" viewBox="0 0 390 176" width="390" heigh
 /* ==== js/screens/applications.js ==== */
 
 (function () {
-  const { html, ui } = OPL;
-  OPL.screens = OPL.screens || {};
-  const A = () => OPL.data.applications;
-  const cl = () => OPL.data.compareLoans;
-  const titleCase = (s) => String(s).replace(/\b\w/g, (c) => c.toUpperCase());
-  const record = (id) => cl().records[cl().aliases[id] || id];
-  const card = (id) => OPL.data.loanCatalog[id];
-  const lender = (id) => {
-    const r = record(id), c = card(id);
-    return {
-      id, name: r ? r.name : c.title, logo: r ? r.logo : c.logo,
-      type: r ? r.values.type : c.subtitle,
-      amountShort: r ? r.values.amount : `Up to ${c.figures[0].value}`,
-      apr: r ? r.values.apr : "",
-      tint: A().tints[id] || (c && c.tint) || "var(--tint-blue)",
-      slug: (r ? r.name : c.title).split(" ")[0].toLowerCase(),
-    };
-  };
-  const rate = { label: "Interest", value: "9.45%", unit: "p.a." };
-  const overrides = {};
-  const withOverride = (a) => (overrides[a.id] ? { ...a, status: overrides[a.id] } : a);
-  const currentApps = () => {
-    const s = OPL.screens.applications;
-    const v = OPL.variantValues("applications");
-    return (v.apps === "figma" || !s.apps ? A().figmaPreset.map((a) => ({ ...a })) : s.apps).map(withOverride);
-  };
-  const verifyingSteps = [
-    { icon: "plain-2-white", label: "Application<br>Sent", state: "done" },
-    { icon: "buildings-primary", label: "Lender Verification", state: "progress" },
-    { icon: "document-text-muted", label: "Sign KFS<br>and Sanction", state: "todo" },
-  ];
-  const kfsSteps = OPL.data.loansOverview.applications.card.steps;
-  OPL.apps = {
-    lender, currentApps,
-    setStatus(id, status) { overrides[id] = status; },
-    statusOf(id) {
-      const a = currentApps().find((x) => x.id === id) || A().figmaPreset.find((x) => x.id === id);
-      return overrides[id] || (a && a.status) || "verifying";
-    },
-  };
-  OPL.screens.applications = {
-    title: "Applications",
-    figma: { list: "382:41059" },
-    apps: null,
-    fresh: false,
-    timers: [],
-    leave() { this.timers.forEach((t) => clearTimeout(t)); this.timers = []; },
-    render(page) {
-      this.leave();
-      const d = A();
-      const apps = currentApps();
-      const v = OPL.variantValues("applications");
-      const cards = apps.map((a) => {
-        const l = lender(a.id);
-        return a.status === "kfs" || a.status === "sign" || a.status === "signed"   // later states reuse the KFS card (no list design yet)
-          ? ui.ApplicationCard({
-              id: a.id, logo: l.logo, name: l.name, product: l.type, tint: l.tint, tag: d.kfs.daysLeft,
-              figures: [{ label: "Final offer", value: d.kfs.finalOffer }, rate], steps: kfsSteps,
-              cta: "Review KFS", ctaAttrs: `data-app-open="${a.id}"`, footnote: d.kfs.cardNote,
-            })
-          : ui.ApplicationCard({
-              id: a.id, logo: l.logo, name: l.name, product: l.type, tint: l.tint,
-              figures: [{ label: "Loan offer", value: l.amountShort }, rate], steps: verifyingSteps, trackerStyle: "solid",
-              cta: "View details", ctaVariant: "outlined", ctaAttrs: `data-app-open="${a.id}"`, note: d.verifying.cardNote(l.name),
-            });
-      });
-      page.innerHTML = html`
-        ${ui.StatusBar()}
-        <div class="scroller">
-          <main class="apps">
-            <div class="apps-bg"><img class="apps-bg__ellipse" src="${OPL.img("hero-ellipse.svg")}" alt=""><img class="apps-bg__texture" src="${OPL.img("hero-texture.jpg")}" alt=""></div>
-            <div class="apps-header">${ui.AppHeader({ title: d.title(apps.length), back: true, backIcon: "arrow-left-b", actions: [{ icon: "headphones-round-sound-linear", label: "Support", goto: "support" }] })}</div>
-            <div class="apps-list">${cards}</div>
-            <div class="apps-note">${ui.NoteRow({ text: d.note })}</div>
-          </main>
-        </div>
-        <div class="floating">
-          ${ui.AiMitraFab({ nudge: d.aiNudge })}
-          ${ui.BottomNav({ items: OPL.data.loansOverview.nav, active: "applications", variant: "section" })}
-        </div>`;
-      const sheets = OPL.fx.sheets(page);
-      const msBody = OPL.fx.bareSheet(page, "ms");
-      this._sheets = sheets; this._ms = msBody;
-      this.wire(page, sheets, msBody, v);
-    },
-    openMilestone(page, sheets, msBody, id) {
-      const d = A(), l = lender(id);
-      msBody.innerHTML = ui.MilestoneApproved({
-        lender: l.name, logo: l.logo, type: l.type, title: d.kfs.approvedTitle(l.name), body: d.kfs.approvedBody, note: d.kfs.approvedNote,
-        figures: [{ label: "Final offer", value: d.kfs.finalOffer }, rate, { label: "APR", value: id === "pick-citi" ? d.kfs.summary.apr : l.apr }],
-      }).toString();
-      msBody.dataset.app = id;
-      sheets.open("ms");
-    },
-    wire(page, sheets, msBody, v) {
-      OPL.fx.statusOnScroll(page);
-      OPL.fx.playInView(page, ".tracker");
-      OPL.fx.nudge(page, this.timers);
-      OPL.fx.enter(page, [...page.querySelectorAll(".app-card"), page.querySelector(".apps-note")]);
-      page.addEventListener("click", (e) => {
-        const o = e.target.closest("[data-app-open]");
-        if (o) return OPL.go("application", { app: o.dataset.appOpen });
-        if (e.target.closest("[data-ms-review]")) { const id = msBody.dataset.app; sheets.close(); return this.timers.push(setTimeout(() => OPL.go("application", { app: id }), 280)); }
-      });
-      if (v.ms === "on") this.openMilestone(page, sheets, msBody, "pick-citi");
-      if (this.fresh && this.apps && this.apps.length) {
-        this.fresh = false;
-        OPL.afterReveal(() => this.timers.push(setTimeout(() => {
-          if (!page.isConnected) return;
-          const first = this.apps[0];
-          first.status = "kfs";
-          const fresh = OPL.rerender();
-          this.openMilestone(fresh, this._sheets, this._ms, first.id);
-        }, OPL.fx.motionOff() ? 0 : 5000)));
-      }
-    },
-  };
-  OPL.screens.application = {
-    title: "Application",
-    figma: { verifying: "382:42423", kfs: "382:42689" },
-    timers: [],
-    leave() { this.timers.forEach((t) => clearTimeout(t)); this.timers = []; },
-    render(page) {
-      this.leave();
-      const d = A();
-      const apps = currentApps();
-      const id = OPL.state.get().app || apps[0].id;
-      const v = OPL.variantValues("application");
-      const status = v.st || OPL.apps.statusOf(id);
-      const l = lender(id);
-      const kfs = status === "kfs", sign = status === "sign", signed = status === "signed";
-      const footCta = kfs ? d.kfs.cta : sign ? d.sign.cta : "";
-      const branch = d.branch(l.slug);
-      const timeline = sign || signed
-        ? [
-            { icon: "plain-2", state: "done", title: `Sent to ${l.name}`, sub: d.sentAt },
-            { icon: "buildings", state: "done", title: "Lender Verification", sub: d.verifiedOn, line: sign ? "fade" : "" },
-            signed
-              ? { icon: "document-text-done", state: "done", strong: true, title: d.signed.step3, sub: d.signed.step3Sub }
-              : { icon: "document-text", state: "action", title: d.sign.step3, sub: d.sign.step3Sub },
-          ]
-        : kfs
-        ? [
-            { icon: "plain-2", state: "done", title: `Sent to ${l.name}`, sub: d.sentAt },
-            { icon: "buildings", state: "done", title: "Lender Verification", sub: d.verifiedOn },
-            { icon: "document-text", state: "action", title: d.kfs.title },
-          ]
-        : [
-            { icon: "plain-2", state: "done", title: `Sent to ${l.name}`, sub: d.sentAt },
-            { icon: "buildings-primary", state: "current", title: "Lender Verification", sub: d.verifying.progress, subTone: "primary" },
-            { icon: "document-text-muted", state: "todo", title: d.verifying.todo },
-          ];
-      const body = signed
-        ? html`
-            <section class="appd-group">
-              <h3 class="appd-group__title">${d.signed.summaryTitle}</h3>
-              ${ui.AprCard({ s: d.kfs.summary, chip: d.signed.aprChip })}
-              ${ui.KeyValueCard({ rows: d.signed.rows })}
-            </section>
-            ${ui.InfoCard({ title: "Branch Details", body: ui.ContactList(branch) })}
-            ${ui.WhatsAppRow({ label: d.whatsapp })}`
-        : sign
-        ? html`
-            ${ui.InfoCard({ title: "Branch Details", body: ui.ContactList(branch) })}
-            ${ui.WhatsAppRow({ label: d.whatsapp })}`
-        : kfs
-        ? html`
-            ${ui.KfsSummary({ s: d.kfs.summary })}
-            ${ui.InfoCard({ title: "Branch Details", body: ui.ContactList(branch) })}
-            ${ui.WhatsAppRow({ label: d.whatsapp })}`
-        : html`
-            ${ui.InfoCard({ title: "What to expect", body: d.verifying.expect(l.name).map((t) => ui.NoteRow({ text: t, tone: "info" })).join("") })}
-            ${ui.InfoCard({ title: "Keep these documents ready", body: ui.DocList({ items: d.verifying.docs }) })}
-            ${ui.InfoCard({ title: "Branch Details", body: ui.ContactList(branch) })}
-            ${ui.InfoCard({ title: "Loan Application Details", body: ui.DetailRows({ rows: [
-                ["Application No.", d.verifying.appNo, true],
-                ["Loan Amount", OPL.fx.longAmount(l.amountShort)],
-                ["Interest Rate", "Floating • 9.45%"],
-                ["Loan Type", titleCase(l.type)],
-              ] }) })}
-            ${ui.WhatsAppRow({ label: d.whatsapp })}`;
-      page.innerHTML = html`
-        ${ui.StatusBar()}
-        <div class="scroller">
-          <main class="${OPL.cx("appd", footCta && "appd--kfs", signed && "appd--signed")}" style="--app-tint:${l.tint}">
-            <section class="appd-top">
-              <header class="appd-header">
-                <button class="app-header__back" aria-label="Back" data-press data-back>${OPL.icon("arrow-left-b", 24)}</button>
-                <div class="appd-header__id">${ui.Logo({ id: l.logo, size: 40 })}<div><p>${l.name}</p><span>${l.type}</span></div></div>
-                ${ui.IconButton({ icon: "headphones-round-sound-linear", label: "Support", goto: "support" })}
-              </header>
-              <div class="appd-status">
-                <h2 class="appd-status__title">${signed ? d.signed.title : sign ? d.sign.title : kfs ? d.kfs.title : d.verifying.title(l.name)}</h2>
-                ${ui.Timeline({ items: timeline })}
-              </div>
-            </section>
-            <div class="appd-body">${body}</div>
-            <div class="appd-withdraw"><button class="appd-withdraw__btn" data-goto="withdraw-application" data-press>${d.withdraw}</button></div>
-          </main>
-        </div>
-        <div class="${OPL.cx("floating", footCta && "floating--above-foot", signed && "floating--fab-only")}">
-          ${ui.AiMitraFab({ nudge: d.aiNudge })}
-          ${kfs || sign || signed ? "" : ui.BottomNav({ items: OPL.data.loansOverview.nav, active: "applications", variant: "section" })}
-        </div>
-        ${kfs ? OPL.raw(`<div class="appd-foot">${ui.Button({ label: d.kfs.cta, block: true, goto: "kfs" })}</div>`) : ""}
-        ${sign ? OPL.raw(`<div class="appd-foot">${ui.Button({ label: d.sign.cta, trailing: "arrow-square-out-white", block: true, attrs: 'data-sign-nesl' })}</div>`) : ""}`;
-      this.wire(page, { id, l, signed, v });
-    },
-    openSigned(page, l) {
-      const d = A().signed.sheet;
-      const sheets = OPL.fx.sheets(page);
-      const body = OPL.fx.bareSheet(page, "signed");
-      body.innerHTML = ui.MilestoneSigned({ ...d, body: d.body(l.name) }).toString();
-      page.addEventListener("click", (e) => { if (e.target.closest("[data-ms-view], [data-ms-done]")) sheets.close(); });
-      sheets.open("signed");
-    },
-    wire(page, { id, l, signed, v }) {
-      OPL.fx.statusOnScroll(page);
-      OPL.fx.playInView(page, ".tl, .kfs-repay");
-      OPL.fx.nudge(page, this.timers);
-      OPL.fx.enter(page, [page.querySelector(".appd-status"), ...page.querySelectorAll(".appd-body > *")]);
-      page.addEventListener("click", (e) => {
-        const acc = e.target.closest("[data-accordion]");
-        if (acc) return acc.closest(".info-card").classList.toggle("is-open");
-        const cp = e.target.closest("[data-copy]");
-        if (cp) {
-          navigator.clipboard?.writeText(cp.dataset.copy).catch(() => {});
-          cp.classList.remove("is-copied"); void cp.offsetWidth; cp.classList.add("is-copied");
-          if (navigator.vibrate) navigator.vibrate(6);
-          return;
-        }
-        const wa = e.target.closest("[data-wa]");
-        if (wa) { wa.classList.toggle("is-on"); wa.setAttribute("aria-checked", wa.classList.contains("is-on")); }
-        if (e.target.closest("[data-sign-nesl]")) return OPL.go("nesl", { app: id, step: null });
-      });
-      if (signed && (this.celebrate || v.ms === "on")) {
-        const fresh = this.celebrate; this.celebrate = false;
-        OPL.afterReveal(() => this.timers.push(setTimeout(() => page.isConnected && this.openSigned(page, l), fresh && !OPL.fx.motionOff() ? 460 : 0)));
-      }
-    },
-  };
+const { html, ui } = OPL;
+OPL.screens = OPL.screens || {};
+const A = () => OPL.data.applications;
+const cl = () => OPL.data.compareLoans;
+const titleCase = (s) => String(s).replace(/\b\w/g, (c) => c.toUpperCase());
+const record = (id) => cl().records[cl().aliases[id] || id];
+const card = (id) => OPL.data.loanCatalog[id];
+const lender = (id) => {
+const r = record(id), c = card(id);
+return {
+id, name: r ? r.name : c.title, logo: r ? r.logo : c.logo,
+type: r ? r.values.type : c.subtitle,
+amountShort: r ? r.values.amount : `Up to ${c.figures[0].value}`,
+apr: r ? r.values.apr : "",
+tint: A().tints[id] || (c && c.tint) || "var(--tint-blue)",
+slug: (r ? r.name : c.title).split(" ")[0].toLowerCase(),
+};
+};
+const rate = { label: "Interest", value: "9.45%", unit: "p.a." };
+const overrides = {};
+const withOverride = (a) => (overrides[a.id] ? { ...a, status: overrides[a.id] } : a);
+const currentApps = () => {
+const s = OPL.screens.applications;
+const v = OPL.variantValues("applications");
+return (v.apps === "figma" || !s.apps ? A().figmaPreset.map((a) => ({ ...a })) : s.apps).map(withOverride);
+};
+const verifyingSteps = [
+{ icon: "plain-2-white", label: "Application<br>Sent", state: "done" },
+{ icon: "buildings-primary", label: "Lender Verification", state: "progress" },
+{ icon: "document-text-muted", label: "Sign KFS<br>and Sanction", state: "todo" },
+];
+const kfsSteps = OPL.data.loansOverview.applications.card.steps;
+OPL.apps = {
+lender, currentApps,
+setStatus(id, status) { overrides[id] = status; },
+statusOf(id) {
+const a = currentApps().find((x) => x.id === id) || A().figmaPreset.find((x) => x.id === id);
+return overrides[id] || (a && a.status) || "verifying";
+},
+};
+OPL.screens.applications = {
+title: "Applications",
+figma: { list: "382:41059" },
+apps: null,
+fresh: false,
+timers: [],
+leave() { this.timers.forEach((t) => clearTimeout(t)); this.timers = []; },
+render(page) {
+this.leave();
+const d = A();
+const apps = currentApps();
+const v = OPL.variantValues("applications");
+const cards = apps.map((a) => {
+const l = lender(a.id);
+return a.status === "kfs" || a.status === "sign" || a.status === "signed"   // later states reuse the KFS card (no list design yet)
+? ui.ApplicationCard({
+id: a.id, logo: l.logo, name: l.name, product: l.type, tint: l.tint, tag: d.kfs.daysLeft,
+figures: [{ label: "Final offer", value: d.kfs.finalOffer }, rate], steps: kfsSteps,
+cta: "Review KFS", ctaAttrs: `data-app-open="${a.id}"`, footnote: d.kfs.cardNote,
+})
+: ui.ApplicationCard({
+id: a.id, logo: l.logo, name: l.name, product: l.type, tint: l.tint,
+figures: [{ label: "Loan offer", value: l.amountShort }, rate], steps: verifyingSteps, trackerStyle: "solid",
+cta: "View details", ctaVariant: "outlined", ctaAttrs: `data-app-open="${a.id}"`, note: d.verifying.cardNote(l.name),
+});
+});
+page.innerHTML = html`
+${ui.StatusBar()}
+<div class="scroller">
+<main class="apps">
+<div class="apps-bg"><img class="apps-bg__ellipse" src="${OPL.img("hero-ellipse.svg")}" alt=""><img class="apps-bg__texture" src="${OPL.img("hero-texture.jpg")}" alt=""></div>
+<div class="apps-header">${ui.AppHeader({ title: d.title(apps.length), back: true, backIcon: "arrow-left-b", actions: [{ icon: "headphones-round-sound-linear", label: "Support", goto: "support" }] })}</div>
+<div class="apps-list">${cards}</div>
+<div class="apps-note">${ui.NoteRow({ text: d.note })}</div>
+</main>
+</div>
+<div class="floating">
+${ui.AiMitraFab({ nudge: d.aiNudge })}
+${ui.BottomNav({ items: OPL.data.loansOverview.nav, active: "applications", variant: "section" })}
+</div>`;
+const sheets = OPL.fx.sheets(page);
+const msBody = OPL.fx.bareSheet(page, "ms");
+this._sheets = sheets; this._ms = msBody;
+this.wire(page, sheets, msBody, v);
+},
+openMilestone(page, sheets, msBody, id) {
+const d = A(), l = lender(id);
+msBody.innerHTML = ui.MilestoneApproved({
+lender: l.name, logo: l.logo, type: l.type, title: d.kfs.approvedTitle(l.name), body: d.kfs.approvedBody, note: d.kfs.approvedNote,
+figures: [{ label: "Final offer", value: d.kfs.finalOffer }, rate, { label: "APR", value: id === "pick-citi" ? d.kfs.summary.apr : l.apr }],
+}).toString();
+msBody.dataset.app = id;
+sheets.open("ms");
+},
+wire(page, sheets, msBody, v) {
+OPL.fx.statusOnScroll(page);
+OPL.fx.playInView(page, ".tracker");
+OPL.fx.nudge(page, this.timers);
+OPL.fx.enter(page, [...page.querySelectorAll(".app-card"), page.querySelector(".apps-note")]);
+page.addEventListener("click", (e) => {
+const o = e.target.closest("[data-app-open]");
+if (o) return OPL.go("application", { app: o.dataset.appOpen });
+if (e.target.closest("[data-ms-review]")) { const id = msBody.dataset.app; sheets.close(); return this.timers.push(setTimeout(() => OPL.go("application", { app: id }), 280)); }
+});
+if (v.ms === "on") this.openMilestone(page, sheets, msBody, "pick-citi");
+if (this.fresh && this.apps && this.apps.length) {
+this.fresh = false;
+OPL.afterReveal(() => this.timers.push(setTimeout(() => {
+if (!page.isConnected) return;
+const first = this.apps[0];
+first.status = "kfs";
+const fresh = OPL.rerender();
+this.openMilestone(fresh, this._sheets, this._ms, first.id);
+}, OPL.fx.motionOff() ? 0 : 5000)));
+}
+},
+};
+OPL.screens.application = {
+title: "Application",
+figma: { verifying: "382:42423", kfs: "382:42689" },
+timers: [],
+leave() { this.timers.forEach((t) => clearTimeout(t)); this.timers = []; },
+render(page) {
+this.leave();
+const d = A();
+const apps = currentApps();
+const id = OPL.state.get().app || apps[0].id;
+const v = OPL.variantValues("application");
+const status = v.st || OPL.apps.statusOf(id);
+const l = lender(id);
+const kfs = status === "kfs", sign = status === "sign", signed = status === "signed";
+const footCta = kfs ? d.kfs.cta : sign ? d.sign.cta : "";
+const branch = d.branch(l.slug);
+const timeline = sign || signed
+? [
+{ icon: "plain-2", state: "done", title: `Sent to ${l.name}`, sub: d.sentAt },
+{ icon: "buildings", state: "done", title: "Lender Verification", sub: d.verifiedOn, line: sign ? "fade" : "" },
+signed
+? { icon: "document-text-done", state: "done", strong: true, title: d.signed.step3, sub: d.signed.step3Sub }
+: { icon: "document-text", state: "action", title: d.sign.step3, sub: d.sign.step3Sub },
+]
+: kfs
+? [
+{ icon: "plain-2", state: "done", title: `Sent to ${l.name}`, sub: d.sentAt },
+{ icon: "buildings", state: "done", title: "Lender Verification", sub: d.verifiedOn },
+{ icon: "document-text", state: "action", title: d.kfs.title },
+]
+: [
+{ icon: "plain-2", state: "done", title: `Sent to ${l.name}`, sub: d.sentAt },
+{ icon: "buildings-primary", state: "current", title: "Lender Verification", sub: d.verifying.progress, subTone: "primary" },
+{ icon: "document-text-muted", state: "todo", title: d.verifying.todo },
+];
+const body = signed
+? html`
+<section class="appd-group">
+<h3 class="appd-group__title">${d.signed.summaryTitle}</h3>
+${ui.AprCard({ s: d.kfs.summary, chip: d.signed.aprChip })}
+${ui.KeyValueCard({ rows: d.signed.rows })}
+</section>
+${ui.InfoCard({ title: "Branch Details", body: ui.ContactList(branch) })}
+${ui.WhatsAppRow({ label: d.whatsapp })}`
+: sign
+? html`
+${ui.InfoCard({ title: "Branch Details", body: ui.ContactList(branch) })}
+${ui.WhatsAppRow({ label: d.whatsapp })}`
+: kfs
+? html`
+${ui.KfsSummary({ s: d.kfs.summary })}
+${ui.InfoCard({ title: "Branch Details", body: ui.ContactList(branch) })}
+${ui.WhatsAppRow({ label: d.whatsapp })}`
+: html`
+${ui.InfoCard({ title: "What to expect", body: d.verifying.expect(l.name).map((t) => ui.NoteRow({ text: t, tone: "info" })).join("") })}
+${ui.InfoCard({ title: "Keep these documents ready", body: ui.DocList({ items: d.verifying.docs }) })}
+${ui.InfoCard({ title: "Branch Details", body: ui.ContactList(branch) })}
+${ui.InfoCard({ title: "Loan Application Details", body: ui.DetailRows({ rows: [
+["Application No.", d.verifying.appNo, true],
+["Loan Amount", OPL.fx.longAmount(l.amountShort)],
+["Interest Rate", "Floating • 9.45%"],
+["Loan Type", titleCase(l.type)],
+] }) })}
+${ui.WhatsAppRow({ label: d.whatsapp })}`;
+page.innerHTML = html`
+${ui.StatusBar()}
+<div class="scroller">
+<main class="${OPL.cx("appd", footCta && "appd--kfs", signed && "appd--signed")}" style="--app-tint:${l.tint}">
+<section class="appd-top">
+<header class="appd-header">
+<button class="app-header__back" aria-label="Back" data-press data-back>${OPL.icon("arrow-left-b", 24)}</button>
+<div class="appd-header__id">${ui.Logo({ id: l.logo, size: 40 })}<div><p>${l.name}</p><span>${l.type}</span></div></div>
+${ui.IconButton({ icon: "headphones-round-sound-linear", label: "Support", goto: "support" })}
+</header>
+<div class="appd-status">
+<h2 class="appd-status__title">${signed ? d.signed.title : sign ? d.sign.title : kfs ? d.kfs.title : d.verifying.title(l.name)}</h2>
+${ui.Timeline({ items: timeline })}
+</div>
+</section>
+<div class="appd-body">${body}</div>
+<div class="appd-withdraw"><button class="appd-withdraw__btn" data-goto="withdraw-application" data-press>${d.withdraw}</button></div>
+</main>
+</div>
+<div class="${OPL.cx("floating", footCta && "floating--above-foot", signed && "floating--fab-only")}">
+${ui.AiMitraFab({ nudge: d.aiNudge })}
+${kfs || sign || signed ? "" : ui.BottomNav({ items: OPL.data.loansOverview.nav, active: "applications", variant: "section" })}
+</div>
+${kfs ? OPL.raw(`<div class="appd-foot">${ui.Button({ label: d.kfs.cta, block: true, goto: "kfs" })}</div>`) : ""}
+${sign ? OPL.raw(`<div class="appd-foot">${ui.Button({ label: d.sign.cta, trailing: "arrow-square-out-white", block: true, attrs: 'data-sign-nesl' })}</div>`) : ""}`;
+this.wire(page, { id, l, signed, v });
+},
+openSigned(page, l) {
+const d = A().signed.sheet;
+const sheets = OPL.fx.sheets(page);
+const body = OPL.fx.bareSheet(page, "signed");
+body.innerHTML = ui.MilestoneSigned({ ...d, body: d.body(l.name) }).toString();
+page.addEventListener("click", (e) => { if (e.target.closest("[data-ms-view], [data-ms-done]")) sheets.close(); });
+sheets.open("signed");
+},
+wire(page, { id, l, signed, v }) {
+OPL.fx.statusOnScroll(page);
+OPL.fx.playInView(page, ".tl, .kfs-repay");
+OPL.fx.nudge(page, this.timers);
+OPL.fx.enter(page, [page.querySelector(".appd-status"), ...page.querySelectorAll(".appd-body > *")]);
+page.addEventListener("click", (e) => {
+const acc = e.target.closest("[data-accordion]");
+if (acc) return acc.closest(".info-card").classList.toggle("is-open");
+const cp = e.target.closest("[data-copy]");
+if (cp) {
+navigator.clipboard?.writeText(cp.dataset.copy).catch(() => {});
+cp.classList.remove("is-copied"); void cp.offsetWidth; cp.classList.add("is-copied");
+if (navigator.vibrate) navigator.vibrate(6);
+return;
+}
+const wa = e.target.closest("[data-wa]");
+if (wa) { wa.classList.toggle("is-on"); wa.setAttribute("aria-checked", wa.classList.contains("is-on")); }
+if (e.target.closest("[data-sign-nesl]")) return OPL.go("nesl", { app: id, step: null });
+});
+if (signed && (this.celebrate || v.ms === "on")) {
+const fresh = this.celebrate; this.celebrate = false;
+OPL.afterReveal(() => this.timers.push(setTimeout(() => page.isConnected && this.openSigned(page, l), fresh && !OPL.fx.motionOff() ? 460 : 0)));
+}
+},
+};
 })();
 
 ;
@@ -2844,144 +2987,144 @@ OPL.ui.SignedHeroSvg = '<svg class="mss" viewBox="0 0 390 176" width="390" heigh
 /* ==== js/screens/kfs.js ==== */
 
 (function () {
-  const { html, ui } = OPL;
-  OPL.screens = OPL.screens || {};
-  const D = () => OPL.data.kfsDoc;
-  const row = ([n, label, value], i) =>
-    `<div class="kfs-row${i % 2 ? " kfs-row--alt" : ""}"><span class="kfs-row__n">${n}</span><span class="kfs-row__l">${label}</span><span class="kfs-row__v">${value}</span></div>`;
-  const ack = (a) => `
-    <div class="kfs-ack">
-      <p class="kfs-ack__title">${a.title}</p>
-      <p class="kfs-ack__text">${a.text}</p>
-      <div class="kfs-ack__sign">${a.lines.map((t) => `<div><span></span><p>${t}</p></div>`).join("")}</div>
-      <p class="kfs-ack__foot">${a.foot}</p>
-    </div>`;
-  const pageEl = (p, i, total, head) => OPL.raw(`
-    <article class="kfs-page" data-kfs-page="${i}">
-      <div class="kfs-page__lh">${ui.Logo({ id: head.logo, size: 16 })}<span class="kfs-page__org">${head.name}</span><span class="kfs-page__no">Page ${i + 1} of ${total}</span></div>
-      <span class="kfs-page__rule"></span>
-      ${p.title ? `<h3 class="kfs-page__title">${p.title}</h3>` : ""}
-      ${p.meta ? `<p class="kfs-page__meta">${p.meta}</p>` : ""}
-      <h4 class="kfs-page__part">${p.part}</h4>
-      <div class="kfs-table">${p.rows.map(row).join("")}</div>
-      ${p.note ? `<p class="kfs-page__note">${p.note}</p>` : ""}
-      ${p.ack ? ack(p.ack) : ""}
-    </article>`);
-  OPL.screens.kfs = {
-    title: "Key Fact Statement",
-    figma: { start: "416:43474", end: "416:43604" },
-    timers: [],
-    leave() { this.timers.forEach((t) => clearTimeout(t)); this.timers = []; (this._ro || {}).disconnect?.(); },
-    render(page) {
-      this.leave();
-      const d = D();
-      const v = OPL.variantValues("kfs");
-      const apps = OPL.apps.currentApps();
-      const id = OPL.state.get().app || (apps.find((a) => a.status === "kfs") || {}).id || "pick-citi";
-      const l = OPL.apps.lender(id);
-      const head = { logo: l.logo, name: d.letterhead[id] || l.name };
-      const pages = d.pages(l);
-      page.innerHTML = html`
-        <div class="kfs">
-          <div class="kfs-top">
-            ${ui.StatusBar()}
-            <header class="kfs-head">
-              <button class="app-header__back" aria-label="Back" data-press data-back>${OPL.icon("arrow-left-b", 24)}</button>
-              <div class="kfs-head__title"><h1>${l.name} Key Fact Statement</h1><p>${d.step}</p></div>
-              <button class="kfs-head__dl" aria-label="Download KFS" data-press data-goto="kfs-download">${OPL.icon("download", 24)}</button>
-            </header>
-          </div>
-          <div class="kfs-canvas scroller">
-            <div class="kfs-pages">${pages.map((p, i) => pageEl(p, i, pages.length, head))}</div>
-            <p class="kfs-end">${d.end}</p>
-          </div>
-          <span class="kfs-counter" aria-live="polite"><b data-kfs-n>1</b> / ${pages.length}</span>
-          <div class="kfs-foot" data-kfs-foot>
-            <span class="kfs-progress"><i data-kfs-bar style="width:${100 / pages.length}%"></i></span>
-            <button class="kfs-consent" data-kfs-consent aria-pressed="false" disabled>
-              ${OPL.icon("check-square", 24)}<span>${OPL.raw(d.consent)}</span>
-            </button>
-            <div class="kfs-hint"><p>${d.hint}</p></div>
-            ${ui.Button({ label: d.cta, block: true, attrs: "disabled data-kfs-accept" })}
-          </div>
-        </div>`;
-      this._id = id;
-      this.wire(page, v);
-    },
-    wire(page, v) {
-      const id = this._id;
-      const root = page.querySelector(".kfs");
-      const sc = page.querySelector(".kfs-canvas");
-      const pages = [...page.querySelectorAll("[data-kfs-page]")];
-      const num = page.querySelector("[data-kfs-n]");
-      const counter = page.querySelector(".kfs-counter");
-      const bar = page.querySelector("[data-kfs-bar]");
-      const foot = page.querySelector("[data-kfs-foot]");
-      const consent = page.querySelector("[data-kfs-consent]");
-      const accept = page.querySelector("[data-kfs-accept]");
-      const last = pages.length - 1;
-      let cur = 0, seen = 0, unlocked = false, checked = false, raf = 0;
-      const syncFoot = () => {
-        root.style.setProperty("--kfs-foot", foot.offsetHeight + "px");
-        root.style.setProperty("--kfs-zoom", Math.min(1, (root.clientWidth - 48) / 342).toFixed(4));
-      };
-      if (window.ResizeObserver) { this._ro = new ResizeObserver(syncFoot); this._ro.observe(foot); this._ro.observe(root); }
-      syncFoot();
-      const pop = (el) => { el.classList.remove("is-popping"); void el.offsetWidth; el.classList.add("is-popping"); };
-      const unlock = (quiet) => {
-        if (unlocked) return;
-        unlocked = true;
-        consent.disabled = false;
-        root.classList.add("is-unlocked");
-        if (!quiet && navigator.vibrate && navigator.userActivation?.hasBeenActive) navigator.vibrate(6);
-      };
-      const setChecked = (on) => {
-        checked = on;
-        consent.setAttribute("aria-pressed", on);
-        consent.querySelector("img").src = `assets/icons/${on ? "check-square-checked" : "check-square"}.svg`;
-        accept.disabled = !on;
-      };
-      const update = () => {
-        raf = 0;
-        const top0 = sc.getBoundingClientRect().top;
-        const mid = sc.clientHeight / 2;
-        const atEnd = sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 8;
-        let i = 0;
-        pages.forEach((p, k) => { if (p.getBoundingClientRect().top - top0 <= mid) i = k; });
-        if (atEnd) i = last;
-        if (i !== cur) { cur = i; num.textContent = i + 1; pop(counter); }
-        if (i > seen) { seen = i; bar.style.width = ((seen + 1) / pages.length) * 100 + "%"; }
-        if (seen === last) unlock();
-      };
-      sc.addEventListener("scroll", () => { if (!raf) raf = requestAnimationFrame(update); }, { passive: true });
-      consent.addEventListener("click", () => {
-        if (!unlocked) return;
-        setChecked(!checked);
-        pop(consent);
-        if (navigator.vibrate) navigator.vibrate(6);
-      });
-      const sheets = OPL.fx.sheets(page);
-      const sheetBody = OPL.fx.bareSheet(page, "nesl-intro");
-      sheetBody.innerHTML = ui.NeslSheetBody({ d: OPL.data.nesl.sheet }).toString();
-      const openSheet = (instant) => { OPL.apps.setStatus(id, "sign"); sheets.open("nesl-intro", { instant }); };
-      accept.addEventListener("click", () => openSheet(false));
-      page.addEventListener("click", (e) => {
-        if (e.target.closest("[data-nesl-go]")) { sheets.close(); return this.timers.push(setTimeout(() => OPL.go("nesl", { app: id, step: null, read: null, sheet: null }), 260)); }
-        if (e.target.closest("[data-nesl-later]")) { sheets.close(); return this.timers.push(setTimeout(() => OPL.go("application", { app: id, st: null, ms: null, read: null, sheet: null }), 260)); }
-      });
-      if (v.read === "end") {
-        root.classList.add("is-instant");
-        requestAnimationFrame(() => {
-          if (!page.isConnected) return;
-          sc.scrollTop = sc.scrollHeight;
-          update(); unlock(true); setChecked(true); syncFoot();
-          if (v.sheet === "nesl") openSheet(true);   // Figma 433:7980
-          this.timers.push(setTimeout(() => root.classList.remove("is-instant"), 60));
-        });
-      }
-      OPL.fx.enter(page, pages.slice(0, 2));
-    },
-  };
+const { html, ui } = OPL;
+OPL.screens = OPL.screens || {};
+const D = () => OPL.data.kfsDoc;
+const row = ([n, label, value], i) =>
+`<div class="kfs-row${i % 2 ? " kfs-row--alt" : ""}"><span class="kfs-row__n">${n}</span><span class="kfs-row__l">${label}</span><span class="kfs-row__v">${value}</span></div>`;
+const ack = (a) => `
+<div class="kfs-ack">
+<p class="kfs-ack__title">${a.title}</p>
+<p class="kfs-ack__text">${a.text}</p>
+<div class="kfs-ack__sign">${a.lines.map((t) => `<div><span></span><p>${t}</p></div>`).join("")}</div>
+<p class="kfs-ack__foot">${a.foot}</p>
+</div>`;
+const pageEl = (p, i, total, head) => OPL.raw(`
+<article class="kfs-page" data-kfs-page="${i}">
+<div class="kfs-page__lh">${ui.Logo({ id: head.logo, size: 16 })}<span class="kfs-page__org">${head.name}</span><span class="kfs-page__no">Page ${i + 1} of ${total}</span></div>
+<span class="kfs-page__rule"></span>
+${p.title ? `<h3 class="kfs-page__title">${p.title}</h3>` : ""}
+${p.meta ? `<p class="kfs-page__meta">${p.meta}</p>` : ""}
+<h4 class="kfs-page__part">${p.part}</h4>
+<div class="kfs-table">${p.rows.map(row).join("")}</div>
+${p.note ? `<p class="kfs-page__note">${p.note}</p>` : ""}
+${p.ack ? ack(p.ack) : ""}
+</article>`);
+OPL.screens.kfs = {
+title: "Key Fact Statement",
+figma: { start: "416:43474", end: "416:43604" },
+timers: [],
+leave() { this.timers.forEach((t) => clearTimeout(t)); this.timers = []; (this._ro || {}).disconnect?.(); },
+render(page) {
+this.leave();
+const d = D();
+const v = OPL.variantValues("kfs");
+const apps = OPL.apps.currentApps();
+const id = OPL.state.get().app || (apps.find((a) => a.status === "kfs") || {}).id || "pick-citi";
+const l = OPL.apps.lender(id);
+const head = { logo: l.logo, name: d.letterhead[id] || l.name };
+const pages = d.pages(l);
+page.innerHTML = html`
+<div class="kfs">
+<div class="kfs-top">
+${ui.StatusBar()}
+<header class="kfs-head">
+<button class="app-header__back" aria-label="Back" data-press data-back>${OPL.icon("arrow-left-b", 24)}</button>
+<div class="kfs-head__title"><h1>${l.name} Key Fact Statement</h1><p>${d.step}</p></div>
+<button class="kfs-head__dl" aria-label="Download KFS" data-press data-goto="kfs-download">${OPL.icon("download", 24)}</button>
+</header>
+</div>
+<div class="kfs-canvas scroller">
+<div class="kfs-pages">${pages.map((p, i) => pageEl(p, i, pages.length, head))}</div>
+<p class="kfs-end">${d.end}</p>
+</div>
+<span class="kfs-counter" aria-live="polite"><b data-kfs-n>1</b> / ${pages.length}</span>
+<div class="kfs-foot" data-kfs-foot>
+<span class="kfs-progress"><i data-kfs-bar style="width:${100 / pages.length}%"></i></span>
+<button class="kfs-consent" data-kfs-consent aria-pressed="false" disabled>
+${OPL.icon("check-square", 24)}<span>${OPL.raw(d.consent)}</span>
+</button>
+<div class="kfs-hint"><p>${d.hint}</p></div>
+${ui.Button({ label: d.cta, block: true, attrs: "disabled data-kfs-accept" })}
+</div>
+</div>`;
+this._id = id;
+this.wire(page, v);
+},
+wire(page, v) {
+const id = this._id;
+const root = page.querySelector(".kfs");
+const sc = page.querySelector(".kfs-canvas");
+const pages = [...page.querySelectorAll("[data-kfs-page]")];
+const num = page.querySelector("[data-kfs-n]");
+const counter = page.querySelector(".kfs-counter");
+const bar = page.querySelector("[data-kfs-bar]");
+const foot = page.querySelector("[data-kfs-foot]");
+const consent = page.querySelector("[data-kfs-consent]");
+const accept = page.querySelector("[data-kfs-accept]");
+const last = pages.length - 1;
+let cur = 0, seen = 0, unlocked = false, checked = false, raf = 0;
+const syncFoot = () => {
+root.style.setProperty("--kfs-foot", foot.offsetHeight + "px");
+root.style.setProperty("--kfs-zoom", Math.min(1, (root.clientWidth - 48) / 342).toFixed(4));
+};
+if (window.ResizeObserver) { this._ro = new ResizeObserver(syncFoot); this._ro.observe(foot); this._ro.observe(root); }
+syncFoot();
+const pop = (el) => { el.classList.remove("is-popping"); void el.offsetWidth; el.classList.add("is-popping"); };
+const unlock = (quiet) => {
+if (unlocked) return;
+unlocked = true;
+consent.disabled = false;
+root.classList.add("is-unlocked");
+if (!quiet && navigator.vibrate && navigator.userActivation?.hasBeenActive) navigator.vibrate(6);
+};
+const setChecked = (on) => {
+checked = on;
+consent.setAttribute("aria-pressed", on);
+consent.querySelector("img").src = `assets/icons/${on ? "check-square-checked" : "check-square"}.svg`;
+accept.disabled = !on;
+};
+const update = () => {
+raf = 0;
+const top0 = sc.getBoundingClientRect().top;
+const mid = sc.clientHeight / 2;
+const atEnd = sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 8;
+let i = 0;
+pages.forEach((p, k) => { if (p.getBoundingClientRect().top - top0 <= mid) i = k; });
+if (atEnd) i = last;
+if (i !== cur) { cur = i; num.textContent = i + 1; pop(counter); }
+if (i > seen) { seen = i; bar.style.width = ((seen + 1) / pages.length) * 100 + "%"; }
+if (seen === last) unlock();
+};
+sc.addEventListener("scroll", () => { if (!raf) raf = requestAnimationFrame(update); }, { passive: true });
+consent.addEventListener("click", () => {
+if (!unlocked) return;
+setChecked(!checked);
+pop(consent);
+if (navigator.vibrate) navigator.vibrate(6);
+});
+const sheets = OPL.fx.sheets(page);
+const sheetBody = OPL.fx.bareSheet(page, "nesl-intro");
+sheetBody.innerHTML = ui.NeslSheetBody({ d: OPL.data.nesl.sheet }).toString();
+const openSheet = (instant) => { OPL.apps.setStatus(id, "sign"); sheets.open("nesl-intro", { instant }); };
+accept.addEventListener("click", () => openSheet(false));
+page.addEventListener("click", (e) => {
+if (e.target.closest("[data-nesl-go]")) { sheets.close(); return this.timers.push(setTimeout(() => OPL.go("nesl", { app: id, step: null, read: null, sheet: null }), 260)); }
+if (e.target.closest("[data-nesl-later]")) { sheets.close(); return this.timers.push(setTimeout(() => OPL.go("application", { app: id, st: null, ms: null, read: null, sheet: null }), 260)); }
+});
+if (v.read === "end") {
+root.classList.add("is-instant");
+requestAnimationFrame(() => {
+if (!page.isConnected) return;
+sc.scrollTop = sc.scrollHeight;
+update(); unlock(true); setChecked(true); syncFoot();
+if (v.sheet === "nesl") openSheet(true);   // Figma 433:7980
+this.timers.push(setTimeout(() => root.classList.remove("is-instant"), 60));
+});
+}
+OPL.fx.enter(page, pages.slice(0, 2));
+},
+};
 })();
 
 ;
@@ -2989,84 +3132,84 @@ OPL.ui.SignedHeroSvg = '<svg class="mss" viewBox="0 0 390 176" width="390" heigh
 /* ==== js/screens/nesl.js ==== */
 
 (function () {
-  const { html, ui } = OPL;
-  OPL.screens = OPL.screens || {};
-  const N = () => OPL.data.nesl;
-  const IMG_W = 390, IMG_H = 723;
-  const src = (id) => `assets/lazy/nesl/${id}.jpg`;
-  const rect = (r) => `left:${(r[0] / IMG_W) * 100}%;top:${(r[1] / IMG_H) * 100}%;width:${(r[2] / IMG_W) * 100}%;height:${(r[3] / IMG_H) * 100}%`;
-  OPL.screens.nesl = {
-    title: "NeSL signing",
-    figma: { redirect: "433:8115", confirm: "416:82947" },
-    timers: [],
-    leave() { this.timers.forEach((t) => clearTimeout(t)); this.timers = []; },
-    render(page) {
-      this.leave();
-      const v = OPL.variantValues("nesl");
-      const apps = OPL.apps.currentApps();
-      this.id = OPL.state.get().app || (apps.find((a) => a.status === "sign" || a.status === "kfs") || {}).id || "pick-citi";
-      page.innerHTML = html`<div class="nesl" data-nesl></div>`;
-      this.root = page.querySelector("[data-nesl]");
-      this.page = page;
-      N().portal.forEach((p) => { const i = new Image(); i.src = src(p.id); });
-      this.show(Number(v.step) || 0, true);
-      page.addEventListener("click", (e) => {
-        if (e.target.closest("[data-nesl-next]")) return this.advance();
-        if (e.target.closest("[data-nesl-cancel]")) return this.cancel();
-        const hit = this.root.querySelector("[data-nesl-next]");
-        if (hit && document.documentElement.dataset.hotspots !== "off") {
-          hit.classList.remove("hotspot-flash"); void hit.offsetWidth; hit.classList.add("hotspot-flash");
-        }
-      });
-    },
-    show(step, first) {
-      this.timers.forEach((t) => clearTimeout(t)); this.timers = [];
-      this.step = step;
-      const portal = N().portal;
-      if (step >= portal.length) return this.confirm(first);   // opened on the Confirming preset: park there
-      const p = portal[step];
-      const view = document.createElement("div");
-      view.className = "nesl-view" + (p.dim ? " nesl-view--dim" : "") + (first ? "" : " is-in");
-      view.innerHTML = html`
-        ${ui.StatusBar()}
-        <div class="nesl-shot">
-          <img src="${src(p.id)}" width="390" height="723" alt="NeSL portal: ${p.id}" draggable="false">
-          ${p.next ? OPL.raw(`<button class="nesl-hit" style="${rect(p.next)}" data-nesl-next aria-label="Continue"></button>`) : ""}
-          ${p.cancel ? OPL.raw(`<button class="nesl-hit nesl-hit--quiet" style="${rect(p.cancel)}" data-nesl-cancel aria-label="Cancel"></button>`) : ""}
-        </div>`.toString();
-      const old = this.root.firstElementChild;
-      this.root.appendChild(view);
-      if (old) setTimeout(() => old.remove(), OPL.fx.motionOff() ? 0 : 220);
-      if (p.auto) this.timers.push(setTimeout(() => this.page.isConnected && this.advance(), OPL.fx.motionOff() ? 300 : p.auto));
-    },
-    advance() { this.show(this.step + 1); },
-    cancel() {
-      OPL.apps.setStatus(this.id, "sign");
-      OPL.go("application", { app: this.id, st: null, ms: null, step: null }, { replace: true });
-    },
-    confirm(park) {
-      const c = N().confirm;
-      const view = document.createElement("div");
-      view.className = "nesl-view nesl-confirm is-in";
-      view.innerHTML = html`
-        ${ui.StatusBar()}
-        <div class="nesl-confirm__loader">
-          <img class="nesl-confirm__spin" src="assets/icons/spinner.svg" width="64" height="64" alt="">
-          <div class="nesl-confirm__msg"><h1>${c.title}</h1><p>${c.sub}</p></div>
-        </div>
-        <p class="nesl-confirm__foot">${c.foot}</p>`.toString();
-      const old = this.root.firstElementChild;
-      this.root.appendChild(view);
-      if (old) setTimeout(() => old.remove(), OPL.fx.motionOff() ? 0 : 220);
-      if (park) return;   // Figma preset 416:82947; the live flow carries on to the signed application
-      this.timers.push(setTimeout(() => {
-        if (!this.page.isConnected) return;
-        OPL.apps.setStatus(this.id, "signed");
-        OPL.screens.application.celebrate = true;
-        OPL.go("application", { app: this.id, st: null, ms: null, step: null }, { replace: true });
-      }, OPL.fx.motionOff() ? 400 : c.wait));
-    },
-  };
+const { html, ui } = OPL;
+OPL.screens = OPL.screens || {};
+const N = () => OPL.data.nesl;
+const IMG_W = 390, IMG_H = 723;
+const src = (id) => `assets/lazy/nesl/${id}.jpg`;
+const rect = (r) => `left:${(r[0] / IMG_W) * 100}%;top:${(r[1] / IMG_H) * 100}%;width:${(r[2] / IMG_W) * 100}%;height:${(r[3] / IMG_H) * 100}%`;
+OPL.screens.nesl = {
+title: "NeSL signing",
+figma: { redirect: "433:8115", confirm: "416:82947" },
+timers: [],
+leave() { this.timers.forEach((t) => clearTimeout(t)); this.timers = []; },
+render(page) {
+this.leave();
+const v = OPL.variantValues("nesl");
+const apps = OPL.apps.currentApps();
+this.id = OPL.state.get().app || (apps.find((a) => a.status === "sign" || a.status === "kfs") || {}).id || "pick-citi";
+page.innerHTML = html`<div class="nesl" data-nesl></div>`;
+this.root = page.querySelector("[data-nesl]");
+this.page = page;
+N().portal.forEach((p) => { const i = new Image(); i.src = src(p.id); });
+this.show(Number(v.step) || 0, true);
+page.addEventListener("click", (e) => {
+if (e.target.closest("[data-nesl-next]")) return this.advance();
+if (e.target.closest("[data-nesl-cancel]")) return this.cancel();
+const hit = this.root.querySelector("[data-nesl-next]");
+if (hit && document.documentElement.dataset.hotspots !== "off") {
+hit.classList.remove("hotspot-flash"); void hit.offsetWidth; hit.classList.add("hotspot-flash");
+}
+});
+},
+show(step, first) {
+this.timers.forEach((t) => clearTimeout(t)); this.timers = [];
+this.step = step;
+const portal = N().portal;
+if (step >= portal.length) return this.confirm(first);   // opened on the Confirming preset: park there
+const p = portal[step];
+const view = document.createElement("div");
+view.className = "nesl-view" + (p.dim ? " nesl-view--dim" : "") + (first ? "" : " is-in");
+view.innerHTML = html`
+${ui.StatusBar()}
+<div class="nesl-shot">
+<img src="${src(p.id)}" width="390" height="723" alt="NeSL portal: ${p.id}" draggable="false">
+${p.next ? OPL.raw(`<button class="nesl-hit" style="${rect(p.next)}" data-nesl-next aria-label="Continue"></button>`) : ""}
+${p.cancel ? OPL.raw(`<button class="nesl-hit nesl-hit--quiet" style="${rect(p.cancel)}" data-nesl-cancel aria-label="Cancel"></button>`) : ""}
+</div>`.toString();
+const old = this.root.firstElementChild;
+this.root.appendChild(view);
+if (old) setTimeout(() => old.remove(), OPL.fx.motionOff() ? 0 : 220);
+if (p.auto) this.timers.push(setTimeout(() => this.page.isConnected && this.advance(), OPL.fx.motionOff() ? 300 : p.auto));
+},
+advance() { this.show(this.step + 1); },
+cancel() {
+OPL.apps.setStatus(this.id, "sign");
+OPL.go("application", { app: this.id, st: null, ms: null, step: null }, { replace: true });
+},
+confirm(park) {
+const c = N().confirm;
+const view = document.createElement("div");
+view.className = "nesl-view nesl-confirm is-in";
+view.innerHTML = html`
+${ui.StatusBar()}
+<div class="nesl-confirm__loader">
+<img class="nesl-confirm__spin" src="assets/icons/spinner.svg" width="64" height="64" alt="">
+<div class="nesl-confirm__msg"><h1>${c.title}</h1><p>${c.sub}</p></div>
+</div>
+<p class="nesl-confirm__foot">${c.foot}</p>`.toString();
+const old = this.root.firstElementChild;
+this.root.appendChild(view);
+if (old) setTimeout(() => old.remove(), OPL.fx.motionOff() ? 0 : 220);
+if (park) return;   // Figma preset 416:82947; the live flow carries on to the signed application
+this.timers.push(setTimeout(() => {
+if (!this.page.isConnected) return;
+OPL.apps.setStatus(this.id, "signed");
+OPL.screens.application.celebrate = true;
+OPL.go("application", { app: this.id, st: null, ms: null, step: null }, { replace: true });
+}, OPL.fx.motionOff() ? 400 : c.wait));
+},
+};
 })();
 
 ;
@@ -3074,198 +3217,535 @@ OPL.ui.SignedHeroSvg = '<svg class="mss" viewBox="0 0 390 176" width="390" heigh
 /* ==== js/screens/subsidy-detail.js ==== */
 
 (function () {
-  const { html, ui } = OPL;
-  OPL.screens = OPL.screens || {};
-  const countUpDecimal = (el, { to, prefix, suffix, duration = 900, delay = 0, timers }) => {
-    const set = (v) => { el.textContent = prefix + v.toFixed(1) + suffix; };
-    if (OPL.fx.motionOff()) return set(to);
-    set(0);
-    OPL.afterReveal(() => timers.push(setTimeout(() => {
-      const t0 = Date.now();
-      const step = () => {
-        const k = Math.min(1, (Date.now() - t0) / duration);
-        set(to * (1 - Math.pow(1 - k, 3)));
-        if (k < 1) timers.push(setTimeout(step, 16));
-      };
-      step();
-    }, delay)));
-  };
-  OPL.screens["subsidy-detail"] = {
-    title: "Subsidy details",
-    figma: { collapsed: "416:44853", expanded: "416:45617" },
-    timers: [],
-    leave() { this.timers.forEach((t) => { clearTimeout(t); clearInterval(t); }); this.timers = []; },
-    render(page) {
-      this.leave();
-      const d = OPL.data.subsidyDetail;
-      const v = OPL.variantValues("subsidy-detail");
-      const b = d.benefits;
-      page.innerHTML = html`
-        ${ui.StatusBar()}
-        <div class="scroller">
-          <main class="sd">
-            <section class="sd-hero">
-              <div class="sd-hero__bg"><img class="sd-hero__texture" src="${OPL.simg("satin-texture.jpg")}" alt=""></div>
-              <header class="sd-head">
-                <div class="sd-head__lead">
-                  <button class="sd-head__btn sd-head__back" aria-label="Back" data-press data-back>${OPL.sicon("alt-arrow-left-19", 19.2)}</button>
-                  <h1 class="sd-head__title">${d.title}</h1>
-                </div>
-                <button class="sd-head__btn" aria-label="Support" data-press data-goto="support">${OPL.sicon("headphones-16", 16)}</button>
-              </header>
-              <div class="sd-hero__body">
-                <div class="sd-illus" aria-hidden="true">
-                  <img class="sd-illus__l sd-illus__base" src="${OPL.simg("hero-plinth-base.svg")}" alt="">
-                  <img class="sd-illus__l sd-illus__top" src="${OPL.simg("hero-plinth-top.svg")}" alt="">
-                  <img class="sd-illus__l sd-illus__notes" src="${OPL.simg("hero-notes.svg")}" alt="">
-                  <img class="sd-illus__l sd-illus__coins-a" src="${OPL.simg("hero-coins-a.svg")}" alt="">
-                  <img class="sd-illus__l sd-illus__coins-b" src="${OPL.simg("hero-coins-b.svg")}" alt="">
-                </div>
-                <div class="sd-hero__copy">
-                  <p class="sd-hero__eyebrow"><span>${d.hero.eyebrow}</span>
-                    <button class="sd-hero__info" aria-label="How we estimate this" data-press data-goto="estimate-info">${OPL.sicon("info-circle-ink", 16)}</button></p>
-                  <p class="sd-hero__amount">${d.hero.prefix}${d.hero.value}${d.hero.suffix}</p>
-                </div>
-                <div class="sd-hero__cta">${ui.Button({ label: d.hero.cta.label, trailing: "chevron-right-white", block: true, strong: true, goto: d.hero.cta.goto })}</div>
-              </div>
-            </section>
-            <div class="sd-body">
-              ${ui.PolicyPeriod({ period: d.period })}
-              <section class="sd-section sd-benefits">
-                <h2 class="sd-section__title">${b.title} ${ui.CountBadge({ n: b.count })}</h2>
-                <div class="sd-benefits__grid">${b.tiles.map((t) => ui.BenefitTile(t))}</div>
-                ${ui.Disclosure({
-                  id: "others", label: b.others.label, count: b.others.count, open: v.others === "open",
-                  body: OPL.raw(b.others.rows.map((r, i) => ui.ListRow({ ...r, attrs: `data-benefit="${r.id}" aria-haspopup="dialog" style="--i:${i}"` })).join("")),
-                })}
-              </section>
-              <section class="sd-section sd-apply">
-                <h2 class="sd-section__title">${d.apply.title}</h2>
-                ${ui.HelpCardExpert(d.apply.help)}
-                <div class="sd-links">${d.apply.links.map((l) => ui.ListRow({ ...l, trailing: "external" }))}</div>
-                ${ui.HowItWorks({ ...d.steps, open: v.steps === "open" })}
-              </section>
-            </div>
-          </main>
-        </div>
-        <div class="floating floating--sd">
-          ${ui.AiMitraFab({ nudge: v.nudge === "on" ? d.aiNudge : null })}
-        </div>
-        ${ui.SubsidyFoot(d.foot)}
-        ${ui.BenefitSheetLayer()}`;
-      this.wire(page, d, v);
-    },
-    wire(page, d, v) {
-      const sc = page.querySelector(".scroller");
-      const motionOff = OPL.fx.motionOff();
-      OPL.fx.statusOnScroll(page);
-      OPL.fx.nudge(page, this.timers);
-      let lastTrigger = null;
-      const sheets = OPL.fx.sheets(page, { onClose: () => {
-        if (OPL.state.get().sheet) OPL.state.set({ sheet: null }, { silent: true });   // a preset-opened sheet stays closed
-        if (lastTrigger && lastTrigger.isConnected) lastTrigger.focus({ preventScroll: true });
-      } });
-      const sheetEl = page.querySelector("[data-bsheet]");
-      const openBenefit = (id, { activity = 0, instant = false } = {}) => {
-        const s = d.sheets[id];
-        if (!s) return;
-        sheetEl.innerHTML = ui.BenefitSheetBody({ s, activity, actions: d.sheetActions }).toString();
-        sheetEl.setAttribute("aria-label", s.title);
-        sheetEl.dataset.benefit = id;
-        const body = sheetEl.querySelector(".bsheet__body");
-        body.scrollTop = 0;
-        sheetEl.classList.remove("is-presenting"); void sheetEl.offsetWidth;
-        if (!motionOff && !instant) sheetEl.classList.add("is-presenting");
-        sheets.open("benefit", { instant });
-        this.timers.push(setTimeout(() => sheetEl.querySelector(".bsheet__close")?.focus({ preventScroll: true }), instant || motionOff ? 0 : 440));
-      };
-      page.addEventListener("click", (e) => {
-        const t = e.target.closest("[data-benefit]");
-        if (t && !t.closest("[data-bsheet]")) { lastTrigger = t; return openBenefit(t.dataset.benefit); }
-        const opt = e.target.closest(".aswitch__opt");
-        if (opt) {
-          const i = +opt.dataset.activity;
-          const sw = opt.parentElement;
-          if (+sw.style.getPropertyValue("--sel") === i) return;
-          const s = d.sheets[sheetEl.dataset.benefit];
-          const act = s.rates.activities[i];
-          sw.style.setProperty("--sel", i);
-          sw.querySelectorAll(".aswitch__opt").forEach((o, k) => { o.classList.toggle("is-on", k === i); o.setAttribute("aria-selected", k === i); });
-          const list = sheetEl.querySelector("[data-rate-list]");
-          const note = sheetEl.querySelector("[data-act-note]");
-          const swap = () => {
-            list.innerHTML = ui.RateRows({ rows: act.rows }).toString();
-            note.textContent = act.note;
-            list.dataset.dir = i > 0 ? "next" : "prev";
-            list.classList.remove("is-swapping"); note.classList.remove("is-swapping");
-            void list.offsetWidth;
-            if (!motionOff) { list.classList.add("is-swapping"); note.classList.add("is-swapping"); }
-          };
-          if (motionOff) return swap();
-          list.classList.add("is-leaving"); note.classList.add("is-leaving");
-          this.timers.push(setTimeout(() => { list.classList.remove("is-leaving"); note.classList.remove("is-leaving"); swap(); }, 130));
-        }
-      });
-      if (v && v.sheet && v.sheet !== "none") {
-        const [id, act] = v.sheet.split("-");
-        openBenefit(id, { activity: act ? +act - 1 : 0, instant: true });
-      }
-      const foot = page.querySelector(".sfoot");
-      const reveal = (panel) => {
-        this.timers.push(setTimeout(() => {
-          const view = sc.getBoundingClientRect();
-          const box = panel.getBoundingClientRect();
-          const bottomLimit = view.bottom - foot.offsetHeight - 16;
-          const head = panel.parentElement.getBoundingClientRect().top;
-          const over = Math.min(box.bottom - bottomLimit, head - view.top - 72);
-          if (over > 24) sc.scrollBy({ top: over, behavior: motionOff ? "auto" : "smooth" });
-        }, motionOff ? 0 : 380));
-      };
-      page.addEventListener("click", (e) => {
-        const head = e.target.closest(".disclosure__head, .how__head");
-        if (!head) return;
-        const sec = head.closest("[data-disclosure]");
-        const panel = sec.querySelector(".disclosure__panel");
-        const open = !sec.classList.contains("is-open");
-        sec.classList.toggle("is-open", open);
-        head.setAttribute("aria-expanded", open);
-        panel.toggleAttribute("inert", !open);
-        const badge = sec.querySelector(".count-badge");
-        if (badge && !motionOff) { badge.classList.remove("is-popping"); void badge.offsetWidth; badge.classList.add("is-popping"); }
-        if (open) {
-          if (sec.classList.contains("how")) { sec.classList.remove("is-playing"); void sec.offsetWidth; if (!motionOff) sec.classList.add("is-playing"); }
-          reveal(panel);
-        }
-      });
-      page.addEventListener("click", async (e) => {
-        const btn = e.target.closest("[data-share-steps]");
-        if (!btn) return;
-        const s = d.steps;
-        const text = `${d.title} — ${s.title}\n` + s.items.map((it, i) => `${i + 1}. ${it.title}${it.body ? ` — ${it.body}` : ""}${it.deadline ? ` (${it.deadline})` : ""}${it.inset ? "\n   " + it.inset.title + ": " + it.inset.rows.map((r) => `${r.value} (${r.label.charAt(0).toLowerCase() + r.label.slice(1)})`).join("; ") : ""}`).join("\n");
-        try {
-          if (navigator.share) { await navigator.share({ title: d.title, text }); return; }
-          await navigator.clipboard.writeText(text);
-        } catch (_) { return; }
-        const label = btn.querySelector(".how__share-label");
-        btn.classList.add("is-done");
-        label.textContent = "Steps copied";
-        this.timers.push(setTimeout(() => { btn.classList.remove("is-done"); label.textContent = s.share; }, 2200));
-      });
-      OPL.fx.enter(page, [
-        page.querySelector(".sd-hero__copy"),
-        page.querySelector(".sd-hero__cta"),
-        page.querySelector(".period"),
-        page.querySelector(".sd-benefits .sd-section__title"),
-        ...page.querySelectorAll(".benefit"),
-        page.querySelector(".disclosure"),
-      ]);
-      if (!motionOff) page.querySelector(".sd-illus").classList.add("is-landing");
-      countUpDecimal(page.querySelector(".sd-hero__amount"), {
-        to: d.hero.value, prefix: d.hero.prefix, suffix: d.hero.suffix, duration: 900, delay: 420, timers: this.timers,
-      });
-      OPL.fx.playInView(page, ".period, .xhelp, .how.is-open");
-    },
-  };
+const { html, ui } = OPL;
+OPL.screens = OPL.screens || {};
+const countUpDecimal = (el, { to, prefix, suffix, duration = 900, delay = 0, timers }) => {
+const set = (v) => { el.textContent = prefix + v.toFixed(1) + suffix; };
+if (OPL.fx.motionOff()) return set(to);
+set(0);
+OPL.afterReveal(() => timers.push(setTimeout(() => {
+const t0 = Date.now();
+const step = () => {
+const k = Math.min(1, (Date.now() - t0) / duration);
+set(to * (1 - Math.pow(1 - k, 3)));
+if (k < 1) timers.push(setTimeout(step, 16));
+};
+step();
+}, delay)));
+};
+OPL.screens["subsidy-detail"] = {
+title: "Subsidy details",
+figma: { collapsed: "416:44853", expanded: "416:45617" },
+timers: [],
+leave() { this.timers.forEach((t) => { clearTimeout(t); clearInterval(t); }); this.timers = []; },
+render(page) {
+this.leave();
+const d = OPL.data.subsidyDetail;
+const v = OPL.variantValues("subsidy-detail");
+const b = d.benefits;
+page.innerHTML = html`
+${ui.StatusBar()}
+<div class="scroller">
+<main class="sd">
+<section class="sd-hero">
+<div class="sd-hero__bg"><img class="sd-hero__texture" src="${OPL.simg("satin-texture.jpg")}" alt=""></div>
+<header class="sd-head">
+<div class="sd-head__lead">
+<button class="sd-head__btn sd-head__back" aria-label="Back" data-press data-back>${OPL.sicon("alt-arrow-left-19", 19.2)}</button>
+<h1 class="sd-head__title">${d.title}</h1>
+</div>
+<button class="sd-head__btn" aria-label="Support" data-press data-goto="support">${OPL.sicon("headphones-16", 16)}</button>
+</header>
+<div class="sd-hero__body">
+<div class="sd-illus" aria-hidden="true">
+<img class="sd-illus__l sd-illus__base" src="${OPL.simg("hero-plinth-base.svg")}" alt="">
+<img class="sd-illus__l sd-illus__top" src="${OPL.simg("hero-plinth-top.svg")}" alt="">
+<img class="sd-illus__l sd-illus__notes" src="${OPL.simg("hero-notes.svg")}" alt="">
+<img class="sd-illus__l sd-illus__coins-a" src="${OPL.simg("hero-coins-a.svg")}" alt="">
+<img class="sd-illus__l sd-illus__coins-b" src="${OPL.simg("hero-coins-b.svg")}" alt="">
+</div>
+<div class="sd-hero__copy">
+<p class="sd-hero__eyebrow"><span>${d.hero.eyebrow}</span>
+<button class="sd-hero__info" aria-label="How we estimate this" data-press data-goto="estimate-info">${OPL.sicon("info-circle-ink", 16)}</button></p>
+<p class="sd-hero__amount">${d.hero.prefix}${d.hero.value}${d.hero.suffix}</p>
+</div>
+<div class="sd-hero__cta">${ui.Button({ label: d.hero.cta.label, trailing: "chevron-right-white", block: true, strong: true, goto: d.hero.cta.goto })}</div>
+</div>
+</section>
+<div class="sd-body">
+${ui.PolicyPeriod({ period: d.period })}
+<section class="sd-section sd-benefits">
+<h2 class="sd-section__title">${b.title} ${ui.CountBadge({ n: b.count })}</h2>
+<div class="sd-benefits__grid">${b.tiles.map((t) => ui.BenefitTile(t))}</div>
+${ui.Disclosure({
+id: "others", label: b.others.label, count: b.others.count, open: v.others === "open",
+body: OPL.raw(b.others.rows.map((r, i) => ui.ListRow({ ...r, attrs: `data-benefit="${r.id}" aria-haspopup="dialog" style="--i:${i}"` })).join("")),
+})}
+</section>
+<section class="sd-section sd-apply">
+<h2 class="sd-section__title">${d.apply.title}</h2>
+${ui.HelpCardExpert(d.apply.help)}
+<div class="sd-links">${d.apply.links.map((l) => ui.ListRow({ ...l, trailing: "external" }))}</div>
+${ui.HowItWorks({ ...d.steps, open: v.steps === "open" })}
+</section>
+</div>
+</main>
+</div>
+<div class="floating floating--sd">
+${ui.AiMitraFab({ nudge: v.nudge === "on" ? d.aiNudge : null })}
+</div>
+${ui.SubsidyFoot(d.foot)}
+${ui.BenefitSheetLayer()}`;
+this.wire(page, d, v);
+},
+wire(page, d, v) {
+const sc = page.querySelector(".scroller");
+const motionOff = OPL.fx.motionOff();
+OPL.fx.statusOnScroll(page);
+OPL.fx.nudge(page, this.timers);
+let lastTrigger = null;
+const sheets = OPL.fx.sheets(page, { onClose: () => {
+if (OPL.state.get().sheet) OPL.state.set({ sheet: null }, { silent: true });   // a preset-opened sheet stays closed
+if (lastTrigger && lastTrigger.isConnected) lastTrigger.focus({ preventScroll: true });
+} });
+const sheetEl = page.querySelector("[data-bsheet]");
+const openBenefit = (id, { activity = 0, instant = false } = {}) => {
+const s = d.sheets[id];
+if (!s) return;
+sheetEl.innerHTML = ui.BenefitSheetBody({ s, activity, actions: d.sheetActions }).toString();
+sheetEl.setAttribute("aria-label", s.title);
+sheetEl.dataset.benefit = id;
+const body = sheetEl.querySelector(".bsheet__body");
+body.scrollTop = 0;
+sheetEl.classList.remove("is-presenting"); void sheetEl.offsetWidth;
+if (!motionOff && !instant) sheetEl.classList.add("is-presenting");
+sheets.open("benefit", { instant });
+this.timers.push(setTimeout(() => sheetEl.querySelector(".bsheet__close")?.focus({ preventScroll: true }), instant || motionOff ? 0 : 440));
+};
+page.addEventListener("click", (e) => {
+const t = e.target.closest("[data-benefit]");
+if (t && !t.closest("[data-bsheet]")) { lastTrigger = t; return openBenefit(t.dataset.benefit); }
+const opt = e.target.closest(".aswitch__opt");
+if (opt) {
+const i = +opt.dataset.activity;
+const sw = opt.parentElement;
+if (+sw.style.getPropertyValue("--sel") === i) return;
+const s = d.sheets[sheetEl.dataset.benefit];
+const act = s.rates.activities[i];
+sw.style.setProperty("--sel", i);
+sw.querySelectorAll(".aswitch__opt").forEach((o, k) => { o.classList.toggle("is-on", k === i); o.setAttribute("aria-selected", k === i); });
+const list = sheetEl.querySelector("[data-rate-list]");
+const note = sheetEl.querySelector("[data-act-note]");
+const swap = () => {
+list.innerHTML = ui.RateRows({ rows: act.rows }).toString();
+note.textContent = act.note;
+list.dataset.dir = i > 0 ? "next" : "prev";
+list.classList.remove("is-swapping"); note.classList.remove("is-swapping");
+void list.offsetWidth;
+if (!motionOff) { list.classList.add("is-swapping"); note.classList.add("is-swapping"); }
+};
+if (motionOff) return swap();
+list.classList.add("is-leaving"); note.classList.add("is-leaving");
+this.timers.push(setTimeout(() => { list.classList.remove("is-leaving"); note.classList.remove("is-leaving"); swap(); }, 130));
+}
+});
+if (v && v.sheet && v.sheet !== "none") {
+const [id, act] = v.sheet.split("-");
+openBenefit(id, { activity: act ? +act - 1 : 0, instant: true });
+}
+const foot = page.querySelector(".sfoot");
+const reveal = (panel) => {
+this.timers.push(setTimeout(() => {
+const view = sc.getBoundingClientRect();
+const box = panel.getBoundingClientRect();
+const bottomLimit = view.bottom - foot.offsetHeight - 16;
+const head = panel.parentElement.getBoundingClientRect().top;
+const over = Math.min(box.bottom - bottomLimit, head - view.top - 72);
+if (over > 24) sc.scrollBy({ top: over, behavior: motionOff ? "auto" : "smooth" });
+}, motionOff ? 0 : 380));
+};
+page.addEventListener("click", (e) => {
+const head = e.target.closest(".disclosure__head, .how__head");
+if (!head) return;
+const sec = head.closest("[data-disclosure]");
+const panel = sec.querySelector(".disclosure__panel");
+const open = !sec.classList.contains("is-open");
+sec.classList.toggle("is-open", open);
+head.setAttribute("aria-expanded", open);
+panel.toggleAttribute("inert", !open);
+const badge = sec.querySelector(".count-badge");
+if (badge && !motionOff) { badge.classList.remove("is-popping"); void badge.offsetWidth; badge.classList.add("is-popping"); }
+if (open) {
+if (sec.classList.contains("how")) { sec.classList.remove("is-playing"); void sec.offsetWidth; if (!motionOff) sec.classList.add("is-playing"); }
+reveal(panel);
+}
+});
+page.addEventListener("click", async (e) => {
+const btn = e.target.closest("[data-share-steps]");
+if (!btn) return;
+const s = d.steps;
+const text = `${d.title} — ${s.title}\n` + s.items.map((it, i) => `${i + 1}. ${it.title}${it.body ? ` — ${it.body}` : ""}${it.deadline ? ` (${it.deadline})` : ""}${it.inset ? "\n   " + it.inset.title + ": " + it.inset.rows.map((r) => `${r.value} (${r.label.charAt(0).toLowerCase() + r.label.slice(1)})`).join("; ") : ""}`).join("\n");
+try {
+if (navigator.share) { await navigator.share({ title: d.title, text }); return; }
+await navigator.clipboard.writeText(text);
+} catch (_) { return; }
+const label = btn.querySelector(".how__share-label");
+btn.classList.add("is-done");
+label.textContent = "Steps copied";
+this.timers.push(setTimeout(() => { btn.classList.remove("is-done"); label.textContent = s.share; }, 2200));
+});
+OPL.fx.enter(page, [
+page.querySelector(".sd-hero__copy"),
+page.querySelector(".sd-hero__cta"),
+page.querySelector(".period"),
+page.querySelector(".sd-benefits .sd-section__title"),
+...page.querySelectorAll(".benefit"),
+page.querySelector(".disclosure"),
+]);
+if (!motionOff) page.querySelector(".sd-illus").classList.add("is-landing");
+countUpDecimal(page.querySelector(".sd-hero__amount"), {
+to: d.hero.value, prefix: d.hero.prefix, suffix: d.hero.suffix, duration: 900, delay: 420, timers: this.timers,
+});
+OPL.fx.playInView(page, ".period, .xhelp, .how.is-open");
+},
+};
+})();
+
+;
+
+/* ==== js/screens/subsidy-estimate.js ==== */
+
+(function () {
+const { html, ui, cx } = OPL;
+OPL.screens = OPL.screens || {};
+const D = () => OPL.data.subsidyEstimate;
+const sicon = (n, s, c) => OPL.sicon(n, s, c);
+const simg = (n) => OPL.simg(n);
+const S = (OPL.estimate = OPL.estimate || { list: null, values: {}, open: null });
+const ensure = () => {
+if (S.list) return;
+S.list = [...D().start];
+D().benefits.forEach((b) => { S.values[b.id] = Object.fromEntries(b.fields.map((f) => [f.key, f.value || ""])); });
+S.open = new Set([S.list[0]]);
+};
+const parse = (b) => {
+const d = D(), raw = S.values[b.id], out = {}; let ok = true;
+b.fields.forEach((f) => {
+const v = f.kind === "money" ? d.parseMoney(raw[f.key], f.unit) : d.parseNum(raw[f.key]);
+out[f.key] = v > 0 ? v : 0;
+if (!(v > 0) && !f.optional) ok = false;
+});
+return { ok, v: out };
+};
+const amounts = () => {
+const all = {}; S.list.forEach((id) => { all[id] = parse(D().byId[id]).v; });
+return Object.fromEntries(S.list.map((id) => {
+const b = D().byId[id], p = parse(b);
+return [id, p.ok ? Math.max(0, b.calc(p.v, all)) : null];
+}));
+};
+const countMoney = (el, from, to, { dur = 700, tight = false, prefix = "", timers, onDone } = {}) => {
+const f = D().fmt;
+if (OPL.fx.motionOff() || dur <= 0) { el.textContent = prefix + f(to, { tight }); return onDone && onDone(); }
+const t0 = Date.now();
+const step = () => {
+const k = Math.min(1, (Date.now() - t0) / dur);
+el.textContent = prefix + f(from + (to - from) * (1 - Math.pow(1 - k, 3)), { tight });
+if (k < 1) timers.push(setTimeout(step, 16)); else onDone && onDone();
+};
+step();
+};
+const field = (b, f, i) => html`
+<label class="${cx("efield", i === 0 && "efield--first")}">
+<span class="efield__label">${f.label}</span>
+<input class="efield__box" type="text" inputmode="${f.kind === "pct" ? "decimal" : f.kind === "money" ? "text" : "numeric"}"
+autocomplete="off" spellcheck="false" data-ben="${b.id}" data-key="${f.key}" data-kind="${f.kind}" data-unit="${f.unit || ""}"
+value="${S.values[b.id][f.key]}" placeholder="${f.placeholder || ""}">
+</label>`;
+const card = (b, amt, open, entering = false) => html`
+<section class="${cx("ecard", open && "is-open", entering && "is-entering")}" data-card="${b.id}">
+<button class="ecard__head" data-press aria-expanded="${open}" aria-controls="ec-${b.id}">
+<span class="ecard__name">${sicon(b.icon, 24, "ecard__icon")}<span>${b.title}</span></span>
+<span class="ecard__right"><span class="ecard__amt" data-amt="${b.id}">${amt == null ? "—" : D().fmt(amt, { tight: true })}</span>${sicon("est-chev", 19.2, "ecard__chev")}</span>
+</button>
+<div class="ecard__panel" id="ec-${b.id}" ${open ? "" : OPL.raw("inert")}><div class="ecard__inner">
+<div class="ecard__fields">${b.fields.map((f, i) => field(b, f, i))}</div>
+<div class="ecard__remove-row"><button class="ecard__remove" data-press data-remove="${b.id}">${D().remove}</button></div>
+</div></div>
+</section>`;
+const chips = (expanded) => {
+const rest = D().benefits.filter((b) => !S.list.includes(b.id));
+if (!rest.length) return "";
+const shown = expanded || rest.length <= 3 ? rest : rest.slice(0, 2);
+return html`
+<div class="est-more" data-more>
+<p class="est-more__label">${D().addMore}</p>
+<div class="est-more__chips">
+${shown.map((b) => html`<button class="est-chip" data-press data-add="${b.id}">+ ${b.chip}</button>`)}
+${shown.length < rest.length ? html`<button class="est-chip" data-press data-more-all>+ ${rest.length - shown.length} more</button>` : ""}
+</div>
+</div>`;
+};
+OPL.screens["subsidy-estimate"] = {
+title: "Calculate estimate",
+figma: { one: "416:77107", all: "416:76872" },
+timers: [],
+leave() { this.timers.forEach(clearTimeout); this.timers = []; },
+render(page) {
+this.leave();
+ensure();
+const d = D(), v = OPL.variantValues("subsidy-estimate");
+if (v.open !== S.preset) {                         // a panel preset was picked: apply its open state
+S.open = new Set(v.open === "all" ? S.list : [S.list[0]]);
+S.preset = v.open;
+}
+const amt = amounts();
+page.innerHTML = html`
+${ui.StatusBar()}
+<header class="est-head">
+<h1 class="est-head__title">${d.title}</h1>
+<button class="est-close" aria-label="Close" data-press data-back>${sicon("sheet-x", 16)}</button>
+</header>
+<div class="scroller est-scroller">
+<main class="est-body">
+<div class="est-list" data-list>${S.list.map((id) => card(d.byId[id], amt[id], S.open.has(id)))}</div>
+<div data-chips>${chips(false)}</div>
+</main>
+</div>
+<footer class="est-actions">
+<button class="btn btn--lg btn--filled btn--strong btn--block est-go" data-press data-go>
+<span class="btn__label">${d.cta.label}</span>${OPL.icon("chevron-right-white", 16)}
+</button>
+<button class="btn btn--md btn--ghost btn--block" data-press data-goto="${d.expert.goto}">${sicon("headset-primary-16", 16)}<span class="btn__label">${d.expert.label}</span></button>
+</footer>`;
+this.wire(page);
+},
+wire(page) {
+const d = D(), motionOff = OPL.fx.motionOff();
+const sc = page.querySelector(".scroller");
+const list = page.querySelector("[data-list]");
+OPL.fx.statusOnScroll(page);
+const shown = {};                                   // last figure painted per card
+Object.entries(amounts()).forEach(([k, a]) => (shown[k] = a));
+const repaint = () => {
+const amt = amounts();
+Object.entries(amt).forEach(([id, a]) => {
+const el = page.querySelector(`[data-amt="${id}"]`);
+if (!el || a === shown[id]) return;
+const from = shown[id] || 0; shown[id] = a;
+if (a == null) { el.textContent = "—"; return; }
+el.classList.remove("is-ticking"); void el.offsetWidth; el.classList.add("is-ticking");
+countMoney(el, from, a, { dur: 420, tight: true, timers: this.timers });
+});
+page.querySelector("[data-go]").disabled = !S.list.length;
+};
+const toggle = (sec, open) => {
+const id = sec.dataset.card;
+sec.classList.toggle("is-open", open);
+sec.querySelector(".ecard__head").setAttribute("aria-expanded", open);
+sec.querySelector(".ecard__panel").toggleAttribute("inert", !open);
+open ? S.open.add(id) : S.open.delete(id);
+};
+const reveal = (el) => this.timers.push(setTimeout(() => {
+const v = sc.getBoundingClientRect(), b = el.getBoundingClientRect();
+const footTop = page.querySelector(".est-actions").getBoundingClientRect().top;
+const over = b.bottom - (footTop - 16);
+if (over > 0) sc.scrollBy({ top: Math.min(over, b.top - v.top - 12), behavior: motionOff ? "auto" : "smooth" });
+}, motionOff ? 0 : 340));
+const repaintChips = (expanded = false) => { page.querySelector("[data-chips]").innerHTML = chips(expanded).toString(); };
+page.addEventListener("click", (e) => {
+const head = e.target.closest(".ecard__head");
+if (head) { const sec = head.closest(".ecard"); const open = !sec.classList.contains("is-open"); toggle(sec, open); if (open) reveal(sec); return; }
+const add = e.target.closest("[data-add]");
+if (add) {
+const id = add.dataset.add;
+if (S.list.includes(id)) return;
+S.list.push(id); S.open.add(id);
+add.classList.add("is-taken");
+const amt = amounts();
+const go = () => {
+list.insertAdjacentHTML("beforeend", card(d.byId[id], amt[id], true, !motionOff).toString());
+shown[id] = amt[id];
+repaintChips();
+const sec = list.lastElementChild;
+reveal(sec);
+this.timers.push(setTimeout(() => { sec.classList.remove("is-entering"); sec.querySelector(".efield__box")?.focus({ preventScroll: true }); }, motionOff ? 0 : 420));
+repaint();
+};
+motionOff ? go() : this.timers.push(setTimeout(go, 160));
+return;
+}
+if (e.target.closest("[data-more-all]")) return repaintChips(true);
+const rm = e.target.closest("[data-remove]");
+if (rm) {
+const id = rm.dataset.remove, sec = rm.closest(".ecard");
+S.list = S.list.filter((x) => x !== id); S.open.delete(id); delete shown[id];
+const done = () => { sec.remove(); repaintChips(); repaint(); };
+if (motionOff) return done();
+sec.style.height = sec.offsetHeight + "px"; void sec.offsetHeight;
+sec.classList.add("is-leaving");
+this.timers.push(setTimeout(done, 300));
+return;
+}
+if (e.target.closest("[data-go]")) {
+for (const id of S.list) {
+const b = d.byId[id];
+if (parse(b).ok) continue;
+const sec = list.querySelector(`[data-card="${id}"]`);
+if (!sec.classList.contains("is-open")) toggle(sec, true);
+const f = b.fields.find((f) => !f.optional && !((f.kind === "money" ? d.parseMoney(S.values[id][f.key], f.unit) : d.parseNum(S.values[id][f.key])) > 0));
+const input = sec.querySelector(`[data-key="${f.key}"]`);
+input.classList.remove("is-error"); void input.offsetWidth; input.classList.add("is-error");
+reveal(sec);
+this.timers.push(setTimeout(() => input.focus({ preventScroll: true }), motionOff ? 0 : 360));
+if (navigator.vibrate) navigator.vibrate([12, 40, 12]);
+return;
+}
+const btn = e.target.closest("[data-go]");
+if (btn.classList.contains("is-loading")) return;
+btn.classList.add("is-loading");
+btn.querySelector(".btn__label").textContent = d.cta.busy;
+this.timers.push(setTimeout(() => OPL.go("subsidy-estimate-result", {}, { replace: true }), motionOff ? 0 : 900));
+}
+});
+page.addEventListener("input", (e) => {
+const inp = e.target.closest(".efield__box");
+if (!inp) return;
+inp.classList.remove("is-error");
+S.values[inp.dataset.ben][inp.dataset.key] = inp.value;
+repaint();
+});
+page.addEventListener("focusout", (e) => {
+const inp = e.target.closest(".efield__box");
+if (!inp || !inp.value) return;
+const k = inp.dataset.kind;
+const tidy = k === "money" ? d.tidyMoney(inp.value, inp.dataset.unit) : k === "count" ? d.tidyCount(inp.value) : inp.value;
+if (tidy !== inp.value) { inp.value = tidy; S.values[inp.dataset.ben][inp.dataset.key] = tidy; }
+});
+OPL.fx.enter(page, [...page.querySelectorAll(".ecard"), page.querySelector(".est-more")]);
+},
+};
+const money = (n) => {
+const bundle = (k) => {
+if (k === 0) return `<div class="er-money__stack" data-k="0" style="--k:0;inset:0">
+<img class="er-l" style="inset:37.74% 15.59% 28.08% 15.89%" src="${simg("estimate/m-group.svg")}" alt="">
+<img class="er-l" style="inset:40.85% 36.64% 31.69% 39.58%" src="${simg("estimate/m-v1.svg")}" alt="">
+<img class="er-l" style="inset:42.27% 44.83% 31.69% 39.58%" src="${simg("estimate/m-v2.svg")}" alt="">
+<img class="er-l" style="inset:51.9% 36.64% 31.69% 55.17%" src="${simg("estimate/m-v3.svg")}" alt="">
+<img class="er-l er-l--mul" style="inset:42.07% 43.25% 31.69% 39.58%" src="${simg("estimate/m-v4.svg")}" alt="">
+<img class="er-l er-l--mul" style="inset:40.85% 36.64% 32.76% 46.68%" src="${simg("estimate/m-v5.svg")}" alt=""></div>`;
+if (k === 1) return `<img class="er-l er-money__stack" data-k="1" style="--k:1;inset:21.94% 23.54% 43.89% 7.93%" src="${simg("estimate/m-group1.svg")}" alt="">`;
+const up = (k - 2) * 13, dx = k === 2 ? 0 : k % 2 ? -5 : 4;      // extra bundles sit on the top one
+return `<img class="er-l er-money__stack" data-k="${k}" style="--k:${k};inset:9.88% 13.87% 55.94% 17.6%;translate:${dx}px ${-up}px" src="${simg("estimate/m-group2.svg")}" alt="">`;
+};
+return OPL.raw(`<div class="er-money" aria-hidden="true">
+<div class="er-money__plinth">
+<img class="er-l" style="left:0;top:69.13px;width:145px;height:41.266px" src="${simg("estimate/m-plinth-base.svg")}" alt="">
+<img class="er-l" style="left:5.12px;top:67.65px;width:134.766px;height:28.549px" src="${simg("estimate/m-union.svg")}" alt="">
+<img class="er-l" style="left:5.12px;top:57.85px;width:134.766px;height:28.549px" src="${simg("estimate/m-ellipse.svg")}" alt="">
+</div>
+${Array.from({ length: Math.min(n, 8) }, (_, k) => bundle(k)).join("")}
+</div>`);
+};
+const loadCelebrate = () => OPL.celebrate ? Promise.resolve() : (OPL._celebrateP = OPL._celebrateP || new Promise((res) => {
+const s = document.createElement("script");
+s.src = simg("estimate/celebrate.js"); s.onload = res; s.onerror = res;
+document.head.appendChild(s);
+}));
+OPL.screens["subsidy-estimate-result"] = {
+title: "Estimate result",
+figma: { result: "416:77363" },
+timers: [],
+leave() { this.timers.forEach(clearTimeout); this.timers = []; },
+render(page) {
+this.leave();
+ensure();
+const d = D(), r = d.result;
+if (!S.list.some((id) => amounts()[id] > 0) || (S.list.includes("power") && amounts().power == null)) {
+Object.entries(d.demo).forEach(([id, vals]) => Object.assign(S.values[id], vals));
+}
+const amt = amounts();
+const rows = d.benefits.filter((b) => S.list.includes(b.id) && amt[b.id] > 0);   // bar order = catalogue order
+const total = rows.reduce((s, b) => s + amt[b.id], 0);
+this.rows = rows.map((b) => ({ id: b.id, amount: amt[b.id] }));
+this.total = total;
+page.innerHTML = html`
+${ui.StatusBar()}
+<div class="er">
+<div class="er-sheet">
+<div class="er-bg" aria-hidden="true"><img src="${simg("estimate/satin-blue.jpg")}" alt=""></div>
+<img class="er-rays" src="${simg("estimate/rays.png")}" alt="" aria-hidden="true">
+<span class="er-confetti-wrap" hidden></span>
+<header class="er-head">
+<h1 class="er-head__title">${d.title}</h1>
+<button class="est-close" aria-label="Close" data-press data-back>${sicon("sheet-x", 16)}</button>
+</header>
+<div class="er-col">
+${money(rows.length)}
+<div class="er-text">
+<div class="er-copy">
+<div class="er-copy__lead"><p class="er-title">${r.title}</p><p class="er-sub">${r.sub}</p></div>
+<p class="er-total" aria-live="polite"><span>${r.lead} </span><span data-total>${d.fmt(total)}</span></p>
+</div>
+<section class="er-card">
+<div class="er-bar" role="img" aria-label="${rows.length} of ${d.benefits.length} benefits added">
+${d.benefits.map((b, i) => {
+const on = rows.find((x) => x.id === b.id);
+return OPL.raw(`${i ? '<span class="er-bar__gap"></span>' : ""}<span class="${on ? "er-seg is-on" : "er-seg"}" ${on ? `style="--c:${b.color};--k:${rows.indexOf(on)}"` : ""}></span>`);
+})}
+</div>
+<div class="er-caption"><p class="er-caption__count">${rows.length} of ${d.benefits.length} benefits added</p>
+<button class="er-caption__more" data-press data-add-more>${r.addMore}</button></div>
+<div class="er-break">
+${rows.map((b, k) => html`
+<div class="er-row" style="--k:${k}">
+<span class="er-row__key" style="background:${b.color}"></span>
+<p class="er-row__label">${b.short}</p>
+<p class="er-row__amt" data-row-amt="${b.id}">${d.fmt(amt[b.id])}</p>
+</div>`)}
+</div>
+</section>
+</div>
+</div>
+<div class="er-note"><p>${r.note}</p></div>
+</div>
+<footer class="est-actions er-actions">
+<button class="btn btn--lg btn--filled btn--strong btn--block" data-press data-goto="${r.apply.goto}"><span class="btn__label">${r.apply.label}</span>${OPL.icon("chevron-right-white", 16)}</button>
+<button class="btn btn--md btn--ghost btn--block" data-press data-goto="${d.expert.goto}">${sicon("headset-primary-16", 16)}<span class="btn__label">${d.expert.label}</span></button>
+</footer>
+</div>`;
+this.wire(page);
+},
+wire(page) {
+const d = D(), motionOff = OPL.fx.motionOff();
+page.addEventListener("click", (e) => {
+if (e.target.closest("[data-add-more]")) OPL.go("subsidy-estimate", {}, { replace: true });
+});
+if (motionOff) return;
+loadCelebrate();
+const er = page.querySelector(".er");
+const totalEl = page.querySelector("[data-total]");
+const rows = this.rows;
+totalEl.textContent = d.fmt(0);
+page.querySelectorAll("[data-row-amt]").forEach((el) => (el.textContent = d.fmt(0)));
+OPL.afterReveal(() => this.timers.push(setTimeout(() => {
+const party = OPL.celebrate ? OPL.celebrate.run(page, this.timers) : null;
+if (!party) page.querySelector(".er-confetti-wrap").outerHTML = ui.Confetti().toString().replace('class="ms__confetti"', 'class="ms__confetti er-confetti"');
+er.classList.add("is-celebrating");
+const START = 1250, STEP = 560;
+let running = 0;
+rows.forEach((row, k) => this.timers.push(setTimeout(() => {
+const from = running; running += row.amount;
+if (party) party.land(k);
+countMoney(page.querySelector(`[data-row-amt="${row.id}"]`), 0, row.amount, { dur: 520, timers: this.timers });
+countMoney(totalEl, from, running, { dur: 520, timers: this.timers, onDone: k === rows.length - 1 ? () => {
+er.classList.add("is-built");
+if (party) party.finale(); else if (navigator.vibrate) navigator.vibrate(14);
+} : null });
+}, START + k * STEP)));
+}, 380)));
+},
+};
 })();
 
 ;
@@ -3273,185 +3753,185 @@ OPL.ui.SignedHeroSvg = '<svg class="mss" viewBox="0 0 390 176" width="390" heigh
 /* ==== js/app.js ==== */
 
 (function () {
-  const screenEl = document.getElementById("screen");
-  if (!screenEl) { OPL.markRevealed && OPL.markRevealed(); return; }   // library page: no router
-  const panelEl = document.getElementById("panel");
-  const wrap = document.querySelector(".device-wrap");
-  let currentPage = null;
-  let depth = 0;
-  const screenName = () => {
-    const st = OPL.state.get();
-    return OPL.screens[st.screen] ? st.screen : "home";
-  };
-  const hashFor = (patch) => {
-    const next = { ...OPL.state.get(), ...patch };
-    Object.keys(next).forEach((k) => (next[k] == null || (k === "screen" && next[k] === "home")) && delete next[k]);
-    return "#" + new URLSearchParams(next).toString();
-  };
-  OPL.go = (name, params = {}, { replace = false } = {}) => {
-    if (!OPL.screens[name]) return;
-    const next = hashFor({ screen: name, ...params });
-    if (next === location.hash || (name === screenName() && !Object.keys(params).length)) return;
-    if (replace) history.replaceState({ depth }, "", next);
-    else { history.pushState({ depth: depth + 1 }, "", next); depth++; }
-    render({ dir: "forward" });
-  };
-  OPL.back = () => {
-    if (depth > 0) return history.back();
-    history.replaceState({ depth: 0 }, "", hashFor({ screen: null }));
-    render({ dir: "back" });
-  };
-  function render({ dir } = {}) {
-    const st = OPL.state.get();
-    const name = screenName();
-    document.documentElement.dataset.hotspots = st.hotspots || "on";
-    document.documentElement.dataset.frame = st.frame || "on";
-    if (currentPage && currentPage.dataset.screen === name && !dir) {
-      const fresh = document.createElement("div");
-      fresh.className = currentPage.className.replace(/\b(is-push-in|is-pop-in|is-entering)\b/g, "").trim();
-      fresh.dataset.screen = name;
-      const scroll = currentPage.querySelector(".scroller")?.scrollTop || 0;
-      currentPage.replaceWith(fresh);
-      currentPage = fresh;
-      const s = OPL.screens[name];
-      if (s.leave) s.leave();
-      s.render(fresh);
-      const sc = fresh.querySelector(".scroller"); if (sc) sc.scrollTop = scroll;
-      return renderPanel(name);
-    }
-    const old = currentPage;
-    if (old) { const leaving = OPL.screens[old.dataset.screen]; if (leaving && leaving.leave) leaving.leave(); }
-    const page = document.createElement("div");
-    page.className = "page";
-    page.dataset.screen = name;
-    screenEl.appendChild(page);
-    OPL.screens[name].render(page);
-    currentPage = page;
-    if (old) {
-      if (dir && !OPL.fx.motionOff()) {
-        const [inC, outC] = dir === "back" ? ["is-pop-in", "is-pop-out"] : ["is-push-in", "is-push-out"];
-        page.classList.add(inC);
-        old.classList.add(outC);
-        old.style.pointerEvents = "none";
-        setTimeout(() => { old.remove(); page.classList.remove(inC); }, 440);
-      } else {
-        old.remove();
-      }
-    }
-    renderPanel(name);
-  }
-  function fit() {
-    if (window.innerWidth <= 500) { wrap.style.transform = ""; wrap.style.margin = ""; return; }
-    wrap.style.transform = ""; wrap.style.margin = "";
-    const h = wrap.offsetHeight, avail = window.innerHeight - 48;
-    const s = Math.min(1, avail / h);
-    wrap.style.transform = s < 1 ? `scale(${s})` : "";
-    wrap.style.margin = s < 1 ? `${(-h * (1 - s)) / 2}px 0` : "";
-  }
-  function seg(groupId, options, current) {
-    return `<div class="seg" data-group="${groupId}">${options
-      .map((o) => `<button data-value="${o.value}" class="${o.value === current ? "is-on" : ""}">${o.label}</button>`)
-      .join("")}</div>`;
-  }
-  function renderPanel(name) {
-    if (!panelEl) return;
-    const reg = OPL.variants[name];
-    const st = OPL.state.get();
-    const v = reg ? OPL.variantValues(name) : {};
-    const activePreset = reg?.presets.find((p) => Object.entries(p.set).every(([k, val]) => v[k] === val));
-    const figmaNode = activePreset?.figma || Object.values(OPL.screens[name].figma || {})[0];
-    panelEl.innerHTML = `
-      <div class="panel__head">
-        <span class="panel__title">${OPL.screens[name].title}</span>
-        <span class="panel__ver">v${OPL.VERSION}</span>
-      </div>
-      <p class="panel__sub">OPL Finance Hub · HTML prototype</p>
-      <div class="panel__group">
-        <div class="panel__label"><span>Screens</span></div>
-        <div class="presets">${Object.entries(OPL.screens)
-          .map(([id, s]) => `<button class="preset ${id === name ? "is-on" : ""}" data-screen="${id}">${s.title}<small>${Object.values(s.figma || {})[0] || ""}</small></button>`)
-          .join("")}</div>
-      </div>
-      ${reg && reg.presets.length > 1 ? `
-      <div class="panel__group">
-        <div class="panel__label"><span>Figma frames</span></div>
-        <div class="presets">${reg.presets
-          .map((p) => `<button class="preset ${p === activePreset ? "is-on" : ""}" data-preset="${p.id}">${p.label}<small>${p.figma}</small></button>`)
-          .join("")}</div>
-      </div>` : ""}
-      ${reg ? reg.groups
-        .filter((g) => g.options.length > 1 && !g.hidden)
-        .map((g) => `
-        <div class="panel__group">
-          <div class="panel__label"><span>${g.label}</span></div>
-          ${seg(g.id, g.options, v[g.id])}
-          ${g.note ? `<p class="panel__note">${g.note}</p>` : ""}
-        </div>`).join("") : ""}
-      <div class="panel__group">
-        <div class="panel__label"><span>Prototype</span></div>
-        <div style="display:grid;gap:8px">
-          ${seg("hotspots", [{ value: "on", label: "Hotspot hints" }, { value: "off", label: "No hints" }], st.hotspots || "on")}
-          ${seg("frame", [{ value: "on", label: "Device frame" }, { value: "off", label: "Bare screen" }], st.frame || "on")}
-          ${seg("motion", [{ value: "on", label: "Motion on" }, { value: "off", label: "Motion off" }], st.motion === "off" ? "off" : "on")}
-          <button class="panel__btn" data-replay>Replay entrance <span>↻</span></button>
-        </div>
-      </div>
-      <div class="panel__group panel__links">
-        ${figmaNode ? `<a href="${OPL.figmaLink(figmaNode)}" target="_blank" rel="noopener">Open frame in Figma <span>${figmaNode} ↗</span></a>` : ""}
-        <a href="library.html" target="_blank">Component library <span>↗</span></a>
-      </div>`;
-  }
-  panelEl?.addEventListener("click", (e) => {
-    const scr = e.target.closest("[data-screen]");
-    if (scr) {
-      const target = scr.dataset.screen;
-      if (target === screenName()) return;
-      if (target === "home") { history.replaceState({ depth: 0 }, "", hashFor({ screen: null })); depth = 0; return render({ dir: "back" }); }
-      return OPL.go(target);
-    }
-    const preset = e.target.closest("[data-preset]");
-    if (preset) {
-      const p = OPL.variants[OPL.current()].presets.find((x) => x.id === preset.dataset.preset);
-      return OPL.state.set(p.set);
-    }
-    const btn = e.target.closest(".seg button");
-    if (btn) {
-      const group = btn.parentElement.dataset.group;
-      return OPL.state.set({ [group]: group === "motion" && btn.dataset.value === "on" ? null : btn.dataset.value });
-    }
-    if (e.target.closest("[data-replay]")) {
-      currentPage?.querySelector(".scroller")?.scrollTo({ top: 0 });
-      return render();
-    }
-  });
-  OPL.current = () => screenName();
-  OPL.rerender = () => { render(); return currentPage; };
-  window.addEventListener("opl:state", () => render());
-  window.addEventListener("popstate", (e) => {
-    depth = (e.state && e.state.depth) || 0;
-    render({ dir: "back" });
-  });
-  window.addEventListener("resize", fit);
-  OPL.initInteractions(screenEl);
-  history.replaceState({ depth: 0 }, "", location.hash || "#");
-  const timeout = (ms) => new Promise((r) => setTimeout(r, ms));
-  const imagesReady = (root) => Promise.all([...root.querySelectorAll("img")]
-    .filter((img) => img.getBoundingClientRect().top < window.innerHeight + 200)
-    .map((img) => (img.complete ? null : new Promise((r) => { img.onload = img.onerror = r; }))));
-  function reveal() {
-    const boot = document.getElementById("boot");
-    currentPage && currentPage.classList.remove("is-booting");
-    document.documentElement.classList.remove("is-booting");
-    OPL.markRevealed();
-    if (boot) { boot.classList.add("is-leaving"); setTimeout(() => boot.remove(), 360); }
-  }
-  render();
-  currentPage && currentPage.classList.add("is-booting");
-  fit();
-  Promise.race([
-    Promise.all([document.fonts ? document.fonts.ready : null, imagesReady(screenEl)]),
-    timeout(3000),
-  ]).then(() => { fit(); reveal(); });
+const screenEl = document.getElementById("screen");
+if (!screenEl) { OPL.markRevealed && OPL.markRevealed(); return; }   // library page: no router
+const panelEl = document.getElementById("panel");
+const wrap = document.querySelector(".device-wrap");
+let currentPage = null;
+let depth = 0;
+const screenName = () => {
+const st = OPL.state.get();
+return OPL.screens[st.screen] ? st.screen : "home";
+};
+const hashFor = (patch) => {
+const next = { ...OPL.state.get(), ...patch };
+Object.keys(next).forEach((k) => (next[k] == null || (k === "screen" && next[k] === "home")) && delete next[k]);
+return "#" + new URLSearchParams(next).toString();
+};
+OPL.go = (name, params = {}, { replace = false } = {}) => {
+if (!OPL.screens[name]) return;
+const next = hashFor({ screen: name, ...params });
+if (next === location.hash || (name === screenName() && !Object.keys(params).length)) return;
+if (replace) history.replaceState({ depth }, "", next);
+else { history.pushState({ depth: depth + 1 }, "", next); depth++; }
+render({ dir: "forward" });
+};
+OPL.back = () => {
+if (depth > 0) return history.back();
+history.replaceState({ depth: 0 }, "", hashFor({ screen: null }));
+render({ dir: "back" });
+};
+function render({ dir } = {}) {
+const st = OPL.state.get();
+const name = screenName();
+document.documentElement.dataset.hotspots = st.hotspots || "on";
+document.documentElement.dataset.frame = st.frame || "on";
+if (currentPage && currentPage.dataset.screen === name && !dir) {
+const fresh = document.createElement("div");
+fresh.className = currentPage.className.replace(/\b(is-push-in|is-pop-in|is-entering)\b/g, "").trim();
+fresh.dataset.screen = name;
+const scroll = currentPage.querySelector(".scroller")?.scrollTop || 0;
+currentPage.replaceWith(fresh);
+currentPage = fresh;
+const s = OPL.screens[name];
+if (s.leave) s.leave();
+s.render(fresh);
+const sc = fresh.querySelector(".scroller"); if (sc) sc.scrollTop = scroll;
+return renderPanel(name);
+}
+const old = currentPage;
+if (old) { const leaving = OPL.screens[old.dataset.screen]; if (leaving && leaving.leave) leaving.leave(); }
+const page = document.createElement("div");
+page.className = "page";
+page.dataset.screen = name;
+screenEl.appendChild(page);
+OPL.screens[name].render(page);
+currentPage = page;
+if (old) {
+if (dir && !OPL.fx.motionOff()) {
+const [inC, outC] = dir === "back" ? ["is-pop-in", "is-pop-out"] : ["is-push-in", "is-push-out"];
+page.classList.add(inC);
+old.classList.add(outC);
+old.style.pointerEvents = "none";
+setTimeout(() => { old.remove(); page.classList.remove(inC); }, 440);
+} else {
+old.remove();
+}
+}
+renderPanel(name);
+}
+function fit() {
+if (window.innerWidth <= 500) { wrap.style.transform = ""; wrap.style.margin = ""; return; }
+wrap.style.transform = ""; wrap.style.margin = "";
+const h = wrap.offsetHeight, avail = window.innerHeight - 48;
+const s = Math.min(1, avail / h);
+wrap.style.transform = s < 1 ? `scale(${s})` : "";
+wrap.style.margin = s < 1 ? `${(-h * (1 - s)) / 2}px 0` : "";
+}
+function seg(groupId, options, current) {
+return `<div class="seg" data-group="${groupId}">${options
+.map((o) => `<button data-value="${o.value}" class="${o.value === current ? "is-on" : ""}">${o.label}</button>`)
+.join("")}</div>`;
+}
+function renderPanel(name) {
+if (!panelEl) return;
+const reg = OPL.variants[name];
+const st = OPL.state.get();
+const v = reg ? OPL.variantValues(name) : {};
+const activePreset = reg?.presets.find((p) => Object.entries(p.set).every(([k, val]) => v[k] === val));
+const figmaNode = activePreset?.figma || Object.values(OPL.screens[name].figma || {})[0];
+panelEl.innerHTML = `
+<div class="panel__head">
+<span class="panel__title">${OPL.screens[name].title}</span>
+<span class="panel__ver">v${OPL.VERSION}</span>
+</div>
+<p class="panel__sub">OPL Finance Hub · HTML prototype</p>
+<div class="panel__group">
+<div class="panel__label"><span>Screens</span></div>
+<div class="presets">${Object.entries(OPL.screens)
+.map(([id, s]) => `<button class="preset ${id === name ? "is-on" : ""}" data-screen="${id}">${s.title}<small>${Object.values(s.figma || {})[0] || ""}</small></button>`)
+.join("")}</div>
+</div>
+${reg && reg.presets.length > 1 ? `
+<div class="panel__group">
+<div class="panel__label"><span>Figma frames</span></div>
+<div class="presets">${reg.presets
+.map((p) => `<button class="preset ${p === activePreset ? "is-on" : ""}" data-preset="${p.id}">${p.label}<small>${p.figma}</small></button>`)
+.join("")}</div>
+</div>` : ""}
+${reg ? reg.groups
+.filter((g) => g.options.length > 1 && !g.hidden)
+.map((g) => `
+<div class="panel__group">
+<div class="panel__label"><span>${g.label}</span></div>
+${seg(g.id, g.options, v[g.id])}
+${g.note ? `<p class="panel__note">${g.note}</p>` : ""}
+</div>`).join("") : ""}
+<div class="panel__group">
+<div class="panel__label"><span>Prototype</span></div>
+<div style="display:grid;gap:8px">
+${seg("hotspots", [{ value: "on", label: "Hotspot hints" }, { value: "off", label: "No hints" }], st.hotspots || "on")}
+${seg("frame", [{ value: "on", label: "Device frame" }, { value: "off", label: "Bare screen" }], st.frame || "on")}
+${seg("motion", [{ value: "on", label: "Motion on" }, { value: "off", label: "Motion off" }], st.motion === "off" ? "off" : "on")}
+<button class="panel__btn" data-replay>Replay entrance <span>↻</span></button>
+</div>
+</div>
+<div class="panel__group panel__links">
+${figmaNode ? `<a href="${OPL.figmaLink(figmaNode)}" target="_blank" rel="noopener">Open frame in Figma <span>${figmaNode} ↗</span></a>` : ""}
+<a href="library.html" target="_blank">Component library <span>↗</span></a>
+</div>`;
+}
+panelEl?.addEventListener("click", (e) => {
+const scr = e.target.closest("[data-screen]");
+if (scr) {
+const target = scr.dataset.screen;
+if (target === screenName()) return;
+if (target === "home") { history.replaceState({ depth: 0 }, "", hashFor({ screen: null })); depth = 0; return render({ dir: "back" }); }
+return OPL.go(target);
+}
+const preset = e.target.closest("[data-preset]");
+if (preset) {
+const p = OPL.variants[OPL.current()].presets.find((x) => x.id === preset.dataset.preset);
+return OPL.state.set(p.set);
+}
+const btn = e.target.closest(".seg button");
+if (btn) {
+const group = btn.parentElement.dataset.group;
+return OPL.state.set({ [group]: group === "motion" && btn.dataset.value === "on" ? null : btn.dataset.value });
+}
+if (e.target.closest("[data-replay]")) {
+currentPage?.querySelector(".scroller")?.scrollTo({ top: 0 });
+return render();
+}
+});
+OPL.current = () => screenName();
+OPL.rerender = () => { render(); return currentPage; };
+window.addEventListener("opl:state", () => render());
+window.addEventListener("popstate", (e) => {
+depth = (e.state && e.state.depth) || 0;
+render({ dir: "back" });
+});
+window.addEventListener("resize", fit);
+OPL.initInteractions(screenEl);
+history.replaceState({ depth: 0 }, "", location.hash || "#");
+const timeout = (ms) => new Promise((r) => setTimeout(r, ms));
+const imagesReady = (root) => Promise.all([...root.querySelectorAll("img")]
+.filter((img) => img.getBoundingClientRect().top < window.innerHeight + 200)
+.map((img) => (img.complete ? null : new Promise((r) => { img.onload = img.onerror = r; }))));
+function reveal() {
+const boot = document.getElementById("boot");
+currentPage && currentPage.classList.remove("is-booting");
+document.documentElement.classList.remove("is-booting");
+OPL.markRevealed();
+if (boot) { boot.classList.add("is-leaving"); setTimeout(() => boot.remove(), 360); }
+}
+render();
+currentPage && currentPage.classList.add("is-booting");
+fit();
+Promise.race([
+Promise.all([document.fonts ? document.fonts.ready : null, imagesReady(screenEl)]),
+timeout(3000),
+]).then(() => { fit(); reveal(); });
 })();
 
 ;

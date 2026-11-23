@@ -126,6 +126,19 @@
     ],
   };
 
+  /* Calculate estimate (416:76869) */
+  OPL.variants["subsidy-estimate"] = {
+    presets: [
+      { id: "one", label: "One benefit open", figma: "416:77107", set: { open: "one" } },
+      { id: "all", label: "All benefits open", figma: "416:76872", set: { open: "all" } },
+    ],
+    groups: [{ id: "open", hidden: true, default: "one", options: [{ value: "one" }, { value: "all" }] }],
+  };
+  OPL.variants["subsidy-estimate-result"] = {
+    presets: [{ id: "result", label: "Estimate result", figma: "416:77363", set: {} }],
+    groups: [],
+  };
+
   OPL.variants["loan-offers"] = {
     presets: [
       { id: "list", label: "Offers list", figma: "382:35324", set: { compare: "none", sheet: "none" } },

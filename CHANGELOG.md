@@ -17,6 +17,12 @@ Synced from Figma: section "Subsidy Home - First Cut" `416:44852`, frames `416:4
   - All ten match their Figma heights exactly.
   - New components: `BenefitSheetBody`, `ActivitySwitch`, `RateRows`, `SheetCondition`, `.btn--ghost`.
 - **Presets:** Collapsed, Expanded, and one per benefit sheet. AI Mitra nudge toggle.
+- **Calculate estimate** (`416:76869`): a form (`416:77107` / `416:76872`) with live per-benefit figures, Add more / Remove and validation, and a result (`416:77363`) with a calculated total and breakdown.
+  - **The result is a "cash arrives" celebration:**
+    - a bundle drops onto the plinth for each benefit, with a thud, gold sparks and the total climbing
+    - then confetti cannons and a shine across the total
+  - The celebration is a lazy-loaded canvas script.
+  - Formulas and flags are in the README.
 - **Components** (`js/components-subsidy.js`, `css/components/subsidy.css`; also on `library.html`): `PolicyPeriod`, `BenefitTile`, `ListRow`, `Disclosure`, `HelpCardExpert`, `HowItWorks` / `HowStep`, `SubsidyFoot`, `CountBadge`, `.deadline-chip`, `.btn--line`.
 - **Motion:** the benefits landing, period fill, disclosure height and stagger with self-scroll, rail draw, stamp press, and directional press nudges. See README.
 - **Assets** in `assets/lazy/subsidy/` (screen-only): the illustration SVGs, the satin texture, the expert photo, the stamp (rasterised from a 139 KB vector to 6 KB), and 23 icons.
@@ -26,7 +32,9 @@ Synced from Figma: section "Subsidy Home - First Cut" `416:44852`, frames `416:4
 - `tools/build.sh` strips comments from the bundles. Sources keep them.
   - CSS: all comments.
   - JS: whole-line comments only, never inside template strings.
-  - This brings first load from 712 KB to 681 KB, under the 700 KB cap.
+  - JS and CSS: leading indentation too, since no template text is whitespace-sensitive.
+  - First load is 693 KB of the 700 KB cap. **The next flow will need a decision:** raise the cap or add a real minifier.
+- Lazy SVGs: removed Figma boilerplate and unused ids, and rounded paths to 2 decimals (−34 KB).
 
 ## v0.8.0 — 23 Nov 2026 · NeSL signing (group E)
 

@@ -1,12 +1,1 @@
-<svg width="116.177" height="33.0642" viewBox="0 0 116.177 33.0642" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g id="Group 2">
-<path id="Union" d="M58.0889 8.45286C73.9095 8.45288 88.2528 9.79329 98.7285 11.9665H116.177V20.8181H116.176C116.024 27.5867 90.0759 33.0642 58.0889 33.0642C26.0078 33.0642 0.000733176 27.5546 0 20.7585C0 20.6167 0.0117231 20.4753 0.0341797 20.3347V11.9665H17.4482C27.9241 9.79324 42.268 8.45286 58.0889 8.45286Z" fill="#EACA94"/>
-<ellipse id="Ellipse 1" cx="58.0887" cy="12.3058" rx="58.0887" ry="12.3056" fill="url(#paint0_linear_0_173)"/>
-</g>
-<defs>
-<linearGradient id="paint0_linear_0_173" x1="58.0887" y1="0.000173357" x2="58.6881" y2="40.4847" gradientUnits="userSpaceOnUse">
-<stop stop-color="#F1DBB3"/>
-<stop offset="1" stop-color="white"/>
-</linearGradient>
-</defs>
-</svg>
+<svg width="116.177" height="33.0642" viewBox="0 0 116.177 33.0642" fill="none" xmlns="http://www.w3.org/2000/svg"><g><path d="M58.09 8.45C73.91 8.45 88.25 9.79 98.73 11.97H116.18V20.82H116.18C116.02 27.59 90.08 33.06 58.09 33.06C26.01 33.06 0 27.55 0 20.76C0 20.62 0.01 20.48 0.03 20.33V11.97H17.45C27.92 9.79 42.27 8.45 58.09 8.45Z" fill="#EACA94"/><ellipse cx="58.0887" cy="12.3058" rx="58.0887" ry="12.3056" fill="url(#paint0_linear_0_173)"/></g><defs><linearGradient id="paint0_linear_0_173" x1="58.0887" y1="0.000173357" x2="58.6881" y2="40.4847" gradientUnits="userSpaceOnUse"><stop stop-color="#F1DBB3"/><stop offset="1" stop-color="white"/></linearGradient></defs></svg>

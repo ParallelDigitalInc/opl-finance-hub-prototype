@@ -1,7 +1,1 @@
-<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g id="Square Academic Cap">
-<path id="Vector" d="M2.83397 9.49975L8.96757 12.3753C10.2702 12.986 11.7299 12.986 13.0325 12.3753L19.166 9.49979C20.5002 8.8743 20.5002 6.70908 19.166 6.08358L13.0324 3.20801C11.7298 2.59733 10.2701 2.59733 8.96749 3.20801L2.83397 6.08354C1.49979 6.70904 1.49979 8.87426 2.83397 9.49975Z" stroke-width="1.5" stroke="#475569"/>
-<path id="Vector_2" d="M1.83333 7.79167V12.8333" stroke-width="1.5" stroke-linecap="round" stroke="#475569"/>
-<path id="Vector_3" d="M17.4167 10.5417V15.24C17.4167 16.164 16.9551 17.0291 16.1468 17.4768C14.8008 18.2222 12.6463 19.25 11 19.25C9.35366 19.25 7.19923 18.2222 5.85322 17.4768C5.04488 17.0291 4.58333 16.164 4.58333 15.24V10.5417" stroke-width="1.5" stroke-linecap="round" stroke="#475569"/>
-</g>
-</svg>
+<svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><g><path d="M2.83 9.5L8.97 12.38C10.27 12.99 11.73 12.99 13.03 12.38L19.17 9.5C20.5 8.87 20.5 6.71 19.17 6.08L13.03 3.21C11.73 2.6 10.27 2.6 8.97 3.21L2.83 6.08C1.5 6.71 1.5 8.87 2.83 9.5Z" stroke-width="1.5" stroke="#475569"/><path d="M1.83 7.79V12.83" stroke-width="1.5" stroke-linecap="round" stroke="#475569"/><path d="M17.42 10.54V15.24C17.42 16.16 16.96 17.03 16.15 17.48C14.8 18.22 12.65 19.25 11 19.25C9.35 19.25 7.2 18.22 5.85 17.48C5.04 17.03 4.58 16.16 4.58 15.24V10.54" stroke-width="1.5" stroke-linecap="round" stroke="#475569"/></g></svg>
