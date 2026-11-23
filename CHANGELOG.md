@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.10.2 — 23 Nov 2026 · Tidier prototype panel
+
+- **The panel no longer looks cut off.** It had grown past the window as screens were added (about 1,800px of controls in a 700px window).
+  - **Fixed header:** the screen name, version and collapse chevron stay put, and the controls scroll beneath with a soft fade at whichever edge has more.
+  - **Foldable sections:** tap Screens, Figma frames, Options or Prototype to fold them. Each shows its count. Prototype starts folded. The browser remembers what you fold.
+  - **Screens grouped by flow:** "Finance hub & loans" (8) and "Subsidies" (4). The flow you're in opens, and the other folds to one line.
+  - **Quieter rows:** the Figma node IDs are gone from the screen and frame rows. Rows are tighter, and the subtitle line is dropped.
+  - "Open frame in Figma" and "Component library" now sit inside Prototype.
+  - Figma frames start folded on screens with four or more; Options start folded when there's more than one toggle.
+  - Result: with the default folds, every screen's panel fits a 760px-tall window without scrolling (checked on all 12 screens).
+  - **The blue ring on the selected screen or frame is drawn inside the row,** so the scrolling panel no longer clips its edges. Keyboard focus rings are inset too.
+
 ## v0.10.1 — 23 Nov 2026 · Collapsible prototype panel
 
 - **The prototype panel collapses for presenting.**

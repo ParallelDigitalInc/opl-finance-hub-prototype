@@ -59,7 +59,7 @@ uses the real status bar and safe areas. Any state can be linked through the URL
 
 `index.html#order=subsidies&emi=on` · `#autoplay=on` · `#frame=off` · `#hotspots=off` · `#motion=off` · `#panel=closed`
 
-While presenting, press **P** (or use the chevron in the panel header) to fold the controls panel into a small pill; the browser remembers it.
+While presenting, press **P** (or use the chevron in the panel header) to fold the controls panel into a small pill; the browser remembers it. Inside the panel, every section (Screens, Figma frames, Options, Prototype) folds by tapping its label, and screens are grouped by flow.
 
 ## Structure
 
