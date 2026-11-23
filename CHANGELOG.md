@@ -1,5 +1,33 @@
 # Changelog
 
+## v0.13.0 — 23 Nov 2026 · Desktop loan journey complete: application page, KFS, NeSL, signed + disbursed
+
+Branch `flow/desktop`. Synced from section *final-loan applications* `440:134259`: application page `440:136328` (verifying) / `440:136512` (KFS ready) / `440:136901` (money on its way) / `440:137099` (money in account), sanction signed `440:136706`, KFS reader `440:134934`, NeSL `471:24999`… and confirming `440:135654`.
+
+**Added**
+
+- **Application page.** One screen covers every status:
+  - breadcrumbs
+  - summary card: tinted head with the Application ID tag, then a 4-figure strip with dividers
+  - status card: title and CTA, the mobile timeline, then "Before you sign" or "What to expect"
+  - Total Repayment card
+  - sticky 340 rail: Branch Details (copy buttons), Documents or documents to keep ready, WhatsApp, Withdraw
+- **KFS reader** (two-pane; the approved desktop merge of summary and PDF):
+  - left: the KFS pages with a file bar, a read-progress line and a floating page counter
+  - right: the APR card, You repay, fact chips and the consent card
+  - reading to the last page unlocks consent; the hint scrolls to the end
+  - Accept KFS opens the mobile "Sign on NeSL" Step 2 sheet in a modal
+- **NeSL signing.** The NeSL portal opens as a window over the dimmed application. It steps through the same portal screens as mobile, each with a hotspot on its real button, and Cancel returns to "Sign Sanction Letter". Then **Confirming your signature** shows, and the application returns Signed.
+- **Delight, same as mobile:**
+  - the **Sanction letter signed** milestone
+  - closing it starts the live demo: Money on its way, then Money received with the **Money disbursed** milestone (full confetti burst, amount counts up)
+  - `#ms=on` opens these directly
+- **The whole desktop journey now plays end to end:** Overview → Offers → Compare → Apply → Applications (approved) → Application → KFS → NeSL → Signed → Money on its way → Money received.
+
+**Fixed**
+
+- "View All", "View details" and other link arrows were indigo `#4338CA` (from the frame) next to `#3858E5` labels; they now use the primary chevron. Breadcrumb separators use the grey chevron.
+
 ## v0.12.0 — 23 Nov 2026 · Desktop Applications + Apply, with the approval moment
 
 Branch `flow/desktop`. Synced from Figma `440:134641` (Your Applications) and `440:137299` ("Citi Bank approved your loan" over the list), in section *final-loan applications* `440:134259`.

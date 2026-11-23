@@ -128,7 +128,7 @@
     </div>`;
 
   D.crumbs = (items) => html`
-    <nav class="d-crumbs" aria-label="Breadcrumb">${items.map((c, i) => html`${i ? html`${D.icon("link-arrow-right", 12, "d-crumbs__sep")}` : ""}${c.goto ? html`<button class="d-crumbs__link" data-goto="${c.goto}">${c.label}</button>` : html`<span class="d-crumbs__here">${c.label}</span>`}`)}</nav>`;
+    <nav class="d-crumbs" aria-label="Breadcrumb">${items.map((c, i) => html`${i ? html`${D.micon("alt-arrow-right", 14, "d-crumbs__sep")}` : ""}${c.goto ? html`<button class="d-crumbs__link" data-goto="${c.goto}">${c.label}</button>` : html`<span class="d-crumbs__here">${c.label}</span>`}`)}</nav>`;
 
   /* ---- AI Mitra FAB (476:200642) + one-time nudge (mobile parity) ----------- */
   D.mitraFab = (nudge = { lead: "Ask anything about", topic: "loans & subsidies" }) => html`
@@ -139,7 +139,7 @@
 
   /* ---- Primitives ----------------------------------------------------------- */
   D.count = (n) => html`<span class="d-count">${n}</span>`;
-  D.link = (label, goto) => html`<button class="d-link" data-goto="${goto}">${label}${D.icon("link-arrow-right", 14, "d-link__arrow")}</button>`;
+  D.link = (label, goto) => html`<button class="d-link" data-goto="${goto}">${label}${D.micon("chevron-right-primary", 14, "d-link__arrow")}</button>`;   // #3858E5 to match the label (frame arrow is indigo)
   D.sectionHead = ({ title, count, link, goto, size = "h4" }) => html`
     <div class="d-sh d-sh--${size}">
       <h2 class="d-sh__title">${title}${count != null ? D.count(count) : ""}</h2>

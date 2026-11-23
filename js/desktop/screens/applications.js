@@ -117,7 +117,7 @@
         lender: l.name, logo: l.logo, type: l.type, title: d.kfs.approvedTitle(l.name), body: d.kfs.approvedBody, note: d.kfs.approvedNote,
         figures: [{ label: "Final offer", value: d.kfs.finalOffer }, { label: "Interest", value: "9.45%", unit: "p.a." }, { label: "APR", value: id === "pick-citi" ? d.kfs.summary.apr : l.apr }],
       }).toString();
-      const m = D.openModal(page, `<div class="d-ms">${body}</div>`, { width: 480, cls: "d-modal--ms" });
+      const m = D.openModal(page, `<div class="d-ms">${body}</div>`, { width: 480, cls: "sheet-layer d-modal--ms" });
       m.el.addEventListener("click", (e) => {
         if (e.target.closest("[data-ms-review]")) { m.close(); this.timers.push(setTimeout(() => OPL.go("application", { app: id }), 240)); }
       });

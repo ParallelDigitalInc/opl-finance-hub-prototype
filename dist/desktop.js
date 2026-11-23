@@ -132,7 +132,7 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
     </div>`;
 
   D.crumbs = (items) => html`
-    <nav class="d-crumbs" aria-label="Breadcrumb">${items.map((c, i) => html`${i ? html`${D.icon("link-arrow-right", 12, "d-crumbs__sep")}` : ""}${c.goto ? html`<button class="d-crumbs__link" data-goto="${c.goto}">${c.label}</button>` : html`<span class="d-crumbs__here">${c.label}</span>`}`)}</nav>`;
+    <nav class="d-crumbs" aria-label="Breadcrumb">${items.map((c, i) => html`${i ? html`${D.micon("alt-arrow-right", 14, "d-crumbs__sep")}` : ""}${c.goto ? html`<button class="d-crumbs__link" data-goto="${c.goto}">${c.label}</button>` : html`<span class="d-crumbs__here">${c.label}</span>`}`)}</nav>`;
 
   /* ---- AI Mitra FAB (476:200642) + one-time nudge (mobile parity) ----------- */
   D.mitraFab = (nudge = { lead: "Ask anything about", topic: "loans & subsidies" }) => html`
@@ -143,7 +143,7 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
 
   /* ---- Primitives ----------------------------------------------------------- */
   D.count = (n) => html`<span class="d-count">${n}</span>`;
-  D.link = (label, goto) => html`<button class="d-link" data-goto="${goto}">${label}${D.icon("link-arrow-right", 14, "d-link__arrow")}</button>`;
+  D.link = (label, goto) => html`<button class="d-link" data-goto="${goto}">${label}${D.micon("chevron-right-primary", 14, "d-link__arrow")}</button>`;   // #3858E5 to match the label (frame arrow is indigo)
   D.sectionHead = ({ title, count, link, goto, size = "h4" }) => html`
     <div class="d-sh d-sh--${size}">
       <h2 class="d-sh__title">${title}${count != null ? D.count(count) : ""}</h2>
@@ -1564,10 +1564,457 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
         lender: l.name, logo: l.logo, type: l.type, title: d.kfs.approvedTitle(l.name), body: d.kfs.approvedBody, note: d.kfs.approvedNote,
         figures: [{ label: "Final offer", value: d.kfs.finalOffer }, { label: "Interest", value: "9.45%", unit: "p.a." }, { label: "APR", value: id === "pick-citi" ? d.kfs.summary.apr : l.apr }],
       }).toString();
-      const m = D.openModal(page, `<div class="d-ms">${body}</div>`, { width: 480, cls: "d-modal--ms" });
+      const m = D.openModal(page, `<div class="d-ms">${body}</div>`, { width: 480, cls: "sheet-layer d-modal--ms" });
       m.el.addEventListener("click", (e) => {
         if (e.target.closest("[data-ms-review]")) { m.close(); this.timers.push(setTimeout(() => OPL.go("application", { app: id }), 240)); }
       });
+    },
+  };
+})();
+
+;
+
+/* ==== js/desktop/screens/application.js ==== */
+/* Desktop · Application page — Figma section "final-loan applications" 440:134259:
+   verifying 440:136328 · KFS ready 440:136512 · money on its way 440:136901 ·
+   money in account 440:137099 · sanction signed 440:136706.
+   Layout as drawn: breadcrumbs → main column (summary card, status story card with the
+   timeline, repayment card) + 340 rail (Branch details, Documents / documents to keep
+   ready, WhatsApp, Withdraw). The timeline, info cards and milestone sheets are the mobile
+   kit's, so status, copy and delight match mobile one-to-one. Status = OPL.apps (shared). */
+(function () {
+  const { html, raw, ui } = OPL;
+  const D = OPL.d;
+  const A = () => OPL.data.applications;
+
+  const COPY = {                                   // desktop-only copy, verbatim from the frames
+    appId: "LA-2026-10-6101",
+    beforeTitle: "Before you sign",
+    before: [
+      { text: "Accept the KFS and sign the sanction letter by 25 Nov 2026.", tone: "warning" },
+      { text: "You can accept one KFS this month. Other ongoing loan applications close once you accept this.", tone: "info" },
+    ],
+    expectTitle: "What to expect",
+    expectVerifying: (name) => [`${name} will call you on +91 ******6789.`, "They may visit your unit on Ring Road, Surat."],
+    expectMoney: (name) => ["Expected in your account by 30 Nov.", `${name} may call you to confirm details before disbursal of the final loan amount.`],
+    repayTitle: "Total Repayment Amount",
+    docsReady: "Keep these documents ready",
+    withdraw: "Withdraw application",
+  };
+  const logoFor = (id) => {
+    const c = OPL.ddata.compare;
+    const r = c.records[c.aliases[id] || id];
+    return r ? r.logo : OPL.img("logo-sbi.png");
+  };
+
+  const timelineFor = (st, l, d) => {
+    const money = st === "disbursing" || st === "disbursed";
+    if (money) return [
+      { icon: "plain-2", state: "done", title: `Sent to ${l.name}`, sub: d.sentAt },
+      { icon: "buildings", state: "done", title: "Lender Verification", sub: d.verifiedOn, pad: 0 },
+      { icon: "document-text-done", state: "done", title: d.signed.step3, sub: d.signed.step3Sub, pad: 0, line: st === "disbursing" ? "fade-blue" : "" },
+      st === "disbursing"
+        ? { icon: "wallet-money", state: "progress", title: d.disbursing.step4, sub: d.disbursing.step4Sub(l.name), pad: 6 }
+        : { icon: "wallet-money", state: "done", strong: true, title: d.disbursed.step4, sub: d.disbursed.step4Sub, pad: 6 },
+    ];
+    if (st === "sign" || st === "signed") return [
+      { icon: "plain-2", state: "done", title: `Sent to ${l.name}`, sub: d.sentAt },
+      { icon: "buildings", state: "done", title: "Lender Verification", sub: d.verifiedOn, line: st === "sign" ? "fade" : "", pad: 0 },
+      st === "signed"
+        ? { icon: "document-text-done", state: "done", strong: true, title: d.signed.step3, sub: d.signed.step3Sub, pad: 6 }
+        : { icon: "document-text", state: "action", title: d.sign.step3, sub: d.sign.step3Sub, pad: 6 },
+    ];
+    if (st === "kfs") return [
+      { icon: "plain-2", state: "done", title: `Sent to ${l.name}`, sub: d.sentAt },
+      { icon: "buildings", state: "done", title: "Lender Verification", sub: d.verifiedOn, pad: 0 },
+      { icon: "document-text", state: "action", title: d.kfs.title, pad: 6 },
+    ];
+    return [
+      { icon: "plain-2", state: "done", title: `Sent to ${l.name}`, sub: d.sentAt },
+      { icon: "buildings-primary", state: "current", title: "Lender Verification", sub: d.verifying.progress, subTone: "primary" },
+      { icon: "document-text-muted", state: "todo", title: d.verifying.todo },
+    ];
+  };
+
+  const repayCard = (s) => html`
+    <section class="d-panel d-repay" data-enter>
+      <div class="d-repay__head"><p>${COPY.repayTitle}</p><b>${s.repay}</b></div>
+      <div class="kfs-repay__bar d-repay__bar">${s.split.map((p) => raw(`<span style="flex:${p.w} 0 0;background:${p.color}"></span>`))}</div>
+      <div class="kfs-repay__legend">${s.split.map((p) => raw(`<div>${OPL.icon(p.dot, 8)}<span>${p.label}</span><b>${p.value}</b></div>`))}</div>
+    </section>`;
+
+  OPL.dscreens.application = {
+    title: "Loans · Application",
+    figma: { verifying: "440:136328", kfs: "440:136512", disbursing: "440:136901", disbursed: "440:137099", signed: "440:136706" },
+    timers: [],
+    leave() { this.timers.forEach(clearTimeout); this.timers = []; },
+
+    render(page) {
+      this.leave();
+      const d = A();
+      const apps = OPL.apps.currentApps();
+      const q = OPL.state.get();
+      const id = q.app || apps[0].id;
+      const st = q.st || OPL.apps.statusOf(id);
+      const l = OPL.apps.lender(id);
+      const verifying = !["kfs", "sign", "signed", "disbursing", "disbursed"].includes(st);
+      const money = st === "disbursing" || st === "disbursed";
+      const s = d.kfs.summary;
+
+      const figures = verifying
+        ? [{ label: "Loan offer", value: l.amountShort }, { label: "Interest rate", value: "9.45%", unit: "p.a. floating" }, { label: "Loan type", value: "Term loan" }, { label: "Decision expected", value: "5–7 working days" }]
+        : [{ label: "Final offer", value: d.kfs.finalOffer }, { label: "Interest rate", value: "9.45%", unit: "p.a. floating" }, { label: "APR", value: s.apr }, { label: "Monthly EMI", value: s.emi }];
+
+      const title = { kfs: d.kfs.title, sign: d.sign.title, signed: d.signed.title, disbursing: d.disbursing.title, disbursed: d.disbursed.title }[st] || d.verifying.title(l.name);
+      const cta = st === "kfs" ? D.btn({ label: "Review KFS & Accept", style: "filled", size: "lg", iconRight: D.icon("btn-arrow-white", 16), attrs: "data-review-kfs" })
+        : st === "sign" ? D.btn({ label: d.sign.cta, style: "filled", size: "lg", iconRight: OPL.icon("arrow-square-out-white", 16), attrs: "data-sign-nesl" }) : "";
+      const notes = st === "kfs" || st === "sign"
+        ? html`<div class="d-story__sub"><p class="d-story__h">${COPY.beforeTitle}</p>${COPY.before.map((n) => ui.NoteRow(n))}</div>`
+        : verifying || money
+        ? html`<div class="d-story__sub"><p class="d-story__h">${COPY.expectTitle}</p>${(verifying ? COPY.expectVerifying(l.name) : COPY.expectMoney(l.name)).map((t) => ui.NoteRow({ text: t, tone: "info" }))}</div>`
+        : "";
+      const branch = ui.InfoCard({ title: "Branch Details", body: ui.ContactList(d.branch(l.slug)) });
+      const docs = ui.InfoCard({ title: "Documents", body: ui.LinkList({ items: d.docs }) });
+      const ready = ui.InfoCard({ title: COPY.docsReady, body: ui.DocList({ items: d.verifying.docs }) });
+
+      page.innerHTML = D.shell({
+        nav: "loans", title: "", tab: null,
+        crumbs: [{ label: "Loans", goto: "loans-overview" }, { label: "Applications", goto: "applications" }, { label: `Loan details - ${l.name}` }],
+        body: html`
+          <div class="d-appd" style="--tint:${l.tint}">
+            <div class="d-appd__main">
+              <section class="d-appd__summary" data-enter>
+                <div class="d-appd__head">
+                  <span class="d-appd__id-tag">Application ID: <b>${COPY.appId}</b></span>
+                  <div class="d-appd__who">${D.logo(logoFor(id))}<div><h1>${l.name}</h1><p>${l.type}</p></div></div>
+                </div>
+                <div class="d-appd__figs">${figures.map((f) => html`<div class="d-appd__fig"><p>${f.label}</p><b>${f.value}${f.unit ? html`<small>${f.unit}</small>` : ""}</b></div>`)}</div>
+              </section>
+              <section class="d-panel d-story" data-enter>
+                <div class="d-story__top"><h2>${title}</h2>${cta}</div>
+                ${st === "disbursing" ? html`<p class="d-story__eta">${d.disbursing.sub}</p>` : ""}
+                ${ui.Timeline({ items: timelineFor(st, l, d) })}
+                ${notes}
+              </section>
+              ${verifying ? "" : repayCard(s)}
+            </div>
+            <aside class="d-appd__rail" data-enter>
+              ${branch}
+              ${verifying ? ready : money || st === "signed" ? docs : ""}
+              ${ui.WhatsAppRow({ label: d.whatsapp })}
+              ${money && st === "disbursed" ? "" : html`<button class="d-withdraw" data-goto="withdraw">${COPY.withdraw}</button>`}
+            </aside>
+          </div>`,
+      });
+      page.querySelectorAll(".d-appd__rail .info-card").forEach((c) => c.classList.add("is-open"));
+      D.mountShell(page);
+      D.enter(page);
+      OPL.fx.playInView(page, ".tl, .d-repay");
+      this.bind(page, { id, l, st });
+
+      // Milestones (as on mobile): arriving from NeSL → Signed; the live demo then moves to
+      // Money on its way → Money received with the Disbursed moment.
+      const m = OPL.screens.application;           // shared flags (mobile NeSL sets .celebrate)
+      if (st === "signed" && (m.celebrate || q.ms === "on")) {
+        const live = m.celebrate; m.celebrate = false;
+        OPL.afterReveal(() => this.timers.push(setTimeout(() => page.isConnected && this.openSigned(page, l, id, live), live && !D.motionOff() ? 460 : 0)));
+      }
+      if (st === "disbursing" && m.progressNext) {
+        m.progressNext = false;
+        this.timers.push(setTimeout(() => {
+          if (!page.isConnected) return;
+          OPL.apps.setStatus(id, "disbursed"); m.celebrateMoney = true; OPL.rerender();
+        }, D.motionOff() ? 300 : d.demo.toDisbursed));
+      }
+      if (st === "disbursed" && (m.celebrateMoney || q.ms === "on")) {
+        const live = m.celebrateMoney; m.celebrateMoney = false;
+        OPL.afterReveal(() => this.timers.push(setTimeout(() => page.isConnected && this.openDisbursed(page), live && !D.motionOff() ? 700 : 0)));
+      }
+    },
+
+    bind(page, { id }) {
+      page.addEventListener("click", (e) => {
+        const acc = e.target.closest("[data-accordion]");
+        if (acc) return acc.closest(".info-card").classList.toggle("is-open");
+        const cp = e.target.closest("[data-copy]");
+        if (cp) {
+          navigator.clipboard?.writeText(cp.dataset.copy).catch(() => {});
+          cp.classList.remove("is-copied"); void cp.offsetWidth; cp.classList.add("is-copied");
+          return D.toast(page, "Copied");
+        }
+        const wa = e.target.closest("[data-wa]");
+        if (wa) { wa.classList.toggle("is-on"); wa.setAttribute("aria-checked", wa.classList.contains("is-on")); return; }
+        if (e.target.closest("[data-review-kfs]")) return OPL.go("kfs", { app: id });
+        if (e.target.closest("[data-sign-nesl]")) return OPL.go("nesl", { app: id, step: null });
+      });
+    },
+
+    // 440:136706 — "Sanction letter signed" (mobile MilestoneSigned) in a 480 modal
+    openSigned(page, l, id, live) {
+      const d = A().signed.sheet;
+      let advanced = false;
+      const body = ui.MilestoneSigned({ ...d, body: d.body(l.name) }).toString();
+      const m = D.openModal(page, `<div class="d-ms">${body}</div>`, { width: 480, cls: "sheet-layer d-modal--ms", onClose: () => {
+        if (!live || advanced) return; advanced = true;
+        this.timers.push(setTimeout(() => {
+          if (!page.isConnected) return;
+          OPL.apps.setStatus(id, "disbursing"); OPL.screens.application.progressNext = true; OPL.rerender();
+        }, D.motionOff() ? 300 : A().demo.toDisbursing));
+      } });
+      m.el.addEventListener("click", (e) => { if (e.target.closest("[data-ms-view], [data-ms-done]")) m.close(); });
+    },
+
+    // 440:137099 — "Money disbursed" (mobile MilestoneDisbursed): full burst, amount counts up
+    openDisbursed(page) {
+      const d = A().disbursed.sheet;
+      const m = D.openModal(page, `<div class="d-ms">${ui.MilestoneDisbursed(d)}</div>`, { width: 480, cls: "sheet-layer d-modal--ms" });
+      m.el.addEventListener("click", (e) => {
+        if (e.target.closest("[data-ms-done]")) m.close();
+        if (e.target.closest("[data-ms-view]")) { m.close(); this.timers.push(setTimeout(() => OPL.go("my-loans"), 240)); }
+      });
+      const el = m.el.querySelector("[data-ms-amount]");
+      const to = Number(d.amount.replace(/[^\d]/g, ""));
+      if (el && !D.motionOff()) {
+        const t0 = Date.now() + 260, dur = 1100;
+        const tick = () => {
+          const k = Math.max(0, Math.min(1, (Date.now() - t0) / dur)), e = 1 - Math.pow(1 - k, 3);
+          el.textContent = "₹" + Math.round(to * e).toLocaleString("en-IN");
+          if (k < 1 && el.isConnected) this.timers.push(setTimeout(tick, 16));
+        };
+        el.textContent = "₹0"; tick();
+      }
+    },
+  };
+})();
+
+;
+
+/* ==== js/desktop/screens/kfs.js ==== */
+/* Desktop · KFS reader — Figma 440:134934 (two-pane, unread) → read + consent → Accept KFS.
+   Approved desktop decision: the KFS summary and the PDF are one screen (one step fewer
+   than mobile). Left: the document (same pages as mobile, OPL.data.kfsDoc) with a file
+   bar, read-progress line and a floating page counter. Right (380): APR card, You repay,
+   fact chips and the consent card. Reading to the last page unlocks consent → Accept KFS
+   → "Sign on NeSL" (the mobile Step 2 sheet, 433:7980) in a modal. */
+(function () {
+  const { html, raw, ui } = OPL;
+  const D = OPL.d;
+  const K = () => OPL.data.kfsDoc;
+
+  const row = ([n, label, value], i) =>
+    `<div class="kfs-row${i % 2 ? " kfs-row--alt" : ""}"><span class="kfs-row__n">${n}</span><span class="kfs-row__l">${label}</span><span class="kfs-row__v">${value}</span></div>`;
+  const ack = (a) => `<div class="kfs-ack"><p class="kfs-ack__title">${a.title}</p><p class="kfs-ack__text">${a.text}</p>
+    <div class="kfs-ack__sign">${a.lines.map((t) => `<div><span></span><p>${t}</p></div>`).join("")}</div><p class="kfs-ack__foot">${a.foot}</p></div>`;
+  const pageEl = (p, i, total, head) => `
+    <article class="kfs-page d-kfs__page" data-kfs-page="${i}">
+      <div class="kfs-page__lh">${ui.Logo({ id: head.logo, size: 16 })}<span class="kfs-page__org">${head.name}</span><span class="kfs-page__no">Page ${i + 1} of ${total}</span></div>
+      <span class="kfs-page__rule"></span>
+      ${p.title ? `<h3 class="kfs-page__title">${p.title}</h3>` : ""}
+      ${p.meta ? `<p class="kfs-page__meta">${p.meta}</p>` : ""}
+      <h4 class="kfs-page__part">${p.part}</h4>
+      <div class="kfs-table">${p.rows.map(row).join("")}</div>
+      ${p.note ? `<p class="kfs-page__note">${p.note}</p>` : ""}
+      ${p.ack ? ack(p.ack) : ""}
+    </article>`;
+
+  OPL.dscreens.kfs = {
+    title: "Loans · Key Fact Statement",
+    figma: { reader: "440:134934" },
+    timers: [],
+    leave() { this.timers.forEach(clearTimeout); this.timers = []; },
+
+    render(page) {
+      this.leave();
+      const d = K();
+      const a = OPL.data.applications;
+      const apps = OPL.apps.currentApps();
+      const id = OPL.state.get().app || (apps.find((x) => x.status === "kfs") || {}).id || "pick-citi";
+      const l = OPL.apps.lender(id);
+      const head = { logo: l.logo, name: d.letterhead[id] || l.name };
+      const pages = d.pages(l);
+      const s = a.kfs.summary;
+
+      page.innerHTML = D.shell({
+        nav: "loans", title: "", tab: null,
+        crumbs: [{ label: "Loans", goto: "loans-overview" }, { label: "Applications", goto: "applications" }, { label: `Loan detail - ${l.name}`, goto: "application" }, { label: "Sign KFS and Sanction Letter" }],
+        body: html`
+          <div class="d-kfs">
+            <div class="d-kfs__bar">
+              <h1 class="d-kfs__title"><button class="d-kfs__back" data-back aria-label="Back">${OPL.icon("arrow-left", 24)}</button>${l.name} Key Fact Statement</h1>
+              ${D.btn({ label: "Download PDF", style: "outlined", size: "sm", cls: "d-btn--neutral", iconRight: OPL.icon("download", 16), goto: "kfs-download" })}
+            </div>
+            <div class="d-kfs__steps">
+              <span class="d-kfs__step is-on"><i>${OPL.icon("document-text", 16)}</i>Step 1 · Accept KFS</span>
+              <span class="d-kfs__step"><i>${OPL.icon("document-text-muted", 16)}</i>Step 2 · Sign sanction letter on NeSL</span>
+            </div>
+            <div class="d-kfs__grid">
+              <section class="d-kfs__doc">
+                <div class="d-kfs__file"><span>${l.name.split(" ")[0]}_Bank_KFS_LA-2026-11-2231.pdf</span><span><b data-kfs-n>1</b> of ${pages.length} · 100%</span></div>
+                <span class="d-kfs__read"><i data-kfs-bar style="width:${100 / pages.length}%"></i></span>
+                <div class="d-kfs__scroll" data-kfs-scroll>${raw(pages.map((p, i) => pageEl(p, i, pages.length, head)).join(""))}<p class="kfs-end">${d.end}</p></div>
+                <span class="d-kfs__counter"><b data-kfs-n2>1</b> / ${pages.length}</span>
+              </section>
+              <aside class="d-kfs__rail">
+                ${ui.AprCard({ s, bordered: true })}
+                <div class="d-panel d-kfs__repay">
+                  <div class="d-repay__head"><p>You repay</p><b>${s.repay}</b></div>
+                  <div class="kfs-repay__bar d-repay__bar">${s.split.map((p) => raw(`<span style="flex:${p.w} 0 0;background:${p.color}"></span>`))}</div>
+                  <div class="kfs-repay__legend">${s.split.map((p) => raw(`<div>${OPL.icon(p.dot, 8)}<span>${p.label}</span><b>${p.value}</b></div>`))}</div>
+                </div>
+                <div class="kfs-facts d-kfs__facts">${s.facts.map((f) => raw(`<span>${f}</span>`))}</div>
+                <div class="d-panel d-kfs__consent">
+                  <button class="d-kfs__check" data-kfs-consent aria-pressed="false" disabled>${OPL.icon("check-square", 24)}<span>I have read and understood the Key Fact Statement</span></button>
+                  ${D.btn({ label: d.cta, style: "filled", size: "lg", cls: "d-btn--block", attrs: "disabled data-kfs-accept" })}
+                  <p class="d-kfs__hint" data-kfs-hint>${d.hint}</p>
+                </div>
+              </aside>
+            </div>
+          </div>`,
+      });
+      D.mountShell(page);
+      this.bind(page, id, pages.length);
+    },
+
+    bind(page, id, total) {
+      const sc = page.querySelector("[data-kfs-scroll]");
+      const n = page.querySelector("[data-kfs-n]"), n2 = page.querySelector("[data-kfs-n2]");
+      const bar = page.querySelector("[data-kfs-bar]");
+      const consent = page.querySelector("[data-kfs-consent]");
+      const accept = page.querySelector("[data-kfs-accept]");
+      const hint = page.querySelector("[data-kfs-hint]");
+      const pagesEls = [...sc.querySelectorAll("[data-kfs-page]")];
+      let unlocked = false;
+      const onScroll = () => {
+        const max = sc.scrollHeight - sc.clientHeight;
+        const k = max > 0 ? sc.scrollTop / max : 1;
+        bar.style.width = `${Math.max(100 / total, k * 100)}%`;
+        const mid = sc.scrollTop + sc.clientHeight * 0.4;
+        let cur = 0;
+        pagesEls.forEach((p, i) => { if (p.offsetTop <= mid) cur = i; });
+        n.textContent = n2.textContent = cur + 1;
+        if (!unlocked && k > 0.97) {
+          unlocked = true;
+          consent.disabled = false;
+          consent.classList.add("is-ready");
+          hint.classList.add("is-done");
+        }
+      };
+      sc.addEventListener("scroll", onScroll, { passive: true });
+      consent.addEventListener("click", () => {
+        const on = consent.getAttribute("aria-pressed") !== "true";
+        consent.setAttribute("aria-pressed", on);
+        consent.querySelector("img").src = `assets/icons/${on ? "check-square-checked" : "check-square"}.svg`;
+        consent.classList.remove("is-popping"); void consent.offsetWidth; consent.classList.add("is-popping");
+        accept.disabled = !on;
+      });
+      // the hint itself scrolls to the end (a desktop shortcut for presenting)
+      hint.addEventListener("click", () => sc.scrollTo({ top: sc.scrollHeight, behavior: D.motionOff() ? "auto" : "smooth" }));
+      accept.addEventListener("click", () => {
+        OPL.apps.setStatus(id, "sign");
+        const body = ui.NeslSheetBody({ d: OPL.data.nesl.sheet }).toString();
+        const m = D.openModal(page, `<div class="d-ms d-nesl-intro">${body}</div>`, { width: 480, cls: "sheet-layer d-modal--ms" });
+        m.el.addEventListener("click", (e) => {
+          if (e.target.closest("[data-nesl-go]")) { m.close(); this.timers.push(setTimeout(() => OPL.go("nesl", { app: id, step: null }), 240)); }
+          if (e.target.closest("[data-nesl-later]")) { m.close(); this.timers.push(setTimeout(() => OPL.go("application", { app: id }, { replace: true }), 240)); }
+        });
+      });
+    },
+  };
+})();
+
+;
+
+/* ==== js/desktop/screens/nesl.js ==== */
+/* Desktop · NeSL signing — section "Loan - Signing Sanction letter & Money disbursal"
+   (471:24999 … 471:26002, confirming 440:135654). The NeSL portal opens as a window over
+   the application (dimmed), stepping through the same portal screens as mobile with a
+   hotspot on each real button; then "Confirming your signature" fills the main panel and the
+   application returns Signed with its milestone. Cancel → application, left before signing. */
+(function () {
+  const { html } = OPL;
+  const D = OPL.d;
+  const N = () => OPL.data.nesl;
+  const IMG_W = 390, IMG_H = 723;
+  const src = (id) => `assets/lazy/nesl/${id}.jpg`;
+  const rect = (r) => `left:${(r[0] / IMG_W) * 100}%;top:${(r[1] / IMG_H) * 100}%;width:${(r[2] / IMG_W) * 100}%;height:${(r[3] / IMG_H) * 100}%`;
+
+  OPL.dscreens.nesl = {
+    title: "Loans · Sign on NeSL",
+    figma: { portal: "471:24999", confirm: "440:135654" },
+    timers: [],
+    leave() { this.timers.forEach(clearTimeout); this.timers = []; OPL.dscreens.application.leave(); },
+
+    render(page) {
+      this.leave();
+      const apps = OPL.apps.currentApps();
+      this.id = OPL.state.get().app || (apps.find((a) => a.status === "sign" || a.status === "kfs") || {}).id || "pick-citi";
+      this.page = page;
+      const step = Number(OPL.state.get().step) || 0;
+      if (step >= N().portal.length) return this.confirm(true);
+      // the application (KFS accepted, not yet signed) sits underneath
+      OPL.apps.setStatus(this.id, "sign");
+      OPL.dscreens.application.render(page);
+      const layer = document.createElement("div");
+      layer.className = "d-modal-layer d-nesl";
+      layer.innerHTML = html`
+        <div class="d-scrim"></div>
+        <section class="d-nesl__win" role="dialog" aria-label="NeSL">
+          <div class="d-nesl__chrome"><span class="browser-bar__dots"><i></i><i></i><i></i></span><span class="d-nesl__url">${OPL.icon("shield-check-bold-duotone", 14)} NeSL · Digital Document Execution</span></div>
+          <div class="d-nesl__shot" data-shot></div>
+        </section>`.toString();
+      page.querySelector(".d-app").appendChild(layer);
+      void layer.offsetWidth; layer.classList.add("is-open");
+      this.shotEl = layer.querySelector("[data-shot]");
+      N().portal.forEach((p) => { const i = new Image(); i.src = src(p.id); });
+      this.show(step);
+      layer.addEventListener("click", (e) => {
+        if (e.target.closest("[data-nesl-next]")) return this.show(this.step + 1);
+        if (e.target.closest("[data-nesl-cancel]")) return this.cancel();
+        const hit = layer.querySelector("[data-nesl-next]");
+        if (hit && document.documentElement.dataset.hotspots !== "off") { hit.classList.remove("hotspot-flash"); void hit.offsetWidth; hit.classList.add("hotspot-flash"); }
+      });
+    },
+
+    show(step) {
+      this.timers.forEach(clearTimeout); this.timers = [];
+      this.step = step;
+      const portal = N().portal;
+      if (step >= portal.length) return this.confirm(false);
+      const p = portal[step];
+      const view = document.createElement("div");
+      view.className = "d-nesl__view";
+      view.innerHTML = `<img src="${src(p.id)}" width="390" height="723" alt="NeSL portal: ${p.id}" draggable="false">
+        ${p.next ? `<button class="nesl-hit" style="${rect(p.next)}" data-nesl-next aria-label="Continue"></button>` : ""}
+        ${p.cancel ? `<button class="nesl-hit nesl-hit--quiet" style="${rect(p.cancel)}" data-nesl-cancel aria-label="Cancel"></button>` : ""}`;
+      const old = this.shotEl.firstElementChild;
+      this.shotEl.appendChild(view);
+      if (old) { old.classList.add("is-out"); setTimeout(() => old.remove(), D.motionOff() ? 0 : 220); }
+      if (p.auto) this.timers.push(setTimeout(() => this.page.isConnected && this.show(this.step + 1), D.motionOff() ? 300 : p.auto));
+    },
+
+    cancel() {
+      OPL.apps.setStatus(this.id, "sign");
+      OPL.go("application", { app: this.id, step: null }, { replace: true });
+    },
+
+    // 440:135654 — "Confirming your signature" in the main panel, then Signed + milestone
+    confirm(park) {
+      const c = N().confirm;
+      this.page.innerHTML = D.shell({
+        nav: "loans", title: "", tab: null,
+        body: html`<div class="d-confirm">
+          <img class="nesl-confirm__spin" src="assets/icons/spinner.svg" width="64" height="64" alt="">
+          <h1>${c.title}</h1><p>${c.sub}</p><small>${c.foot}</small>
+        </div>`,
+      });
+      D.mountShell(this.page);
+      if (park) return;
+      this.timers.push(setTimeout(() => {
+        if (!this.page.isConnected) return;
+        OPL.apps.setStatus(this.id, "signed");
+        OPL.screens.application.celebrate = true;
+        OPL.go("application", { app: this.id, step: null }, { replace: true });
+      }, D.motionOff() ? 400 : c.wait));
     },
   };
 })();
