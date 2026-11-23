@@ -53,7 +53,7 @@
         </div>
         <div class="floating">
           ${ui.AiMitraFab({ nudge: v.nudge === "on" ? d.aiNudge : null })}
-          ${ui.BottomNav({ items: d.nav, active: "overview", variant: "section" })}
+          ${ui.BottomNav({ items: d.nav.map((it) => ({ ...it, label: it.overviewLabel || it.label })), active: "overview", variant: "section" })}
         </div>`;
 
       this.wire(page, d);
@@ -61,6 +61,10 @@
 
     wire(page, d) {
       OPL.fx.statusOnScroll(page);
+      page.addEventListener("click", (e) => {
+        const o = e.target.closest("[data-app-open]");
+        if (o) OPL.go("application", { app: o.dataset.appOpen });
+      });
       { const sh = OPL.fx.sheets(page); OPL.fx.applySheet(page, sh); OPL.fx.loanDetail(page, sh); }   // offer cards → details → apply
       page.querySelectorAll(".rail").forEach(OPL.fx.mouseDrag);
       OPL.fx.playInView(page, ".tracker, .borrow");

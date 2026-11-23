@@ -50,7 +50,7 @@
           { icon: "document-text", label: "Sign KFS<br>and Sanction", state: "action" },
         ],
         cta: "Review KFS",
-        goto: "kfs-summary",
+        ctaAttrs: 'data-app-open="pick-citi"',   // → Application detail, KFS ready (382:42689)
       },
     },
 
@@ -73,8 +73,9 @@
     nav: [
       { id: "overview", label: "Overview", icon: "widget", iconActive: "widget-active", goto: "loans-overview" },
       { id: "loan-offers", label: "Offers", icon: "banknote-2" },
-      // Figma renamed this tab "Track Loans" on 23 Nov (nav 440:132239); active icon from there
-      { id: "applications", label: "Track Loans", icon: "clipboard-list", iconActive: "clipboard-list-active" },
+      // "Track Loans" on the application screens (nav 440:132239); this frame (382:36150)
+      // still says "Applications", so Loans overview overrides the label (overviewLabel).
+      { id: "applications", label: "Track Loans", overviewLabel: "Applications", icon: "clipboard-list", iconActive: "clipboard-list-active" },
       { id: "my-loans", label: "My Loans", icon: "wallet-2" },
     ],
   };

@@ -9,7 +9,7 @@
 (function () {
   const OPL = (window.OPL = window.OPL || {});
 
-  OPL.VERSION = "0.7.0";
+  OPL.VERSION = "0.7.1";
   OPL.FIGMA_FILE = "https://www.figma.com/design/GHuBkYGEQZvQppv3v55EaA/OPL----Internal-Playground--5-";
   OPL.figmaLink = (nodeId) => `${OPL.FIGMA_FILE}?node-id=${nodeId.replace(":", "-")}`;
 
@@ -1381,7 +1381,7 @@
           { icon: "document-text", label: "Sign KFS<br>and Sanction", state: "action" },
         ],
         cta: "Review KFS",
-        goto: "kfs-summary",
+        ctaAttrs: 'data-app-open="pick-citi"',   // → Application detail, KFS ready (382:42689)
       },
     },
 
@@ -1404,8 +1404,9 @@
     nav: [
       { id: "overview", label: "Overview", icon: "widget", iconActive: "widget-active", goto: "loans-overview" },
       { id: "loan-offers", label: "Offers", icon: "banknote-2" },
-      // Figma renamed this tab "Track Loans" on 23 Nov (nav 440:132239); active icon from there
-      { id: "applications", label: "Track Loans", icon: "clipboard-list", iconActive: "clipboard-list-active" },
+      // "Track Loans" on the application screens (nav 440:132239); this frame (382:36150)
+      // still says "Applications", so Loans overview overrides the label (overviewLabel).
+      { id: "applications", label: "Track Loans", overviewLabel: "Applications", icon: "clipboard-list", iconActive: "clipboard-list-active" },
       { id: "my-loans", label: "My Loans", icon: "wallet-2" },
     ],
   };
@@ -2084,7 +2085,7 @@
         </div>
         <div class="floating">
           ${ui.AiMitraFab({ nudge: v.nudge === "on" ? d.aiNudge : null })}
-          ${ui.BottomNav({ items: d.nav, active: "overview", variant: "section" })}
+          ${ui.BottomNav({ items: d.nav.map((it) => ({ ...it, label: it.overviewLabel || it.label })), active: "overview", variant: "section" })}
         </div>`;
 
       this.wire(page, d);
@@ -2092,6 +2093,10 @@
 
     wire(page, d) {
       OPL.fx.statusOnScroll(page);
+      page.addEventListener("click", (e) => {
+        const o = e.target.closest("[data-app-open]");
+        if (o) OPL.go("application", { app: o.dataset.appOpen });
+      });
       { const sh = OPL.fx.sheets(page); OPL.fx.applySheet(page, sh); OPL.fx.loanDetail(page, sh); }   // offer cards → details → apply
       page.querySelectorAll(".rail").forEach(OPL.fx.mouseDrag);
       OPL.fx.playInView(page, ".tracker, .borrow");
@@ -2596,7 +2601,8 @@
       const d = A();
       const apps = currentApps();
       const id = OPL.state.get().app || apps[0].id;
-      const app = apps.find((a) => a.id === id) || { id, status: "verifying" };
+      // not in the live list (e.g. opened from the Loans overview card): use its Figma status
+      const app = apps.find((a) => a.id === id) || d.figmaPreset.find((a) => a.id === id) || { id, status: "verifying" };
       const l = lender(id);
       const kfs = app.status === "kfs";
       const branch = d.branch(l.slug);

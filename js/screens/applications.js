@@ -143,7 +143,8 @@
       const d = A();
       const apps = currentApps();
       const id = OPL.state.get().app || apps[0].id;
-      const app = apps.find((a) => a.id === id) || { id, status: "verifying" };
+      // not in the live list (e.g. opened from the Loans overview card): use its Figma status
+      const app = apps.find((a) => a.id === id) || d.figmaPreset.find((a) => a.id === id) || { id, status: "verifying" };
       const l = lender(id);
       const kfs = app.status === "kfs";
       const branch = d.branch(l.slug);

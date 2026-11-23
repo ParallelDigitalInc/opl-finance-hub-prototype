@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.7.1 — 23 Nov 2026 · Loans overview fixes
+
+- **"Review KFS" on the Loans overview application card now works.** It used to point at an unbuilt `kfs-summary` screen. It now opens the Citi application in its KFS-ready state (`382:42689`), the same place the Track Loans list goes.
+- If an application isn't in your live submitted list, its detail now falls back to its Figma status (Citi → KFS ready) instead of "verifying".
+- **Loans overview footer:** the third tab reads "Applications", as frame `382:36150` draws it. The application screens keep "Track Loans" (`440:132239`).
+
 ## v0.7.0 — 23 Nov 2026 · KFS reader (group D)
 
 Synced from Figma `416:43474` (KFS, page 1) and `416:43604` (KFS Page 4).
