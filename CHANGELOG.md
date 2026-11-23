@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.6.1 — 23 Nov 2026 · Confetti that moves
+
+- **The approval sheet's confetti is now animated.** Its 16 pieces are inlined from Figma (`416:44065` › Confetti), so each one moves on its own:
+  - each piece bursts out of the lender mark, overshoots with a spin, and lands exactly on its Figma position (staggered 22 ms apart)
+  - then the pieces drift gently while the sheet is open
+- **Reduced-motion users** see the pieces at rest.
+- The static confetti SVG moved to `assets/_source`.
+
 ## v0.6.0 — 23 Nov 2026 · Loan applications (A–C)
 
 Synced from Figma section "Loan Applications" `416:122660`: groups A (apply to 2–3), B (apply to one) and C (track applications).

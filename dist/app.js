@@ -9,7 +9,7 @@
 (function () {
   const OPL = (window.OPL = window.OPL || {});
 
-  OPL.VERSION = "0.6.0";
+  OPL.VERSION = "0.6.1";
   OPL.FIGMA_FILE = "https://www.figma.com/design/GHuBkYGEQZvQppv3v55EaA/OPL----Internal-Playground--5-";
   OPL.figmaLink = (nodeId) => `${OPL.FIGMA_FILE}?node-id=${nodeId.replace(":", "-")}`;
 
@@ -720,12 +720,42 @@
       <div class="kfs-facts">${s.facts.map((f) => OPL.raw(`<span>${f}</span>`))}</div>
     </div>`;
 
+  /* Confetti — the 16 pieces of the Milestone sheet hero (416:44065 › Confetti), copied
+     verbatim. Inlined so each piece can burst from the mark and land on its Figma spot. */
+  const CONFETTI = [
+    { t: "r", x: 352.367, y: 69.4755, rot: -10, fill: "#3858E5", cx: 354.87, cy: 75.48 },
+    { t: "r", x: 330.166, y: 23.7718, rot: 11, fill: "#3858E5", cx: 332.67, cy: 29.77 },
+    { t: "r", x: 70.9786, y: 18.4614, rot: -16, fill: "#14B8A6", cx: 73.48, cy: 24.46 },
+    { t: "r", x: 67.6425, y: 79.1371, rot: -51, fill: "#A5B4FC", cx: 70.14, cy: 85.14 },
+    { t: "c", cx: 334.204, cy: 153.199, r: 3.5, fill: "#14B8A6" },
+    { t: "r", x: 19.7542, y: 45.727, rot: -14, fill: "#3858E5", cx: 22.25, cy: 51.73 },
+    { t: "c", cx: 103.075, cy: 124.51, r: 3, fill: "#FFBB00" },
+    { t: "r", x: 100.188, y: 65.8312, rot: 1, fill: "#14B8A6", cx: 102.69, cy: 71.83 },
+    { t: "c", cx: 20.5939, cy: 151.894, r: 2.5, fill: "#A5B4FC" },
+    { t: "c", cx: 84.2341, cy: 165.148, r: 3, fill: "#A5B4FC" },
+    { t: "c", cx: 95.4787, cy: 97.9172, r: 3.5, fill: "#3858E5" },
+    { t: "c", cx: 54.4103, cy: 158.598, r: 4, fill: "#3858E5" },
+    { t: "c", cx: 335.002, cy: 147.873, r: 3.5, fill: "#14B8A6" },
+    { t: "r", x: 104.861, y: 122.427, rot: 32, fill: "#14B8A6", cx: 107.36, cy: 128.43 },
+    { t: "c", cx: 133.229, cy: 163.184, r: 4, fill: "#14B8A6" },
+    { t: "r", x: 87.4348, y: 109.234, rot: -7, fill: "#3858E5", cx: 89.93, cy: 115.23 }
+  ];
+  const ORIGIN = { x: 195, y: 90 };   // centre of the lender mark
+  ui.Confetti = () => OPL.raw(`<svg class="ms__confetti" viewBox="0 0 390 176" width="390" height="176" aria-hidden="true">${CONFETTI.map((p, i) => {
+    const dx = (ORIGIN.x - p.cx).toFixed(1), dy = (ORIGIN.y - p.cy).toFixed(1);
+    const spin = (i % 2 ? 1 : -1) * (180 + (i * 37) % 200);
+    const shape = p.t === "r"
+      ? `<rect x="${p.x}" y="${p.y}" width="5" height="12" rx="1.5" transform="rotate(${p.rot} ${p.x} ${p.y})" fill="${p.fill}"/>`
+      : `<circle cx="${p.cx}" cy="${p.cy}" r="${p.r}" fill="${p.fill}"/>`;
+    return `<g class="cf" style="--dx:${dx}px;--dy:${dy}px;--spin:${spin}deg;--i:${i}">${shape}</g>`;
+  }).join("")}</svg>`);
+
   /* MilestoneSheet body — "Loan / Milestone sheet", State=Approved (400:1873 / 416:44065) */
   ui.MilestoneApproved = ({ lender, logo, type, figures, title, body, note }) => html`
     <div class="ms">
       <span class="sheet__grabber" data-sheet-drag></span>
       <div class="ms__hero">
-        <img class="ms__confetti" src="${img("milestone-confetti.svg")}" alt="">
+        ${ui.Confetti()}
         <img class="ms__ripple" src="${img("milestone-ripple.svg")}" alt="">
         <img class="ms__glow1" src="${img("milestone-glow-1.svg")}" alt="">
         <img class="ms__glow2" src="${img("milestone-glow-2.svg")}" alt="">
