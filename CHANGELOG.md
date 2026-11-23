@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.16.17 — 23 Nov 2026 · Money on its way: working days, not a date
+
+Shreya: we can't promise when the money arrives, so show "5–8 working days", not a date.
+
+- **Mobile:** the status line reads "Expected in 5–8 working days", and the disbursal card reads "Expected in · 5–8 working days". Both were "Expected by 30 Nov".
+- **Desktop:** the same line, plus "Expected in your account in 5–8 working days."
+- **README flag:** Figma `435:8001` still draws the date.
+
 ## v0.16.16 — 23 Nov 2026 · Subsidy lists follow the state · All subsidies · Refine your matches
 
 Shreya asked for four things:

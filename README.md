@@ -325,6 +325,8 @@ All of this is behaviour on existing elements. None of it adds UI:
 
 ## Figma flags · Disbursal (group F)
 
+- **No arrival date, only working days (Shreya, 23 Nov).** "Money on its way" says "Expected in 5–8 working days" in the mobile status line and disbursal card, and "Expected in your account in 5–8 working days." on desktop. Figma (`435:8001`) draws "Expected by 30 Nov".
+
 1. **Stray cell border.** In Money on its way, the Disbursal card's "First EMI" cell has its right border on the card's outer edge, and there's no divider between Monthly EMI and First EMI. Money received puts its dividers between cells. Reproduced as drawn; probably meant to sit between the cells.
 2. **The wallet icon is primary blue on the green "done" node** in Money received; the other done icons are green. Used as drawn.
 3. **The Money received note** still says "…may call you to confirm details before sending the money", after the money has arrived.

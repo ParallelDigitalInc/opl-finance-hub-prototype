@@ -4,7 +4,7 @@
 
 (function () {
 const OPL = (window.OPL = window.OPL || {});
-OPL.VERSION = "0.16.16";
+OPL.VERSION = "0.16.17";
 OPL.FIGMA_FILE = "https://www.figma.com/design/GHuBkYGEQZvQppv3v55EaA/OPL----Internal-Playground--5-";
 OPL.figmaLink = (nodeId) => `${OPL.FIGMA_FILE}?node-id=${nodeId.replace(":", "-")}`;
 const esc = (v) =>
@@ -2169,12 +2169,12 @@ cta: "View application", done: "Done",
 Object.assign(OPL.data.applications, {
 disbursing: {
 title: "Money on Its Way",
-sub: "Expected by 30 Nov",
+sub: "Expected in 5–8 working days",
 step4: "Money Disbursal",
 step4Sub: (name) => `${name} is processing the disbursal`,
 note: (name) => `${name} may call you to confirm details before disbursal of final loan amount.`,
 card: { label: "Final Loan Amount", value: "₹44,32,500", tex: 0.2,
-rows: [[{ l: "Expected by", v: "30 Nov", b: 1 }], [{ l: "Monthly EMI", v: "₹1,44,043" }, { l: "First EMI", v: "5 Jan 2027", r: 1 }]] },
+rows: [[{ l: "Expected in", v: "5–8 working days", b: 1 }], [{ l: "Monthly EMI", v: "₹1,44,043" }, { l: "First EMI", v: "5 Jan 2027", r: 1 }]] },
 },
 disbursed: {
 title: "Money Received",

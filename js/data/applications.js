@@ -207,13 +207,15 @@
   Object.assign(OPL.data.applications, {
     disbursing: {
       title: "Money on Its Way",
-      sub: "Expected by 30 Nov",
+      // Only an estimate in working days, never a date: the lender decides the day (Shreya, 23 Nov).
+      // Drawn "Expected by 30 Nov".
+      sub: "Expected in 5–8 working days",
       step4: "Money Disbursal",
       step4Sub: (name) => `${name} is processing the disbursal`,
       note: (name) => `${name} may call you to confirm details before disbursal of final loan amount.`,
       // cell borders exactly as drawn: b = bottom, r = right (435:8181)
       card: { label: "Final Loan Amount", value: "₹44,32,500", tex: 0.2,
-        rows: [[{ l: "Expected by", v: "30 Nov", b: 1 }], [{ l: "Monthly EMI", v: "₹1,44,043" }, { l: "First EMI", v: "5 Jan 2027", r: 1 }]] },
+        rows: [[{ l: "Expected in", v: "5–8 working days", b: 1 }], [{ l: "Monthly EMI", v: "₹1,44,043" }, { l: "First EMI", v: "5 Jan 2027", r: 1 }]] },
     },
     disbursed: {
       title: "Money Received",

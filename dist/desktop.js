@@ -1955,7 +1955,7 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
     ],
     expectTitle: "What to expect",
     expectVerifying: (name) => [`${name} will call you on +91 ******6789.`, "They may visit your unit on Ring Road, Surat."],
-    expectMoney: (name) => ["Expected in your account by 30 Nov.", `${name} may call you to confirm details before disbursal of the final loan amount.`],
+    expectMoney: (name) => ["Expected in your account in 5–8 working days.", `${name} may call you to confirm details before disbursal of the final loan amount.`],
     repayTitle: "Total Repayment Amount",
     docsReady: "Keep these documents ready",
     withdraw: "Withdraw application",
