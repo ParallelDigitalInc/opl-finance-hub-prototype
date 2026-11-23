@@ -1105,11 +1105,11 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
   // Subsidy cards (524:98881 …). Logos are the mobile kit's ui.Logo ids.
   const CARDS = {
     msme: { id: "msme", tag: "Central", tint: "#fbf0e9", logo: "msme", name: "MSME Competitive Lean Scheme", sub: "MSME Champions Scheme",
-      value: "Up to ₹2.4L", note: "90% of lean consultant fees", kind: "Central" },
+      value: "Up to ₹2.4L", note: "90% of lean consultant fees", kind: "Central", pays: [] },
     electronics: { id: "electronics", tag: "State", tint: "#ebf1f8", logo: "gujarat", name: "Gujarat Electronics Policy (2022–28)", sub: "Sector specific scheme",
-      value: "Up to ₹2.4L", note: "90% of lean consultant fees", kind: "State" },          // note as drawn (copied from the MSME card) — flagged
+      value: "Up to ₹2.4L", note: "90% of lean consultant fees", kind: "State", pays: ["capital", "interest"] },          // note as drawn (copied from the MSME card) — flagged
     textile: { id: "textile", tag: "State", tint: "#fcf4ee", logo: "gujaratGovt", name: "Gujarat Textile Policy 2024", sub: "Sector specific scheme",
-      value: "Up to 35%", note: "capital subsidy on eligible investment", kind: "State" },
+      value: "Up to 35%", note: "capital subsidy on eligible investment", kind: "State", pays: ["capital", "interest", "payroll", "export"] },
   };
 
   dd.subsidies = {
@@ -2426,6 +2426,55 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
   const D = OPL.d;
   const S = () => OPL.ddata.subsidies;
 
+  // Mobile scheme catalogue → desktop card fields (tag "Central"/"State", "Up to …", note line)
+  const toDesk = (c, i) => {
+    const central = c.tag.startsWith("Central");
+    return { id: `s${i}`, tag: central ? "Central" : "State", kind: central ? "Central" : "State", tint: central ? "#ebf1f8" : "#fbf0e9",
+      logo: c.logo, name: c.title.replace(/<br>/g, " "), sub: c.subtitle, value: `Up to ${c.figures[0].value}`, note: c.note || "", pays: c.pays };
+  };
+
+  /* Refine your matches — side panel (OPL Reviews 2289:330535) on the kit's drawer, 480 wide.
+     All four questions at once (the panel's layout), the kit's blue instead of the old indigo.
+     onDone runs after "Show my matches" (the list re-ranks). */
+  D.openRefine = (page, onDone) => {
+    const R = OPL.data.subsidyRefine, A = OPL.refine.answers, n = () => R.count();
+    const body = String(html`
+      <p class="d-rf__sub">${R.sub}</p>
+      <div class="d-rf__prog"><span class="d-rf__track"><span class="d-rf__fill" data-rf-fill></span></span><span class="d-rf__count" data-rf-count></span></div>
+      <div class="d-rf__qs">${R.questions.map((q, i) => html`
+        <div class="d-rf__q" style="--i:${i}">
+          <p class="d-rf__text">${q.q}</p>
+          <p class="d-rf__why">${q.why}</p>
+          <div class="d-rf__choices" role="radiogroup" aria-label="${q.q}">${R.choices.map((c) => html`
+            <button class="d-rf__choice ${A[q.id] === c ? "is-on" : ""}" role="radio" aria-checked="${A[q.id] === c}" data-rf-q="${q.id}" data-rf-a="${c}">${D.micon("check-circle-primary", 14, "d-rf__tick")}<span>${c}</span></button>`)}
+          </div>
+        </div>`)}
+      </div>`);
+    const footer = String(html`
+      ${D.btn({ label: R.close, style: "outlined", size: "md", attrs: "data-drawer-close" })}
+      ${D.btn({ label: R.cta, style: "filled", size: "md", cls: "d-btn--grow", iconRight: D.icon("arrow-white-16", 16), attrs: "data-rf-done" })}`);
+    const dr = D.openDrawer(page, { title: R.title, body, footer, width: 480 });
+    dr.el.classList.add("d-drawer-layer--refine");
+    const paint = () => {
+      dr.el.querySelector("[data-rf-count]").textContent = R.answered(n(), R.questions.length);
+      dr.el.querySelector("[data-rf-fill]").style.width = `${(n() / R.questions.length) * 100}%`;
+    };
+    paint();
+    dr.el.addEventListener("click", (e) => {
+      const ch = e.target.closest("[data-rf-a]");
+      if (ch) {
+        A[ch.dataset.rfQ] = ch.dataset.rfA;
+        dr.el.querySelectorAll(`[data-rf-q="${ch.dataset.rfQ}"]`).forEach((b) => { const on = b === ch; b.classList.toggle("is-on", on); b.setAttribute("aria-checked", on); });
+        return paint();
+      }
+      if (e.target.closest("[data-rf-done]")) {
+        OPL.refine.done = true;
+        dr.close();
+        setTimeout(() => { onDone && onDone(); D.toast(page, R.toast(n())); }, D.motionOff() ? 0 : 240);
+      }
+    });
+  };
+
   D.subsidyCard = (c) => html`
     <article class="d-scard" data-scard="${c.id}" style="--tint:${c.tint}" tabindex="0">
       <div class="d-scard__head">
@@ -2521,6 +2570,7 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
       let list = t.cards.filter((c) => !st.chips.length || st.chips.some((ch) => ch === c.kind || ch === "Sector" || ch === "Import & Export"));
       if (st.state !== "Gujarat") list = list.filter((c) => c.kind === "Central");   // other states: only central schemes apply
       if (st.sort === "Highest benefit") list = list.slice().sort((a, b) => (b.value.includes("%") ? 1 : 0) - (a.value.includes("%") ? 1 : 0));
+      list = OPL.data.subsidyRefine.rank(list);
       if (!list.length) return `<div class="d-empty"><p class="d-empty__title">No subsidies match these filters</p><p class="d-empty__body">Try another state or remove a filter.</p></div>`;
       return list.map((c) => String(D.subsidyCard(c))).join("");
     },
@@ -2586,6 +2636,7 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
       const st = this.st;
       const closeMenus = () => page.querySelectorAll(".d-menu.is-open").forEach((m) => { m.classList.remove("is-open"); page.querySelector(`[data-menu="${m.dataset.menuFor}"]`)?.setAttribute("aria-expanded", "false"); });
       page.addEventListener("click", (e) => {
+        if (e.target.closest('[data-goto="subsidy-refine"]')) { e.stopPropagation(); return D.openRefine(page, () => this.refresh(page)); }
         const chip = e.target.closest("[data-schip]");
         if (chip) {
           const c = chip.dataset.schip;
@@ -2642,15 +2693,27 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
 
     list() {
       const r = S().results, st = this.st;
-      let list = r.cards.map((c, i) => ({ ...c, id: c.id + "-" + i }));
+      // central schemes + the chosen state's own (was the drawn Gujarat set ×2 for any state)
+      let list = OPL.data.schemes.forPlace(this.pick.state, this.pick.activity).map(toDesk);
       if (st.chips.includes("State")) list = list.filter((c) => c.kind === "State");
       if (st.sort === "Highest benefit") list = list.slice().sort((a, b) => (b.value.includes("%") ? 1 : 0) - (a.value.includes("%") ? 1 : 0));
-      return list;
+      return OPL.data.subsidyRefine.rank(list);
     },
     cardsHtml() {
       const list = this.list();
-      if (!list.length) return `<div class="d-empty"><p class="d-empty__title">No subsidies match these filters</p><p class="d-empty__body">Remove a filter or change an answer above.</p></div>`;
-      return list.map((c) => String(D.subsidyCard(c))).join("");
+      const R = OPL.data.subsidyRefine, done = OPL.refine.done;
+      const f = done ? { title: R.doneTitle, body: R.doneBody(R.count()), cta: R.doneCta } : S().refine;
+      // "Refine your matches" as a full-width row after the first row of cards (art 558:104693)
+      const refine = String(html`
+        <section class="d-refine d-refine--row ${done ? "is-done" : ""}" data-refine-row>
+          <img class="d-refine__art" src="assets/lazy/dsk/refine-art.png" width="165" height="87" alt="">
+          <div class="d-refine__copy"><h3>${f.title}</h3><p>${f.body}</p></div>
+          ${D.btn({ label: f.cta, style: done ? "tonal" : "filled", size: "lg", iconRight: D.icon(done ? "arrow-primary-16" : "arrow-white-16", 16), goto: "subsidy-refine" })}
+        </section>`);
+      if (!list.length) return `<div class="d-empty"><p class="d-empty__title">No subsidies match these filters</p><p class="d-empty__body">Remove a filter or change an answer above.</p></div>` + refine;
+      const cards = list.map((c) => String(D.subsidyCard(c)));
+      cards.splice(Math.min(3, cards.length), 0, refine);
+      return cards.join("");
     },
 
     render(page) {
@@ -2719,7 +2782,7 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
 
     animateCards(page, delay = 0) {
       if (D.motionOff()) return;
-      page.querySelectorAll("[data-xcards] .d-scard").forEach((c, i) => c.animate([{ opacity: 0, transform: "translateY(10px)" }, { opacity: 1, transform: "none" }], { duration: 360, delay: delay + i * 55, easing: "cubic-bezier(0.22, 1, 0.36, 1)", fill: "backwards" }));
+      page.querySelectorAll("[data-xcards] .d-scard, [data-xcards] .d-refine--row").forEach((c, i) => c.animate([{ opacity: 0, transform: "translateY(10px)" }, { opacity: 1, transform: "none" }], { duration: 360, delay: delay + i * 55, easing: "cubic-bezier(0.22, 1, 0.36, 1)", fill: "backwards" }));
     },
     refresh(page) {
       page.querySelector("[data-xcards]").innerHTML = this.cardsHtml();
@@ -2732,6 +2795,7 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
       const tick = (sel, on) => page.querySelectorAll(sel).forEach((b) => { const yes = on(b); b.classList.toggle("is-on", yes); b.setAttribute("aria-checked", yes); b.querySelector(".ico")?.remove(); if (yes) b.insertAdjacentHTML("beforeend", String(D.micon("check-circle-primary", 16))); });
       const closeMenus = () => page.querySelectorAll(".d-menu.is-open").forEach((m) => { m.classList.remove("is-open"); page.querySelector(`[data-menu="${m.dataset.menuFor}"]`)?.setAttribute("aria-expanded", "false"); });
       page.addEventListener("click", (e) => {
+        if (e.target.closest('[data-goto="subsidy-refine"]')) { e.stopPropagation(); return D.openRefine(page, () => this.refresh(page)); }
         const mb = e.target.closest("[data-menu]");
         if (mb) {
           const menu = page.querySelector(`[data-menu-for="${mb.dataset.menu}"]`);

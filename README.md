@@ -392,6 +392,27 @@ Opens from Home → "CMR score" and Loans overview → "CMR - 2" (both point at 
 - The lead card's usage bar slides from amber 45% to green 30% when it scrolls into view, and its "Biggest lift" tag shines once.
 - The footer lifts with a hairline while content scrolls beneath it.
 
+## Proposed · Subsidy lists, Refine your matches (23 Nov)
+
+1. **The lists follow the answers.**
+   - Explore (mobile `556:128366`, desktop `558:101968`) showed the drawn Gujarat set twice for any state. It now shows the chosen state's own schemes (state-wide ones, plus the one for the chosen activity, first), then central schemes.
+   - The catalogue is `OPL.data.schemes` in `js/data/subsidies-home.js`. Scheme names are real; amounts, notes and the benefits each one pays are sample.
+   - Only Gujarat has a seal in the kit, so other states show a monogram (MH, KA…) until seals are supplied.
+2. **All subsidies (`subsidy-list`, mobile):** "View all" and the benefit chips on Home and Subsidies home used to be dead links. They now open the same list without the expansion answers.
+   - **Filters sit outside, as a chip row:** a state pill, then State · Sector · Central.
+   - **State pill:** opens the Subsidies home picker, which lists only the states on the business's GST registration. The choice is shared with Subsidies home.
+   - **Chips:** State and Central pick the issuer; Sector keeps the sector-specific schemes. They combine (State + Sector = that state's sector schemes).
+   - Count and Sort share the row above. There's no filter sheet and no note line.
+3. **Refine banner:** in every list after the 3rd card, using the 3D art `558:104693`.
+   - Mobile uses the Home help card's surface (help-bg, slate-200, Shadow/s, small filled button).
+   - Desktop shows it as a full-width row in the grid.
+   - After refining it turns into "Matches refined · Edit answers".
+4. **Refine flow (OPL Reviews `2289:330535`):**
+   - **Questions:** the panel's 6 are cut to 4, one per benefit you can claim: term loan → interest, new machinery → capital, hiring → payroll, export → export. Patent/trademark and "notified industrial area" are dropped. The copy is rewritten short, and each question says why it's asked.
+   - **Desktop:** the panel on the kit's drawer (480 wide), in the kit's `#3858E5` and Geist instead of the panel's `#4338CA` and Figtree.
+   - **Mobile:** a bottom sheet with one question at a time. Picking an answer moves on; Skip and Back sit in the footer; the last step reads "Show my matches".
+   - **Ranking (sample logic):** a Yes counts 1 and a Not sure counts ½ towards each scheme that pays that benefit, and the list re-sorts. Answers last for the session and are shared by both views.
+
 ## Figma flags · Calculate estimate (`416:76869`)
 
 1. **The estimate is calculated, not copied.**

@@ -72,6 +72,8 @@
     },
   };
   ui.Logo = ({ id, size = 40, ring }) => {
+    // "mono:MH" — a state's scheme with no seal in the kit yet: initials on a soft disc
+    if (String(id).startsWith("mono:")) return html`<span class="logo logo--mono" style="--logo:${size}px;--ring:1px"><span class="logo__fill"><span class="logo__mono">${id.slice(5)}</span></span></span>`;
     const def = LOGOS[id];
     const r = ring ?? def.ring ?? 0;
     return html`<span class="logo" style="--logo:${size}px;--ring:${r}px${def.bg ? `;--logo-bg:${def.bg}` : ""}">

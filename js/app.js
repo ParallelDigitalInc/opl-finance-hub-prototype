@@ -89,7 +89,8 @@
     nesl: ["kfs", "application"],
     "subsidies-overview": ["home"],
     "subsidies-explore": ["subsidies-overview"],
-    "subsidy-detail": ["subsidies-explore", "subsidies-overview", "home"],
+    "subsidy-list": ["subsidies-overview", "home"],
+    "subsidy-detail": ["subsidies-explore", "subsidy-list", "subsidies-overview", "home"],
     "subsidy-estimate": ["subsidy-detail"],
     "subsidy-estimate-result": ["subsidy-detail"],
   };

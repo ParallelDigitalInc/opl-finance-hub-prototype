@@ -152,7 +152,16 @@
       { id: "results", label: "Explore results", figma: "556:128366", set: { sheet: "none" } },
       { id: "edit", label: "Edit answers sheet", figma: "524:99050", set: { sheet: "edit" } },   // desktop modal's fields; no mobile frame
     ],
-    groups: [{ id: "sheet", hidden: true, default: "none", options: [{ value: "none" }, { value: "edit" }, { value: "sort" }, { value: "filter" }] }],
+    groups: [{ id: "sheet", hidden: true, default: "none", options: [{ value: "none" }, { value: "edit" }, { value: "sort" }, { value: "filter" }, { value: "refine" }] }],
+  };
+  OPL.variants["subsidies-explore"].presets.push({ id: "refine", label: "Refine sheet (proposed)", figma: "2289:330535", set: { sheet: "refine" } });
+  /* All subsidies ("View all") — same list, no expansion answers (proposed) */
+  OPL.variants["subsidy-list"] = {
+    presets: [
+      { id: "all", label: "All subsidies", figma: "556:128366", set: { sheet: "none" } },
+      { id: "refine", label: "Refine sheet (proposed)", figma: "2289:330535", set: { sheet: "refine" } },
+    ],
+    groups: [{ id: "sheet", hidden: true, default: "none", options: [{ value: "none" }, { value: "sort" }, { value: "states" }, { value: "refine" }] }],
   };
 
   /* Calculate estimate (416:76869) */

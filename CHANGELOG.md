@@ -1,5 +1,33 @@
 # Changelog
 
+## v0.16.16 — 23 Nov 2026 · Subsidy lists follow the state · All subsidies · Refine your matches
+
+Shreya asked for four things:
+- a Refine banner in the subsidy lists, using the latest illustration;
+- the refine flow: desktop from OPL Reviews `2289:330535` with cleaner colours, fewer questions and better copy; mobile one question at a time in a sheet, skippable;
+- no Gujarat schemes for a Maharashtra expansion;
+- a list for "View all subsidies", with State / Sector / Central filters outside and a GST-state dropdown.
+
+**What changed:**
+- **The lists follow the state.**
+  - Explore (mobile and desktop) lists the chosen state's own schemes first, with the one for the chosen activity on top, then central ones. Before, it showed the drawn Gujarat set twice.
+  - The catalogue is `OPL.data.schemes`. Names are real; amounts, notes and benefits are sample.
+  - States without a seal in the kit get a monogram (`ui.Logo` `mono:MH`).
+- **All Subsidies (`subsidy-list`, mobile):** "View all" and the benefit chips now lead here instead of a dead link.
+  - It lists every scheme in the business's state, plus central ones.
+  - A state pill opens the Subsidies home picker (GST-registered states only).
+  - State · Sector · Central chips sit outside and combine.
+- **Refine banner** after the 3rd card, with the 3D art `558:104693`.
+  - Mobile: the Home help card's surface and a small filled button.
+  - Desktop: a full-width grid row.
+  - After refining it reads "Matches refined · Edit answers".
+- **Refine flow:**
+  - **Questions:** 4 instead of 6, one per benefit (term loan, machinery, hiring, export), each with a one-line "why".
+  - **Desktop:** the panel on the kit drawer, in `#3858E5` and Geist, with a live "n of 4 answered" bar and a toast when done.
+  - **Mobile:** a sheet, one question per step. Picking an answer moves on; Skip and Back are in the footer.
+  - **Result:** the list re-ranks by the answers (sample logic). Answers are shared by both views for the session.
+- Back from All Subsidies goes to Subsidies home, or Home.
+
 ## v0.16.15 — 23 Nov 2026 · "Track Loans" everywhere
 
 Shreya: some places say "Track Loans", others "Applications"; stick to Track Loans.

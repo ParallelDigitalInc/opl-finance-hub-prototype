@@ -4,7 +4,7 @@
 
 (function () {
 const OPL = (window.OPL = window.OPL || {});
-OPL.VERSION = "0.16.15";
+OPL.VERSION = "0.16.16";
 OPL.FIGMA_FILE = "https://www.figma.com/design/GHuBkYGEQZvQppv3v55EaA/OPL----Internal-Playground--5-";
 OPL.figmaLink = (nodeId) => `${OPL.FIGMA_FILE}?node-id=${nodeId.replace(":", "-")}`;
 const esc = (v) =>
@@ -148,6 +148,7 @@ layers: [
 },
 };
 ui.Logo = ({ id, size = 40, ring }) => {
+if (String(id).startsWith("mono:")) return html`<span class="logo logo--mono" style="--logo:${size}px;--ring:1px"><span class="logo__fill"><span class="logo__mono">${id.slice(5)}</span></span></span>`;
 const def = LOGOS[id];
 const r = ring ?? def.ring ?? 0;
 return html`<span class="logo" style="--logo:${size}px;--ring:${r}px${def.bg ? `;--logo-bg:${def.bg}` : ""}">
@@ -895,6 +896,45 @@ ${r.groups.map((g) => html`<div class="rlist"><p class="rlist__group">${g.title}
 ${s.apply ? html`<button class="btn btn--md btn--ghost btn--block" data-press ${goto(actions.apply.goto)}><span class="btn__label">${actions.apply.label}</span>${sicon("arrow-right-up-primary", 16)}</button>` : ""}
 </div>`;
 };
+ui.RefineBanner = ({ title, body, cta, goto: to, done = false }) => html`
+<article class="${cx("refine", done && "refine--done")}" data-press ${goto(to)} role="link" tabindex="0" aria-label="${title}. ${body}">
+<span class="refine__glow" aria-hidden="true"></span>
+<div class="refine__copy">
+<h3 class="refine__title">${done ? sicon("rq-done", 20, "refine__done") : ""}${title}</h3>
+<p class="refine__body">${body}</p>
+${ui.Button({ label: cta, size: "sm", trailing: "chevron-right-white", attrs: "tabindex=\"-1\"" })}
+</div>
+<img class="refine__art" src="assets/lazy/dsk/refine-art.png" width="118" height="62" alt="" draggable="false">
+</article>`;
+ui.RefineSheet = (r) => html`
+<div class="sheet-layer" data-sheet="refine" hidden>
+<div class="sheet-scrim" data-sheet-close></div>
+<section class="sheet bsheet rq" role="dialog" aria-modal="true" aria-label="${r.title}">
+<div class="bsheet__grip" data-sheet-drag>
+<span class="bsheet__grabber"></span>
+<div class="bsheet__head">
+<h2 class="bsheet__title">${r.title}</h2>
+<button class="bsheet__close" aria-label="Close" data-press data-sheet-close>${sicon("sheet-x", 16)}</button>
+</div>
+</div>
+<div class="rq__body">
+<div class="rq__prog"><span class="rq__track"><span class="rq__fill" data-rq-fill></span></span><span class="rq__count" data-rq-count></span></div>
+<div class="rq__stage" data-rq-stage aria-live="polite"></div>
+</div>
+<div class="rq__foot">
+<button class="rq__link" data-press data-rq-back>${OPL.icon("alt-arrow-left", 16)}${r.back}</button>
+<button class="rq__link rq__link--skip" data-press data-rq-skip>${r.skip}</button>
+</div>
+</section>
+</div>`;
+ui.RefineStep = (q, picked, choices) => html`
+<div class="rq__pane">
+<p class="rq__q">${q.q}</p>
+<p class="rq__why">${sicon("rq-why", 16)}<span>${q.why}</span></p>
+<div class="rq__opts" role="radiogroup" aria-label="${q.q}">
+${choices.map((c) => html`<button class="${cx("rq__opt", picked === c && "is-on")}" role="radio" aria-checked="${picked === c}" data-press data-rq-choice="${c}"><span>${c}</span>${sicon("rq-check", 16, "rq__tick")}</button>`)}
+</div>
+</div>`;
 ui.BenefitSheetLayer = () => html`
 <div class="sheet-layer" data-sheet="benefit" hidden>
 <div class="sheet-scrim" data-sheet-close></div>
@@ -1497,7 +1537,15 @@ presets: [
 { id: "results", label: "Explore results", figma: "556:128366", set: { sheet: "none" } },
 { id: "edit", label: "Edit answers sheet", figma: "524:99050", set: { sheet: "edit" } },   // desktop modal's fields; no mobile frame
 ],
-groups: [{ id: "sheet", hidden: true, default: "none", options: [{ value: "none" }, { value: "edit" }, { value: "sort" }, { value: "filter" }] }],
+groups: [{ id: "sheet", hidden: true, default: "none", options: [{ value: "none" }, { value: "edit" }, { value: "sort" }, { value: "filter" }, { value: "refine" }] }],
+};
+OPL.variants["subsidies-explore"].presets.push({ id: "refine", label: "Refine sheet (proposed)", figma: "2289:330535", set: { sheet: "refine" } });
+OPL.variants["subsidy-list"] = {
+presets: [
+{ id: "all", label: "All subsidies", figma: "556:128366", set: { sheet: "none" } },
+{ id: "refine", label: "Refine sheet (proposed)", figma: "2289:330535", set: { sheet: "refine" } },
+],
+groups: [{ id: "sheet", hidden: true, default: "none", options: [{ value: "none" }, { value: "sort" }, { value: "states" }, { value: "refine" }] }],
 };
 OPL.variants["subsidy-estimate"] = {
 presets: [
@@ -2548,6 +2596,7 @@ OPL.data.subsidyExplore = {
 title: "Explore Government Subsidies",
 brief: "Showing subsidies for",
 found: (n) => `${n} subsidies found`,
+refine: { title: "Refine your matches", body: "Answer a few questions to get more accurate subsidy matches", cta: "Try Now", goto: "subsidy-refine", after: 3 },
 fields: [
 { id: "state", label: "Where will the new unit be?", options: ["Andhra Pradesh", "Gujarat", "Karnataka", "Madhya Pradesh", "Maharashtra", "Rajasthan", "Tamil Nadu"] },
 { id: "sector", label: "Industry Sector", options: ["Manufacturing", "Services", "Trading"] },
@@ -2559,7 +2608,40 @@ edit: { title: "Edit answers", cta: "Find Subsidies" },
 sort: { label: "Sort by", options: ["Alphabetical", "Highest benefit"] },
 filter: { label: "Filter", title: "Filter", clear: "Clear all", cta: "Show subsidies",
 options: [{ label: "Central", match: "Central Government" }, { label: "State", match: "State Government" }] },
-cards: () => { const c = OPL.data.home.subsidies.cards; return [c[0], c[1], c[2], c[1], c[2], c[0]]; },
+cards: (pick) => OPL.data.schemes.forPlace(pick.state, pick.activity),
+all: { title: "All Subsidies", chips: ["State", "Sector", "Central"] },
+};
+const card = (o) => ({ kind: "subsidy", goto: "subsidy-detail", pays: [], ...o, figures: [{ label: "Assistance up to", value: o.value }] });
+const central = (o) => card({ tag: "Central Government", tint: "var(--tint-blue)", ...o });
+const state = (o) => card({ tag: "State Government", tint: "var(--tint-peach)", ...o });
+const MONO = { "Andhra Pradesh": "AP", Karnataka: "KA", "Madhya Pradesh": "MP", Maharashtra: "MH", Rajasthan: "RJ", "Tamil Nadu": "TN" };
+OPL.data.schemes = {
+central: [
+central({ logo: "msme", title: "MSME Competitive<br>Lean Scheme", subtitle: "MSME Champions Scheme", value: "₹2.4L", note: "90% of lean consultant fees" }),
+central({ logo: "msme", title: "ZED Certification<br>Scheme", subtitle: "MSME Champions Scheme", value: "₹5L", note: "on ZED certification costs", pays: ["export"] }),
+],
+states: {
+Gujarat: [
+state({ logo: "gujaratGovt", title: "Aatmanirbhar<br>Gujarat 2022", subtitle: "Industries and Mines Department", value: "₹1.2Cr", note: "capital and interest subsidy", activity: null, pays: ["capital", "interest", "payroll"] }),
+state({ logo: "gujaratGovt", title: "Gujarat Textile<br>Policy 2024", subtitle: "Industries and Mines Department", value: "₹1Cr", note: "capital subsidy on eligible investment", activity: "Textiles", pays: ["capital", "interest", "payroll", "export"] }),
+state({ logo: "gujarat", title: "Gujarat Electronics Policy<br>(2022 - 28)", subtitle: "Science and Technology Department", value: "₹2.4L", note: "capital subsidy for electronics units", activity: "Electronics", pays: ["capital", "interest"] }),
+],
+Maharashtra: [
+state({ logo: "mono:MH", title: "Package Scheme of<br>Incentives 2019", subtitle: "Industries Department", value: "₹1Cr", note: "capital and interest subsidy", activity: null, pays: ["capital", "interest", "payroll"] }),
+state({ logo: "mono:MH", title: "Maharashtra Textile<br>Policy 2023 - 28", subtitle: "Textiles Department", value: "₹80L", note: "capital subsidy on eligible investment", activity: "Textiles", pays: ["capital", "interest", "export"] }),
+state({ logo: "mono:MH", title: "Maharashtra Electronics<br>Policy 2016", subtitle: "Industries Department", value: "₹50L", note: "capital subsidy for electronics units", activity: "Electronics", pays: ["capital", "interest"] }),
+],
+},
+generic: (s) => [
+state({ logo: `mono:${MONO[s] || s.slice(0, 2).toUpperCase()}`, title: `${s}<br>Industrial Policy`, subtitle: "Industries Department", value: "₹75L", note: "capital and interest subsidy", activity: null, pays: ["capital", "interest"] }),
+state({ logo: `mono:${MONO[s] || s.slice(0, 2).toUpperCase()}`, title: `${s}<br>MSME Policy`, subtitle: "MSME Department", value: "₹25L", note: "for micro and small units", activity: null, pays: ["capital", "payroll"] }),
+],
+ofState(s) { return this.states[s] || this.generic(s); },
+forPlace(s, activity) {
+const own = this.ofState(s).filter((c) => !c.activity || c.activity === activity);
+return [...own.sort((a, b) => (b.activity === activity) - (a.activity === activity)), ...this.central];
+},
+forState(s) { return [...this.ofState(s), ...this.central]; },
 };
 })();
 
@@ -2605,6 +2687,47 @@ link: { label: "View credit line", goto: "my-loans" },
 },
 note: "Checking your rank here doesn't change it. CIBIL refreshes it every month.",
 cta: { label: "See loans for CMR-2", goto: "loan-offers" },
+};
+})();
+
+;
+
+/* ==== js/data/subsidy-refine.js ==== */
+
+(function () {
+OPL.data = OPL.data || {};
+const R = (OPL.data.subsidyRefine = {
+title: "Refine your matches",
+sub: "Four quick questions. Schemes that fit your business move to the top.",
+choices: ["Yes", "No", "Not sure"],
+questions: [
+{ id: "loan", benefit: "interest", q: "Have you taken a term loan, or plan to?", why: "Interest subsidies are for businesses with a term loan" },
+{ id: "machinery", benefit: "capital", q: "Did you buy new machinery in the last 2 years?", why: "Capital subsidies pay back part of what you invest" },
+{ id: "hiring", benefit: "payroll", q: "Will you hire more people this year?", why: "Some schemes pay part of new employees' salaries" },
+{ id: "export", benefit: "export", q: "Do you sell outside India, or plan to?", why: "Export schemes help with freight, fairs and certification" },
+],
+cta: "Show my matches",
+close: "Close",
+skip: "Skip",
+back: "Back",
+progress: (n, total) => `${n} of ${total}`,
+answered: (n, total) => `${n} of ${total} answered`,
+doneTitle: "Matches refined",
+doneBody: (n) => n ? `Sorted by your ${n} answer${n > 1 ? "s" : ""}. Best fits are on top.` : "No answers yet, so you're seeing every match.",
+doneCta: "Edit answers",
+toast: (n) => n ? `Matches refined with ${n} answer${n > 1 ? "s" : ""}` : "Showing all matches",
+});
+OPL.refine = OPL.refine || { answers: {}, done: false };
+R.count = () => Object.keys(OPL.refine.answers).length;
+R.score = (pays = []) => {
+return R.questions.reduce((s, q) => {
+const a = OPL.refine.answers[q.id];
+return s + (pays.includes(q.benefit) ? (a === "Yes" ? 1 : a === "Not sure" ? 0.5 : 0) : 0);
+}, 0);
+};
+R.rank = (list, paysOf = (c) => c.pays) => {
+if (!OPL.refine.done) return list;
+return list.map((c, i) => ({ c, i, s: R.score(paysOf(c)) })).sort((a, b) => b.s - a.s || a.i - b.i).map((x) => x.c);
 };
 })();
 
@@ -4351,6 +4474,8 @@ ${s.options.map((o) => stateRow(o, o === place))}
 </div>
 <p class="sh-states__empty" data-place-empty hidden></p>
 </div>`;
+OPL.ui.StateRow = stateRow;
+OPL.ui.StatesSheetBody = statesBody;
 OPL.screens["subsidies-overview"] = {
 title: "Subsidies home",
 figma: { default: "524:103425" },
@@ -4507,32 +4632,45 @@ pick: null,
 sort: "Alphabetical",
 filters: new Set(),
 leave() { this.timers.forEach(clearTimeout); this.timers = []; },
+home() { const h = OPL.screens["subsidies-overview"]; return (h && h.place) || OPL.data.subsidiesHome.states.home; },
+source() { return this.mode === "all" ? OPL.data.schemes.forState(this.place || this.home()) : D().cards(this.pick); },
 list() {
-let list = D().cards().map((c, i) => ({ ...c, key: i }));
+let list = OPL.data.subsidyRefine.rank(this.source().map((c, i) => ({ ...c, key: i })));
 if (this.filters.size) list = list.filter((c) => this.filters.has(c.tag));
+if (this.mode === "all" && this.chips.size) {
+const kinds = ["State", "Central"].filter((k) => this.chips.has(k));
+list = list.filter((c) => (!kinds.length || kinds.some((k) => c.tag.startsWith(k))) && (!this.chips.has("Sector") || c.activity));
+}
 if (this.sort === "Highest benefit") list = list.slice().sort((a, b) => (b.figures[0].value.includes("Cr") ? 1 : 0) - (a.figures[0].value.includes("Cr") ? 1 : 0));
 return list;
 },
 cardsHtml() {
 const list = this.list();
-if (!list.length) return `<p class="sh-none">No subsidies match this filter. Clear it to see all ${D().cards().length}.</p>`;
-return list.map((c) => ui.MatchCard({ ...c, size: "lg", title: c.title.replace(/<br>/g, " ") }).toString()).join("");   // full width: one line, as drawn
+const R = OPL.data.subsidyRefine, n = R.count();
+const refine = ui.RefineBanner(OPL.refine.done ? { ...D().refine, title: R.doneTitle, body: R.doneBody(n), cta: R.doneCta, done: true } : D().refine).toString();
+if (!list.length) return `<p class="sh-none">No subsidies match this filter. Clear it to see all ${this.source().length}.</p>` + refine;
+const cards = list.map((c) => ui.MatchCard({ ...c, size: "lg", title: c.title.replace(/<br>/g, " ") }).toString());   // full width: one line, as drawn
+cards.splice(Math.min(D().refine.after, cards.length), 0, refine);   // "Refine your matches" mid-list
+return cards.join("");
 },
 render(page) {
 this.leave();
 const d = D();
 this.pick = this.pick || { ...d.pick };
-const v = OPL.variantValues("subsidies-explore");
+const v = OPL.variantValues(this.mode === "all" ? "subsidy-list" : "subsidies-explore");
+const all = this.mode === "all";
+if (all && !this.place) this.place = this.home();   // GST principal state, or the Subsidies home pick
 page.innerHTML = html`
 ${ui.StatusBar()}
 <div class="scroller">
 <main class="sx">
-<section class="sx-hero">
+<section class="${cx("sx-hero", all && "sx-hero--all")}">
 <div class="sh-hero__bg sx-hero__bg">
 <img class="sh-hero__ellipse" src="${OPL.img("hero-ellipse.svg")}" alt="">
 <img class="sh-hero__texture" src="${OPL.img("hero-texture.jpg")}" alt="">
 </div>
-<div class="sx-hero__header">${ui.AppHeader({ title: d.title, back: true, actions: [] })}</div>
+<div class="sx-hero__header">${ui.AppHeader({ title: all ? d.all.title : d.title, back: true, actions: [] })}</div>
+${all ? "" : html`
 <button class="sx-brief" data-press data-open-sheet="edit" aria-haspopup="dialog">
 <span class="sx-brief__art" aria-hidden="true">
 <img class="sx-brief__ground" src="${OPL.simg("home/promo-ground.svg")}" alt="">
@@ -4546,16 +4684,29 @@ ${ui.StatusBar()}
 <span class="sx-brief__top"><span class="sx-brief__label">${d.brief}</span>${sicon("pen-16", 16, "sx-brief__pen")}</span>
 <span class="sx-brief__values" data-brief>${briefValues(this.pick)}</span>
 </span>
-</button>
+</button>`}
 </section>
 <section class="sx-results">
+${all ? html`
+<div class="sx-bar sx-bar--all">
+<div class="sx-row">
+<p class="sx-found" data-found>${d.found(this.list().length)}</p>
+<button class="sx-pill" data-press data-open-sheet="sort">${sicon("list-arrow-down-16", 16)}<span class="sx-pill__muted">${d.sort.label}</span><b data-sort-label>${this.sort}</b>${sicon("alt-arrow-right-14", 14, "sx-pill__chev")}</button>
+</div>
+<div class="rail rail--chips sx-chips">
+<button class="sh-where" data-press data-open-sheet="states" aria-haspopup="dialog" aria-label="Schemes in ${this.place}. Change state">
+${sicon("map-point-16", 16)}<span class="sh-where__value" data-place-label>${this.place}</span>${sicon("alt-arrow-right-14", 14, "sh-where__chev")}
+</button>
+<span class="chip-divider"></span>
+${d.all.chips.map((c) => ui.Chip({ label: c, selected: this.chips.has(c), attrs: `data-sxchip="${c}" aria-pressed="${this.chips.has(c)}"` }))}</div>
+</div>` : html`
 <div class="sx-bar">
 <p class="sx-found" data-found>${d.found(this.list().length)}</p>
 <div class="sx-pills">
 <button class="sx-pill" data-press data-open-sheet="sort">${sicon("list-arrow-down-16", 16)}<span class="sx-pill__muted">${d.sort.label}</span><b data-sort-label>${this.sort}</b>${sicon("alt-arrow-right-14", 14, "sx-pill__chev")}</button>
 <button class="${cx("sx-pill", this.filters.size && "is-on")}" data-press data-open-sheet="filter" data-filter-pill>${sicon("list-arrow-down-16", 16)}<span class="sx-pill__muted">${d.filter.label}</span><b class="sx-pill__count" data-filter-count ${this.filters.size ? "" : OPL.raw("hidden")}>${this.filters.size}</b>${sicon("alt-arrow-right-14", 14, "sx-pill__chev")}</button>
 </div>
-</div>
+</div>`}
 <div class="sx-list" data-list>${OPL.raw(this.cardsHtml())}</div>
 </section>
 </main>
@@ -4573,18 +4724,20 @@ ${ui.Sheet({
 id: "filter", title: d.filter.title, action: d.filter.clear,
 body: html`<div class="sheet-filters"><div class="filter-group__chips">${d.filter.options.map((o) => ui.Chip({ label: o.label, bordered: true, selected: this.filters.has(o.match), attrs: `data-sxfilter="${o.match}"` }))}</div></div>`,
 footer: ui.Button({ label: d.filter.cta, block: true, attrs: "data-sheet-done" }),
-})}`;
+})}
+${ui.RefineSheet(OPL.data.subsidyRefine)}
+${all ? ui.Sheet({ id: "states", title: OPL.data.subsidiesHome.states.title, body: ui.StatesSheetBody(OPL.data.subsidiesHome.states, this.place) }) : ""}`;
 this.wire(page, v);
 },
 deal(page, delay = 0) {
 if (OPL.fx.motionOff()) return;
-page.querySelectorAll("[data-list] .match").forEach((c, i) => c.animate([{ opacity: 0, transform: "translateY(10px)" }, { opacity: 1, transform: "none" }], { duration: 340, delay: delay + i * 60, easing: "cubic-bezier(0.22, 1, 0.36, 1)", fill: "backwards" }));
+page.querySelectorAll("[data-list] .match, [data-list] .refine").forEach((c, i) => c.animate([{ opacity: 0, transform: "translateY(10px)" }, { opacity: 1, transform: "none" }], { duration: 340, delay: delay + i * 60, easing: "cubic-bezier(0.22, 1, 0.36, 1)", fill: "backwards" }));
 },
 refresh(page) {
 page.querySelector("[data-list]").innerHTML = this.cardsHtml();
 page.querySelector("[data-found]").textContent = D().found(this.list().length);
 const n = this.filters.size, pill = page.querySelector("[data-filter-pill]"), cnt = page.querySelector("[data-filter-count]");
-pill.classList.toggle("is-on", !!n); cnt.hidden = !n; cnt.textContent = n;
+if (pill) { pill.classList.toggle("is-on", !!n); cnt.hidden = !n; cnt.textContent = n; }
 this.deal(page);
 },
 wire(page, v) {
@@ -4592,8 +4745,71 @@ const d = D(), motionOff = OPL.fx.motionOff();
 OPL.fx.statusOnScroll(page);
 const sheets = OPL.fx.sheets(page, { onClose: () => OPL.state.set({ sheet: null }, { silent: true }) });
 let draft = new Set(this.filters);
+const R = OPL.data.subsidyRefine, Q = R.questions;
+let step = 0;
+const paint = (dir) => {
+const q = Q[step], stage = page.querySelector("[data-rq-stage]");
+stage.innerHTML = String(ui.RefineStep(q, OPL.refine.answers[q.id], R.choices));
+page.querySelector("[data-rq-count]").textContent = R.progress(step + 1, Q.length);
+page.querySelector("[data-rq-fill]").style.width = `${((step + 1) / Q.length) * 100}%`;
+page.querySelector("[data-rq-back]").hidden = step === 0;
+page.querySelector("[data-rq-skip]").textContent = step === Q.length - 1 ? R.cta : R.skip;
+const pane = stage.firstElementChild;
+if (dir && !motionOff) pane.classList.add(dir === "back" ? "is-from-left" : "is-from-right");
+};
+const finish = () => {
+OPL.refine.done = true;
+sheets.close();
+this.timers.push(setTimeout(() => this.refresh(page), motionOff ? 0 : 260));
+};
+const go = (to) => {
+if (to >= Q.length) return finish();
+const dir = to < step ? "back" : "next";
+step = Math.max(0, to);
+paint(dir);
+};
+const openRefine = () => {
+const first = Q.findIndex((q) => !OPL.refine.answers[q.id]);
+step = OPL.refine.done || first < 0 ? 0 : first;
+paint();
+sheets.open("refine");
+};
+page.addEventListener("input", (e) => {
+const q = e.target.closest("[data-place-search]");
+if (!q) return;
+const k = q.value.trim().toLowerCase(); let n = 0;
+page.querySelectorAll("[data-place]").forEach((b) => { const hit = !k || b.dataset.place.toLowerCase().includes(k); b.hidden = !hit; if (hit) n++; });
+const empty = page.querySelector("[data-place-empty]");
+empty.hidden = n > 0; if (!n) empty.textContent = OPL.data.subsidiesHome.states.empty(q.value.trim());
+});
 page.addEventListener("click", (e) => {
 const t = e.target;
+if (t.closest('[data-goto="subsidy-refine"]')) { e.stopPropagation(); return openRefine(); }
+const ch = t.closest("[data-rq-choice]");
+if (ch) {
+OPL.refine.answers[Q[step].id] = ch.dataset.rqChoice;
+page.querySelectorAll("[data-rq-choice]").forEach((b) => { const on = b === ch; b.classList.toggle("is-on", on); b.setAttribute("aria-checked", on); });
+return this.timers.push(setTimeout(() => go(step + 1), motionOff ? 0 : 280));
+}
+const pl = t.closest("[data-place]");
+if (pl) {
+const value = pl.dataset.place;
+this.place = value;
+const home = OPL.screens["subsidies-overview"]; if (home) home.place = value;   // one choice across the subsidy screens
+page.querySelectorAll("[data-place]").forEach((b) => { b.outerHTML = ui.StateRow(b.dataset.place, b.dataset.place === value).toString(); });
+const label = page.querySelector("[data-place-label]");
+label.textContent = value; label.classList.remove("is-changed"); void label.offsetWidth; label.classList.add("is-changed");
+return this.timers.push(setTimeout(() => { sheets.close(); this.refresh(page); }, motionOff ? 0 : 220));
+}
+const chip = t.closest("[data-sxchip]");
+if (chip) {
+const c = chip.dataset.sxchip;
+this.chips.has(c) ? this.chips.delete(c) : this.chips.add(c);
+chip.classList.toggle("is-selected", this.chips.has(c)); chip.setAttribute("aria-pressed", this.chips.has(c));
+return this.refresh(page);
+}
+if (t.closest("[data-rq-skip]")) return go(step + 1);
+if (t.closest("[data-rq-back]")) return go(step - 1);
 const open = t.closest("[data-open-sheet]");
 if (open) {
 const id = open.dataset.openSheet;
@@ -4623,11 +4839,15 @@ this.refresh(page);
 }, motionOff ? 0 : 240));
 }
 });
-OPL.fx.enter(page, [page.querySelector(".sx-brief"), page.querySelector(".sx-bar"), ...page.querySelectorAll("[data-list] .match")]);
-if (!motionOff) OPL.afterReveal(() => this.timers.push(setTimeout(() => page.querySelector(".sx-brief").classList.add("is-playing"), 200)));
-if (v.sheet !== "none") sheets.open(v.sheet, { instant: true });
+OPL.fx.enter(page, [page.querySelector(".sx-brief"), page.querySelector(".sx-bar"), ...page.querySelectorAll("[data-list] .match, [data-list] .refine")]);
+if (!motionOff) OPL.afterReveal(() => this.timers.push(setTimeout(() => page.querySelector(".sx-brief")?.classList.add("is-playing"), 200)));
+if (v.sheet === "refine") { openRefine(); }
+else if (v.sheet !== "none") sheets.open(v.sheet, { instant: true });
 },
 };
+OPL.screens["subsidy-list"] = Object.assign(Object.create(OPL.screens["subsidies-explore"]), {
+title: "All subsidies", figma: { results: "556:128366" }, mode: "all", timers: [], pick: null, place: null, sort: "Alphabetical", filters: new Set(), chips: new Set(),
+});
 })();
 
 ;
@@ -4698,7 +4918,8 @@ kfs: ["application"],
 nesl: ["kfs", "application"],
 "subsidies-overview": ["home"],
 "subsidies-explore": ["subsidies-overview"],
-"subsidy-detail": ["subsidies-explore", "subsidies-overview", "home"],
+"subsidy-list": ["subsidies-overview", "home"],
+"subsidy-detail": ["subsidies-explore", "subsidy-list", "subsidies-overview", "home"],
 "subsidy-estimate": ["subsidy-detail"],
 "subsidy-estimate-result": ["subsidy-detail"],
 };

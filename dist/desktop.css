@@ -1307,6 +1307,47 @@
 .d-sd__blue [data-est-amt].is-updated { animation-name: d-est-glow-light; }
 @keyframes d-est-glow-light { 30% { text-shadow: 0 0 24px rgba(255, 255, 255, 0.6); } }
 
+/* "Refine your matches" as a row inside the results grid (after the first row of cards):
+   art · copy · button on one line; the home card's look, with a soft blue wash so it reads as a prompt */
+.d-refine--row {
+  grid-column: 1 / -1; flex-direction: row; align-items: center; gap: 24px; padding: 20px 28px 20px 24px;
+  background: linear-gradient(100deg, #ffffff 0%, #f3f7ff 60%, #e6efff 100%); outline-color: #dbe5fb;
+}
+.d-refine--row .d-refine__art { flex-shrink: 0; }
+.d-refine--row .d-refine__copy { flex: 1 1 0; min-width: 0; }
+.d-refine--row .d-btn { margin-top: 0; flex-shrink: 0; }
+
+/* Refine your matches — side panel (OPL Reviews 2289:330535) on the kit drawer, 480 wide.
+   Choice chips: 40px pills sharing the row; selected = primary tint, 1.5px primary, check. */
+.d-drawer-layer--refine .d-drawer__body { gap: 24px; overflow-y: auto; margin: -12px -24px 0; padding: 0 24px 8px; }
+.d-rf__sub { font-size: 14px; line-height: 20px; color: var(--muted-foreground); }
+.d-rf__prog { display: flex; align-items: center; gap: 12px; }
+.d-rf__track { position: relative; flex: 1; height: 6px; border-radius: 999px; background: var(--border); overflow: hidden; }
+.d-rf__fill { position: absolute; inset: 0 auto 0 0; width: 0; border-radius: inherit; background: var(--primary); transition: width 420ms var(--d-ease); }
+.d-rf__count { font-size: 12px; line-height: 16px; font-weight: 600; color: var(--muted-foreground); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.d-rf__qs { display: flex; flex-direction: column; gap: 24px; }
+.d-rf__q { display: flex; flex-direction: column; gap: 4px; }
+.d-drawer-layer--refine.is-open .d-rf__q { animation: d-content-in 360ms var(--d-ease) both; animation-delay: calc(var(--i) * 60ms + 160ms); }
+.d-rf__text { font-size: 16px; line-height: 24px; font-weight: 500; color: var(--foreground); }
+.d-rf__why { font-size: 13px; line-height: 18px; color: var(--muted-foreground); }
+.d-rf__choices { display: flex; gap: 8px; margin-top: 8px; }
+.d-rf__choice {
+  flex: 1 1 0; height: 40px; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  border-radius: 999px; background: #fff; outline: 1px solid var(--border); outline-offset: -1px;
+  font-size: 14px; line-height: 20px; font-weight: 500; color: var(--foreground);
+  transition: background 160ms, outline-color 160ms, transform 120ms var(--d-ease);
+}
+.d-rf__choice:hover { background: #f8fafc; }
+.d-rf__choice:active { transform: scale(0.97); }
+.d-rf__tick { display: none; }
+.d-rf__choice.is-on { background: var(--primary-tint); outline: 1.5px solid var(--primary); outline-offset: -1.5px; color: var(--primary); font-weight: 600; }
+.d-rf__choice.is-on .d-rf__tick { display: inline-block; animation: d-rf-pop 320ms var(--ease-spring) both; }
+@keyframes d-rf-pop { from { transform: scale(0.4); opacity: 0; } }
+.d-drawer-layer--refine .d-drawer__foot { display: flex; gap: 12px; }
+.d-drawer-layer--refine .d-drawer__foot .d-btn--grow { flex: 1; }
+/* refined state of the in-grid row */
+.d-refine--row.is-done { background: linear-gradient(100deg, #ffffff 0%, #f2fbf5 60%, #e3f5ea 100%); outline-color: #cdeedb; }
+
 /* ==== css/desktop/screens/subsidy-estimate.css ==== */
 /* Desktop · Calculate estimate as a modal (560) over Subsidy details. Modelled on the mobile sheet
    416:76869 → 416:77363 (no desktop frame). Cards, chips and result art are the mobile kit's.

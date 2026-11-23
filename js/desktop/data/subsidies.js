@@ -8,11 +8,11 @@
   // Subsidy cards (524:98881 …). Logos are the mobile kit's ui.Logo ids.
   const CARDS = {
     msme: { id: "msme", tag: "Central", tint: "#fbf0e9", logo: "msme", name: "MSME Competitive Lean Scheme", sub: "MSME Champions Scheme",
-      value: "Up to ₹2.4L", note: "90% of lean consultant fees", kind: "Central" },
+      value: "Up to ₹2.4L", note: "90% of lean consultant fees", kind: "Central", pays: [] },
     electronics: { id: "electronics", tag: "State", tint: "#ebf1f8", logo: "gujarat", name: "Gujarat Electronics Policy (2022–28)", sub: "Sector specific scheme",
-      value: "Up to ₹2.4L", note: "90% of lean consultant fees", kind: "State" },          // note as drawn (copied from the MSME card) — flagged
+      value: "Up to ₹2.4L", note: "90% of lean consultant fees", kind: "State", pays: ["capital", "interest"] },          // note as drawn (copied from the MSME card) — flagged
     textile: { id: "textile", tag: "State", tint: "#fcf4ee", logo: "gujaratGovt", name: "Gujarat Textile Policy 2024", sub: "Sector specific scheme",
-      value: "Up to 35%", note: "capital subsidy on eligible investment", kind: "State" },
+      value: "Up to 35%", note: "capital subsidy on eligible investment", kind: "State", pays: ["capital", "interest", "payroll", "export"] },
   };
 
   dd.subsidies = {

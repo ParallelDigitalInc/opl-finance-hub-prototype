@@ -70,3 +70,48 @@
 .sx-brief__factory img.sx-brief__smoke { position: absolute; max-width: none; }
 .sx-brief__factory img.sx-brief__smoke--a { left: 34.15%; top: 0; width: 32.32%; height: 32.32%; }
 .sx-brief__factory img.sx-brief__smoke--b { left: 7.93%; top: 12.8%; width: 26.22%; height: 20.73%; }
+
+/* ==========================================================================
+   Refine your matches — mobile sheet, one question per step (shell: .bsheet)
+   ========================================================================== */
+.rq__body { display: flex; flex-direction: column; gap: var(--s20); padding: var(--s16) var(--gutter) var(--s8); overflow: hidden; }
+.rq__prog { display: flex; align-items: center; gap: var(--s12); }
+.rq__track { position: relative; flex: 1 1 0; height: 6px; border-radius: var(--r-full); background: var(--muted); overflow: hidden; }
+.rq__fill { position: absolute; inset: 0 auto 0 0; width: 0; border-radius: inherit; background: var(--primary); transition: width 420ms var(--ease-out); }
+.rq__count { font-size: 12px; line-height: 16px; font-weight: var(--fw-semibold); color: var(--muted-foreground); font-variant-numeric: tabular-nums; }
+.rq__stage { min-height: 268px; }
+.rq__pane { display: flex; flex-direction: column; gap: var(--s12); }
+.rq__pane.is-from-right { animation: rq-in-r 380ms var(--ease-out) both; }
+.rq__pane.is-from-left { animation: rq-in-l 380ms var(--ease-out) both; }
+@keyframes rq-in-r { from { opacity: 0; transform: translateX(28px); } }
+@keyframes rq-in-l { from { opacity: 0; transform: translateX(-28px); } }
+.rq__q { font-size: 20px; line-height: 28px; letter-spacing: -0.2px; font-weight: var(--fw-semibold); color: var(--foreground); text-wrap: balance; }
+.rq__why { display: flex; align-items: flex-start; gap: 6px; font-size: 13px; line-height: 18px; color: var(--muted-foreground); }
+.rq__why .ico { flex-shrink: 0; margin-top: 1px; }
+.rq__opts { display: flex; flex-direction: column; gap: var(--s8); margin-top: var(--s8); }
+.rq__opt {
+  display: flex; align-items: center; justify-content: space-between; height: 52px; padding: 0 var(--s16);
+  border-radius: var(--r-inner); background: var(--surface); outline: 1px solid var(--border); outline-offset: -1px;
+  font-size: 15px; line-height: 20px; font-weight: var(--fw-medium); color: var(--foreground); text-align: left;
+  transition: background var(--dur-fast), outline-color var(--dur-fast), transform var(--dur-press) var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+.rq__opt.is-pressed { transform: scale(0.98); }
+.rq__opt:hover { background: var(--slate-50); }
+.rq__tick { opacity: 0; transform: scale(0.5); transition: opacity var(--dur-fast), transform 320ms var(--ease-spring); }
+.rq__opt.is-on { background: var(--primary-tint); outline: 1.5px solid var(--primary); outline-offset: -1.5px; color: var(--primary); font-weight: var(--fw-semibold); }
+.rq__opt.is-on .rq__tick { opacity: 1; transform: none; }
+.rq__opt:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.rq__foot { flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: var(--s12) var(--gutter) max(var(--s24), env(safe-area-inset-bottom)); }
+.rq__link { display: inline-flex; align-items: center; gap: 4px; min-height: 40px; padding: 0 4px; font-size: 14px; line-height: 20px; font-weight: var(--fw-semibold); color: var(--muted-foreground); transition: color var(--dur-fast); }
+.rq__link--skip { margin-left: auto; color: var(--primary); }
+.rq__link[hidden] { display: none; }
+@media (prefers-reduced-motion: reduce) { .rq__pane.is-from-right, .rq__pane.is-from-left { animation: none; } }
+
+/* All subsidies: no expansion brief, so the hero is just the header. The filters sit outside
+   as chips (State · Sector · Central) under the count + Sort row. */
+.sx-hero--all { height: calc(110px + var(--dy)); }
+.sx-hero--all .sx-hero__bg { height: calc(117px + var(--dy)); }
+.sx-bar--all { gap: var(--s12); }
+.sx-row { display: flex; align-items: center; justify-content: space-between; gap: var(--s8); }
+.sx-chips { margin: 0 calc(var(--gutter) * -1); padding: 0 var(--gutter); }

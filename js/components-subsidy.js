@@ -241,6 +241,51 @@
   };
 
   /* One shared layer per screen; the body is re-rendered for each benefit. */
+  /* RefineBanner — "Refine your matches" inside a subsidy list (mobile twin of desktop 524:98833,
+     3D art 558:104693). Copy left, art right inside the card, a text CTA. */
+  ui.RefineBanner = ({ title, body, cta, goto: to, done = false }) => html`
+    <article class="${cx("refine", done && "refine--done")}" data-press ${goto(to)} role="link" tabindex="0" aria-label="${title}. ${body}">
+      <span class="refine__glow" aria-hidden="true"></span>
+      <div class="refine__copy">
+        <h3 class="refine__title">${done ? sicon("rq-done", 20, "refine__done") : ""}${title}</h3>
+        <p class="refine__body">${body}</p>
+        ${ui.Button({ label: cta, size: "sm", trailing: "chevron-right-white", attrs: "tabindex=\"-1\"" })}
+      </div>
+      <img class="refine__art" src="assets/lazy/dsk/refine-art.png" width="118" height="62" alt="" draggable="false">
+    </article>`;
+
+  /* Refine your matches — mobile: one question per step in a bottom sheet, skippable.
+     Shell = the benefit sheet's .bsheet. The stage is repainted per step (RefineStep). */
+  ui.RefineSheet = (r) => html`
+    <div class="sheet-layer" data-sheet="refine" hidden>
+      <div class="sheet-scrim" data-sheet-close></div>
+      <section class="sheet bsheet rq" role="dialog" aria-modal="true" aria-label="${r.title}">
+        <div class="bsheet__grip" data-sheet-drag>
+          <span class="bsheet__grabber"></span>
+          <div class="bsheet__head">
+            <h2 class="bsheet__title">${r.title}</h2>
+            <button class="bsheet__close" aria-label="Close" data-press data-sheet-close>${sicon("sheet-x", 16)}</button>
+          </div>
+        </div>
+        <div class="rq__body">
+          <div class="rq__prog"><span class="rq__track"><span class="rq__fill" data-rq-fill></span></span><span class="rq__count" data-rq-count></span></div>
+          <div class="rq__stage" data-rq-stage aria-live="polite"></div>
+        </div>
+        <div class="rq__foot">
+          <button class="rq__link" data-press data-rq-back>${OPL.icon("alt-arrow-left", 16)}${r.back}</button>
+          <button class="rq__link rq__link--skip" data-press data-rq-skip>${r.skip}</button>
+        </div>
+      </section>
+    </div>`;
+  ui.RefineStep = (q, picked, choices) => html`
+    <div class="rq__pane">
+      <p class="rq__q">${q.q}</p>
+      <p class="rq__why">${sicon("rq-why", 16)}<span>${q.why}</span></p>
+      <div class="rq__opts" role="radiogroup" aria-label="${q.q}">
+        ${choices.map((c) => html`<button class="${cx("rq__opt", picked === c && "is-on")}" role="radio" aria-checked="${picked === c}" data-press data-rq-choice="${c}"><span>${c}</span>${sicon("rq-check", 16, "rq__tick")}</button>`)}
+      </div>
+    </div>`;
+
   ui.BenefitSheetLayer = () => html`
     <div class="sheet-layer" data-sheet="benefit" hidden>
       <div class="sheet-scrim" data-sheet-close></div>

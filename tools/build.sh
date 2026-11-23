@@ -43,6 +43,7 @@ JS=(
   js/data/subsidy-estimate.js
   js/data/subsidies-home.js
   js/data/cmr.js
+  js/data/subsidy-refine.js
   js/screens/home.js
   js/screens/loans-overview.js
   js/screens/loan-offers.js

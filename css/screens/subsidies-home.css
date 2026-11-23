@@ -141,3 +141,38 @@
 .sh-states__empty { padding: var(--s24) var(--s8); text-align: center; font-size: 14px; line-height: 20px; color: var(--muted-foreground); }
 .sh-rail { max-height: 320px; transition: max-height 360ms var(--ease-out), padding 360ms var(--ease-out); }
 .sh-rail.is-empty { max-height: 0; padding-top: 0; padding-bottom: 0; overflow: hidden; }
+
+/* ==========================================================================
+   Refine your matches — in-list banner (mobile twin of desktop 524:98833)
+   Card language of the list: r16, 1px stroke inside, soft lift; a pale blue wash
+   (hero ice → white) marks it as a prompt rather than a scheme. Art sits inside, right.
+   ========================================================================== */
+.refine {
+  /* same surface as the Home help card ("Need help?" 382:34328): help-bg, 1px slate-200 inside, r16, Shadow/s */
+  position: relative; isolation: isolate; overflow: hidden; display: flex; align-items: center; gap: 10px;
+  padding: var(--s16); border-radius: var(--r-large); text-align: left; cursor: pointer;
+  background: var(--help-bg); outline: 1px solid var(--border); outline-offset: -1px; box-shadow: var(--shadow-s);
+  transition: transform var(--dur-press) var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+.refine.is-pressed { transform: scale(0.98); }
+.refine:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.refine__glow { display: none; position: absolute; right: -30px; top: -40px; width: 200px; height: 160px; border-radius: 50%; background: radial-gradient(closest-side, rgba(56, 88, 229, 0.16), rgba(56, 88, 229, 0)); z-index: -1; pointer-events: none; }
+.refine__copy { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: var(--s2); }
+.refine__title { font-size: 16px; line-height: 22px; font-weight: var(--fw-semibold); color: var(--foreground); }
+.refine__body { font-size: 12px; line-height: 16px; color: var(--tertiary-foreground); text-wrap: pretty; }
+.refine__copy .btn { margin-top: var(--s16); }
+.refine__cta { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; font-size: 14px; line-height: 20px; font-weight: var(--fw-semibold); color: var(--primary); }
+.refine__cta .ico { transition: transform var(--dur-fast) var(--ease-out); }
+.refine:hover .refine__cta .ico, .refine.is-pressed .refine__cta .ico { transform: translateX(3px); }
+.refine__art { flex-shrink: 0; width: 118px; height: 62px; filter: drop-shadow(0 10px 14px rgba(56, 88, 229, 0.18)); transition: transform 500ms var(--ease-spring); }
+.refine:hover .refine__art, .refine.is-pressed .refine__art { transform: translateY(-3px) rotate(-2deg); }
+/* the art floats in a touch after the card lands */
+.refine.enter .refine__art { animation: refine-art 700ms var(--ease-spring) both; animation-delay: calc(var(--i, 0) * 55ms + 260ms); }
+@keyframes refine-art { from { opacity: 0; transform: translateY(14px) scale(0.92) rotate(3deg); } }
+@media (prefers-reduced-motion: reduce) { .refine.enter .refine__art { animation: none; } }
+/* refined state: a green tick before the title */
+.refine__title { display: flex; align-items: center; gap: 6px; }
+.refine__done { flex-shrink: 0; }
+.refine--done.enter .refine__done { animation: refine-tick 520ms var(--ease-spring) 200ms both; }
+@keyframes refine-tick { from { transform: scale(0); } }

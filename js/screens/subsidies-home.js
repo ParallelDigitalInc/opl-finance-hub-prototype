@@ -42,6 +42,10 @@
       <p class="sh-states__empty" data-place-empty hidden></p>
     </div>`;
 
+  // shared with All subsidies (subsidies-explore.js), which offers the same GST-state picker
+  OPL.ui.StateRow = stateRow;
+  OPL.ui.StatesSheetBody = statesBody;
+
   OPL.screens["subsidies-overview"] = {
     title: "Subsidies home",
     figma: { default: "524:103425" },
