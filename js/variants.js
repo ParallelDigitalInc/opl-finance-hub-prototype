@@ -139,6 +139,15 @@
     }],
   };
 
+  /* Explore results (556:128366) */
+  OPL.variants["subsidies-explore"] = {
+    presets: [
+      { id: "results", label: "Explore results", figma: "556:128366", set: { sheet: "none" } },
+      { id: "edit", label: "Edit answers sheet", figma: "524:99050", set: { sheet: "edit" } },   // desktop modal's fields; no mobile frame
+    ],
+    groups: [{ id: "sheet", hidden: true, default: "none", options: [{ value: "none" }, { value: "edit" }, { value: "sort" }, { value: "filter" }] }],
+  };
+
   /* Calculate estimate (416:76869) */
   OPL.variants["subsidy-estimate"] = {
     presets: [

@@ -455,7 +455,7 @@
           ${D.icon("list-arrow-down", 16)}<span class="d-pill__muted">Sort by</span><b>${sort}</b>${D.icon("chevron-muted", 14, "d-pill__chev")}
         </button>
         <div class="d-menu" role="menu" data-menu-for="sort">
-          ${D.SORT_OPTIONS.map((o) => html`<button class="d-menu__item ${o === sort ? "is-on" : ""}" role="menuitemradio" aria-checked="${o === sort}" data-sort="${o}">${o}${o === sort ? D.micon("check-circle-chip", 16) : ""}</button>`)}
+          ${D.SORT_OPTIONS.map((o) => html`<button class="d-menu__item ${o === sort ? "is-on" : ""}" role="menuitemradio" aria-checked="${o === sort}" data-sort="${o}">${o}${o === sort ? D.micon("check-circle-primary", 16) : ""}</button>`)}
         </div>
       </div>
       <button class="d-pill" ${filtersGoto ? raw(`data-goto="${filtersGoto}"`) : ""} data-filters>${D.icon("filter", 16)}<span>Filters</span>${D.icon("chevron-muted", 14, "d-pill__chev")}</button>
@@ -557,7 +557,7 @@
           b.classList.toggle("is-on", on);
           b.setAttribute("aria-checked", on);
           b.querySelector(".ico")?.remove();
-          if (on) b.insertAdjacentHTML("beforeend", String(D.micon("check-circle-chip", 16)));
+          if (on) b.insertAdjacentHTML("beforeend", String(D.micon("check-circle-primary", 16)));
         });
         closeMenus();
         return refresh();

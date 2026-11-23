@@ -1,0 +1,66 @@
+/* Screen · Explore subsidies — Figma 556:128366 */
+.sx { position: relative; padding-bottom: 100px; --dy: calc(var(--status-h) - 47px); }
+
+/* hero: the Subsidies home background, 242 tall, holding the header and the brief card */
+.sx-hero { position: relative; height: calc(235px + var(--dy)); }
+.sx-hero__bg { height: calc(242px + var(--dy)); top: -7px; }
+.sx-hero__header { position: absolute; top: var(--status-h); left: 0; right: 0; z-index: 2; }
+.sx-hero__header .app-header__title { font-size: 18px; line-height: 28px; }
+
+/* brief card (556:128397): 350 × 100, white, slate-200, r16, Shadow/s; text from x93 */
+.sx-brief {
+  position: absolute; z-index: 2; left: var(--gutter); right: var(--gutter); top: calc(115px + var(--dy));
+  height: 100px; display: flex; overflow: hidden; text-align: left;
+  border-radius: var(--r-large); background: var(--surface); outline: 1px solid var(--border); outline-offset: -1px; box-shadow: var(--shadow-s);
+  transition: transform var(--dur-press) var(--ease-out);
+}
+.sx-brief.is-pressed { transform: scale(0.985); }
+.sx-brief__art { position: absolute; inset: 0; pointer-events: none; }
+.sx-brief__ground { position: absolute; left: calc(50% - 154px - 253px); top: 74px; width: 506px; height: 506px; max-width: none; }
+.sx-brief__factory { position: absolute; left: 18px; top: 26px; width: 58px; height: 58px; }
+.sx-brief__factory img { position: absolute; inset: 0; width: 58px; height: 58px; max-width: none; }
+.sx-brief__text { position: relative; margin: 17px 19px 0 93px; flex: 1; display: flex; flex-direction: column; gap: var(--s4); min-width: 0; }
+.sx-brief__top { display: flex; align-items: center; justify-content: space-between; }
+.sx-brief__label { font-size: 12px; line-height: 18px; font-weight: var(--fw-medium); color: var(--muted-foreground); }
+.sx-brief__values { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; font-size: 14px; line-height: 20px; font-weight: var(--fw-medium); color: var(--foreground); }
+.sx-brief__values span { white-space: nowrap; }
+.sx-brief__dot { width: 3px; height: 3px; border-radius: 50%; background: #a3aab4; flex-shrink: 0; }
+.sx-brief__values.is-changed span { animation: amt-tick 420ms var(--ease-out); display: inline-block; }
+.sx-brief__pen { transition: transform var(--dur-fast) var(--ease-out); }
+.sx-brief.is-pressed .sx-brief__pen { transform: rotate(-12deg); }
+.sx-brief.is-playing .sx-brief__ground { animation: promo-ground 700ms var(--ease-out) both; }
+.sx-brief.is-playing .sx-brief__factory { animation: tile-pop 560ms var(--ease-spring) 160ms both; }
+.sx-brief.is-playing .sx-brief__smoke--a { animation: smoke 2600ms ease-in-out 600ms 2 both; }
+.sx-brief.is-playing .sx-brief__smoke--b { animation: smoke 2600ms ease-in-out 1000ms 2 both; }
+
+/* results: 24 under the hero · "6 subsidies found" · 12 · pills · 20 · cards gap 16 */
+.sx-results { display: flex; flex-direction: column; gap: 20px; padding: var(--s24) var(--gutter) 0; }
+.sx-bar { display: flex; flex-direction: column; gap: 12px; }
+.sx-found { font-size: 16px; line-height: 24px; font-weight: var(--fw-medium); color: var(--muted-foreground); }
+.sx-pills { display: flex; gap: var(--s8); }
+.sx-pill {
+  display: flex; align-items: center; gap: 4px; height: 36px; padding: 0 12px 0 14px; border-radius: var(--r-full);
+  background: var(--muted); font-size: 14px; line-height: 20px; color: var(--foreground); white-space: nowrap;
+  transition: transform var(--dur-press) var(--ease-out), background var(--dur-fast), box-shadow var(--dur-fast);
+}
+.sx-pill.is-pressed { transform: scale(0.96); background: var(--border); }
+.sx-pill.is-on { background: var(--primary-tint); box-shadow: inset 0 0 0 1px var(--primary); }
+.sx-pill__muted { color: var(--muted-foreground); }
+.sx-pill b { font-weight: var(--fw-semibold); }
+.sx-pill__count { min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--primary); color: #fff; font-size: 11px; line-height: 18px; text-align: center; }
+.sx-pill__chev { transform: rotate(90deg); }
+.sx-list { display: flex; flex-direction: column; gap: var(--s16); }
+.sx-list .match { flex: none; width: 100%; }
+
+/* Edit answers sheet: the desktop modal's four questions */
+.sx-edit { width: 100%; display: flex; flex-direction: column; gap: var(--s16); padding: var(--s8) var(--s20) var(--s24); }
+.sx-field { display: flex; flex-direction: column; gap: var(--s6); }
+.sx-field__label { font-size: 12px; line-height: 16px; font-weight: var(--fw-semibold); color: var(--foreground); }
+.sx-select { position: relative; display: block; }
+.sx-select select {
+  width: 100%; height: 44px; padding: 0 40px 0 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface);
+  font: inherit; font-size: 16px; line-height: 24px; color: var(--foreground); appearance: none; -webkit-appearance: none; outline: none;
+  transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
+}
+.sx-select select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(56, 88, 229, 0.12); }
+.sx-select__chev { position: absolute; right: 14px; top: 14px; pointer-events: none; }

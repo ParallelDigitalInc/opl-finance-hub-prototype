@@ -60,16 +60,23 @@
         { id: "size", label: "Enterprise size", placeholder: "Select enterprise size", options: ["Micro enterprise", "Small enterprise", "Medium enterprise"] },
       ],
       // used when the form is submitted untouched: the values drawn on the results frame (524:99743)
-      figmaPick: { state: "Maharashtra", sector: "Manufacturing", activity: "Textiles", size: "Small enterprise" },
+      figmaPick: { state: "Maharashtra", sector: "Manufacturing", activity: "Textiles", size: "Medium enterprise" },   // as drawn on 558:101968
       cancel: "Cancel",
       cta: "Find Subsidies",
     },
-    results: {                                                 // 524:99743
+    results: {                                                 // 558:101968 (replaces 524:99743)
       back: "Government Subsidies",
-      title: "Subsidies for your expansion",
-      edit: "Edit",
-      available: "Subsidies available",
+      title: "Explore government subsidies",
+      // the four answers, editable in place (labels as drawn; the modal says "Industry Sector")
+      picks: [
+        { id: "state", label: "State" },
+        { id: "sector", label: "Industry" },
+        { id: "activity", label: "Activity" },
+        { id: "size", label: "Enterprise size", short: (v) => v.replace(/ enterprise$/i, "") },   // "Medium enterprise" → "Medium"
+      ],
+      found: (n) => `${n} subsidies found`,
       chips: ["State", "Sector"],
+      sort: { label: "Sort by", value: "Alphabetical", options: ["Alphabetical", "Highest benefit"] },
       // six cards as drawn (the three schemes, twice in a different order) — placeholder set, flagged
       cards: [CARDS.msme, CARDS.electronics, CARDS.textile, CARDS.electronics, CARDS.textile, CARDS.msme],
     },

@@ -52,8 +52,29 @@
     promo: {
       title: "Planning a new unit in another state, or a new product line?",
       secondary: { label: "Call an Expert", goto: "expert" },
-      primary: { label: "Explore Now", goto: "subsidy-list" },
+      primary: { label: "Explore Now", goto: "subsidies-explore" },
     },
     aiNudge: { lead: "Ask anything about", topic: "subsidies" },   // same pattern as Home (proposed copy)
+  };
+
+  /* Explore results — Figma 556:128366 ("Explore subsidies"). Same answers as desktop (modal 524:99050,
+     results 558:101968); the pen opens them in a sheet (no mobile form frame — designed in code). */
+  OPL.data.subsidyExplore = {
+    title: "Explore Government Subsidies",
+    brief: "Showing subsidies for",
+    found: (n) => `${n} subsidies found`,
+    fields: [
+      { id: "state", label: "Where will the new unit be?", options: ["Andhra Pradesh", "Gujarat", "Karnataka", "Madhya Pradesh", "Maharashtra", "Rajasthan", "Tamil Nadu"] },
+      { id: "sector", label: "Industry Sector", options: ["Manufacturing", "Services", "Trading"] },
+      { id: "activity", label: "Activity", options: ["Textiles", "Electronics", "Food processing", "Chemicals"] },
+      { id: "size", label: "Enterprise size", options: ["Micro enterprise", "Small enterprise", "Medium enterprise"], short: (v) => v.replace(/ enterprise$/i, "") },
+    ],
+    pick: { state: "Maharashtra", sector: "Manufacturing", activity: "Textiles", size: "Medium enterprise" },   // as drawn
+    edit: { title: "Edit answers", cta: "Find Subsidies" },
+    sort: { label: "Sort by", options: ["Alphabetical", "Highest benefit"] },
+    filter: { label: "Filter", title: "Filter", clear: "Clear all", cta: "Show subsidies",
+      options: [{ label: "Central", match: "Central Government" }, { label: "State", match: "State Government" }] },
+    // six cards as drawn: the three subsidy matches, twice (placeholder set, as desktop)
+    cards: () => { const c = OPL.data.home.subsidies.cards; return [c[0], c[1], c[2], c[1], c[2], c[0]]; },
   };
 })();

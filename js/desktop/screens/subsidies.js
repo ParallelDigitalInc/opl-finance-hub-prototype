@@ -57,7 +57,7 @@
       <label class="d-dsearch d-dsearch--sm">${D.icon("drawer-search", 16)}<input type="search" placeholder="${s.search}" data-state-search aria-label="${s.search}"></label>
       <p class="d-menu__caption">${s.caption}</p>
       <div class="d-menu__list" data-state-list>
-        ${s.options.map((o) => html`<button class="d-menu__item ${o === current ? "is-on" : ""}" role="menuitemradio" aria-checked="${o === current}" data-state="${o}">${o}${o === current ? D.micon("check-circle-chip", 16) : ""}</button>`)}
+        ${s.options.map((o) => html`<button class="d-menu__item ${o === current ? "is-on" : ""}" role="menuitemradio" aria-checked="${o === current}" data-state="${o}">${o}${o === current ? D.micon("check-circle-primary", 16) : ""}</button>`)}
       </div>
     </div>`;
 
@@ -132,7 +132,7 @@
                     </div>
                     <div class="d-menu-anchor">
                       <button class="d-pill d-pill--sort" data-menu="ssort" aria-haspopup="menu" aria-expanded="false">${D.icon("list-arrow-down", 16)}<span class="d-pill__muted">${t.sort.label}</span><b data-sort-label>${st.sort}</b>${D.icon("chevron-muted", 14, "d-pill__chev")}</button>
-                      <div class="d-menu" role="menu" data-menu-for="ssort">${t.sort.options.map((o) => html`<button class="d-menu__item ${o === st.sort ? "is-on" : ""}" role="menuitemradio" aria-checked="${o === st.sort}" data-ssort="${o}">${o}${o === st.sort ? D.micon("check-circle-chip", 16) : ""}</button>`)}</div>
+                      <div class="d-menu" role="menu" data-menu-for="ssort">${t.sort.options.map((o) => html`<button class="d-menu__item ${o === st.sort ? "is-on" : ""}" role="menuitemradio" aria-checked="${o === st.sort}" data-ssort="${o}">${o}${o === st.sort ? D.micon("check-circle-primary", 16) : ""}</button>`)}</div>
                     </div>
                   </div>
                 </div>
@@ -186,7 +186,7 @@
         if (pickState) {
           st.state = pickState.dataset.state;
           page.querySelector("[data-state-label]").textContent = st.state;
-          page.querySelectorAll("[data-state]").forEach((b) => { const on = b.dataset.state === st.state; b.classList.toggle("is-on", on); b.setAttribute("aria-checked", on); b.querySelector(".ico")?.remove(); if (on) b.insertAdjacentHTML("beforeend", String(D.micon("check-circle-chip", 16))); });
+          page.querySelectorAll("[data-state]").forEach((b) => { const on = b.dataset.state === st.state; b.classList.toggle("is-on", on); b.setAttribute("aria-checked", on); b.querySelector(".ico")?.remove(); if (on) b.insertAdjacentHTML("beforeend", String(D.micon("check-circle-primary", 16))); });
           closeMenus();
           return this.refresh(page);
         }
@@ -194,7 +194,7 @@
         if (so) {
           st.sort = so.dataset.ssort;
           page.querySelector("[data-sort-label]").textContent = st.sort;
-          page.querySelectorAll("[data-ssort]").forEach((b) => { const on = b.dataset.ssort === st.sort; b.classList.toggle("is-on", on); b.querySelector(".ico")?.remove(); if (on) b.insertAdjacentHTML("beforeend", String(D.micon("check-circle-chip", 16))); });
+          page.querySelectorAll("[data-ssort]").forEach((b) => { const on = b.dataset.ssort === st.sort; b.classList.toggle("is-on", on); b.querySelector(".ico")?.remove(); if (on) b.insertAdjacentHTML("beforeend", String(D.micon("check-circle-primary", 16))); });
           closeMenus();
           return this.refresh(page);
         }
@@ -212,40 +212,147 @@
     },
   };
 
+  /* Expansion results — "Exlplore" 558:101968. The four answers sit in a brief card (each one a
+     dropdown that re-runs the search in place) beside the new-unit art; then "N subsidies found",
+     State / Sector chips, Sort, and the cards three across. */
   OPL.dscreens["subsidies-explore"] = {
-    title: "Govt. subsidies · For your expansion",
-    figma: { results: "524:99743" },
+    title: "Govt. subsidies · Explore",
+    figma: { results: "558:101968" },
     pick: null,
+    st: { chips: [], sort: "Alphabetical" },
+
+    list() {
+      const r = S().results, st = this.st;
+      let list = r.cards.map((c, i) => ({ ...c, id: c.id + "-" + i }));
+      if (st.chips.includes("State")) list = list.filter((c) => c.kind === "State");
+      if (st.sort === "Highest benefit") list = list.slice().sort((a, b) => (b.value.includes("%") ? 1 : 0) - (a.value.includes("%") ? 1 : 0));
+      return list;
+    },
+    cardsHtml() {
+      const list = this.list();
+      if (!list.length) return `<div class="d-empty"><p class="d-empty__title">No subsidies match these filters</p><p class="d-empty__body">Remove a filter or change an answer above.</p></div>`;
+      return list.map((c) => String(D.subsidyCard(c))).join("");
+    },
+
     render(page) {
-      const s = S(), r = s.results;
-      const pick = this.pick || s.explore.figmaPick;
-      const values = ["state", "sector", "activity", "size"].map((k) => pick[k]);
+      const s = S(), r = s.results, st = this.st;
+      const pick = (this.pick = this.pick || { ...s.explore.figmaPick });
+      const field = (id) => s.explore.fields.find((f) => f.id === id);
+      const show = (q) => (q.short ? q.short(pick[q.id]) : pick[q.id]);
       page.innerHTML = D.shell({
         nav: "subsidies", title: "", tab: null,
         body: html`
           <div class="d-subx">
             <button class="d-subx__back" data-goto="subsidies-overview">${D.icon("back-arrow", 16)}<span>${r.back}</span></button>
-            <h1 class="d-title">${r.title}</h1>
-            <div class="d-subx__picks">${values.map((v) => html`<span class="d-subx__pick">${v}</span>`)}<button class="d-subx__edit" data-edit>${D.icon("edit-pen", 16)}${r.edit}</button></div>
-            <section class="d-matches">
-              <div class="d-matches__head">
-                <div class="d-sh"><h2 class="d-sh__title">${r.available}${D.count(r.cards.length)}</h2></div>
+            <div class="d-subx__head" data-enter>
+              <h1 class="d-title">${r.title}</h1>
+              <section class="d-subx__brief" aria-label="Your answers">
+                <div class="d-subx__qs">${r.picks.map((q, i) => html`
+                  ${i ? raw('<span class="d-subx__rule" aria-hidden="true"></span>') : ""}
+                  <div class="d-menu-anchor">
+                    <button class="d-subx__q" data-menu="q-${q.id}" aria-haspopup="menu" aria-expanded="false">
+                      <span class="d-subx__q-label">${q.label}</span>
+                      <span class="d-subx__q-value"><b data-q-value="${q.id}">${show(q)}</b>${D.icon("switcher-chevron", 16, "d-subx__q-chev")}</span>
+                    </button>
+                    <div class="d-menu d-menu--q" role="menu" data-menu-for="q-${q.id}">${field(q.id).options.map((o) => html`
+                      <button class="d-menu__item ${o === pick[q.id] ? "is-on" : ""}" role="menuitemradio" aria-checked="${o === pick[q.id]}" data-q="${q.id}" data-q-opt="${o}">${o}${o === pick[q.id] ? D.micon("check-circle-primary", 16) : ""}</button>`)}
+                    </div>
+                  </div>`)}
+                </div>
+                <div class="d-subx__art" aria-hidden="true">
+                  <img class="d-subx__ground" src="${OPL.simg("home/promo-ground.svg")}" alt="">
+                  <img class="d-subx__pin d-subx__pin--lg" src="${OPL.simg("home/pin-large.svg")}" alt="">
+                  <div class="d-subx__factory">
+                    <img class="d-promo__smoke d-promo__smoke--b" src="${OPL.simg("home/smoke-b.svg")}" alt="">
+                    <img class="d-promo__smoke d-promo__smoke--a" src="${OPL.simg("home/smoke-a.svg")}" alt="">
+                    <img class="d-promo__building" src="${OPL.simg("home/factory.svg")}" alt="">
+                  </div>
+                  <img class="d-subx__pin d-subx__pin--sm" src="${OPL.simg("home/pin-small.svg")}" alt="">
+                </div>
+              </section>
+            </div>
+            <section class="d-subx__results">
+              <div class="d-subx__bar">
+                <p class="d-subx__found" data-found>${r.found(this.list().length)}</p>
                 <div class="d-toolbar">
-                  <div class="d-toolbar__chips">${r.chips.map((c) => D.chip(c))}</div>
-                  <div class="d-toolbar__right"><button class="d-pill d-pill--sort">${D.icon("list-arrow-down", 16)}<span class="d-pill__muted">Sort by</span><b>Alphabetical</b>${D.icon("chevron-muted", 14, "d-pill__chev")}</button></div>
+                  <div class="d-toolbar__chips">${r.chips.map((c) => D.chip(c, { selected: st.chips.includes(c), attrs: `data-xchip="${c}"` }))}</div>
+                  <div class="d-toolbar__right">
+                    <div class="d-menu-anchor">
+                      <button class="d-pill d-pill--sort" data-menu="xsort" aria-haspopup="menu" aria-expanded="false">${D.icon("list-arrow-down", 16)}<span class="d-pill__muted">${r.sort.label}</span><b data-xsort-label>${st.sort}</b>${D.icon("chevron-muted", 14, "d-pill__chev")}</button>
+                      <div class="d-menu" role="menu" data-menu-for="xsort">${r.sort.options.map((o) => html`<button class="d-menu__item ${o === st.sort ? "is-on" : ""}" role="menuitemradio" aria-checked="${o === st.sort}" data-xsort="${o}">${o}${o === st.sort ? D.micon("check-circle-primary", 16) : ""}</button>`)}</div>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div class="d-cards d-sub__cards">${r.cards.map((c, i) => D.subsidyCard({ ...c, id: c.id + "-" + i }))}</div>
+              <div class="d-cards d-sub__cards d-subx__cards" data-xcards>${raw(this.cardsHtml())}</div>
             </section>
           </div>`,
       });
       D.mountShell(page);
-      if (!D.motionOff()) page.querySelectorAll(".d-scard").forEach((c, i) => c.animate([{ opacity: 0, transform: "translateY(10px)" }, { opacity: 1, transform: "none" }], { duration: 380, delay: 80 + i * 60, easing: "cubic-bezier(0.22, 1, 0.36, 1)", fill: "backwards" }));
+      D.enter(page);
+      const brief = page.querySelector(".d-subx__brief");
+      if (!D.motionOff()) {
+        OPL.afterReveal(() => brief.classList.add("is-playing"));          // ground rises, factory settles, pins drop, smoke
+        this.animateCards(page, 120);
+      }
+      this.bind(page);
+    },
+
+    animateCards(page, delay = 0) {
+      if (D.motionOff()) return;
+      page.querySelectorAll("[data-xcards] .d-scard").forEach((c, i) => c.animate([{ opacity: 0, transform: "translateY(10px)" }, { opacity: 1, transform: "none" }], { duration: 360, delay: delay + i * 55, easing: "cubic-bezier(0.22, 1, 0.36, 1)", fill: "backwards" }));
+    },
+    refresh(page) {
+      page.querySelector("[data-xcards]").innerHTML = this.cardsHtml();
+      page.querySelector("[data-found]").textContent = S().results.found(this.list().length);
+      this.animateCards(page);
+    },
+
+    bind(page) {
+      const r = S().results, st = this.st;
+      const tick = (sel, on) => page.querySelectorAll(sel).forEach((b) => { const yes = on(b); b.classList.toggle("is-on", yes); b.setAttribute("aria-checked", yes); b.querySelector(".ico")?.remove(); if (yes) b.insertAdjacentHTML("beforeend", String(D.micon("check-circle-primary", 16))); });
+      const closeMenus = () => page.querySelectorAll(".d-menu.is-open").forEach((m) => { m.classList.remove("is-open"); page.querySelector(`[data-menu="${m.dataset.menuFor}"]`)?.setAttribute("aria-expanded", "false"); });
       page.addEventListener("click", (e) => {
-        if (e.target.closest("[data-edit]")) return D.openExplore(page, pick);
+        const mb = e.target.closest("[data-menu]");
+        if (mb) {
+          const menu = page.querySelector(`[data-menu-for="${mb.dataset.menu}"]`);
+          const open = !menu.classList.contains("is-open");
+          closeMenus(); menu.classList.toggle("is-open", open); mb.setAttribute("aria-expanded", open);
+          if (open) setTimeout(() => menu.querySelector(".is-on")?.focus({ preventScroll: true }), 60);
+          return;
+        }
+        // an answer changed: the search re-runs in place
+        const q = e.target.closest("[data-q-opt]");
+        if (q) {
+          const id = q.dataset.q, v = q.dataset.qOpt, def = r.picks.find((x) => x.id === id);
+          this.pick[id] = v;
+          const val = page.querySelector(`[data-q-value="${id}"]`);
+          val.textContent = def.short ? def.short(v) : v;
+          val.classList.remove("is-changed"); void val.offsetWidth; val.classList.add("is-changed");
+          tick(`[data-q="${id}"]`, (b) => b.dataset.qOpt === v);
+          closeMenus();
+          return this.refresh(page);
+        }
+        const chip = e.target.closest("[data-xchip]");
+        if (chip) {
+          const c = chip.dataset.xchip;
+          st.chips = st.chips.includes(c) ? st.chips.filter((x) => x !== c) : [...st.chips, c];
+          chip.classList.toggle("is-selected"); chip.setAttribute("aria-pressed", st.chips.includes(c));
+          return this.refresh(page);
+        }
+        const so = e.target.closest("[data-xsort]");
+        if (so) {
+          st.sort = so.dataset.xsort;
+          page.querySelector("[data-xsort-label]").textContent = st.sort;
+          tick("[data-xsort]", (b) => b.dataset.xsort === st.sort);
+          closeMenus();
+          return this.refresh(page);
+        }
+        if (!e.target.closest(".d-menu")) closeMenus();
         const card = e.target.closest("[data-scard]");
         if (card && !e.target.closest("button")) return OPL.go("subsidy-detail");
       });
+      page.addEventListener("keydown", (e) => { if (e.key === "Escape") closeMenus(); if (e.key === "Enter" && e.target.matches("[data-scard]")) OPL.go("subsidy-detail"); });
     },
   };
 })();

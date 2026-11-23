@@ -1,5 +1,31 @@
 # Changelog
 
+## v0.16.0 — 23 Nov 2026 · Explore subsidies, desktop + mobile
+
+Synced from Shreya's revised frames.
+
+**Desktop — expansion results rebuilt to `558:101968`** (replaces `524:99743`)
+
+- Title **"Explore government subsidies"**, then a **brief card** with your four answers: State · Industry · Activity · Enterprise size ("Medium").
+  - Each answer is a dropdown that re-runs the search in place. The value ticks and the cards re-deal.
+  - The new-unit illustration sits on the right. The ground rises, the factory settles, the pins drop and smoke puffs.
+  - Answers sit on Figma's 176px pitch; longer values can widen a column.
+- **"6 subsidies found"** with **State / Sector** chips (State narrows to state schemes) and a working **Sort** (Alphabetical / Highest benefit). Cards are three across with a 24 gap.
+- The old answer pills and "Edit" button are gone; the dropdowns replace them.
+
+**Mobile — new Explore subsidies screen (`556:128366`)**
+
+- Open it from Subsidies home → "Planning a new unit…" → **Explore Now**, which used to lead to an unbuilt screen.
+- Hero with **"Showing subsidies for"**: Maharashtra · Manufacturing · Textiles · Medium, beside a small factory that puffs smoke.
+  - The **pen** (or a tap anywhere on the card) opens **Edit answers**: the desktop modal's four questions as a sheet, then Find Subsidies. There's no mobile frame for it, so it's designed in code and flagged.
+- "6 subsidies found", **Sort** (radio sheet, applies on tap) and **Filter** (Central / State, Clear all, Show subsidies; the pill shows a count). Cards are full width with one-line titles.
+- Values read "Assistance up to · ₹2.4L", keeping the earlier fix for the doubled "Up to" that Figma still draws.
+- Panel presets: *Explore results*, *Edit answers sheet*.
+
+**Changed**
+
+- **Dropdown checkmarks are blue** (`#3858E5`) in every desktop menu: sort, state and answers. They used to be a navy circle with a green tick. Shreya asked for it.
+
 ## v0.15.9 — 23 Nov 2026 · Desktop state picker matches mobile
 
 - **The desktop "Schemes in" picker has no "All" row**, like the mobile sheet: only the states on the GST registration. Figma `524:99394` draws "All". It's dropped at Shreya's request.

@@ -49,7 +49,7 @@
               ${D.icon("list-arrow-down", 16)}<span class="d-pill__muted">${m.sort.label}</span><b>${st.sort}</b>${D.icon("chevron-muted", 14, "d-pill__chev")}
             </button>
             <div class="d-menu" role="menu" data-menu-for="sort">
-              ${m.sortOptions.map((o) => html`<button class="d-menu__item ${o === st.sort ? "is-on" : ""}" role="menuitemradio" aria-checked="${o === st.sort}" data-sort="${o}">${o}${o === st.sort ? D.micon("check-circle-chip", 16) : ""}</button>`)}
+              ${m.sortOptions.map((o) => html`<button class="d-menu__item ${o === st.sort ? "is-on" : ""}" role="menuitemradio" aria-checked="${o === st.sort}" data-sort="${o}">${o}${o === st.sort ? D.micon("check-circle-primary", 16) : ""}</button>`)}
             </div>
           </div>
           <button class="d-pill" data-goto="loan-offers" data-filters>${D.icon("filter", 16)}<span>Filters</span>${D.icon("chevron-muted", 14, "d-pill__chev")}</button>
@@ -222,7 +222,7 @@
             b.classList.toggle("is-on", on);
             b.setAttribute("aria-checked", on);
             b.querySelector(".ico")?.remove();
-            if (on) b.insertAdjacentHTML("beforeend", String(D.micon("check-circle-chip", 16)));
+            if (on) b.insertAdjacentHTML("beforeend", String(D.micon("check-circle-primary", 16)));
           });
           closeMenus();
           return this.refreshCards(page);

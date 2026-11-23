@@ -23,6 +23,7 @@ CSS=(
   css/screens/subsidy-detail.css
   css/screens/subsidy-estimate.css
   css/screens/subsidies-home.css
+  css/screens/subsidies-explore.css
 )
 JS=(
   js/core.js
@@ -49,6 +50,7 @@ JS=(
   js/screens/subsidy-detail.js
   js/screens/subsidy-estimate.js
   js/screens/subsidies-home.js
+  js/screens/subsidies-explore.js
   js/app.js
 )
 # Desktop view — a separate bundle, fetched only when the prototype switches to desktop,
