@@ -54,17 +54,26 @@
       },
     },
 
-    borrowing: {
-      title: "Your Borrowing",
-      card: {
-        total: { label: "Total outstanding", value: "₹64.92 L" },
-        legend: [
-          { dot: "dot-indigo", label: "Loans on EMI", value: "₹50.22 L" },
-          { dot: "dot-green", label: "Credit line used", value: "₹14.70 L" },
-        ],
-        available: { label: "Credit line available", value: "₹18.30 L", unit: "of ₹33 L" },
-        goto: "my-loans",
-      },
+    /* Debt Profile (570:105880, was "Your Borrowing") — Shreya's design, numbers corrected.
+       Figma's rows didn't reconcile (Working Capital repeated ₹50.22 L, so rows summed to
+       ₹1.15 Cr against ₹64.92 L; Free Credit Limit read ₹8.5 L; the donut was the old 2-part
+       one). Now, in lakh: loans on EMI ₹50.22 L = term ₹36.50 L + working capital ₹13.72 L;
+       cash credit ₹14.70 L drawn of a ₹33 L limit (as in the CMR sheet), so ₹18.30 L is free.
+       Total outstanding = the three owed parts. The donut is all your credit: the owed parts
+       in colour, the free limit in pale blue. Colours = the Figma legend dots. */
+    debt: {
+      title: "Debt Profile",
+      link: { label: "View Debt Profile", goto: "my-loans" },
+      totalLabel: "Total outstanding",
+      parts: [
+        { id: "term", label: "Term Loans (2)", lakh: 36.5, color: "#4340d6" },
+        { id: "wc", label: "Working Capital Loan (1)", lakh: 13.72, color: "#55c4da" },
+        { id: "cc", label: "Cash Credit Lines (1)", lakh: 14.7, color: "#af78d9" },
+      ],
+      free: { id: "free", label: "Free Credit Limit", of: "cc", limit: 33, color: "#c4d9f3" },
+      // First as drawn; the rest rotate in (proposed), built from this card's own figures
+      ai: ["Can I take another term loan?", "Which loan should I repay first?",
+        "Should I draw my free ₹18.30 L?", "Is ₹64.92 L too much to owe?"],
     },
 
     help: OPL.data.home.help,

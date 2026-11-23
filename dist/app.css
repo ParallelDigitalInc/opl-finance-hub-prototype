@@ -688,30 +688,42 @@ overflow: hidden;
 .figure--app { gap: var(--s4); }
 .figure--app .figure__value { gap: 3px; }
 .figure--app .figure__unit, .figure--avail .figure__unit { font-weight: var(--fw-regular); color: var(--muted-foreground); }
-.borrow {
-display: flex;
-flex-direction: column;
-gap: var(--s24, 24px);
-padding: var(--s20);
-border: 1px solid var(--border);
-border-radius: var(--r-large);
-background: var(--surface);
-box-shadow: var(--shadow-s);
+.debt .section-head { padding: 0; }
+.debt__card {
+display: flex; flex-direction: column; gap: var(--s20);
+padding: 17px 21px 21px; border-radius: var(--r-large); background: var(--surface);
+outline: 1px solid var(--border); outline-offset: -1px; box-shadow: var(--shadow-s);
+}
+.debt__top { display: flex; align-items: center; gap: 40px; }
+.debt__total { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: var(--s2); white-space: nowrap; }
+.debt__amount { font-size: 30px; line-height: normal; font-weight: var(--fw-medium); color: var(--foreground); font-variant-numeric: tabular-nums; }
+.debt__donut { flex-shrink: 0; width: 80px; height: 80px; overflow: visible; }
+.debt__donut path { transform-box: view-box; transform-origin: 40px 40px; transition: opacity var(--dur-fast), transform var(--dur-base) var(--ease-out); }
+.debt__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--s12); }
+.debt__row { display: flex; align-items: center; gap: 5px; font-size: 14px; line-height: 20px; white-space: nowrap; transition: opacity var(--dur-fast); }
+.debt__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c); flex-shrink: 0; }
+.debt__name { flex: 1 1 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; color: var(--muted-foreground); }
+.debt__val { font-weight: var(--fw-medium); color: var(--foreground); font-variant-numeric: tabular-nums; }
+.debt__card.is-focus [data-part]:not(.is-hot) { opacity: 0.35; }
+.debt__card.is-focus .debt__donut path.is-hot { transform: scale(1.06); }
+.debt__ai {
+position: relative; display: flex; align-items: center; gap: var(--s12); padding: 12px; text-align: left;
+border-radius: var(--r-large); outline: 1px solid #c5d0ff; outline-offset: -1px;
+background: url("../assets/img/ai-question-bg.png") center bottom / cover no-repeat, var(--surface);
 transition: transform var(--dur-press) var(--ease-out);
 }
-.borrow.is-pressed { transform: scale(0.98); }
-.borrow__total { display: flex; flex-direction: column; gap: var(--s2); white-space: nowrap; }
-.borrow__amount { font-size: 30px; line-height: 39px; font-weight: var(--fw-medium); color: var(--foreground); font-variant-numeric: tabular-nums; }
-.borrow__row { display: flex; align-items: center; gap: var(--s16); }
-.borrow__donut { width: 103px; height: 103px; flex-shrink: 0; }
-.borrow__side { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: var(--s16); }
-.borrow__legend { display: flex; flex-direction: column; gap: var(--s8); }
-.borrow__item { display: flex; align-items: center; gap: 5px; font-size: 14px; line-height: 20px; white-space: nowrap; }
-.borrow__item-label { flex: 1 1 0; color: var(--muted-foreground); }
-.borrow__item-value { font-weight: var(--fw-medium); color: var(--foreground); }
-.figure--avail .figure__value { gap: var(--s4); }
-.borrow.is-playing .borrow__donut { animation: donut-in 900ms var(--ease-out) both; }
-@keyframes donut-in { from { transform: rotate(-140deg) scale(0.82); opacity: 0; } to { transform: none; opacity: 1; } }
+.debt__ai.is-pressed { transform: scale(0.98); }
+.debt__ai-mark { width: 28px; height: 28px; border-radius: var(--r-full); background: var(--primary); display: grid; place-items: center; flex-shrink: 0; }
+.debt__ai-q { flex: 1 1 0; min-width: 0; font-size: 14px; line-height: 20px; font-weight: var(--fw-medium); color: var(--foreground); }
+.ai-q { display: grid; overflow: hidden; }
+.ai-q__t { grid-area: 1 / 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ai-q__t.is-in { animation: ai-q-in 520ms var(--ease-out) both; }
+.ai-q__t.is-out { animation: ai-q-out 360ms ease-in both; }
+@keyframes ai-q-in { from { opacity: 0; transform: translateY(9px); filter: blur(3px); } }
+@keyframes ai-q-out { to { opacity: 0; transform: translateY(-9px); filter: blur(3px); } }
+.debt__card.is-playing .debt__donut path { animation: debt-slice 520ms var(--ease-spring) backwards; animation-delay: calc(var(--i) * 110ms + 80ms); }
+@keyframes debt-slice { from { opacity: 0; transform: scale(0.7) rotate(-24deg); } }
+@media (prefers-reduced-motion: reduce) { .debt__card.is-playing .debt__donut path { animation: none; } }
 .offer {
 flex-shrink: 0;
 display: flex;

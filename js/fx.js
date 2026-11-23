@@ -46,6 +46,47 @@
     OPL.afterReveal(() => setTimeout(() => page.classList.remove("is-entering"), holdMs));
   };
 
+  /* Rotating AI questions (mobile twin of desktop D.mountAi). Any [data-ai-qs] holding an
+     .ai-q cell swaps its question every ~4.6s: the old one lifts away as the next rises into
+     the same cell (no layout shift). Holds while pressed or hovered, while off-screen or the
+     tab is hidden; still under reduced motion. Stops when the page is gone. */
+  fx.aiRotate = (page, timers = []) => {
+    if (motionOff()) return;
+    page.querySelectorAll("[data-ai-qs]").forEach((row, k) => {
+      const qs = JSON.parse(decodeURIComponent(row.dataset.aiQs));
+      const cell = row.querySelector(".ai-q");
+      let i = 0, hold = false, seen = false;
+      ["pointerenter", "pointerdown", "focus"].forEach((ev) => row.addEventListener(ev, () => { hold = true; }));
+      ["pointerleave", "pointercancel", "blur"].forEach((ev) => row.addEventListener(ev, () => { hold = false; }));
+      if ("IntersectionObserver" in window) new IntersectionObserver((es) => { seen = es[0].isIntersecting; },
+        { root: page.querySelector(".scroller"), threshold: 0.8 }).observe(row);
+      else seen = true;
+      const swap = () => {
+        i = (i + 1) % qs.length;
+        const old = cell.querySelector(".ai-q__t:not(.is-out)");
+        const next = document.createElement("span");
+        next.className = "ai-q__t is-in";
+        next.textContent = qs[i];
+        cell.appendChild(next);
+        old?.classList.add("is-out");
+        setTimeout(() => { old?.remove(); next.classList.remove("is-in"); }, 520);
+        row.setAttribute("aria-label", `Ask AI Mitra: ${qs[i]}`);
+      };
+      const tick = () => {
+        if (!row.isConnected) return;
+        if (!hold && seen && !document.hidden) swap();
+        timers.push(setTimeout(tick, 4600));
+      };
+      // first swap ~2.4s after the row comes into view, so the drawn question is read first
+      const start = () => timers.push(setTimeout(tick, 2400 + k * 1700));
+      if ("IntersectionObserver" in window) {
+        const once = new IntersectionObserver((es) => { if (es[0].isIntersecting) { once.disconnect(); start(); } },
+          { root: page.querySelector(".scroller"), threshold: 0.8 });
+        once.observe(row);
+      } else start();
+    });
+  };
+
   /* Bottom sheets: open(id) / close(). Scrim tap, Escape and a downward drag on
      the grip close it. onClose fires after the sheet has animated away. */
   fx.sheets = (page, { onClose } = {}) => {

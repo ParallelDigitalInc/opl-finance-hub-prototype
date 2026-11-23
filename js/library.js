@@ -114,8 +114,9 @@
       demos: [["", OPL.raw(`<div style="width:354px">${ui.ApplicationCard(lo.applications.card)}</div>`), `ui.ApplicationCard({ logo, name, product, tag, figures, steps, cta })`]],
     },
     {
-      name: "BorrowingCard", node: "382:36253",
-      demos: [["", OPL.raw(`<div style="width:354px">${ui.BorrowingCard(lo.borrowing.card)}</div>`), `ui.BorrowingCard({ total, legend, available })`]],
+      name: "DebtProfile", node: "570:105880",
+      use: "Loans overview debt summary (was BorrowingCard). Total, donut and free limit are computed from the parts.",
+      demos: [["", OPL.raw(`<div style="width:354px">${ui.DebtProfile(lo.debt)}</div>`), `ui.DebtProfile({ title, link, totalLabel, parts, free, ai })`]],
     },
     {
       name: "OfferCard", node: "pick 382:35360 · offer 382:35473", use: "Loan offers cards. Compare checkbox toggles a 2px primary outline (382:35815); Apply now is a Tonal Medium button.",

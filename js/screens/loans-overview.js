@@ -43,10 +43,7 @@
                 <h2 class="lo-section__title">${d.applications.title}</h2>
                 ${ui.ApplicationCard(d.applications.card)}
               </section>
-              <section class="lo-section">
-                <h2 class="lo-section__title">${d.borrowing.title}</h2>
-                ${ui.BorrowingCard(d.borrowing.card)}
-              </section>
+              ${ui.DebtProfile(d.debt)}
               ${ui.HelpCard(d.help)}
             </div>
           </main>
@@ -70,8 +67,19 @@
         const cmr = OPL.fx.cmrSheet(page, sh, this.timers);             // "CMR - 2" pill
         if (OPL.variantValues("loans-overview").cmr === "on") cmr.open({ instant: true }); }
       page.querySelectorAll(".rail").forEach(OPL.fx.mouseDrag);
-      OPL.fx.playInView(page, ".tracker, .borrow");
+      // Debt Profile: pointing at a row or a bar segment brings that part forward
+      const debt = page.querySelector(".debt__card");
+      if (debt) {
+        const hot = (id) => {
+          debt.classList.toggle("is-focus", !!id);
+          debt.querySelectorAll("[data-part]").forEach((el) => el.classList.toggle("is-hot", el.dataset.part === id));
+        };
+        debt.addEventListener("pointerover", (e) => e.pointerType === "mouse" && hot(e.target.closest("[data-part]")?.dataset.part || null));
+        debt.addEventListener("pointerleave", () => hot(null));
+      }
+      OPL.fx.playInView(page, ".tracker, .debt__card");
       OPL.fx.nudge(page, this.timers);
+      OPL.fx.aiRotate(page, this.timers);                 // Debt Profile AI question
 
       const amt = page.querySelector(".lo-hero__amount");
       OPL.fx.enter(page, [

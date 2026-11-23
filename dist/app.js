@@ -4,7 +4,7 @@
 
 (function () {
 const OPL = (window.OPL = window.OPL || {});
-OPL.VERSION = "0.16.11";
+OPL.VERSION = "0.16.13";
 OPL.FIGMA_FILE = "https://www.figma.com/design/GHuBkYGEQZvQppv3v55EaA/OPL----Internal-Playground--5-";
 OPL.figmaLink = (nodeId) => `${OPL.FIGMA_FILE}?node-id=${nodeId.replace(":", "-")}`;
 const esc = (v) =>
@@ -277,19 +277,53 @@ ${note ? OPL.raw(`<p class="app-card__note">${note}</p>`) : ""}
 </div>
 ${footnote ? OPL.raw(`<div class="app-card__foot">${icon("info-circle-amber", 16)}<span>${footnote}</span></div>`) : ""}
 </article>`;
-ui.BorrowingCard = ({ total, legend, available, goto }) => html`
-<article class="borrow" data-press ${goto ? OPL.raw(`data-goto="${goto}"`) : ""}>
-<div class="borrow__total"><span class="figure__label">${total.label}</span><span class="borrow__amount">${total.value}</span></div>
-<div class="borrow__row">
-<img class="borrow__donut" src="${img("donut-borrowing.svg")}" width="103" height="103" alt="">
-<div class="borrow__side">
-<div class="borrow__legend">${legend.map((l) => OPL.raw(`
-<div class="borrow__item">${icon(l.dot, 8)}<span class="borrow__item-label">${l.label}</span><span class="borrow__item-value">${l.value}</span></div>`))}</div>
-<div class="figure figure--avail"><span class="figure__label">${available.label}</span>
-<span class="figure__value">${available.value}<span class="figure__unit">${available.unit}</span></span></div>
+const lakh = (n) => `₹${n.toFixed(2).replace(/\.00$/, "")} L`;
+const sector = (c, r0, r1, a0, a1, h) => {
+const pt = (r, a) => [c + r * Math.sin(a), c - r * Math.cos(a)].map((v) => v.toFixed(2)).join(" ");
+const o1 = Math.asin(h / r1), o0 = Math.asin(h / r0);
+const large = a1 - a0 - 2 * o1 > Math.PI ? 1 : 0;
+return `M${pt(r1, a0 + o1)}A${r1} ${r1} 0 ${large} 1 ${pt(r1, a1 - o1)}L${pt(r0, a1 - o0)}A${r0} ${r0} 0 0 0 ${pt(r0, a0 + o0)}Z`;
+};
+ui.DebtDonut = (slices, size = 80) => {
+const total = slices.reduce((a, x) => a + x.value, 0), c = size / 2;
+let a = 0;
+const paths = slices.map((x, i) => {
+const span = (x.value / total) * Math.PI * 2, d = sector(c, 20, c - 2, a, a + span, 3.4);
+a += span;
+return `<path data-part="${x.id}" style="--i:${i}" d="${d}" fill="${x.color}" stroke="${x.color}" stroke-width="4" stroke-linejoin="round"/>`;
+}).join("");
+return OPL.raw(`<svg class="debt__donut" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" aria-hidden="true">${paths}</svg>`);
+};
+ui.DebtProfile = ({ title, link, totalLabel, parts, free, ai }) => {
+const total = parts.reduce((a, p) => a + p.lakh, 0);
+const freeLakh = free.limit - parts.find((p) => p.id === free.of).lakh;
+const rows = [...parts, { ...free, lakh: freeLakh }];
+return html`
+<section class="lo-section debt" aria-label="${title}">
+${ui.SectionHeader({ title, action: link.label, goto: link.goto })}
+<article class="debt__card">
+<div class="debt__top">
+<div class="debt__total">
+<span class="figure__label">${totalLabel}</span>
+<span class="debt__amount">${lakh(total)}</span>
 </div>
+${ui.DebtDonut(rows.map((p) => ({ id: p.id, value: p.lakh, color: p.color })))}
 </div>
-</article>`;
+<ul class="debt__list">
+${rows.map((p) => OPL.raw(`
+<li class="debt__row" data-part="${p.id}" style="--c:${p.color}">
+<span class="debt__dot"></span><span class="debt__name">${p.label}</span><span class="debt__val">${lakh(p.lakh)}</span>
+</li>`))}
+</ul>
+${(() => { const qs = Array.isArray(ai) ? ai : [ai]; return html`
+<button class="debt__ai" data-press data-goto="ai-mitra" aria-label="Ask AI Mitra: ${qs[0]}" ${qs.length > 1 ? OPL.raw(`data-ai-qs="${encodeURIComponent(JSON.stringify(qs))}"`) : ""}>
+<span class="debt__ai-mark">${icon("mitra-mark-white", 14)}</span>
+<span class="debt__ai-q ai-q"><span class="ai-q__t">${qs[0]}</span></span>`; })()}
+${icon("chevron-down-ai", 20)}
+</button>
+</article>
+</section>`;
+};
 ui.OfferCard = ({ id, kind = "offer", logo, tint, tags = [], title, subtitle, figures, details, selected = false }) => html`
 <article class="${cx("offer", `offer--${kind}`, selected && "is-selected")}" style="--tint:${tint}" data-offer="${id}">
 <div class="offer__head" data-press data-detail="${id}">
@@ -904,6 +938,41 @@ if (motionOff()) return;
 els.filter(Boolean).forEach((el, i) => { el.classList.add("enter"); el.style.setProperty("--i", Math.min(i, 16)); });
 page.classList.remove("is-entering"); void page.offsetWidth; page.classList.add("is-entering");
 OPL.afterReveal(() => setTimeout(() => page.classList.remove("is-entering"), holdMs));
+};
+fx.aiRotate = (page, timers = []) => {
+if (motionOff()) return;
+page.querySelectorAll("[data-ai-qs]").forEach((row, k) => {
+const qs = JSON.parse(decodeURIComponent(row.dataset.aiQs));
+const cell = row.querySelector(".ai-q");
+let i = 0, hold = false, seen = false;
+["pointerenter", "pointerdown", "focus"].forEach((ev) => row.addEventListener(ev, () => { hold = true; }));
+["pointerleave", "pointercancel", "blur"].forEach((ev) => row.addEventListener(ev, () => { hold = false; }));
+if ("IntersectionObserver" in window) new IntersectionObserver((es) => { seen = es[0].isIntersecting; },
+{ root: page.querySelector(".scroller"), threshold: 0.8 }).observe(row);
+else seen = true;
+const swap = () => {
+i = (i + 1) % qs.length;
+const old = cell.querySelector(".ai-q__t:not(.is-out)");
+const next = document.createElement("span");
+next.className = "ai-q__t is-in";
+next.textContent = qs[i];
+cell.appendChild(next);
+old?.classList.add("is-out");
+setTimeout(() => { old?.remove(); next.classList.remove("is-in"); }, 520);
+row.setAttribute("aria-label", `Ask AI Mitra: ${qs[i]}`);
+};
+const tick = () => {
+if (!row.isConnected) return;
+if (!hold && seen && !document.hidden) swap();
+timers.push(setTimeout(tick, 4600));
+};
+const start = () => timers.push(setTimeout(tick, 2400 + k * 1700));
+if ("IntersectionObserver" in window) {
+const once = new IntersectionObserver((es) => { if (es[0].isIntersecting) { once.disconnect(); start(); } },
+{ root: page.querySelector(".scroller"), threshold: 0.8 });
+once.observe(row);
+} else start();
+});
 };
 fx.sheets = (page, { onClose } = {}) => {
 let current = null;
@@ -1697,17 +1766,18 @@ cta: "Review KFS",
 ctaAttrs: 'data-app-open="pick-citi"',   // → Application detail, KFS ready (382:42689)
 },
 },
-borrowing: {
-title: "Your Borrowing",
-card: {
-total: { label: "Total outstanding", value: "₹64.92 L" },
-legend: [
-{ dot: "dot-indigo", label: "Loans on EMI", value: "₹50.22 L" },
-{ dot: "dot-green", label: "Credit line used", value: "₹14.70 L" },
+debt: {
+title: "Debt Profile",
+link: { label: "View Debt Profile", goto: "my-loans" },
+totalLabel: "Total outstanding",
+parts: [
+{ id: "term", label: "Term Loans (2)", lakh: 36.5, color: "#4340d6" },
+{ id: "wc", label: "Working Capital Loan (1)", lakh: 13.72, color: "#55c4da" },
+{ id: "cc", label: "Cash Credit Lines (1)", lakh: 14.7, color: "#af78d9" },
 ],
-available: { label: "Credit line available", value: "₹18.30 L", unit: "of ₹33 L" },
-goto: "my-loans",
-},
+free: { id: "free", label: "Free Credit Limit", of: "cc", limit: 33, color: "#c4d9f3" },
+ai: ["Can I take another term loan?", "Which loan should I repay first?",
+"Should I draw my free ₹18.30 L?", "Is ₹64.92 L too much to owe?"],
 },
 help: OPL.data.home.help,
 aiNudge: { lead: "Ask anything about", topic: "your loans" },
@@ -2827,10 +2897,7 @@ ${ui.CmrPill(d.cmr)}
 <h2 class="lo-section__title">${d.applications.title}</h2>
 ${ui.ApplicationCard(d.applications.card)}
 </section>
-<section class="lo-section">
-<h2 class="lo-section__title">${d.borrowing.title}</h2>
-${ui.BorrowingCard(d.borrowing.card)}
-</section>
+${ui.DebtProfile(d.debt)}
 ${ui.HelpCard(d.help)}
 </div>
 </main>
@@ -2852,8 +2919,18 @@ OPL.fx.applySheet(page, sh); OPL.fx.loanDetail(page, sh);       // offer cards �
 const cmr = OPL.fx.cmrSheet(page, sh, this.timers);             // "CMR - 2" pill
 if (OPL.variantValues("loans-overview").cmr === "on") cmr.open({ instant: true }); }
 page.querySelectorAll(".rail").forEach(OPL.fx.mouseDrag);
-OPL.fx.playInView(page, ".tracker, .borrow");
+const debt = page.querySelector(".debt__card");
+if (debt) {
+const hot = (id) => {
+debt.classList.toggle("is-focus", !!id);
+debt.querySelectorAll("[data-part]").forEach((el) => el.classList.toggle("is-hot", el.dataset.part === id));
+};
+debt.addEventListener("pointerover", (e) => e.pointerType === "mouse" && hot(e.target.closest("[data-part]")?.dataset.part || null));
+debt.addEventListener("pointerleave", () => hot(null));
+}
+OPL.fx.playInView(page, ".tracker, .debt__card");
 OPL.fx.nudge(page, this.timers);
+OPL.fx.aiRotate(page, this.timers);                 // Debt Profile AI question
 const amt = page.querySelector(".lo-hero__amount");
 OPL.fx.enter(page, [
 page.querySelector(".lo-hero__title"),

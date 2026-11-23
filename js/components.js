@@ -252,20 +252,62 @@
       ${footnote ? OPL.raw(`<div class="app-card__foot">${icon("info-circle-amber", 16)}<span>${footnote}</span></div>`) : ""}
     </article>`;
 
-  /* BorrowingCard — "Your Borrowing" summary (382:36253) */
-  ui.BorrowingCard = ({ total, legend, available, goto }) => html`
-    <article class="borrow" data-press ${goto ? OPL.raw(`data-goto="${goto}"`) : ""}>
-      <div class="borrow__total"><span class="figure__label">${total.label}</span><span class="borrow__amount">${total.value}</span></div>
-      <div class="borrow__row">
-        <img class="borrow__donut" src="${img("donut-borrowing.svg")}" width="103" height="103" alt="">
-        <div class="borrow__side">
-          <div class="borrow__legend">${legend.map((l) => OPL.raw(`
-            <div class="borrow__item">${icon(l.dot, 8)}<span class="borrow__item-label">${l.label}</span><span class="borrow__item-value">${l.value}</span></div>`))}</div>
-          <div class="figure figure--avail"><span class="figure__label">${available.label}</span>
-            <span class="figure__value">${available.value}<span class="figure__unit">${available.unit}</span></span></div>
+  /* DebtProfile — 570:105880 (was BorrowingCard), as designed: total + 80px donut, a legend
+     row per part, the AI question. Every figure is computed from the parts, so they always
+     reconcile. Donut = all your credit: owed parts in colour from 12 o'clock clockwise, then
+     the free limit (limit − drawn) in pale blue. Segments: outer r40, inner r18 (as drawn),
+     ~3px gaps, rounded corners (each sector is inset 2px and stroked 4px round in its colour). */
+  const lakh = (n) => `₹${n.toFixed(2).replace(/\.00$/, "")} L`;
+  // Annular sector whose straight edges sit h px off each boundary ray, so the gap between
+  // neighbours is a constant 2h wide from the inner to the outer edge (as drawn).
+  const sector = (c, r0, r1, a0, a1, h) => {
+    const pt = (r, a) => [c + r * Math.sin(a), c - r * Math.cos(a)].map((v) => v.toFixed(2)).join(" ");
+    const o1 = Math.asin(h / r1), o0 = Math.asin(h / r0);
+    const large = a1 - a0 - 2 * o1 > Math.PI ? 1 : 0;
+    return `M${pt(r1, a0 + o1)}A${r1} ${r1} 0 ${large} 1 ${pt(r1, a1 - o1)}L${pt(r0, a1 - o0)}A${r0} ${r0} 0 0 0 ${pt(r0, a0 + o0)}Z`;
+  };
+  // Inset 2px on every side, then a 4px round-joined stroke in the same colour brings the
+  // edges back out with ~2px rounded corners. Gap between slices ≈ 2.8px.
+  ui.DebtDonut = (slices, size = 80) => {
+    const total = slices.reduce((a, x) => a + x.value, 0), c = size / 2;
+    let a = 0;
+    const paths = slices.map((x, i) => {
+      const span = (x.value / total) * Math.PI * 2, d = sector(c, 20, c - 2, a, a + span, 3.4);
+      a += span;
+      return `<path data-part="${x.id}" style="--i:${i}" d="${d}" fill="${x.color}" stroke="${x.color}" stroke-width="4" stroke-linejoin="round"/>`;
+    }).join("");
+    return OPL.raw(`<svg class="debt__donut" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" aria-hidden="true">${paths}</svg>`);
+  };
+  ui.DebtProfile = ({ title, link, totalLabel, parts, free, ai }) => {
+    const total = parts.reduce((a, p) => a + p.lakh, 0);
+    const freeLakh = free.limit - parts.find((p) => p.id === free.of).lakh;
+    const rows = [...parts, { ...free, lakh: freeLakh }];
+    return html`
+    <section class="lo-section debt" aria-label="${title}">
+      ${ui.SectionHeader({ title, action: link.label, goto: link.goto })}
+      <article class="debt__card">
+        <div class="debt__top">
+          <div class="debt__total">
+            <span class="figure__label">${totalLabel}</span>
+            <span class="debt__amount">${lakh(total)}</span>
+          </div>
+          ${ui.DebtDonut(rows.map((p) => ({ id: p.id, value: p.lakh, color: p.color })))}
         </div>
-      </div>
-    </article>`;
+        <ul class="debt__list">
+          ${rows.map((p) => OPL.raw(`
+            <li class="debt__row" data-part="${p.id}" style="--c:${p.color}">
+              <span class="debt__dot"></span><span class="debt__name">${p.label}</span><span class="debt__val">${lakh(p.lakh)}</span>
+            </li>`))}
+        </ul>
+        ${(() => { const qs = Array.isArray(ai) ? ai : [ai]; return html`
+        <button class="debt__ai" data-press data-goto="ai-mitra" aria-label="Ask AI Mitra: ${qs[0]}" ${qs.length > 1 ? OPL.raw(`data-ai-qs="${encodeURIComponent(JSON.stringify(qs))}"`) : ""}>
+          <span class="debt__ai-mark">${icon("mitra-mark-white", 14)}</span>
+          <span class="debt__ai-q ai-q"><span class="ai-q__t">${qs[0]}</span></span>`; })()}
+          ${icon("chevron-down-ai", 20)}
+        </button>
+      </article>
+    </section>`;
+  };
 
   /* ------------------------------------------------------------------------
      OfferCard — Loan offers cards. kind "pick" (300w, 382:35360) | "offer" (350w, 382:35473)

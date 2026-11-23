@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.16.13 — 23 Nov 2026 · Debt Profile, as designed, with the maths fixed
+
+Shreya: improve the Debt Profile (was "Your Borrowing", Figma `570:105880`); the data viz and maths need correcting. Keep changing the questions in the AI widget.
+
+- **Built as designed:** "Debt Profile" with View Debt Profile, total outstanding beside an 80px donut, four legend rows, and the Ask AI Mitra question row with its texture.
+- **The maths now reconciles:**
+  - Term Loans (2) ₹36.50 L + Working Capital Loan (1) ₹13.72 L + Cash Credit Lines (1) ₹14.70 L = ₹64.92 L. Figma repeated ₹50.22 L, so its rows summed to ₹1.15 Cr.
+  - Free Credit Limit = ₹33 L − ₹14.70 L = ₹18.30 L (Figma: ₹8.5L), matching the CMR sheet.
+  - Every figure is computed from the parts in `ui.DebtProfile`.
+- **The donut** now has four slices in the legend colours: the three owed parts, then the free limit in pale blue. Figma still had the old two-part donut. Geometry is as drawn, with rounded corners and even ~3px gaps. Slices pop in clockwise; with a mouse, pointing at a row or slice highlights it.
+- **Rotating AI question** (`fx.aiRotate`): after the drawn "Can I take another term loan?", it cycles to "Which loan should I repay first?", "Should I draw my free ₹18.30 L?" and "Is ₹64.92 L too much to owe?". It holds while pressed, off-screen or under reduced motion.
+- `ui.BorrowingCard` is replaced by `ui.DebtProfile` (library updated). README → Loans overview flags lists what changed from Figma.
+
 ## v0.16.11 — 23 Nov 2026 · Desktop AI questions change with context
 
 Shreya: on desktop, wherever there's AI, the questions should change subtly in context.

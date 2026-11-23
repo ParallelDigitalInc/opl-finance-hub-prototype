@@ -237,6 +237,23 @@ All of this is behaviour on existing elements. None of it adds UI:
 5. The header icons and CMR chevron are Solar `#1C274C`, not ink.
 6. Home now matches the updated Figma: "₹50 Lakhs" and the "Explore Loans" / "Explore Subsidies" CTAs. `382:36681` still reads "See all subsidies (3)"; I used "Explore Subsidies" for both, since the hero carousel is shared. The Subsidies overview isn't designed yet, so that CTA shows a hotspot hint.
 
+- **Debt Profile (`570:105880`, was "Your Borrowing"):** built as designed, with the maths corrected.
+  - **Figma's figures don't reconcile:**
+    - Working Capital Loan repeats Term Loans' ₹50.22 L, so the rows sum to ₹1.15 Cr against "Total outstanding ₹64.92 L".
+    - "Free Credit Limit ₹8.5L" contradicts the ₹18.30 L available elsewhere.
+    - The donut is the old two-part one ("Loans on EMI / Credit limit used") and doesn't match the four legend dots.
+  - **Now** (`js/data/loans-overview.js` → `debt`; every figure is computed in `ui.DebtProfile`):
+    - Term Loans (2) ₹36.50 L + Working Capital Loan (1) ₹13.72 L + Cash Credit Lines (1) ₹14.70 L = ₹64.92 L. This keeps loans on EMI at ₹50.22 L.
+    - Free Credit Limit = ₹33 L limit − ₹14.70 L drawn = ₹18.30 L, the same as the CMR sheet.
+  - **The donut** shows all your credit: the three owed parts in their legend colours, clockwise from 12 o'clock, then the free limit in pale blue.
+    - Its geometry is as drawn: r40/r18, rounded corners, ~3px even gaps.
+    - Slices pop in clockwise when scrolled into view. Pointing at a row or slice brings that part forward (mouse only).
+  - **The AI question rotates** (proposed; `fx.aiRotate`, the mobile twin of desktop `D.mountAi`):
+    - Questions: "Can I take another term loan?" (as drawn), then "Which loan should I repay first?", "Should I draw my free ₹18.30 L?" and "Is ₹64.92 L too much to owe?".
+    - The first swap comes ~2.4s after the card scrolls into view, then every ~4.6s. Each new question lifts in with a slight blur, on one line, with no layout shift.
+    - It holds while pressed, while off-screen, or under reduced motion.
+  - The split of ₹50.22 L into term and working capital is sample data.
+
 ## Figma flags · Loan offers flow (`416:121835`)
 
 1. **Compare loans follows the selection** (decided 23 Nov). Columns are the ticked offers, in the order they were ticked; opened directly, it shows the Figma set (Citi, SIDBI, SBI). Removing a column un-ticks it on the list.
