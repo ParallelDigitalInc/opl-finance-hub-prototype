@@ -17,6 +17,7 @@
     if (!svg) return `assets/lazy/dsk/${name}.svg`;
     return (iconUri[name] ||= "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg));
   };
+  D.iconSrc = (name) => iconSrc(name);
   D.icon = (name, size = 16, cls = "") =>
     raw(`<img class="ico ${cls}" src="${iconSrc(name)}" width="${size}" height="${size}" alt="" draggable="false">`);
   // icons shared with the mobile kit (assets/icons)
@@ -43,7 +44,7 @@
     ] },
   ];
   const navItem = (it, active) => html`
-    <button class="d-nav__item ${it.id === active ? "is-active" : ""}" data-goto="${it.goto || "d-" + it.id}" ${it.id === active ? raw('aria-current="page"') : ""}>
+    <button class="d-nav__item ${it.id === active ? "is-active" : ""}" data-goto="${it.goto || "d-" + it.id}" data-label="${it.label}" ${it.id === active ? raw('aria-current="page"') : ""}>
       <span class="d-nav__icon">${D.icon(it.icon, it.size || 16)}</span>
       <span class="d-nav__label">${it.label}</span>
     </button>`;
@@ -70,7 +71,7 @@
   /* ---- Top bar (476:200177) ----------------------------------------------- */
   D.topbar = () => html`
     <header class="d-top">
-      <button class="d-top__toggle" data-goto="d-sidebar-toggle" aria-label="Collapse sidebar">${D.icon("top-sidebar-toggle", 40)}</button>
+      <button class="d-top__toggle" data-side-toggle aria-label="${D.sideCollapsed ? "Expand" : "Collapse"} sidebar" aria-expanded="${!D.sideCollapsed}">${D.icon("top-sidebar-toggle", 40)}</button>
       <label class="d-search">
         ${D.icon("top-search", 14)}
         <input class="d-search__input" type="search" placeholder="Search everything..." aria-label="Search everything">
@@ -107,8 +108,10 @@
 
   /* ---- Page shell ----------------------------------------------------------- */
   // nav: sidebar item · title: page heading (Regular 30/40) · tab: Loans tab (null = none)
+  // Sidebar collapse (top-bar toggle): remembered for the session and in this browser
+  D.sideCollapsed = (() => { try { return localStorage.getItem("opl.dside") === "1"; } catch (_) { return false; } })();
   D.shell = ({ nav = "loans", title = "Loans", tab = "overview", counts, body, crumbs, after = "" }) => html`
-    <div class="d-app">
+    <div class="d-app ${D.sideCollapsed ? "is-side-collapsed" : ""}">
       ${D.sidebar(nav)}
       <main class="d-main">
         <div class="d-main__scroll scroller">
@@ -350,6 +353,23 @@
     page.addEventListener("pointerover", (e) => { const h = e.target.closest(".d-tip")?.parentElement || e.target.closest(":has(> .d-tip)"); if (h) fit(h); });
     page.addEventListener("focusin", (e) => { if (e.target.querySelector?.(":scope > .d-tip")) fit(e.target); });
   };
+
+  document.addEventListener("click", (e) => {
+    const t = e.target.closest("[data-side-toggle]");
+    if (!t) return;
+    const app = t.closest(".d-app");
+    D.sideCollapsed = !app.classList.contains("is-side-collapsed");
+    try { localStorage.setItem("opl.dside", D.sideCollapsed ? "1" : "0"); } catch (_) {}
+    app.classList.toggle("is-side-collapsed", D.sideCollapsed);
+    t.setAttribute("aria-expanded", !D.sideCollapsed);
+    t.setAttribute("aria-label", `${D.sideCollapsed ? "Expand" : "Collapse"} sidebar`);
+  });
+  // "[" toggles the sidebar too (desktop apps' convention), ignored while typing
+  window.addEventListener("keydown", (e) => {
+    if (e.key !== "[" || e.metaKey || e.ctrlKey || !OPL.isDesktop || !OPL.isDesktop()) return;
+    if (e.target.closest && e.target.closest("input, textarea, select, [contenteditable]")) return;
+    document.querySelector(".page:last-child [data-side-toggle]")?.click();
+  });
 
   // Every desktop page: shell behaviours
   D.mountShell = (page) => {

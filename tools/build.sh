@@ -61,11 +61,13 @@ DCSS=(
   css/desktop/screens/compare-loans.css
   css/desktop/screens/applications.css
   css/desktop/screens/application.css
+  css/desktop/screens/subsidies.css
 )
 DJS=(
   js/desktop/ui.js
   js/desktop/data/loans-overview.js
   js/desktop/data/loan-offers.js
+  js/desktop/data/subsidies.js
   js/desktop/screens/fallback.js
   js/desktop/screens/loans-overview.js
   js/desktop/screens/loan-offers.js
@@ -74,6 +76,8 @@ DJS=(
   js/desktop/screens/application.js
   js/desktop/screens/kfs.js
   js/desktop/screens/nesl.js
+  js/desktop/screens/subsidies.js
+  js/desktop/screens/subsidy-detail.js
 )
 
 mkdir -p dist
