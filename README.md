@@ -247,7 +247,7 @@ All of this is behaviour on existing elements. None of it adds UI:
    - **Figma conflict:** Citi's card says Tenure "Renews yearly", Fee 0.75%, while its Compare column says 3 years, 1.5%. Compare uses the Compare column.
 2. **The third Compare column** is labelled "SIDBI" but carries the SBI logo and different figures. It's shown as **SBI**.
 3. **"Top 3 picks" draws only 2 cards.** I added SIDBI as the third, using only Figma values: its All-offers card, plus the 0.5% processing fee from Compare loans.
-4. **Nav doesn't match.** Loan offers uses the Finance hub tabs (Home · Business · Finance · Grow), while Loans overview uses the Loans tabs, whose Offers tab leads here. Kept as drawn.
+4. **Nav doesn't match in Figma.** Loan offers is drawn with the Finance hub tabs (Home · Business · Finance · Grow). Since v0.16.9 it uses the Loans tabs instead, the same as Loans overview, with Offers active (Shreya, 23 Nov). The active Offers icon is Solar Banknote 2 Bold, as no filled version is drawn.
 5. **Hero texture.** It's 50% in the compare state and 30% in the list; I used 30%.
 6. **Toggle On state.** The DS Toggle is drawn Off only, so "On" (primary track) is inferred.
 7. **Sort and filters change state only.** All three All-offers cards share the same figures, so sort updates the chip but doesn't reorder; quick and sheet filters toggle without filtering. "Show 4 offers" is static.

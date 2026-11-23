@@ -72,7 +72,7 @@
 
     nav: [
       { id: "overview", label: "Overview", icon: "widget", iconActive: "widget-active", goto: "loans-overview" },
-      { id: "loan-offers", label: "Offers", icon: "banknote-2" },
+      { id: "loan-offers", label: "Offers", icon: "banknote-2", iconActive: "banknote-2-active" },   // active: Solar Banknote 2 Bold (same family as the other active tabs)
       // "Track Loans" on the application screens (nav 440:132239); this frame (382:36150)
       // still says "Applications", so Loans overview overrides the label (overviewLabel).
       { id: "applications", label: "Track Loans", overviewLabel: "Applications", icon: "clipboard-list", iconActive: "clipboard-list-active" },

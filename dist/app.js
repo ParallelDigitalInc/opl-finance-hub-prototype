@@ -4,7 +4,7 @@
 
 (function () {
 const OPL = (window.OPL = window.OPL || {});
-OPL.VERSION = "0.16.8";
+OPL.VERSION = "0.16.9";
 OPL.FIGMA_FILE = "https://www.figma.com/design/GHuBkYGEQZvQppv3v55EaA/OPL----Internal-Playground--5-";
 OPL.figmaLink = (nodeId) => `${OPL.FIGMA_FILE}?node-id=${nodeId.replace(":", "-")}`;
 const esc = (v) =>
@@ -1713,7 +1713,7 @@ help: OPL.data.home.help,
 aiNudge: { lead: "Ask anything about", topic: "your loans" },
 nav: [
 { id: "overview", label: "Overview", icon: "widget", iconActive: "widget-active", goto: "loans-overview" },
-{ id: "loan-offers", label: "Offers", icon: "banknote-2" },
+{ id: "loan-offers", label: "Offers", icon: "banknote-2", iconActive: "banknote-2-active" },   // active: Solar Banknote 2 Bold (same family as the other active tabs)
 { id: "applications", label: "Track Loans", overviewLabel: "Applications", icon: "clipboard-list", iconActive: "clipboard-list-active" },
 { id: "my-loans", label: "My Loans", icon: "wallet-2" },
 ],
@@ -2926,7 +2926,8 @@ ${d.quickFilters.map((q) => ui.Chip({ label: q, selected: this.quick.includes(q)
 <div class="floating">
 ${ui.AiMitraFab({ nudge: v.nudge === "on" ? d.aiNudge : null })}
 <div class="floating__tray" data-tray></div>
-${ui.BottomNav({ items: OPL.data.home.nav, active: "finance" })}
+${/* Loans section footer, Offers active — same tabs and labels as Loans overview (Shreya, 23 Nov) */ ""}
+${ui.BottomNav({ items: OPL.data.loansOverview.nav.map((it) => ({ ...it, label: it.overviewLabel || it.label })), active: "loan-offers", variant: "section" })}
 </div>
 ${ui.Sheet({ id: "sort", title: "Sort by", body: html`<div class="sheet-sort" data-sort-list>${d.sortOptions.map((o) => ui.SortOption({ label: o, selected: o === this.sort }))}</div>` })}
 ${ui.Sheet({
