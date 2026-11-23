@@ -33,7 +33,7 @@ Synced from Figma: section "Subsidy Home - First Cut" `416:44852`, frames `416:4
   - CSS: all comments.
   - JS: whole-line comments only, never inside template strings.
   - JS and CSS: leading indentation too, since no template text is whitespace-sensitive.
-  - First load is 693 KB of the 700 KB cap. **The next flow will need a decision:** raise the cap or add a real minifier.
+  - Loading caps raised (agreed 23 Nov 2026): first load **900 KB** (was 700), screen-only assets **1000 KB** (was 600). Per-asset stays 150 KB.
 - Lazy SVGs: removed Figma boilerplate and unused ids, and rounded paths to 2 decimals (−34 KB).
 
 ## v0.8.0 — 23 Nov 2026 · NeSL signing (group E)

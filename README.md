@@ -103,9 +103,9 @@ Rules for every new screen and asset:
 3. **Fonts are self-hosted** (`assets/fonts`, Geist variable latin + latin-ext, which carries ₹) and preloaded. No Google Fonts in the prototype, so it works offline in a meeting room.
 4. **Images are ≤3× their displayed size.**
    - Opaque photos and textures are JPEG; transparent art is PNG; icons are SVG.
-   - Max **150 KB per asset** and **700 KB total**, enforced by `tools/check.sh`.
+   - Max **150 KB per asset** and **900 KB total** (raised from 700 on 23 Nov 2026 as flows were added), enforced by `tools/check.sh`.
    - Full-resolution originals live in `assets/_source/` for re-export and are never loaded.
-5. **Screen-only images live in `assets/lazy/`** (for example the NeSL portal shots). They're fetched only by the screen that shows them, and never referenced from `index.html`. They have their own cap (150 KB each, 600 KB total) and don't count against the first-load total.
+5. **Screen-only images live in `assets/lazy/`** (for example the NeSL portal shots). They're fetched only by the screen that shows them, and never referenced from `index.html`. They have their own cap (150 KB each, 1000 KB total; raised from 600 on 23 Nov 2026) and don't count against the first-load total.
 6. **Every image has a fixed CSS size**, so nothing shifts as it loads.
 7. **First paint is the boot layer.**
    - Inline critical CSS in `index.html` paints the device and a neutral placeholder at first byte.
