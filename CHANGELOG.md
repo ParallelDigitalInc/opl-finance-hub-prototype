@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.15.2 — 23 Nov 2026 · Desktop: "Applications sent" moment + clearer sidebar rail
+
+Matched the remaining Compare frames on *-> Final Desktop*.
+
+- **"Applications sent to N lenders"** (`507:131209`, modal `507:131481`). Submitting from Compare turns the apply modal into the success moment in place. It matches Figma to the pixel: 480 × 537, card 133, rows 38.
+  - Hero art inlined from Figma so it can move: the glows pop and breathe, the plane flies in, the tick lands, and each "Sent" chip pops in turn.
+  - **Track applications** opens Applications, where the approval moment still plays. **Done** keeps you on Compare.
+- **Apply modal is 480 wide**, as in "proceed with 2 offers" (`507:130904`). It was 520.
+- "Comparing" (`524:105408`) and "show differences" (`507:131530`) already matched.
+- **Collapsed sidebar, reworked** (Shreya: "messy, needs to be more visible"):
+  - Icons and the business avatar now sit dead-centre in the 72px rail. Hidden labels used to keep their flex space and push everything left.
+  - A round **edge handle** straddles the sidebar border in both states and shows "Collapse/Expand sidebar [" on hover. The top-bar button and **[** still work.
+  - **Hovering any rail icon names the section** in a dark label with a pointer, drawn above the main panel. Before, it was hidden underneath. The avatar shows the business name.
+  - In the rail, group headings become short rules, so the three groups still read as groups.
+  - When expanding, labels fade in only once there's room, so nothing wraps mid-animation.
+
 ## v0.15.1 — 23 Nov 2026 · Sticky actions in benefit sheets
 
 - **"Talk to an Expert" and "Apply Now" stay pinned to the bottom of every subsidy benefit sheet.** On a phone, the long sheets (Capital, Interest, Payroll) used to scroll them out of view.
