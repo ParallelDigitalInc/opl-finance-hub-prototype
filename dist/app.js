@@ -4,7 +4,7 @@
 
 (function () {
 const OPL = (window.OPL = window.OPL || {});
-OPL.VERSION = "0.16.4";
+OPL.VERSION = "0.16.5";
 OPL.FIGMA_FILE = "https://www.figma.com/design/GHuBkYGEQZvQppv3v55EaA/OPL----Internal-Playground--5-";
 OPL.figmaLink = (nodeId) => `${OPL.FIGMA_FILE}?node-id=${nodeId.replace(":", "-")}`;
 const esc = (v) =>
@@ -4594,13 +4594,38 @@ OPL.go = (name, params = {}, { replace = false } = {}) => {
 if (!OPL.hasScreen(name)) return;
 const next = hashFor({ screen: name, ...params });
 if (next === location.hash || (name === screenName() && !Object.keys(params).length)) return;
-if (replace) history.replaceState({ depth }, "", next);
-else { history.pushState({ depth: depth + 1 }, "", next); depth++; }
+const trail = trailNow().slice(0, depth);
+if (replace) history.replaceState({ depth, trail: [...trail, name] }, "", next);
+else { history.pushState({ depth: depth + 1, trail: [...trail, screenName(), name] }, "", next); depth++; }
 render({ dir: "forward" });
 };
+OPL.parents = {
+"loans-overview": ["home"],
+"loan-offers": ["loans-overview", "home"],
+applications: ["loans-overview", "home"],
+"compare-loans": ["loan-offers"],
+application: ["applications", "loans-overview", "home"],
+kfs: ["application"],
+nesl: ["kfs", "application"],
+"subsidies-overview": ["home"],
+"subsidies-explore": ["subsidies-overview"],
+"subsidy-detail": ["subsidies-explore", "subsidies-overview", "home"],
+"subsidy-estimate": ["subsidy-detail"],
+"subsidy-estimate-result": ["subsidy-detail"],
+};
+const KEEP = ["app", "device", "panel", "motion", "hotspots", "frame"];
+const trailNow = () => (history.state && history.state.trail) || [];
 OPL.back = () => {
-if (depth > 0) return history.back();
-history.replaceState({ depth: 0 }, "", hashFor({ screen: null }));
+const cur = screenName();
+const ups = (OPL.parents[cur] || ["home"]).map((n) => (isDesktop() && n === "home" ? "loans-overview" : n));
+if (cur === "home" || (isDesktop() && cur === "loans-overview")) return;
+const trail = trailNow();
+for (let i = depth - 1; i >= 0; i--) if (ups.includes(trail[i])) return history.go(i - depth);
+const parent = ups[0];
+const st = OPL.state.get(), next = { screen: parent === "home" ? null : parent };
+KEEP.forEach((k) => st[k] != null && (next[k] = st[k]));
+const hash = "#" + new URLSearchParams(Object.entries(next).filter(([, v]) => v != null)).toString();
+history.replaceState({ depth, trail: [...trail.slice(0, depth), parent] }, "", hash);
 render({ dir: "back" });
 };
 function render({ dir } = {}) {
@@ -4817,7 +4842,7 @@ const scr = e.target.closest("[data-screen]");
 if (scr) {
 const target = scr.dataset.screen;
 if (target === screenName() || (isDesktop() && target === dName(screenName()))) return;
-if (target === "home" || (isDesktop() && target === "loans-overview" && depth === 0)) { history.replaceState({ depth: 0 }, "", hashFor({ screen: null })); depth = 0; return render({ dir: "back" }); }
+if (target === "home" || (isDesktop() && target === "loans-overview" && depth === 0)) { history.replaceState({ depth: 0, trail: ["home"] }, "", hashFor({ screen: null })); depth = 0; return render({ dir: "back" }); }
 return OPL.go(target);
 }
 const preset = e.target.closest("[data-preset]");
@@ -4860,7 +4885,7 @@ fit();
 if ((isDesktop() ? "desktop" : "mobile") !== document.documentElement.dataset.device) render();
 });
 OPL.initInteractions(screenEl);
-history.replaceState({ depth: 0 }, "", location.hash || "#");
+history.replaceState({ depth: 0, trail: [screenName()] }, "", location.hash || "#");
 const timeout = (ms) => new Promise((r) => setTimeout(r, ms));
 const imagesReady = (root) => Promise.all([...root.querySelectorAll("img")]
 .filter((img) => img.getBoundingClientRect().top < window.innerHeight + 200)
