@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.16.10 — 23 Nov 2026 · Estimate card stacks like the mobile hero
+
+Shreya asked for the illustration on top, with "Up to" given the same treatment as the amount.
+
+- **The desktop Subsidy details estimate card** (cover-photo version, right rail) is now a centred stack, the same order as the mobile hero (`558:103930`): the 3D notes-and-coins illustration on top, 16 below it **Estimated benefits ⓘ**, then **Up to ₹1.2Cr**, then Calculate Estimate and Apply Now at full width.
+- "Up to" is the same 40/52 medium as the amount. It used to be 20px grey.
+
 ## v0.16.9 — 23 Nov 2026 · Loan offers gets the Loans footer
 
 Shreya: the footer on "See all loan offers" / "View all" should match the Loans page, with Offers selected.
