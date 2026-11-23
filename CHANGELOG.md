@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.15.3 — 23 Nov 2026 · Desktop Calculate estimate
+
+Shreya asked for it. There's no desktop frame on *-> Final Desktop*, so this adapts the mobile flow (`416:76869` form, `416:77363` result). It's flagged in the README.
+
+- **Calculate estimate page.** Open it from "Calculate Estimate" on either Subsidy details version.
+  - Left: the mobile benefit cards, with fields side by side on desktop, plus the "Add more benefits" chips. State is shared with mobile, so your numbers carry across views.
+  - Right: a sticky **live summary** in the details page's cream estimate card. As you type, the total re-counts, each benefit's Build-up segment grows in, and the rows follow.
+  - A row with missing numbers reads "Add numbers". Click it to jump to that field.
+  - **Get Estimate** checks every added benefit first. It opens the first card with a gap, shakes the empty field and focuses it.
+- **Result as a 480 modal**: the mobile celebration. A bundle lands on the plinth for each benefit while the total climbs, then confetti bursts from the stack. "Add more" closes it and nudges the chips. `#screen=subsidy-estimate-result` opens the page with the result already up.
+- Hover states on cards, fields, chips, Remove and the close button.
+- **Fixed, mobile too:**
+  - A ₹1.005 Cr total showed as "₹1 Cr" because of a rounding slip in the money formatter. It now reads ₹1.01 Cr.
+  - On a scaled stage, celebration sparks and confetti now land on the money stack.
+
 ## v0.15.2 — 23 Nov 2026 · Desktop: "Applications sent" moment + clearer sidebar rail
 
 Matched the remaining Compare frames on *-> Final Desktop*.

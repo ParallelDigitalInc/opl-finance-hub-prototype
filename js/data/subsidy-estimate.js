@@ -33,8 +33,8 @@
   const fmt = (r, { tight = false } = {}) => {
     const sp = tight ? "" : " ";
     if (!(r > 0)) return "₹0";
-    if (r >= CR) return `₹${trim(Math.round(r / CR * 100) / 100, 2)}${sp}Cr`;
-    if (r >= L) return `₹${trim(Math.round(r / L * 10) / 10, 1)}${sp}L`;
+    if (r >= CR) return `₹${trim(Math.round(r / CR * 100 + 1e-9) / 100, 2)}${sp}Cr`;   // +ε: 1.005 Cr is ₹1.01 Cr, not ₹1 Cr
+    if (r >= L) return `₹${trim(Math.round(r / L * 10 + 1e-9) / 10, 1)}${sp}L`;
     return `₹${indian(r)}`;
   };
   // tidy what was typed into a money field, on blur

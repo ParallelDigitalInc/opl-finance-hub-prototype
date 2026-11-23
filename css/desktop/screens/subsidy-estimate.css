@@ -1,0 +1,71 @@
+/* Desktop · Calculate estimate — adapted from mobile 416:76869 / 416:77363 (no desktop frame).
+   Cards, chips and the result art are the mobile kit's; this file lays them out for the shell. */
+.d-est { display: flex; flex-direction: column; padding-bottom: 40px; }
+.d-est__head { margin-bottom: 24px; }
+.d-est__cols { grid-template-columns: minmax(0, 1fr) 360px; }
+.d-est__main { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+
+/* cards: fields sit side by side on desktop (three per row) */
+.d-est .ecard { filter: none; box-shadow: var(--shadow-s); transition: padding var(--dur-base) var(--ease-out), box-shadow 160ms; }
+.d-est .ecard:hover { box-shadow: 0 0 0 1px var(--d-border-hover, #cbd5e1), var(--shadow-s); }
+.d-est .ecard__head { cursor: pointer; transition: background 140ms; }
+.d-est .ecard:not(.is-open) > .ecard__head:hover { background: #f8fafc; }
+.d-est .ecard.is-open > .ecard__head:hover { background: #eef2f6; }
+.d-est .ecard__head:hover .ecard__chev { transform: rotate(-90deg) translateY(2px); }
+.d-est .ecard.is-open .ecard__head:hover .ecard__chev { transform: rotate(90deg) translateY(-1px); }
+.d-est .ecard__fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 0 4px; }
+.d-est .efield, .d-est .efield--first { padding: 16px 12px 0; }
+.d-est .efield__box:hover:not(:focus) { border-color: #cbd5e1; }
+.d-est .ecard__remove-row { padding: 16px 16px 12px; }
+.d-est .ecard__remove:hover { background: #fee2e2; }
+.d-est .est-chip:hover { background: var(--soft-primary, #e0e7ff); }
+.d-est .est-more.is-nudged .est-chip { animation: d-chip-nudge 700ms var(--ease-out); }
+.d-est .est-more.is-nudged .est-chip:nth-child(2) { animation-delay: 60ms; }
+.d-est .est-more.is-nudged .est-chip:nth-child(3) { animation-delay: 120ms; }
+@keyframes d-chip-nudge { 30% { transform: translateY(-3px); box-shadow: 0 0 0 4px rgba(56, 88, 229, 0.12); } }
+
+/* rail: the details page's cream estimate card, live */
+.d-est__rail { top: 88px; }
+.d-est__sum { display: flex; flex-direction: column; }
+.d-est__sum .d-sd__est-in { gap: 4px; padding: 16px 20px 18px; }
+.d-est__sum .d-sd__est-amt b { font-weight: 500; display: inline-block; font-variant-numeric: tabular-nums; }
+.d-est__sum .d-sd__est-amt b.is-ticking { animation: d-est-tick 480ms var(--ease-out); }
+@keyframes d-est-tick { 0% { color: var(--primary); transform: translateY(-3px); } 60% { color: var(--primary); } 100% { transform: none; } }
+.d-est__bar { margin-top: 12px; }
+.d-est__bar .er-seg i { position: absolute; inset: 0; background: var(--c); transform: scaleX(0); transform-origin: 0 50%; transition: transform 460ms var(--ease-out); }
+.d-est__bar .er-seg.is-lit i { transform: none; }
+.d-est__count { margin-top: 8px; font-size: 13px; line-height: 18px; color: #475569; }
+.d-est__rows { display: flex; flex-direction: column; gap: 4px; padding: 12px 12px 4px; }
+.d-est__row { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 10px; transition: background 140ms; }
+.d-est__row p { flex: 1; min-width: 0; font-size: 14px; line-height: 20px; color: var(--muted-foreground); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.d-est__row b { font-size: 14px; line-height: 20px; font-weight: 600; color: var(--foreground); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.d-est__row.is-pending { cursor: pointer; }
+.d-est__row.is-pending .er-row__key { opacity: 0.4; }
+.d-est__row.is-pending b { font-weight: 500; color: var(--primary); }
+.d-est__row.is-pending:hover { background: var(--primary-tint, #eef2ff); }
+.d-est__row.is-new { animation: d-est-row-in 420ms var(--ease-out) both; }
+@keyframes d-est-row-in { from { opacity: 0; transform: translateX(-8px); } }
+.d-est__empty { padding: 6px 8px; font-size: 14px; line-height: 20px; color: var(--muted-foreground); }
+.d-est__actions { display: flex; flex-direction: column; gap: 8px; padding: 12px 16px 16px; }
+.d-est__go.is-loading { pointer-events: none; }
+.d-est__go.is-loading span::after { content: "…"; display: inline-block; width: 1.1em; text-align: left; overflow: hidden; vertical-align: bottom; animation: dots 900ms steps(4) infinite; }
+.d-est__go.is-loading .ico { animation: go-nudge 600ms var(--ease-out) infinite; }
+.d-est__go[disabled] { opacity: 0.45; pointer-events: none; }
+.d-est__note { padding: 0 8px; font-size: 12px; line-height: 16px; color: var(--muted-foreground); }
+
+/* ---- result modal: the mobile result sheet, sized for a 480 modal ---------------------------- */
+.d-modal--est .d-modal { overflow: hidden; }
+.d-er { position: relative; inset: auto; --status-h: 0px; }
+.d-er .er-sheet { flex: none; overflow: visible; padding-bottom: 20px; }
+.d-er .er-bg { top: -48px; }
+.d-er .er-rays { top: -64px; }
+.d-er__head { justify-content: flex-end; padding: 16px 16px 0; }
+.d-er__close { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 999px; background: rgba(255, 255, 255, 0.8); box-shadow: inset 0 0 0 1px var(--border); transition: background 140ms, transform 140ms; }
+.d-er__close:hover { background: #fff; }
+.d-er__close:hover .ico { transform: rotate(90deg); }
+.d-er__close .ico { transition: transform 200ms var(--ease-out); }
+.d-er__close:active { transform: scale(0.92); }
+.d-er .er-col { gap: 36px; margin-top: -8px; }
+.d-er .er-note { padding: 20px 32px 0; }
+.d-er .er-caption__more:hover { text-decoration: underline; text-underline-offset: 3px; }
+.d-er__actions { position: relative; gap: 8px; padding: 16px 20px 20px; filter: none; }

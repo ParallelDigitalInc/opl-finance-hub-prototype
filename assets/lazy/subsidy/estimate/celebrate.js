@@ -129,21 +129,21 @@
       er.classList.add("is-party");
 
       const fx = confetti(page);
-      const pr = page.getBoundingClientRect();
+      const pr = page.getBoundingClientRect(), ks = page.offsetWidth / (pr.width || page.offsetWidth) || 1;   // scaled stage → box px
       const plinth = page.querySelector(".er-money__plinth");
       return {
         /* a bundle has just landed: the plinth takes the weight, gold sparks off the top */
         land(k) {
           const b = page.querySelector(`.er-money__stack[data-k="${k}"]`);
           plinth.classList.remove("is-thud"); void plinth.offsetWidth; plinth.classList.add("is-thud");
-          if (b) { const r = b.getBoundingClientRect(); fx.coins(r.left - pr.left + r.width / 2, r.top - pr.top + r.height * 0.3); }
+          if (b) { const r = b.getBoundingClientRect(); fx.coins((r.left - pr.left + r.width / 2) * ks, (r.top - pr.top + r.height * 0.3) * ks); }
           if (navigator.vibrate) navigator.vibrate(k === 0 ? 14 : 10);
         },
         /* the total is built: confetti from the stack and both sides, the total shines */
         finale() {
           const tot = page.querySelector(".er-total");
           const mr = money.getBoundingClientRect();
-          fx.burst(mr.left - pr.left + mr.width / 2, mr.top - pr.top + mr.height * 0.4, 50, [6, 13]);
+          fx.burst((mr.left - pr.left + mr.width / 2) * ks, (mr.top - pr.top + mr.height * 0.4) * ks, 50, [6, 13]);
           timers.push(setTimeout(() => fx.cannons(), 120));
           if (tot) {
             tot.classList.remove("is-shining"); void tot.offsetWidth; tot.classList.add("is-shining");

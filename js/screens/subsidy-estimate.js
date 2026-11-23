@@ -285,6 +285,9 @@
     document.head.appendChild(s);
   }));
 
+  // shared with the desktop page (js/desktop/screens/subsidy-estimate.js): same state, cards, maths, art
+  OPL.estimateKit = { S, ensure, parse, amounts, countMoney, card, chips, money, loadCelebrate };
+
   OPL.screens["subsidy-estimate-result"] = {
     title: "Estimate result",
     figma: { result: "416:77363" },

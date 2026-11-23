@@ -4,7 +4,7 @@
 
 (function () {
 const OPL = (window.OPL = window.OPL || {});
-OPL.VERSION = "0.15.2";
+OPL.VERSION = "0.15.3";
 OPL.FIGMA_FILE = "https://www.figma.com/design/GHuBkYGEQZvQppv3v55EaA/OPL----Internal-Playground--5-";
 OPL.figmaLink = (nodeId) => `${OPL.FIGMA_FILE}?node-id=${nodeId.replace(":", "-")}`;
 const esc = (v) =>
@@ -2111,8 +2111,8 @@ const indian = (n) => Math.round(n).toString().replace(/(\d)(?=(\d\d)+\d$)/g, "$
 const fmt = (r, { tight = false } = {}) => {
 const sp = tight ? "" : " ";
 if (!(r > 0)) return "₹0";
-if (r >= CR) return `₹${trim(Math.round(r / CR * 100) / 100, 2)}${sp}Cr`;
-if (r >= L) return `₹${trim(Math.round(r / L * 10) / 10, 1)}${sp}L`;
+if (r >= CR) return `₹${trim(Math.round(r / CR * 100 + 1e-9) / 100, 2)}${sp}Cr`;   // +ε: 1.005 Cr is ₹1.01 Cr, not ₹1 Cr
+if (r >= L) return `₹${trim(Math.round(r / L * 10 + 1e-9) / 10, 1)}${sp}L`;
 return `₹${indian(r)}`;
 };
 const tidyMoney = (raw, unit) => {
@@ -3870,6 +3870,7 @@ const s = document.createElement("script");
 s.src = simg("estimate/celebrate.js"); s.onload = res; s.onerror = res;
 document.head.appendChild(s);
 }));
+OPL.estimateKit = { S, ensure, parse, amounts, countMoney, card, chips, money, loadCelebrate };
 OPL.screens["subsidy-estimate-result"] = {
 title: "Estimate result",
 figma: { result: "416:77363" },

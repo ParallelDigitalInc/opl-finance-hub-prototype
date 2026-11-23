@@ -83,6 +83,7 @@ Switch with **View → Desktop** in the panel, press **D**, or link `#device=des
    - The Explore options, the Sort options and the tooltip copy are proposed.
    - Choosing a state other than Gujarat filters to central schemes; that rule is assumed.
 9. **Add offers drawer:** the Select button is indigo `#4338CA` in Figma and shown as `#3858E5` here. The "n of 3 selected" counter is proposed.
+9. **Calculate estimate on desktop has no Figma frame.** It adapts mobile 416:76869 (form) and 416:77363 (result): cards on the left, a sticky live summary on the right in the details page's cream estimate card, and the result as a 480 modal. Please confirm or draw the desktop frame.
 
 ## Run it
 

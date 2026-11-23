@@ -62,6 +62,7 @@ DCSS=(
   css/desktop/screens/applications.css
   css/desktop/screens/application.css
   css/desktop/screens/subsidies.css
+  css/desktop/screens/subsidy-estimate.css
 )
 DJS=(
   js/desktop/ui.js
@@ -78,6 +79,7 @@ DJS=(
   js/desktop/screens/nesl.js
   js/desktop/screens/subsidies.js
   js/desktop/screens/subsidy-detail.js
+  js/desktop/screens/subsidy-estimate.js
 )
 
 mkdir -p dist
