@@ -1408,6 +1408,18 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
     },
 
     bind(page) {
+      // row hover lights the label and every column's cell for that row
+      const grid = page.querySelector(".d-cmp__grid");
+      let hoverRow = null;
+      const setRow = (r) => {
+        if (r === hoverRow) return;
+        if (hoverRow) grid.querySelectorAll(`[data-row="${hoverRow}"]`).forEach((el) => el.classList.remove("is-hover"));
+        hoverRow = r;
+        if (r && r !== "lender" && r !== "amount") grid.querySelectorAll(`[data-row="${r}"]`).forEach((el) => el.classList.add("is-hover"));
+        if (r) grid.dataset.hoverRow = r; else delete grid.dataset.hoverRow;
+      };
+      grid?.addEventListener("pointerover", (e) => setRow(e.target.closest("[data-row]")?.dataset.row || null));
+      grid?.addEventListener("pointerleave", () => setRow(null));
       page.addEventListener("click", (e) => {
         const rm = e.target.closest("[data-remove]");
         if (rm) {

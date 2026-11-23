@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.13.3 — 23 Nov 2026 · Desktop polish from a rendered audit (radii, strokes, shadows, hovers)
+
+An audit script ran on every desktop screen. It measured nested radii, icons clipped by their containers, shadows cut by `overflow: hidden`, and clickable elements with no `:hover` rule.
+
+**Fixed**
+
+- **Nested radii.** Tinted inner boxes inside a 16px card are now **14px** everywhere (Shreya's rule): the CIBIL MSME Rank head, the horizontal offer head, the Compare column head and the Application card head (all were 16). The hero's glass panel stays 12px at its 6px inset, as drawn.
+- **Strokes cut off.** Card strokes were inset box-shadows, so any child touching the edge painted over them: the repayment chart fill, row hover backgrounds, the compare tray texture. They're now `outline` with a negative offset, drawn above children, as in the mobile kit. This covers cards, panels, Compare columns and slots, offer rows, application cards, the summary card, rail cards, the KFS document pane and the compare tray.
+- **Corner tags.** Tags poked out past the rounded head with a square corner ("Collateral-free", "Low Interest", Application ID). The heads now clip them, as mobile does since v0.9.2.
+- **Main panel right stroke.** It's drawn at the window edge, as in Figma.
+- **Shadows.** Compare columns and empty slots get a subtle shadow (Shreya). The KFS document pane and the summary card's shadow is now a real box-shadow, so nothing clips it. The Add-offers list has top room, so a hovered card's shadow isn't sliced.
+- **Hover states:**
+  - Compare rows light up across the label and every column, instead of one cell covering the column stroke.
+  - Every hover keeps selected states (outline colour changes, not a box-shadow swap).
+  - New hovers: rail accordion headers, copy buttons, WhatsApp toggle, KFS consent checkbox, Compare info icon.
+
 ## v0.13.2 — 23 Nov 2026 · Compare tray + selection hovers
 
 **Added**

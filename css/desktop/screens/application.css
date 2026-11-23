@@ -5,8 +5,8 @@
 .d-appd__rail { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 88px; }
 
 /* summary card (440:136589): white, 1px slate-200, r16, p4, gap 16 */
-.d-appd__summary { display: flex; flex-direction: column; gap: 16px; padding: 4px; border-radius: 16px; background: #fff; box-shadow: inset 0 0 0 1px var(--border); filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.04)); }
-.d-appd__head { display: flex; flex-direction: column; padding: 0 0 12px 24px; border-radius: 14px; background: var(--tint); }
+.d-appd__summary { display: flex; flex-direction: column; gap: 16px; padding: 4px; border-radius: 16px; background: #fff; outline: 1px solid var(--border); outline-offset: -1px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04); }
+.d-appd__head { display: flex; flex-direction: column; padding: 0 0 12px 24px; border-radius: 14px; background: var(--tint); overflow: hidden; }
 .d-appd__id-tag { align-self: flex-end; display: inline-flex; gap: 6px; padding: 6px 8px; border-radius: 0 0 0 12px; background: #fff; font-size: 12px; line-height: normal; font-weight: 500; color: var(--muted-foreground); white-space: nowrap; }
 .d-appd__id-tag b { font-weight: 500; color: var(--primary); }
 .d-appd__who { display: flex; align-items: center; gap: 16px; }
@@ -20,7 +20,7 @@
 .d-appd__fig small { font-size: 12px; line-height: 16px; font-weight: 400; color: var(--muted-foreground); }
 
 /* status story card (440:136617): p24, gap 24, Shadow/s */
-.d-story { display: flex; flex-direction: column; gap: 24px; padding: 24px; box-shadow: inset 0 0 0 1px var(--border), var(--shadow-s); }
+.d-story { display: flex; flex-direction: column; gap: 24px; padding: 24px; box-shadow: var(--shadow-s); }
 .d-story__top { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .d-story__top h2 { font-size: 20px; line-height: 24px; font-weight: 600; color: var(--foreground); }
 .d-story__eta { margin-top: -18px; font-size: 14px; line-height: 20px; color: var(--muted-foreground); }
@@ -28,14 +28,14 @@
 .d-story__h { margin-bottom: 8px; font-size: 16px; line-height: 20px; font-weight: 500; color: var(--foreground); }
 
 /* repayment card (440:136653) */
-.d-repay { display: flex; flex-direction: column; gap: 16px; padding: 24px; box-shadow: inset 0 0 0 1px var(--border), var(--shadow-s); }
+.d-repay { display: flex; flex-direction: column; gap: 16px; padding: 24px; box-shadow: var(--shadow-s); }
 .d-repay__head { display: flex; flex-direction: column; gap: 2px; white-space: nowrap; }
 .d-repay__head p { font-size: 14px; line-height: 20px; color: var(--muted-foreground); }
 .d-repay__head b { font-size: 20px; line-height: 28px; font-weight: 500; color: var(--foreground); }
 .d-repay__bar { display: flex; gap: 2px; height: 12px; border-radius: 6px; overflow: hidden; background: #e2e8f0; }
 
 /* rail: mobile info cards / WhatsApp row, desktop padding (p24, Medium 16 titles) */
-.d-appd__rail .info-card, .d-appd__rail .wa-row { border-radius: 16px; background: #fff; box-shadow: inset 0 0 0 1px var(--border), var(--shadow-s); outline: 0; }
+.d-appd__rail .info-card, .d-appd__rail .wa-row { border-radius: 16px; background: #fff; outline: 1px solid var(--border); outline-offset: -1px; box-shadow: var(--shadow-s); }
 .d-appd__rail .info-card button[data-accordion]:hover { opacity: 0.8; }
 .d-withdraw { align-self: center; height: 38px; padding: 10px 14px; border-radius: 999px; font-size: 13px; line-height: 18px; font-weight: 600; color: #b91c1c; transition: background 160ms; }
 .d-withdraw:hover { background: #fef2f2; }
@@ -52,7 +52,7 @@
 .d-kfs__step.is-on { background: #fff; color: var(--foreground); font-weight: 500; }
 .d-kfs__step.is-on i { background: #ffedd5; }
 .d-kfs__grid { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 16px; align-items: start; }
-.d-kfs__doc { position: relative; display: flex; flex-direction: column; height: 620px; border-radius: 16px; background: #f1f5f9; box-shadow: inset 0 0 0 1px var(--border); overflow: hidden; }
+.d-kfs__doc { position: relative; display: flex; flex-direction: column; height: 620px; border-radius: 16px; background: #f1f5f9; outline: 1px solid var(--border); outline-offset: -1px; box-shadow: var(--shadow-s); overflow: hidden; }
 .d-kfs__file { display: flex; justify-content: space-between; padding: 12px 16px; background: #fff; font-size: 12px; line-height: 16px; color: var(--foreground); }
 .d-kfs__file span:last-child { color: var(--muted-foreground); }
 .d-kfs__read { display: block; height: 3px; background: #e2e8f0; }
@@ -61,9 +61,9 @@
 .d-kfs__page { max-width: 470px; width: 100%; margin: 0 auto; zoom: 1.32; box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06); }
 .d-kfs__counter { position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); padding: 6px 12px; border-radius: 999px; background: rgba(15, 23, 42, 0.72); color: #fff; font-size: 12px; line-height: 16px; font-weight: 500; backdrop-filter: blur(4px); }
 .d-kfs__rail { display: flex; flex-direction: column; gap: 12px; }
-.d-kfs__repay { display: flex; flex-direction: column; gap: 12px; padding: 16px; box-shadow: inset 0 0 0 1px var(--border), var(--shadow-s); }
+.d-kfs__repay { display: flex; flex-direction: column; gap: 12px; padding: 16px; box-shadow: var(--shadow-s); }
 .d-kfs__facts { margin: 0; }
-.d-kfs__consent { display: flex; flex-direction: column; gap: 16px; padding: 16px; box-shadow: inset 0 0 0 1px var(--border), var(--shadow-s); }
+.d-kfs__consent { display: flex; flex-direction: column; gap: 16px; padding: 16px; box-shadow: var(--shadow-s); }
 .d-kfs__check { display: flex; align-items: flex-start; gap: 10px; text-align: left; font-size: 14px; line-height: 20px; color: var(--foreground); transition: opacity 200ms; }
 .d-kfs__check[disabled] { opacity: 0.5; cursor: not-allowed; }
 .d-kfs__check.is-ready { animation: d-bump 420ms var(--ease-spring); }
@@ -110,3 +110,15 @@
 .d-confirm h1 { font-size: 20px; line-height: 28px; font-weight: 600; }
 .d-confirm p { font-size: 14px; line-height: 20px; color: var(--muted-foreground); }
 .d-confirm small { margin-top: 24px; font-size: 12px; color: var(--tertiary-foreground); }
+
+/* Hover for the mobile pieces reused on desktop (rail accordions, copy, WhatsApp toggle) and the KFS consent */
+.d-appd__rail .info-card__head { border-radius: 10px; transition: background 140ms; }
+.d-appd__rail .info-card__head:hover { background: var(--d-bg); }
+.d-appd__rail .info-card__head .ico { transition: transform 220ms var(--d-ease); }
+.d-appd__rail .copy-btn { border-radius: 6px; transition: background 140ms, transform 120ms var(--d-ease); }
+.d-appd__rail .copy-btn:hover { background: var(--muted); }
+.d-appd__rail .copy-btn:active { transform: scale(0.9); }
+.d-appd__rail .toggle { transition: filter 160ms; cursor: pointer; }
+.d-appd__rail .toggle:hover { filter: brightness(0.94); }
+.d-kfs__check:not([disabled]):hover img { transform: scale(1.08); }
+.d-kfs__check img { transition: transform 200ms var(--ease-spring); }

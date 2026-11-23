@@ -51,6 +51,7 @@
   transition: background 200ms, transform 260ms var(--d-ease);
 }
 .d-stat:hover { background: #eaeff5; }
+.d-stat__tag { z-index: 1; }
 .d-stat__icon { padding: 12px; border-radius: 999px; background: #fff; margin-bottom: 12px; transition: transform 300ms var(--ease-spring); }
 .d-stat:hover .d-stat__icon { transform: rotate(-8deg) scale(1.06); }
 .d-stat__value { font-size: 24px; line-height: 21px; font-weight: 600; color: var(--foreground); }

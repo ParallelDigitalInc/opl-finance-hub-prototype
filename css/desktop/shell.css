@@ -80,7 +80,6 @@
   margin: 12px 0;
   background: #fff;
   border: 1px solid var(--border);
-  border-right: 0;
   border-radius: 16px 0 0 16px;
   box-shadow: var(--shadow-s);
   overflow: hidden;
