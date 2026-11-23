@@ -879,17 +879,36 @@
 .d-kfs__hint:hover { color: var(--primary); }
 .d-kfs__hint.is-done { opacity: 0; max-height: 0; margin-top: -16px; }
 
-/* NeSL window over the application (471:24999) */
+/* NeSL portal over the KFS (524:105163): the third-party screen as drawn, r16, deep shadow */
 .d-nesl { z-index: 80; }
-.d-nesl__win { position: relative; width: 420px; border-radius: 14px; background: #fff; overflow: hidden; box-shadow: 0 32px 80px -16px rgba(15, 23, 42, 0.45); opacity: 0; transform: translateY(20px) scale(0.96); transition: opacity 240ms, transform 460ms var(--ease-spring); }
 .d-nesl.is-open .d-scrim { opacity: 1; }
+.d-nesl__win { position: relative; border-radius: 16px; overflow: hidden; background: #fff; box-shadow: 0 24px 64px -12px rgba(15, 23, 42, 0.45); opacity: 0; transform: translateY(20px) scale(0.97); transition: opacity 240ms, transform 460ms var(--ease-spring), width 320ms var(--d-ease), height 320ms var(--d-ease); }
 .d-nesl.is-open .d-nesl__win { opacity: 1; transform: none; }
-.d-nesl__chrome { display: flex; align-items: center; gap: 12px; height: 34px; padding: 0 12px; background: #eef1f5; border-bottom: 1px solid #e2e8f0; }
-.d-nesl__url { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #475569; }
-.d-nesl__shot { position: relative; width: 420px; height: calc(420px * 723 / 390); max-height: 700px; overflow: hidden; }
 .d-nesl__view { position: absolute; inset: 0; animation: d-content-in 260ms var(--d-ease) both; }
-.d-nesl__view img { width: 100%; height: auto; }
+.d-nesl__view img { width: 100%; height: 100%; display: block; }
 .d-nesl__view.is-out { opacity: 0; transition: opacity 200ms; }
+.d-nesl .nesl-hit { position: absolute; border-radius: 6px; cursor: pointer; transition: box-shadow 160ms, background 160ms; }
+.d-nesl .nesl-hit:hover { box-shadow: 0 0 0 2px rgba(56, 88, 229, 0.55); background: rgba(56, 88, 229, 0.08); }
+.d-nesl .nesl-hit--quiet:hover { box-shadow: none; background: transparent; }
+
+/* "Sign on NeSL" modal (476:230861): p32, r20, gap 20 */
+.d-modal--sign .d-modal { border-radius: 20px; }
+.d-signm { display: flex; flex-direction: column; gap: 20px; padding: 32px; }
+.d-signm__head { display: flex; flex-direction: column; gap: 8px; padding-top: 8px; }
+.d-signm__progress { display: flex; align-items: center; justify-content: space-between; font-size: 12px; line-height: 16px; font-weight: 500; color: var(--muted-foreground); }
+.d-signm__ok { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px 4px 8px; border-radius: 999px; background: #f0fdf4; color: #15803d; }
+.d-signm__head h2 { font-size: 18px; line-height: 28px; font-weight: 600; color: var(--foreground); }
+.d-signm__steps { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; }
+.d-signm__steps li { display: flex; gap: 12px; align-items: flex-start; }
+.d-signm__rail { display: flex; flex-direction: column; align-items: center; width: 24px; }
+.d-signm__rail b { width: 24px; height: 24px; border-radius: 999px; display: grid; place-items: center; background: #f0f6fe; color: var(--primary); font-size: 12px; line-height: 16px; font-weight: 600; }
+.d-signm__rail i { width: 1.5px; height: 20px; background: #e2e8f0; }
+.d-signm__t { padding-top: 2px; font-size: 14px; line-height: 20px; font-weight: 500; color: var(--foreground); }
+.d-modal-layer.is-open .d-signm__steps li { animation: enter-up 380ms var(--ease-out) both; animation-delay: calc(120ms + var(--i) * 70ms); }
+.d-signm__actions { display: flex; flex-direction: column; gap: 4px; }
+.d-signm__go { font-weight: 500; }
+.d-signm__later { width: 100%; padding: 12px 0; text-align: center; font-size: 14px; line-height: 20px; font-weight: 500; color: var(--primary); border-radius: 999px; transition: background 140ms; }
+.d-signm__later:hover { background: var(--primary-tint); }
 
 /* Confirming your signature (440:135654) */
 .d-confirm { min-height: 560px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; }

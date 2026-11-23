@@ -31,7 +31,7 @@
     timers: [],
     leave() { this.timers.forEach(clearTimeout); this.timers = []; },
 
-    render(page) {
+    render(page, { read = false } = {}) {
       this.leave();
       const d = K();
       const a = OPL.data.applications;
@@ -81,6 +81,43 @@
       });
       D.mountShell(page);
       this.bind(page, id, pages.length);
+      if (read || OPL.state.get().read === "on") this.markRead(page);
+    },
+
+    // 476:230861 — "Sign your sanction letter on NeSL" (Step 2 of 2), over the read KFS
+    openSignModal(page, id) {
+      OPL.apps.setStatus(id, "sign");
+      const steps = ["Verify OTP", "Read the Sanction Letter", "Confirm e-stamp", "eSign with Aadhaar"];
+      const body = String(html`
+        <div class="d-signm">
+          <div class="d-signm__head">
+            <div class="d-signm__progress"><span class="d-signm__ok">${D.icon("check-circle-green", 14)}KFS accepted</span><span>Step 2 of 2</span></div>
+            <h2>Sign your sanction letter on NeSL</h2>
+          </div>
+          <ol class="d-signm__steps">${steps.map((t, i) => html`<li style="--i:${i}"><span class="d-signm__rail"><b>${i + 1}</b>${i < steps.length - 1 ? html`<i></i>` : ""}</span><span class="d-signm__t">${t}</span></li>`)}</ol>
+          ${ui.NoteRow({ text: "Sign sanction letter before 25 Nov 2026", tone: "warning" })}
+          <div class="d-signm__actions">
+            ${D.btn({ label: "Continue to NeSL", style: "filled", size: "lg", cls: "d-btn--block d-signm__go", iconRight: D.icon("external-white", 16), attrs: "data-nesl-go" })}
+            <button class="d-signm__later" data-nesl-later>I’ll come back later</button>
+          </div>
+        </div>`);
+      const m = D.openModal(page, body, { width: 520, cls: "d-modal--sign" });
+      m.el.addEventListener("click", (e) => {
+        if (e.target.closest("[data-nesl-go]")) { m.close(); this.timers.push(setTimeout(() => OPL.go("nesl", { app: id, step: null }), 200)); }
+        if (e.target.closest("[data-nesl-later]")) { m.close(); this.timers.push(setTimeout(() => OPL.go("application", { app: id }, { replace: true }), 200)); }
+      });
+    },
+
+    // KFS read to the end with consent ticked (476:230649 backdrop)
+    markRead(page) {
+      const sc = page.querySelector("[data-kfs-scroll]");
+      sc.scrollTop = sc.scrollHeight;
+      sc.dispatchEvent(new Event("scroll"));
+      const c = page.querySelector("[data-kfs-consent]");
+      c.disabled = false; c.setAttribute("aria-pressed", "true");
+      c.querySelector("img").src = "assets/icons/check-square-checked.svg";
+      page.querySelector("[data-kfs-accept]").disabled = false;
+      page.querySelector("[data-kfs-hint]").classList.add("is-done");
     },
 
     bind(page, id, total) {
@@ -117,15 +154,7 @@
       });
       // the hint itself scrolls to the end (a desktop shortcut for presenting)
       hint.addEventListener("click", () => sc.scrollTo({ top: sc.scrollHeight, behavior: D.motionOff() ? "auto" : "smooth" }));
-      accept.addEventListener("click", () => {
-        OPL.apps.setStatus(id, "sign");
-        const body = ui.NeslSheetBody({ d: OPL.data.nesl.sheet }).toString();
-        const m = D.openModal(page, `<div class="d-ms d-nesl-intro">${body}</div>`, { width: 480, cls: "sheet-layer d-modal--ms" });
-        m.el.addEventListener("click", (e) => {
-          if (e.target.closest("[data-nesl-go]")) { m.close(); this.timers.push(setTimeout(() => OPL.go("nesl", { app: id, step: null }), 240)); }
-          if (e.target.closest("[data-nesl-later]")) { m.close(); this.timers.push(setTimeout(() => OPL.go("application", { app: id }, { replace: true }), 240)); }
-        });
-      });
+      accept.addEventListener("click", () => this.openSignModal(page, id));
     },
   };
 })();

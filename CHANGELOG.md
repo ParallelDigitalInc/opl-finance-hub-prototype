@@ -1,5 +1,25 @@
 # Changelog
 
+## v0.13.1 — 23 Nov 2026 · Desktop NeSL as drawn
+
+Synced from Figma section "nesl" `524:105163`. Shreya: the desktop NeSL screens were wrong; they reused the mobile portal.
+
+**Fixed**
+
+- **"Sign your sanction letter on NeSL"** (`476:230861`) is now the desktop modal: a "KFS accepted" chip, Step 2 of 2, the four numbered steps, the deadline warning, Continue to NeSL and I'll come back later. It opens over the KFS, which shows as read with consent ticked (`476:230649`). It replaces the mobile sheet.
+- **NeSL portal** now uses the four desktop NeSL screens, in this order:
+  1. Agreement Preview (`476:231547`; a scroll or a click on the document reads it)
+  2. Agreement Preview at the end, with I AGREE (`476:231121`)
+  3. E-Stamp Details, with Next (`476:231334`)
+  4. NSDL eSign OTP, with Verify OTP (`476:231761`)
+
+  Each shows at its drawn size (1055 or 943 wide, r16) over the KFS and a dark overlay, with a hotspot on its real button. CANCEL returns to "Sign Sanction Letter".
+- Then Confirming (`476:231762`), then Signed with its milestone (`476:232230`), as before.
+
+**Changed**
+
+- Desktop screen-only images go in `assets/lazy/dsk/<screen>/`, with their own 600 KB cap in `tools/check.sh`. They load only on that screen. The NeSL shots are 1.5× JPEGs, 418 KB in total.
+
 ## v0.13.0 — 23 Nov 2026 · Desktop loan journey complete: application page, KFS, NeSL, signed + disbursed
 
 Branch `flow/desktop`. Synced from section *final-loan applications* `440:134259`: application page `440:136328` (verifying) / `440:136512` (KFS ready) / `440:136901` (money on its way) / `440:137099` (money in account), sanction signed `440:136706`, KFS reader `440:134934`, NeSL `471:24999`… and confirming `440:135654`.

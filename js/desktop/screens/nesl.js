@@ -1,21 +1,30 @@
-/* Desktop · NeSL signing — section "Loan - Signing Sanction letter & Money disbursal"
-   (471:24999 … 471:26002, confirming 440:135654). The NeSL portal opens as a window over
-   the application (dimmed), stepping through the same portal screens as mobile with a
-   hotspot on each real button; then "Confirming your signature" fills the main panel and the
-   application returns Signed with its milestone. Cancel → application, left before signing. */
+/* Desktop · NeSL signing — Figma section "nesl" 524:105163.
+   Over the KFS (read, consent ticked) and a dark overlay, NeSL's own desktop portal opens
+   as drawn: Agreement Preview (476:231547, scroll to read) → Agreement Preview, end, I AGREE
+   (476:231121) → E-Stamp Details, Next (476:231334) → NSDL eSign OTP, Verify OTP (476:231761)
+   → "Confirming your signature" (476:231762) → application Signed + milestone (476:232230).
+   Each screen is the third-party screenshot with a hotspot on its real button; clicking
+   elsewhere flashes it (Figma-prototype convention). CANCEL → application, left before signing.
+   Order: Figma lays the frames out m2 · m3 · 231547 · m4; the reading order used here puts the
+   unscrolled agreement first (flagged in the README). */
 (function () {
   const { html } = OPL;
   const D = OPL.d;
-  const N = () => OPL.data.nesl;
-  const IMG_W = 390, IMG_H = 723;
-  const src = (id) => `assets/lazy/nesl/${id}.jpg`;
-  const rect = (r) => `left:${(r[0] / IMG_W) * 100}%;top:${(r[1] / IMG_H) * 100}%;width:${(r[2] / IMG_W) * 100}%;height:${(r[3] / IMG_H) * 100}%`;
+  // display size in the 1440 frame; hotspots in those display px [x, y, w, h]
+  const STEPS = [
+    { id: "agreement-top", figma: "476:231547", w: 1055, h: 517, scrollToNext: true, next: [170, 89, 715, 340], cancel: [460, 468, 145, 24] },
+    { id: "agreement-end", figma: "476:231121", w: 1055, h: 517, next: [374, 478, 147, 25], cancel: [531, 478, 144, 25] },
+    { id: "estamp", figma: "476:231334", w: 1055, h: 497, next: [457, 297, 141, 23] },
+    { id: "esign-otp", figma: "476:231761", w: 943, h: 517, next: [488, 330, 62, 26], cancel: [553, 330, 45, 26] },
+  ];
+  const src = (id) => `assets/lazy/dsk/nesl/${id}.jpg`;
+  const box = (s, r) => `left:${(r[0] / s.w) * 100}%;top:${(r[1] / s.h) * 100}%;width:${(r[2] / s.w) * 100}%;height:${(r[3] / s.h) * 100}%`;
 
   OPL.dscreens.nesl = {
     title: "Loans · Sign on NeSL",
-    figma: { portal: "471:24999", confirm: "440:135654" },
+    figma: { portal: "476:231547", confirm: "476:231762" },
     timers: [],
-    leave() { this.timers.forEach(clearTimeout); this.timers = []; OPL.dscreens.application.leave(); },
+    leave() { this.timers.forEach(clearTimeout); this.timers = []; OPL.dscreens.kfs.leave(); },
 
     render(page) {
       this.leave();
@@ -23,46 +32,44 @@
       this.id = OPL.state.get().app || (apps.find((a) => a.status === "sign" || a.status === "kfs") || {}).id || "pick-citi";
       this.page = page;
       const step = Number(OPL.state.get().step) || 0;
-      if (step >= N().portal.length) return this.confirm(true);
-      // the application (KFS accepted, not yet signed) sits underneath
+      if (step >= STEPS.length) return this.confirm(true);
       OPL.apps.setStatus(this.id, "sign");
-      OPL.dscreens.application.render(page);
+      // backdrop: the KFS, read to the end, consent ticked (as in every NeSL frame)
+      OPL.dscreens.kfs.render(page, { read: true });
       const layer = document.createElement("div");
       layer.className = "d-modal-layer d-nesl";
-      layer.innerHTML = html`
-        <div class="d-scrim"></div>
-        <section class="d-nesl__win" role="dialog" aria-label="NeSL">
-          <div class="d-nesl__chrome"><span class="browser-bar__dots"><i></i><i></i><i></i></span><span class="d-nesl__url">${OPL.icon("shield-check-bold-duotone", 14)} NeSL · Digital Document Execution</span></div>
-          <div class="d-nesl__shot" data-shot></div>
-        </section>`.toString();
+      layer.innerHTML = `<div class="d-scrim"></div><section class="d-nesl__win" role="dialog" aria-label="NeSL Digital Document Execution" data-win></section>`;
       page.querySelector(".d-app").appendChild(layer);
       void layer.offsetWidth; layer.classList.add("is-open");
-      this.shotEl = layer.querySelector("[data-shot]");
-      N().portal.forEach((p) => { const i = new Image(); i.src = src(p.id); });
+      this.win = layer.querySelector("[data-win]");
+      STEPS.forEach((s) => { const i = new Image(); i.src = src(s.id); });
       this.show(step);
       layer.addEventListener("click", (e) => {
         if (e.target.closest("[data-nesl-next]")) return this.show(this.step + 1);
         if (e.target.closest("[data-nesl-cancel]")) return this.cancel();
-        const hit = layer.querySelector("[data-nesl-next]");
+        const hit = layer.querySelector(".d-nesl__view:last-child [data-nesl-next]");
         if (hit && document.documentElement.dataset.hotspots !== "off") { hit.classList.remove("hotspot-flash"); void hit.offsetWidth; hit.classList.add("hotspot-flash"); }
       });
+      // reading the agreement: a scroll over the document moves to its end (I AGREE)
+      layer.addEventListener("wheel", (e) => {
+        if (STEPS[this.step] && STEPS[this.step].scrollToNext && e.deltaY > 0) { e.preventDefault(); this.show(this.step + 1); }
+      }, { passive: false });
     },
 
     show(step) {
-      this.timers.forEach(clearTimeout); this.timers = [];
       this.step = step;
-      const portal = N().portal;
-      if (step >= portal.length) return this.confirm(false);
-      const p = portal[step];
+      if (step >= STEPS.length) return this.confirm(false);
+      const s = STEPS[step];
+      this.win.style.width = `${s.w}px`;
+      this.win.style.height = `${s.h}px`;
       const view = document.createElement("div");
       view.className = "d-nesl__view";
-      view.innerHTML = `<img src="${src(p.id)}" width="390" height="723" alt="NeSL portal: ${p.id}" draggable="false">
-        ${p.next ? `<button class="nesl-hit" style="${rect(p.next)}" data-nesl-next aria-label="Continue"></button>` : ""}
-        ${p.cancel ? `<button class="nesl-hit nesl-hit--quiet" style="${rect(p.cancel)}" data-nesl-cancel aria-label="Cancel"></button>` : ""}`;
-      const old = this.shotEl.firstElementChild;
-      this.shotEl.appendChild(view);
+      view.innerHTML = `<img src="${src(s.id)}" width="${s.w}" height="${s.h}" alt="NeSL: ${s.id}" draggable="false">
+        ${s.next ? `<button class="nesl-hit ${s.scrollToNext ? "nesl-hit--quiet" : ""}" style="${box(s, s.next)}" data-nesl-next aria-label="${s.scrollToNext ? "Read the agreement" : "Continue"}"></button>` : ""}
+        ${s.cancel ? `<button class="nesl-hit nesl-hit--quiet" style="${box(s, s.cancel)}" data-nesl-cancel aria-label="Cancel"></button>` : ""}`;
+      const old = this.win.firstElementChild;
+      this.win.appendChild(view);
       if (old) { old.classList.add("is-out"); setTimeout(() => old.remove(), D.motionOff() ? 0 : 220); }
-      if (p.auto) this.timers.push(setTimeout(() => this.page.isConnected && this.show(this.step + 1), D.motionOff() ? 300 : p.auto));
     },
 
     cancel() {
@@ -70,9 +77,9 @@
       OPL.go("application", { app: this.id, step: null }, { replace: true });
     },
 
-    // 440:135654 — "Confirming your signature" in the main panel, then Signed + milestone
+    // 476:231762 — "Confirming your signature" in the main panel, then Signed + milestone
     confirm(park) {
-      const c = N().confirm;
+      const c = OPL.data.nesl.confirm;
       this.page.innerHTML = D.shell({
         nav: "loans", title: "", tab: null,
         body: html`<div class="d-confirm">
