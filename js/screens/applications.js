@@ -26,11 +26,16 @@
   };
   const rate = { label: "Interest", value: "9.45%", unit: "p.a." };
 
+  /* Status changes made in the flow (KFS accepted → "sign", NeSL done → "signed") sit on top
+     of whichever list is showing, so they survive the Figma preset as well as live apps. */
+  const overrides = {};
+  const withOverride = (a) => (overrides[a.id] ? { ...a, status: overrides[a.id] } : a);
+
   /* Current application list: what was submitted, or the Figma state. */
   const currentApps = () => {
     const s = OPL.screens.applications;
     const v = OPL.variantValues("applications");
-    return v.apps === "figma" || !s.apps ? A().figmaPreset.map((a) => ({ ...a })) : s.apps;
+    return (v.apps === "figma" || !s.apps ? A().figmaPreset.map((a) => ({ ...a })) : s.apps).map(withOverride);
   };
 
   const verifyingSteps = [
@@ -39,7 +44,15 @@
     { icon: "document-text-muted", label: "Sign KFS<br>and Sanction", state: "todo" },
   ];
   const kfsSteps = OPL.data.loansOverview.applications.card.steps;
-  OPL.apps = { lender, currentApps };   // shared with the KFS reader (screens/kfs.js)
+  // shared with the KFS reader and NeSL hand-off (screens/kfs.js, screens/nesl.js)
+  OPL.apps = {
+    lender, currentApps,
+    setStatus(id, status) { overrides[id] = status; },
+    statusOf(id) {
+      const a = currentApps().find((x) => x.id === id) || A().figmaPreset.find((x) => x.id === id);
+      return overrides[id] || (a && a.status) || "verifying";
+    },
+  };
 
   /* ---- List --------------------------------------------------------------- */
   OPL.screens.applications = {
@@ -58,7 +71,7 @@
 
       const cards = apps.map((a) => {
         const l = lender(a.id);
-        return a.status === "kfs"
+        return a.status === "kfs" || a.status === "sign" || a.status === "signed"   // later states reuse the KFS card (no list design yet)
           ? ui.ApplicationCard({
               id: a.id, logo: l.logo, name: l.name, product: l.type, tint: l.tint, tag: d.kfs.daysLeft,
               figures: [{ label: "Final offer", value: d.kfs.finalOffer }, rate], steps: kfsSteps,
@@ -143,13 +156,23 @@
       const d = A();
       const apps = currentApps();
       const id = OPL.state.get().app || apps[0].id;
-      // not in the live list (e.g. opened from the Loans overview card): use its Figma status
-      const app = apps.find((a) => a.id === id) || d.figmaPreset.find((a) => a.id === id) || { id, status: "verifying" };
+      const v = OPL.variantValues("application");
+      // preset (st) > flow status > live list > Figma status (e.g. opened from the Loans overview card)
+      const status = v.st || OPL.apps.statusOf(id);
       const l = lender(id);
-      const kfs = app.status === "kfs";
+      const kfs = status === "kfs", sign = status === "sign", signed = status === "signed";
+      const footCta = kfs ? d.kfs.cta : sign ? d.sign.cta : "";
       const branch = d.branch(l.slug);
 
-      const timeline = kfs
+      const timeline = sign || signed
+        ? [
+            { icon: "plain-2", state: "done", title: `Sent to ${l.name}`, sub: d.sentAt },
+            { icon: "buildings", state: "done", title: "Lender Verification", sub: d.verifiedOn, line: sign ? "fade" : "" },
+            signed
+              ? { icon: "document-text-done", state: "done", strong: true, title: d.signed.step3, sub: d.signed.step3Sub }
+              : { icon: "document-text", state: "action", title: d.sign.step3, sub: d.sign.step3Sub },
+          ]
+        : kfs
         ? [
             { icon: "plain-2", state: "done", title: `Sent to ${l.name}`, sub: d.sentAt },
             { icon: "buildings", state: "done", title: "Lender Verification", sub: d.verifiedOn },
@@ -161,7 +184,20 @@
             { icon: "document-text-muted", state: "todo", title: d.verifying.todo },
           ];
 
-      const body = kfs
+      const body = signed
+        ? html`
+            <section class="appd-group">
+              <h3 class="appd-group__title">${d.signed.summaryTitle}</h3>
+              ${ui.AprCard({ s: d.kfs.summary, chip: d.signed.aprChip })}
+              ${ui.KeyValueCard({ rows: d.signed.rows })}
+            </section>
+            ${ui.InfoCard({ title: "Branch Details", body: ui.ContactList(branch) })}
+            ${ui.WhatsAppRow({ label: d.whatsapp })}`
+        : sign
+        ? html`
+            ${ui.InfoCard({ title: "Branch Details", body: ui.ContactList(branch) })}
+            ${ui.WhatsAppRow({ label: d.whatsapp })}`
+        : kfs
         ? html`
             ${ui.KfsSummary({ s: d.kfs.summary })}
             ${ui.InfoCard({ title: "Branch Details", body: ui.ContactList(branch) })}
@@ -181,7 +217,7 @@
       page.innerHTML = html`
         ${ui.StatusBar()}
         <div class="scroller">
-          <main class="${OPL.cx("appd", kfs && "appd--kfs")}" style="--app-tint:${l.tint}">
+          <main class="${OPL.cx("appd", footCta && "appd--kfs", signed && "appd--signed")}" style="--app-tint:${l.tint}">
             <section class="appd-top">
               <header class="appd-header">
                 <button class="app-header__back" aria-label="Back" data-press data-back>${OPL.icon("arrow-left-b", 24)}</button>
@@ -189,7 +225,7 @@
                 ${ui.IconButton({ icon: "headphones-round-sound-linear", label: "Support", goto: "support" })}
               </header>
               <div class="appd-status">
-                <h2 class="appd-status__title">${kfs ? d.kfs.title : d.verifying.title(l.name)}</h2>
+                <h2 class="appd-status__title">${signed ? d.signed.title : sign ? d.sign.title : kfs ? d.kfs.title : d.verifying.title(l.name)}</h2>
                 ${ui.Timeline({ items: timeline })}
               </div>
             </section>
@@ -197,16 +233,27 @@
             <div class="appd-withdraw"><button class="appd-withdraw__btn" data-goto="withdraw-application" data-press>${d.withdraw}</button></div>
           </main>
         </div>
-        <div class="${OPL.cx("floating", kfs && "floating--above-foot")}">
+        <div class="${OPL.cx("floating", footCta && "floating--above-foot", signed && "floating--fab-only")}">
           ${ui.AiMitraFab({ nudge: d.aiNudge })}
-          ${kfs ? "" : ui.BottomNav({ items: OPL.data.loansOverview.nav, active: "applications", variant: "section" })}
+          ${kfs || sign || signed ? "" : ui.BottomNav({ items: OPL.data.loansOverview.nav, active: "applications", variant: "section" })}
         </div>
-        ${kfs ? OPL.raw(`<div class="appd-foot">${ui.Button({ label: d.kfs.cta, block: true, goto: "kfs" })}</div>`) : ""}`;
+        ${kfs ? OPL.raw(`<div class="appd-foot">${ui.Button({ label: d.kfs.cta, block: true, goto: "kfs" })}</div>`) : ""}
+        ${sign ? OPL.raw(`<div class="appd-foot">${ui.Button({ label: d.sign.cta, trailing: "arrow-square-out-white", block: true, attrs: 'data-sign-nesl' })}</div>`) : ""}`;
 
-      this.wire(page);
+      this.wire(page, { id, l, signed, v });
     },
 
-    wire(page) {
+    /* "Sanction letter signed" milestone (431:8687) over the signed detail */
+    openSigned(page, l) {
+      const d = A().signed.sheet;
+      const sheets = OPL.fx.sheets(page);
+      const body = OPL.fx.bareSheet(page, "signed");
+      body.innerHTML = ui.MilestoneSigned({ ...d, body: d.body(l.name) }).toString();
+      page.addEventListener("click", (e) => { if (e.target.closest("[data-ms-view], [data-ms-done]")) sheets.close(); });
+      sheets.open("signed");
+    },
+
+    wire(page, { id, l, signed, v }) {
       OPL.fx.statusOnScroll(page);
       OPL.fx.playInView(page, ".tl, .kfs-repay");
       OPL.fx.nudge(page, this.timers);
@@ -223,7 +270,14 @@
         }
         const wa = e.target.closest("[data-wa]");
         if (wa) { wa.classList.toggle("is-on"); wa.setAttribute("aria-checked", wa.classList.contains("is-on")); }
+        if (e.target.closest("[data-sign-nesl]")) return OPL.go("nesl", { app: id, step: null });
       });
+
+      // Arriving from NeSL (celebrate) or the Figma preset: the signed milestone sheet
+      if (signed && (this.celebrate || v.ms === "on")) {
+        const fresh = this.celebrate; this.celebrate = false;
+        OPL.afterReveal(() => this.timers.push(setTimeout(() => page.isConnected && this.openSigned(page, l), fresh && !OPL.fx.motionOff() ? 460 : 0)));
+      }
     },
   };
 })();

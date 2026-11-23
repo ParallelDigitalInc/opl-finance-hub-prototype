@@ -9,7 +9,7 @@
 (function () {
   const OPL = (window.OPL = window.OPL || {});
 
-  OPL.VERSION = "0.7.1";
+  OPL.VERSION = "0.8.0";
   OPL.FIGMA_FILE = "https://www.figma.com/design/GHuBkYGEQZvQppv3v55EaA/OPL----Internal-Playground--5-";
   OPL.figmaLink = (nodeId) => `${OPL.FIGMA_FILE}?node-id=${nodeId.replace(":", "-")}`;
 
@@ -670,13 +670,14 @@
   };
 
   /* Timeline — vertical status timeline (382:42462).
-     items: [{ icon, state: done|current|action|todo, title, sub, subTone }] */
+     items: [{ icon, state: done|current|action|todo, title, sub, subTone, line, strong }]
+     line: "fade" = teal → warning gradient into an action step (431:7855). strong: SemiBold title. */
   ui.Timeline = ({ items }) => html`
     <div class="tl">${items.map((it, i) => OPL.raw(`
       <div class="tl__item tl__item--${it.state}">
         <div class="tl__rail"><span class="tl__node tl__node--${it.state}" style="--i:${i}">${icon(it.icon, 16)}</span>
-          ${i < items.length - 1 ? `<span class="tl__line ${it.state === "done" ? "tl__line--done" : ""}"></span>` : ""}</div>
-        <div class="tl__text"><p class="tl__title">${it.title}</p>${it.sub ? `<p class="tl__sub ${it.subTone ? `tl__sub--${it.subTone}` : ""}">${it.sub}</p>` : ""}</div>
+          ${i < items.length - 1 ? `<span class="tl__line ${it.line === "fade" ? "tl__line--fade" : it.state === "done" ? "tl__line--done" : ""}"></span>` : ""}</div>
+        <div class="tl__text"><p class="tl__title${it.strong ? " tl__title--strong" : ""}">${it.title}</p>${it.sub ? `<p class="tl__sub ${it.subTone ? `tl__sub--${it.subTone}` : ""}">${it.sub}</p>` : ""}</div>
       </div>`))}</div>`;
 
   /* InfoCard — collapsible card (382:42487 family). body: HTML */
@@ -699,19 +700,29 @@
     <div class="wa-row"><img class="wa-row__logo" src="${img("whatsapp.png")}" width="24" height="24" alt=""><span>${label}</span>
       ${ui.Toggle({ on, attrs: "data-wa" })}</div>`;
 
+  /* AprCard — "APR summary" (416:43894 / 431:8556): tinted APR head + 2×2 figures.
+     chip: optional success chip on the head ("Same as KFS", 431:8560). */
+  ui.AprCard = ({ s, chip }) => html`
+    <div class="kfs-apr">
+      <div class="kfs-apr__head"><img class="kfs-apr__tex" src="${img("hero-texture.jpg")}" alt=""><p>APR</p><p class="kfs-apr__v">${s.apr}</p>
+        ${chip ? OPL.raw(`<span class="ok-chip kfs-apr__chip">${icon("check-circle-chip", 14)}<span>${chip}</span></span>`) : ""}</div>
+      <div class="kfs-apr__grid">
+        <div><span>Loan amount</span><b>${s.loanAmount}</b></div>
+        <div><span>Tenure</span><b>${s.tenure}<i> months</i></b></div>
+        <div><span>Interest rate</span><b>${s.rate}<i> p.a.</i></b></div>
+        <div><span>Monthly EMI</span><b>${s.emi}</b></div>
+      </div>
+    </div>`;
+
+  /* KeyValueCard — "Sanction details" (431:8578): label left, value right, hairline rows */
+  ui.KeyValueCard = ({ rows }) => html`
+    <div class="kv-card">${rows.map(([k, v]) => OPL.raw(`<div class="kv-card__row"><span>${k}</span><b>${v}</b></div>`))}</div>`;
+
   /* KfsSummary — "KFS Summary" (416:43894): APR card, You repay split bar, fact chips */
   ui.KfsSummary = ({ s }) => html`
     <div class="kfs-sum">
       <h3 class="kfs-sum__title">KFS Summary</h3>
-      <div class="kfs-apr">
-        <div class="kfs-apr__head"><img class="kfs-apr__tex" src="${img("hero-texture.jpg")}" alt=""><p>APR</p><p class="kfs-apr__v">${s.apr}</p></div>
-        <div class="kfs-apr__grid">
-          <div><span>Loan amount</span><b>${s.loanAmount}</b></div>
-          <div><span>Tenure</span><b>${s.tenure}<i> months</i></b></div>
-          <div><span>Interest rate</span><b>${s.rate}<i> p.a.</i></b></div>
-          <div><span>Monthly EMI</span><b>${s.emi}</b></div>
-        </div>
-      </div>
+      ${ui.AprCard({ s })}
       <div class="kfs-repay">
         <div class="kfs-repay__head"><span>You repay</span><b>${s.repay}</b></div>
         <div class="kfs-repay__bar">${s.split.map((p) => OPL.raw(`<span style="flex:${p.w} 0 0;background:${p.color}"></span>`))}</div>
@@ -777,6 +788,38 @@
         <div class="ms__actions">
           ${ui.Button({ label: "Review KFS", block: true, attrs: "data-ms-review" })}
           <button class="ms__later" data-sheet-close>Later</button>
+        </div>
+      </div>
+    </div>`;
+
+  /* NeslSheetBody — "KFS accepted – Step 2 of 2 (Sign on NeSL)" sheet (433:8060) */
+  ui.NeslSheetBody = ({ d }) => html`
+    <div class="nesl-sheet">
+      <span class="sheet__grabber" data-sheet-drag></span>
+      <div class="nesl-sheet__head">
+        <div class="nesl-sheet__progress"><span class="ok-chip">${icon("check-circle-green", 14)}<span>${d.chip}</span></span><span class="nesl-sheet__step">${d.step}</span></div>
+        <h2 class="nesl-sheet__title">${d.title}</h2>
+      </div>
+      <ol class="nesl-steps">${d.steps.map((t, i) => OPL.raw(`
+        <li class="nesl-steps__item" style="--i:${i}"><span class="nesl-steps__rail"><span class="nesl-steps__no">${i + 1}</span>${i < d.steps.length - 1 ? '<span class="nesl-steps__line"></span>' : ""}</span><span class="nesl-steps__text">${t}</span></li>`))}</ol>
+      ${ui.NoteRow({ text: d.note, tone: "warning" })}
+      <div class="nesl-sheet__actions">
+        ${ui.Button({ label: d.cta, trailing: "arrow-square-out-white", block: true, attrs: "data-nesl-go" })}
+        <button class="ms__later" data-nesl-later>${d.later}</button>
+      </div>
+    </div>`;
+
+  /* MilestoneSigned — "Loan / Milestone sheet", State=Signed (431:8687). Hero inlined (SignedHeroSvg). */
+  ui.MilestoneSigned = ({ title, body, rows, cta, done }) => html`
+    <div class="ms ms--signed">
+      <span class="sheet__grabber" data-sheet-drag></span>
+      <div class="ms__hero">${OPL.raw(ui.SignedHeroSvg)}</div>
+      <div class="ms__content">
+        <div class="ms__msg"><h2>${title}</h2><p>${OPL.raw(body)}</p></div>
+        <div class="ms__card ms__card--rows">${rows.map(([k, v]) => OPL.raw(`<div class="ms__row"><span>${k}</span><b>${v}</b></div>`))}</div>
+        <div class="ms__actions">
+          ${ui.Button({ label: cta, block: true, attrs: "data-ms-view" })}
+          <button class="ms__later" data-ms-done>${done}</button>
         </div>
       </div>
     </div>`;
@@ -1153,22 +1196,43 @@
   };
   OPL.variants.application = {
     presets: [
-      { id: "verifying", label: "Verifying (SIDBI)", figma: "382:42423", set: { app: "offer-sidbi", apps: "figma" } },
-      { id: "kfs", label: "KFS ready (Citi)", figma: "382:42689", set: { app: "pick-citi", apps: "figma" } },
+      { id: "verifying", label: "Verifying (SIDBI)", figma: "382:42423", set: { app: "offer-sidbi", apps: "figma", st: "", ms: "off" } },
+      { id: "kfs", label: "KFS ready (Citi)", figma: "382:42689", set: { app: "pick-citi", apps: "figma", st: "", ms: "off" } },
+      { id: "sign", label: "Sign letter (resume)", figma: "431:7803", set: { app: "pick-citi", apps: "figma", st: "sign", ms: "off" } },
+      { id: "signed", label: "Letter signed + sheet", figma: "431:8486", set: { app: "pick-citi", apps: "figma", st: "signed", ms: "on" } },
     ],
     groups: [
       { id: "app", hidden: true, default: "", options: [{ value: "" }, { value: "offer-sidbi" }, { value: "pick-citi" }] },
+      { id: "st", hidden: true, default: "", options: [{ value: "" }, { value: "sign" }, { value: "signed" }] },
+      { id: "ms", hidden: true, default: "off", options: [{ value: "off" }, { value: "on" }] },
       { id: "apps", hidden: true, default: "live", options: [{ value: "live" }, { value: "figma" }] },
     ],
   };
 
   OPL.variants.kfs = {
     presets: [
-      { id: "start", label: "Reading (page 1)", figma: "416:43474", set: { read: "start" } },
-      { id: "end", label: "Read to the end", figma: "416:43604", set: { read: "end" } },
+      { id: "start", label: "Reading (page 1)", figma: "416:43474", set: { read: "start", sheet: "off" } },
+      { id: "end", label: "Read to the end", figma: "416:43604", set: { read: "end", sheet: "off" } },
+      { id: "accepted", label: "Accepted → NeSL sheet", figma: "433:7980", set: { read: "end", sheet: "nesl" } },
     ],
     groups: [
       { id: "read", hidden: true, default: "start", options: [{ value: "start" }, { value: "end" }] },
+      { id: "sheet", hidden: true, default: "off", options: [{ value: "off" }, { value: "nesl" }] },
+    ],
+  };
+
+  OPL.variants.nesl = {
+    presets: [
+      { id: "redirect", label: "1 · Redirecting", figma: "433:8115", set: { step: "0" } },
+      { id: "otp", label: "2 · OTP", figma: "416:83009", set: { step: "1" } },
+      { id: "agreement", label: "3 · Agreement", figma: "416:83028", set: { step: "2" } },
+      { id: "estamp", label: "4 · E-stamp", figma: "416:83058", set: { step: "3" } },
+      { id: "method", label: "5 · Signing method", figma: "416:83077", set: { step: "4" } },
+      { id: "aadhaar", label: "6 · Aadhaar eSign", figma: "416:83101", set: { step: "5" } },
+      { id: "confirm", label: "Confirming signature", figma: "416:82947", set: { step: "6" } },
+    ],
+    groups: [
+      { id: "step", hidden: true, default: "0", options: ["0", "1", "2", "3", "4", "5", "6"].map((value) => ({ value })) },
     ],
   };
 
@@ -1736,7 +1800,72 @@
       },
     ],
   };
+
+  /* Group E · NeSL signing (Figma 433:7980 → NeSL-Redirection ×6 → 416:82947 → 431:8486; resume 431:7803).
+     The six NeSL frames are screenshots of the third-party portal (assets/lazy/nesl). Hotspot
+     rects are in image px (390 × 723 image, placed under the 47px status bar). Frame fill is
+     #F7FBFB behind every step except OTP (dim). */
+  OPL.data.nesl = {
+    sheet: {
+      chip: "KFS accepted", step: "Step 2 of 2", title: "Sign your sanction letter on NeSL",
+      steps: ["Verify OTP", "Read the Sanction Letter", "Confirm e-stamp", "eSign with Aadhaar"],
+      note: "Sign sanction letter before 25 Nov 2026",
+      cta: "Continue to NeSL", later: "I’ll come back later",
+    },
+    portal: [
+      { id: "redirect", figma: "433:8115", auto: 1800 },
+      { id: "otp", figma: "416:83009", dim: true, next: [138, 464, 52, 34], cancel: [202, 464, 54, 34] },   // frame fill #676D8E, white status bar
+      { id: "agreement", figma: "416:83028", next: [8, 16, 374, 488], cancel: [176, 591, 56, 32] },
+      { id: "estamp", figma: "416:83058", next: [166, 443, 58, 70] },
+      { id: "method", figma: "416:83077", next: [164, 700, 62, 23] },
+      { id: "aadhaar", figma: "416:83101", next: [198, 321, 183, 46] },
+    ],
+    confirm: {
+      figma: "416:82947", wait: 2400,
+      title: "Confirming your signature",
+      sub: "Checking with NeSL. This takes a few seconds.",
+      foot: "Do not press back, or close the application",
+    },
+  };
+
+  // Application states after the KFS (sign = left before signing 431:7803, signed = 431:8486)
+  Object.assign(OPL.data.applications, {
+    sign: {
+      title: "Sign Sanction Letter",
+      step3: "Review KFS and Sanction Letter",
+      step3Sub: "KFS accepted on 24 Nov · Sign by 25 Nov",
+      cta: "Sign on NeSL",
+    },
+    signed: {
+      title: "Sanction Letter Signed",
+      step3: "Review KFS and Sanction Letter",
+      step3Sub: "Signed on NeSL, 24 Nov",
+      summaryTitle: "Sanction Summary",
+      aprChip: "Same as KFS",
+      rows: [
+        ["Sanction letter no.", "SL/SRT/2026/1187"],
+        ["Sanction date", "24 Nov 2026"],
+        ["Final Loan Amount", "₹44,32,500"],
+        ["Security", "Collateral-free · CGTMSE cover"],
+        ["Money in", "3–4 working days after KYC"],
+      ],
+      sheet: {
+        title: "Sanction letter signed",
+        body: (name) => `${name} will reach out to you for<br>next steps on money disbursal.`,
+        rows: [["Final Loan Amount", "₹44,32,500"], ["Into account", "•••• 4521"], ["Money in", "3–4 working days"]],
+        cta: "View application", done: "Done",
+      },
+    },
+  });
 })();
+
+;
+
+/* ==== js/data/signed-hero.js ==== */
+/* Milestone sheet · Signed hero (431:8687 › Hero 400:1747), inlined from Figma with layer classes so it can animate.
+   GENERATED from the Figma SVG — do not hand-edit shapes. */
+OPL.ui = OPL.ui || {};
+OPL.ui.SignedHeroSvg = '<svg class="mss" viewBox="0 0 390 176" width="390" height="176" fill="none" aria-hidden="true"><g><g class="ms__confetti"><g class="cf" style="--dx:-99.7px;--dy:-73.3px;--spin:-180deg;--fall:150px;--drift:-20px;--i:0"><rect x="292.162" y="157.322" width="5" height="12" rx="1.5" transform="rotate(6 292.162 157.322)" fill="#FFBB00"/></g><g class="cf" style="--dx:117.0px;--dy:-28.0px;--spin:217deg;--fall:203px;--drift:9px;--i:1"><rect x="75.4642" y="112.018" width="5" height="12" rx="1.5" transform="rotate(-1 75.4642 112.018)" fill="#A5B4FC"/></g><g class="cf" style="--dx:-94.6px;--dy:20.0px;--spin:-254deg;--fall:166px;--drift:-2px;--i:2"><rect x="287.058" y="63.9925" width="5" height="12" rx="1.5" transform="rotate(24 287.058 63.9925)" fill="#3858E5"/></g><g class="cf" style="--dx:92.1px;--dy:-27.5px;--spin:291deg;--fall:219px;--drift:-13px;--i:3"><rect x="100.386" y="111.532" width="5" height="12" rx="1.5" transform="rotate(-33 100.386 111.532)" fill="#FFBB00"/></g><g class="cf" style="--dx:-114.4px;--dy:-68.0px;--spin:-328deg;--fall:182px;--drift:16px;--i:4"><circle cx="309.41" cy="158.005" r="4" fill="#14B8A6"/></g><g class="cf" style="--dx:-93.9px;--dy:-15.7px;--spin:365deg;--fall:235px;--drift:5px;--i:5"><circle cx="288.851" cy="105.702" r="2.5" fill="#3858E5"/></g><g class="cf" style="--dx:147.8px;--dy:60.7px;--spin:-202deg;--fall:198px;--drift:-6px;--i:6"><rect x="44.7369" y="23.3174" width="5" height="12" rx="1.5" transform="rotate(-13 44.7369 23.3174)" fill="#3858E5"/></g><g class="cf" style="--dx:-162.1px;--dy:47.3px;--spin:239deg;--fall:161px;--drift:-17px;--i:7"><rect x="354.578" y="36.7218" width="5" height="12" rx="1.5" transform="rotate(-21 354.578 36.7218)" fill="#3858E5"/></g><g class="cf" style="--dx:89.4px;--dy:5.0px;--spin:-276deg;--fall:214px;--drift:12px;--i:8"><rect x="103.087" y="79.0171" width="5" height="12" rx="1.5" transform="rotate(-21 103.087 79.0171)" fill="#14B8A6"/></g><g class="cf" style="--dx:-100.7px;--dy:14.5px;--spin:313deg;--fall:177px;--drift:1px;--i:9"><rect x="293.215" y="69.5013" width="5" height="12" rx="1.5" transform="rotate(32 293.215 69.5013)" fill="#FFBB00"/></g><g class="cf" style="--dx:-110.1px;--dy:-76.8px;--spin:-350deg;--fall:230px;--drift:-10px;--i:10"><circle cx="305.134" cy="166.848" r="3.5" fill="#3858E5"/></g><g class="cf" style="--dx:101.3px;--dy:-18.4px;--spin:187deg;--fall:193px;--drift:19px;--i:11"><rect x="91.2254" y="102.419" width="5" height="12" rx="1.5" transform="rotate(27 91.2254 102.419)" fill="#14B8A6"/></g></g><circle class="mss__ripple" cx="195" cy="90" r="77.25" stroke-width="1.5" stroke="#14B8A6" stroke-opacity="0.35"/><circle class="mss__glow" cx="195" cy="90" r="66" fill="#3858E5" fill-opacity="0.06"/><circle class="mss__glow mss__glow--2" cx="195" cy="90" r="50" fill="#3858E5" fill-opacity="0.1"/><g class="mss__core" filter="url(#mss-filter0_d_0_513)"><circle cx="195" cy="90" r="37.5" fill="white" stroke="#E2E8F0"/></g><g class="mss__mark"><path opacity="0.5" d="M176.667 90C176.667 81.3576 176.667 77.0364 179.352 74.3515C182.036 71.6667 186.358 71.6667 195 71.6667C203.642 71.6667 207.964 71.6667 210.648 74.3515C213.333 77.0364 213.333 81.3576 213.333 90C213.333 98.6424 213.333 102.964 210.648 105.648C207.964 108.333 203.642 108.333 195 108.333C186.358 108.333 182.036 108.333 179.352 105.648C176.667 102.964 176.667 98.6424 176.667 90Z" fill="#3858E5"/><g><path d="M198.211 93.8364C198.619 93.5179 198.99 93.1475 199.73 92.4068L208.964 83.1729C209.187 82.9497 209.085 82.5652 208.787 82.4617C207.697 82.0835 206.279 81.3736 204.953 80.0473C203.627 78.7209 202.917 77.3031 202.538 76.2131C202.435 75.9149 202.05 75.8127 201.827 76.0359L192.593 85.2699L192.593 85.2699C191.853 86.0106 191.482 86.3809 191.164 86.7892C190.788 87.2709 190.466 87.7921 190.203 88.3436C189.98 88.8111 189.815 89.308 189.483 90.3017L189.055 91.5858L188.375 93.6275L187.737 95.542C187.574 96.031 187.701 96.5702 188.065 96.9347C188.43 97.2992 188.969 97.4265 189.458 97.2635L191.373 96.6253L193.414 95.9447L194.698 95.5167L194.698 95.5167C195.692 95.1854 196.189 95.0198 196.657 94.797C197.208 94.5342 197.729 94.2121 198.211 93.8364Z" fill="#3858E5"/><path d="M211.855 80.2818C213.826 78.3109 213.826 75.1156 211.855 73.1448C209.885 71.174 206.689 71.174 204.718 73.1448L204.422 73.4416C204.326 73.5376 204.278 73.5856 204.231 73.6497C204.112 73.814 204.037 74.0533 204.041 74.2562C204.042 74.3354 204.054 74.3993 204.077 74.527C204.122 74.7778 204.205 75.1446 204.357 75.5822C204.661 76.4573 205.234 77.6061 206.314 78.6861C207.394 79.766 208.543 80.3394 209.418 80.643C209.856 80.7948 210.222 80.8783 210.473 80.9233C210.601 80.9462 210.665 80.9577 210.744 80.9592C210.947 80.9632 211.186 80.8882 211.35 80.769C211.415 80.7225 211.463 80.6746 211.558 80.5787L211.559 80.5786L211.855 80.2818Z" fill="#3858E5"/></g></g><circle class="mss__badge" cx="219" cy="114" r="16" fill="white"/><g class="mss__badge"><path d="M229.833 114C229.833 119.983 224.983 124.833 219 124.833C213.017 124.833 208.167 119.983 208.167 114C208.167 108.017 213.017 103.167 219 103.167C224.983 103.167 229.833 108.017 229.833 114ZM223.366 110.717C223.683 111.034 223.683 111.549 223.366 111.866L217.95 117.283C217.632 117.6 217.118 117.6 216.8 117.283L214.634 115.116C214.317 114.799 214.317 114.284 214.634 113.967C214.951 113.65 215.466 113.65 215.783 113.967L217.375 115.559L219.796 113.138L222.217 110.717C222.534 110.4 223.049 110.4 223.366 110.717Z" fill-rule="evenodd" clip-rule="evenodd" fill="#16A34A"/></g></g><defs><filter id="mss-filter0_d_0_513" x="145" y="42" width="100" height="100" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset dy="2"/><feGaussianBlur stdDeviation="6"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0"/><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_0_513"/><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_0_513" result="shape"/></filter></defs></svg>\n';
 
 ;
 
@@ -2484,11 +2613,16 @@
   };
   const rate = { label: "Interest", value: "9.45%", unit: "p.a." };
 
+  /* Status changes made in the flow (KFS accepted → "sign", NeSL done → "signed") sit on top
+     of whichever list is showing, so they survive the Figma preset as well as live apps. */
+  const overrides = {};
+  const withOverride = (a) => (overrides[a.id] ? { ...a, status: overrides[a.id] } : a);
+
   /* Current application list: what was submitted, or the Figma state. */
   const currentApps = () => {
     const s = OPL.screens.applications;
     const v = OPL.variantValues("applications");
-    return v.apps === "figma" || !s.apps ? A().figmaPreset.map((a) => ({ ...a })) : s.apps;
+    return (v.apps === "figma" || !s.apps ? A().figmaPreset.map((a) => ({ ...a })) : s.apps).map(withOverride);
   };
 
   const verifyingSteps = [
@@ -2497,7 +2631,15 @@
     { icon: "document-text-muted", label: "Sign KFS<br>and Sanction", state: "todo" },
   ];
   const kfsSteps = OPL.data.loansOverview.applications.card.steps;
-  OPL.apps = { lender, currentApps };   // shared with the KFS reader (screens/kfs.js)
+  // shared with the KFS reader and NeSL hand-off (screens/kfs.js, screens/nesl.js)
+  OPL.apps = {
+    lender, currentApps,
+    setStatus(id, status) { overrides[id] = status; },
+    statusOf(id) {
+      const a = currentApps().find((x) => x.id === id) || A().figmaPreset.find((x) => x.id === id);
+      return overrides[id] || (a && a.status) || "verifying";
+    },
+  };
 
   /* ---- List --------------------------------------------------------------- */
   OPL.screens.applications = {
@@ -2516,7 +2658,7 @@
 
       const cards = apps.map((a) => {
         const l = lender(a.id);
-        return a.status === "kfs"
+        return a.status === "kfs" || a.status === "sign" || a.status === "signed"   // later states reuse the KFS card (no list design yet)
           ? ui.ApplicationCard({
               id: a.id, logo: l.logo, name: l.name, product: l.type, tint: l.tint, tag: d.kfs.daysLeft,
               figures: [{ label: "Final offer", value: d.kfs.finalOffer }, rate], steps: kfsSteps,
@@ -2601,13 +2743,23 @@
       const d = A();
       const apps = currentApps();
       const id = OPL.state.get().app || apps[0].id;
-      // not in the live list (e.g. opened from the Loans overview card): use its Figma status
-      const app = apps.find((a) => a.id === id) || d.figmaPreset.find((a) => a.id === id) || { id, status: "verifying" };
+      const v = OPL.variantValues("application");
+      // preset (st) > flow status > live list > Figma status (e.g. opened from the Loans overview card)
+      const status = v.st || OPL.apps.statusOf(id);
       const l = lender(id);
-      const kfs = app.status === "kfs";
+      const kfs = status === "kfs", sign = status === "sign", signed = status === "signed";
+      const footCta = kfs ? d.kfs.cta : sign ? d.sign.cta : "";
       const branch = d.branch(l.slug);
 
-      const timeline = kfs
+      const timeline = sign || signed
+        ? [
+            { icon: "plain-2", state: "done", title: `Sent to ${l.name}`, sub: d.sentAt },
+            { icon: "buildings", state: "done", title: "Lender Verification", sub: d.verifiedOn, line: sign ? "fade" : "" },
+            signed
+              ? { icon: "document-text-done", state: "done", strong: true, title: d.signed.step3, sub: d.signed.step3Sub }
+              : { icon: "document-text", state: "action", title: d.sign.step3, sub: d.sign.step3Sub },
+          ]
+        : kfs
         ? [
             { icon: "plain-2", state: "done", title: `Sent to ${l.name}`, sub: d.sentAt },
             { icon: "buildings", state: "done", title: "Lender Verification", sub: d.verifiedOn },
@@ -2619,7 +2771,20 @@
             { icon: "document-text-muted", state: "todo", title: d.verifying.todo },
           ];
 
-      const body = kfs
+      const body = signed
+        ? html`
+            <section class="appd-group">
+              <h3 class="appd-group__title">${d.signed.summaryTitle}</h3>
+              ${ui.AprCard({ s: d.kfs.summary, chip: d.signed.aprChip })}
+              ${ui.KeyValueCard({ rows: d.signed.rows })}
+            </section>
+            ${ui.InfoCard({ title: "Branch Details", body: ui.ContactList(branch) })}
+            ${ui.WhatsAppRow({ label: d.whatsapp })}`
+        : sign
+        ? html`
+            ${ui.InfoCard({ title: "Branch Details", body: ui.ContactList(branch) })}
+            ${ui.WhatsAppRow({ label: d.whatsapp })}`
+        : kfs
         ? html`
             ${ui.KfsSummary({ s: d.kfs.summary })}
             ${ui.InfoCard({ title: "Branch Details", body: ui.ContactList(branch) })}
@@ -2639,7 +2804,7 @@
       page.innerHTML = html`
         ${ui.StatusBar()}
         <div class="scroller">
-          <main class="${OPL.cx("appd", kfs && "appd--kfs")}" style="--app-tint:${l.tint}">
+          <main class="${OPL.cx("appd", footCta && "appd--kfs", signed && "appd--signed")}" style="--app-tint:${l.tint}">
             <section class="appd-top">
               <header class="appd-header">
                 <button class="app-header__back" aria-label="Back" data-press data-back>${OPL.icon("arrow-left-b", 24)}</button>
@@ -2647,7 +2812,7 @@
                 ${ui.IconButton({ icon: "headphones-round-sound-linear", label: "Support", goto: "support" })}
               </header>
               <div class="appd-status">
-                <h2 class="appd-status__title">${kfs ? d.kfs.title : d.verifying.title(l.name)}</h2>
+                <h2 class="appd-status__title">${signed ? d.signed.title : sign ? d.sign.title : kfs ? d.kfs.title : d.verifying.title(l.name)}</h2>
                 ${ui.Timeline({ items: timeline })}
               </div>
             </section>
@@ -2655,16 +2820,27 @@
             <div class="appd-withdraw"><button class="appd-withdraw__btn" data-goto="withdraw-application" data-press>${d.withdraw}</button></div>
           </main>
         </div>
-        <div class="${OPL.cx("floating", kfs && "floating--above-foot")}">
+        <div class="${OPL.cx("floating", footCta && "floating--above-foot", signed && "floating--fab-only")}">
           ${ui.AiMitraFab({ nudge: d.aiNudge })}
-          ${kfs ? "" : ui.BottomNav({ items: OPL.data.loansOverview.nav, active: "applications", variant: "section" })}
+          ${kfs || sign || signed ? "" : ui.BottomNav({ items: OPL.data.loansOverview.nav, active: "applications", variant: "section" })}
         </div>
-        ${kfs ? OPL.raw(`<div class="appd-foot">${ui.Button({ label: d.kfs.cta, block: true, goto: "kfs" })}</div>`) : ""}`;
+        ${kfs ? OPL.raw(`<div class="appd-foot">${ui.Button({ label: d.kfs.cta, block: true, goto: "kfs" })}</div>`) : ""}
+        ${sign ? OPL.raw(`<div class="appd-foot">${ui.Button({ label: d.sign.cta, trailing: "arrow-square-out-white", block: true, attrs: 'data-sign-nesl' })}</div>`) : ""}`;
 
-      this.wire(page);
+      this.wire(page, { id, l, signed, v });
     },
 
-    wire(page) {
+    /* "Sanction letter signed" milestone (431:8687) over the signed detail */
+    openSigned(page, l) {
+      const d = A().signed.sheet;
+      const sheets = OPL.fx.sheets(page);
+      const body = OPL.fx.bareSheet(page, "signed");
+      body.innerHTML = ui.MilestoneSigned({ ...d, body: d.body(l.name) }).toString();
+      page.addEventListener("click", (e) => { if (e.target.closest("[data-ms-view], [data-ms-done]")) sheets.close(); });
+      sheets.open("signed");
+    },
+
+    wire(page, { id, l, signed, v }) {
       OPL.fx.statusOnScroll(page);
       OPL.fx.playInView(page, ".tl, .kfs-repay");
       OPL.fx.nudge(page, this.timers);
@@ -2681,7 +2857,14 @@
         }
         const wa = e.target.closest("[data-wa]");
         if (wa) { wa.classList.toggle("is-on"); wa.setAttribute("aria-checked", wa.classList.contains("is-on")); }
+        if (e.target.closest("[data-sign-nesl]")) return OPL.go("nesl", { app: id, step: null });
       });
+
+      // Arriving from NeSL (celebrate) or the Figma preset: the signed milestone sheet
+      if (signed && (this.celebrate || v.ms === "on")) {
+        const fresh = this.celebrate; this.celebrate = false;
+        OPL.afterReveal(() => this.timers.push(setTimeout(() => page.isConnected && this.openSigned(page, l), fresh && !OPL.fx.motionOff() ? 460 : 0)));
+      }
     },
   };
 })();
@@ -2695,7 +2878,7 @@
    Entry: Application detail (KFS ready) → "Review Full KFS & Accept".
    Behaviour: the page counter and read-progress bar follow the scroll; reaching
    the last page unlocks the consent row (the hint collapses); ticking it enables
-   Accept KFS → Step 2 (NeSL signing, not built yet: hotspot "nesl").
+   Accept KFS → "Sign on NeSL" sheet (433:7980) → NeSL portal (screens/nesl.js).
    ========================================================================== */
 (function () {
   const { html, ui } = OPL;
@@ -2762,14 +2945,16 @@
               ${OPL.icon("check-square", 24)}<span>${OPL.raw(d.consent)}</span>
             </button>
             <div class="kfs-hint"><p>${d.hint}</p></div>
-            ${ui.Button({ label: d.cta, block: true, goto: "nesl", attrs: "disabled data-kfs-accept" })}
+            ${ui.Button({ label: d.cta, block: true, attrs: "disabled data-kfs-accept" })}
           </div>
         </div>`;
 
+      this._id = id;
       this.wire(page, v);
     },
 
     wire(page, v) {
+      const id = this._id;
       const root = page.querySelector(".kfs");
       const sc = page.querySelector(".kfs-canvas");
       const pages = [...page.querySelectorAll("[data-kfs-page]")];
@@ -2831,6 +3016,17 @@
         if (navigator.vibrate) navigator.vibrate(6);
       });
 
+      // Accept KFS → KFS is accepted (application moves to "sign") and the Step 2 sheet opens.
+      const sheets = OPL.fx.sheets(page);
+      const sheetBody = OPL.fx.bareSheet(page, "nesl-intro");
+      sheetBody.innerHTML = ui.NeslSheetBody({ d: OPL.data.nesl.sheet }).toString();
+      const openSheet = (instant) => { OPL.apps.setStatus(id, "sign"); sheets.open("nesl-intro", { instant }); };
+      accept.addEventListener("click", () => openSheet(false));
+      page.addEventListener("click", (e) => {
+        if (e.target.closest("[data-nesl-go]")) { sheets.close(); return this.timers.push(setTimeout(() => OPL.go("nesl", { app: id, step: null, read: null, sheet: null }), 260)); }
+        if (e.target.closest("[data-nesl-later]")) { sheets.close(); return this.timers.push(setTimeout(() => OPL.go("application", { app: id, st: null, ms: null, read: null, sheet: null }), 260)); }
+      });
+
       // Figma 416:43604: scrolled to the end, consent ticked, Accept enabled.
       if (v.read === "end") {
         root.classList.add("is-instant");
@@ -2838,11 +3034,117 @@
           if (!page.isConnected) return;
           sc.scrollTop = sc.scrollHeight;
           update(); unlock(true); setChecked(true); syncFoot();
+          if (v.sheet === "nesl") openSheet(true);   // Figma 433:7980
           this.timers.push(setTimeout(() => root.classList.remove("is-instant"), 60));
         });
       }
 
       OPL.fx.enter(page, pages.slice(0, 2));
+    },
+  };
+})();
+
+;
+
+/* ==== js/screens/nesl.js ==== */
+/* ==========================================================================
+   Screen · NeSL signing hand-off — Figma group E.
+   Steps 0–5 are the NeSL portal as drawn: screenshots of the third-party site
+   (433:8115 redirect → 416:83009 OTP → 416:83028 agreement → 416:83058 e-stamp →
+   416:83077 signing method → 416:83101 Aadhaar eSign). Each has a hotspot on its
+   real button; tapping elsewhere flashes it (Figma-prototype convention).
+   Step 6 is ours: "Confirming your signature" (416:82947), then the application
+   opens in the Signed state with the milestone sheet (431:8486).
+   Cancel on NeSL returns to the application, left before signing (431:7803).
+   The portal steps live inside one page: Back leaves NeSL, it doesn't step back.
+   ========================================================================== */
+(function () {
+  const { html, ui } = OPL;
+  OPL.screens = OPL.screens || {};
+  const N = () => OPL.data.nesl;
+  const IMG_W = 390, IMG_H = 723;
+  const src = (id) => `assets/lazy/nesl/${id}.jpg`;
+  const rect = (r) => `left:${(r[0] / IMG_W) * 100}%;top:${(r[1] / IMG_H) * 100}%;width:${(r[2] / IMG_W) * 100}%;height:${(r[3] / IMG_H) * 100}%`;
+
+  OPL.screens.nesl = {
+    title: "NeSL signing",
+    figma: { redirect: "433:8115", confirm: "416:82947" },
+    timers: [],
+    leave() { this.timers.forEach((t) => clearTimeout(t)); this.timers = []; },
+
+    render(page) {
+      this.leave();
+      const v = OPL.variantValues("nesl");
+      const apps = OPL.apps.currentApps();
+      this.id = OPL.state.get().app || (apps.find((a) => a.status === "sign" || a.status === "kfs") || {}).id || "pick-citi";
+      page.innerHTML = html`<div class="nesl" data-nesl></div>`;
+      this.root = page.querySelector("[data-nesl]");
+      this.page = page;
+      // warm the cache so each portal step swaps in without a blank frame
+      N().portal.forEach((p) => { const i = new Image(); i.src = src(p.id); });
+      this.show(Number(v.step) || 0, true);
+
+      page.addEventListener("click", (e) => {
+        if (e.target.closest("[data-nesl-next]")) return this.advance();
+        if (e.target.closest("[data-nesl-cancel]")) return this.cancel();
+        const hit = this.root.querySelector("[data-nesl-next]");
+        if (hit && document.documentElement.dataset.hotspots !== "off") {
+          hit.classList.remove("hotspot-flash"); void hit.offsetWidth; hit.classList.add("hotspot-flash");
+        }
+      });
+    },
+
+    show(step, first) {
+      this.timers.forEach((t) => clearTimeout(t)); this.timers = [];
+      this.step = step;
+      const portal = N().portal;
+      if (step >= portal.length) return this.confirm(first);   // opened on the Confirming preset: park there
+      const p = portal[step];
+      const view = document.createElement("div");
+      view.className = "nesl-view" + (p.dim ? " nesl-view--dim" : "") + (first ? "" : " is-in");
+      view.innerHTML = html`
+        ${ui.StatusBar()}
+        <div class="nesl-shot">
+          <img src="${src(p.id)}" width="390" height="723" alt="NeSL portal: ${p.id}" draggable="false">
+          ${p.next ? OPL.raw(`<button class="nesl-hit" style="${rect(p.next)}" data-nesl-next aria-label="Continue"></button>`) : ""}
+          ${p.cancel ? OPL.raw(`<button class="nesl-hit nesl-hit--quiet" style="${rect(p.cancel)}" data-nesl-cancel aria-label="Cancel"></button>`) : ""}
+        </div>`.toString();
+      const old = this.root.firstElementChild;
+      this.root.appendChild(view);
+      if (old) setTimeout(() => old.remove(), OPL.fx.motionOff() ? 0 : 220);
+      if (p.auto) this.timers.push(setTimeout(() => this.page.isConnected && this.advance(), OPL.fx.motionOff() ? 300 : p.auto));
+    },
+
+    advance() { this.show(this.step + 1); },
+
+    // NeSL Cancel → back to the application, KFS accepted but not signed (431:7803)
+    cancel() {
+      OPL.apps.setStatus(this.id, "sign");
+      OPL.go("application", { app: this.id, st: null, ms: null, step: null }, { replace: true });
+    },
+
+    /* "Confirming your signature" (416:82947) → Signed (431:8486) */
+    confirm(park) {
+      const c = N().confirm;
+      const view = document.createElement("div");
+      view.className = "nesl-view nesl-confirm is-in";
+      view.innerHTML = html`
+        ${ui.StatusBar()}
+        <div class="nesl-confirm__loader">
+          <img class="nesl-confirm__spin" src="assets/icons/spinner.svg" width="64" height="64" alt="">
+          <div class="nesl-confirm__msg"><h1>${c.title}</h1><p>${c.sub}</p></div>
+        </div>
+        <p class="nesl-confirm__foot">${c.foot}</p>`.toString();
+      const old = this.root.firstElementChild;
+      this.root.appendChild(view);
+      if (old) setTimeout(() => old.remove(), OPL.fx.motionOff() ? 0 : 220);
+      if (park) return;   // Figma preset 416:82947; the live flow carries on to the signed application
+      this.timers.push(setTimeout(() => {
+        if (!this.page.isConnected) return;
+        OPL.apps.setStatus(this.id, "signed");
+        OPL.screens.application.celebrate = true;
+        OPL.go("application", { app: this.id, st: null, ms: null, step: null }, { replace: true });
+      }, OPL.fx.motionOff() ? 400 : c.wait));
     },
   };
 })();
@@ -2874,12 +3176,14 @@
     return "#" + new URLSearchParams(next).toString();
   };
 
-  OPL.go = (name, params = {}) => {
+  // replace: swap the current history entry (hand-offs like NeSL → loader → result,
+  // so Back doesn't land on a page that only makes sense once)
+  OPL.go = (name, params = {}, { replace = false } = {}) => {
     if (!OPL.screens[name]) return;
     const next = hashFor({ screen: name, ...params });
     if (next === location.hash || (name === screenName() && !Object.keys(params).length)) return;
-    history.pushState({ depth: depth + 1 }, "", next);
-    depth++;
+    if (replace) history.replaceState({ depth }, "", next);
+    else { history.pushState({ depth: depth + 1 }, "", next); depth++; }
     render({ dir: "forward" });
   };
   OPL.back = () => {
@@ -2910,17 +3214,19 @@
       return renderPanel(name);
     }
 
+    // Clean up the outgoing screen BEFORE rendering: when both pages are the same screen
+    // (e.g. application → application), a later leave() would cancel the new page's timers.
+    const old = currentPage;
+    if (old) { const leaving = OPL.screens[old.dataset.screen]; if (leaving && leaving.leave) leaving.leave(); }
+
     const page = document.createElement("div");
     page.className = "page";
     page.dataset.screen = name;
     screenEl.appendChild(page);
     OPL.screens[name].render(page);
 
-    const old = currentPage;
     currentPage = page;
     if (old) {
-      const leaving = OPL.screens[old.dataset.screen];
-      if (leaving && leaving.leave) leaving.leave();
       if (dir && !OPL.fx.motionOff()) {
         const [inC, outC] = dir === "back" ? ["is-pop-in", "is-pop-out"] : ["is-push-in", "is-push-out"];
         page.classList.add(inC);

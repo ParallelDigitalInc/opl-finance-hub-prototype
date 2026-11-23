@@ -1,5 +1,44 @@
 # Changelog
 
+## v0.8.0 — 23 Nov 2026 · NeSL signing (group E)
+
+Synced from Figma: `433:7980`, the six NeSL-Redirection frames, `416:82947`, `431:8486` and `431:7803`.
+
+**Added**
+
+- **Accept KFS opens the Step 2 sheet** ("Sign your sanction letter on NeSL", `433:7980`).
+  - It has the "KFS accepted" chip, the four numbered steps, the deadline note, "Continue to NeSL" and "I'll come back later".
+  - The chip pops and the steps stagger in.
+  - Accepting moves the application to *sign*.
+- **NeSL portal** (`nesl`): six screenshots of the real portal (redirect, OTP, agreement, e-stamp, signing method, Aadhaar eSign).
+  - Each step has a hotspot on its own button. Tapping elsewhere flashes the hotspot.
+  - The redirect advances by itself after 1.8 s. Steps cross-fade like page loads.
+  - Cancel on OTP or the agreement returns to the application.
+- **Confirming your signature** (`416:82947`): a spinner for 2.4 s, then the application opens in **Signed**.
+- **Application · Signed** (`431:8486`):
+  - The timeline is all done ("Signed on NeSL, 24 Nov").
+  - New Sanction Summary: the APR card with a "Same as KFS" chip, and sanction details rows.
+  - Only AI Mitra floats; there's no nav.
+  - The **"Sanction letter signed" milestone sheet** opens on arrival. Its hero is inlined from Figma, so the pen mark and badge pop, the teal ripple pulses, and the confetti bursts then falls away.
+- **Application · Sign letter (resume)** (`431:7803`): the third step is in action ("KFS accepted on 24 Nov · Sign by 25 Nov") with a fading connector, and a sticky "Sign on NeSL ↗" button leads back into the portal.
+- **Presets:**
+  - KFS: "Accepted → NeSL sheet"
+  - NeSL: one per step, plus "Confirming signature"
+  - Application: "Sign letter (resume)" and "Letter signed + sheet"
+- **Components:** `AprCard` (shared with KFS Summary), `KeyValueCard`, `NeslSheetBody`, `MilestoneSigned`, `.ok-chip`. The Timeline gets `line: "fade"` and `strong`.
+- **Router:** `OPL.go(name, params, { replace: true })`, so the NeSL steps and loader don't stack up behind Back.
+
+**Fixed**
+
+- **Same-screen navigation** (e.g. one application to another) cleaned up the outgoing page *after* the new one rendered, which cancelled the new page's timers. Cleanup now runs first.
+- **Bare sheets** now span the full width. Their body used to shrink to its content.
+
+**Loading guardrail**
+
+- New `assets/lazy/` folder for images that only one screen loads (the NeSL screenshots, 408 KB as 2× JPEGs).
+- `tools/check.sh` caps it separately: 150 KB per file and 600 KB in total. It also fails if `index.html` references a lazy asset.
+- First load stays at 663 KB.
+
 ## v0.7.1 — 23 Nov 2026 · Loans overview fixes
 
 - **"Review KFS" on the Loans overview application card now works.** It used to point at an unbuilt `kfs-summary` screen. It now opens the Citi application in its KFS-ready state (`382:42689`), the same place the Track Loans list goes.

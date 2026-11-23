@@ -18,6 +18,7 @@ CSS=(
   css/screens/loan-offers.css
   css/screens/applications.css
   css/screens/kfs.css
+  css/screens/nesl.css
 )
 JS=(
   js/core.js
@@ -29,12 +30,14 @@ JS=(
   js/data/loans-overview.js
   js/data/loan-offers.js
   js/data/applications.js
+  js/data/signed-hero.js
   js/screens/home.js
   js/screens/loans-overview.js
   js/screens/loan-offers.js
   js/screens/compare-loans.js
   js/screens/applications.js
   js/screens/kfs.js
+  js/screens/nesl.js
   js/app.js
 )
 

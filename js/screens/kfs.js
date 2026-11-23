@@ -4,7 +4,7 @@
    Entry: Application detail (KFS ready) → "Review Full KFS & Accept".
    Behaviour: the page counter and read-progress bar follow the scroll; reaching
    the last page unlocks the consent row (the hint collapses); ticking it enables
-   Accept KFS → Step 2 (NeSL signing, not built yet: hotspot "nesl").
+   Accept KFS → "Sign on NeSL" sheet (433:7980) → NeSL portal (screens/nesl.js).
    ========================================================================== */
 (function () {
   const { html, ui } = OPL;
@@ -71,14 +71,16 @@
               ${OPL.icon("check-square", 24)}<span>${OPL.raw(d.consent)}</span>
             </button>
             <div class="kfs-hint"><p>${d.hint}</p></div>
-            ${ui.Button({ label: d.cta, block: true, goto: "nesl", attrs: "disabled data-kfs-accept" })}
+            ${ui.Button({ label: d.cta, block: true, attrs: "disabled data-kfs-accept" })}
           </div>
         </div>`;
 
+      this._id = id;
       this.wire(page, v);
     },
 
     wire(page, v) {
+      const id = this._id;
       const root = page.querySelector(".kfs");
       const sc = page.querySelector(".kfs-canvas");
       const pages = [...page.querySelectorAll("[data-kfs-page]")];
@@ -140,6 +142,17 @@
         if (navigator.vibrate) navigator.vibrate(6);
       });
 
+      // Accept KFS → KFS is accepted (application moves to "sign") and the Step 2 sheet opens.
+      const sheets = OPL.fx.sheets(page);
+      const sheetBody = OPL.fx.bareSheet(page, "nesl-intro");
+      sheetBody.innerHTML = ui.NeslSheetBody({ d: OPL.data.nesl.sheet }).toString();
+      const openSheet = (instant) => { OPL.apps.setStatus(id, "sign"); sheets.open("nesl-intro", { instant }); };
+      accept.addEventListener("click", () => openSheet(false));
+      page.addEventListener("click", (e) => {
+        if (e.target.closest("[data-nesl-go]")) { sheets.close(); return this.timers.push(setTimeout(() => OPL.go("nesl", { app: id, step: null, read: null, sheet: null }), 260)); }
+        if (e.target.closest("[data-nesl-later]")) { sheets.close(); return this.timers.push(setTimeout(() => OPL.go("application", { app: id, st: null, ms: null, read: null, sheet: null }), 260)); }
+      });
+
       // Figma 416:43604: scrolled to the end, consent ticked, Accept enabled.
       if (v.read === "end") {
         root.classList.add("is-instant");
@@ -147,6 +160,7 @@
           if (!page.isConnected) return;
           sc.scrollTop = sc.scrollHeight;
           update(); unlock(true); setChecked(true); syncFoot();
+          if (v.sheet === "nesl") openSheet(true);   // Figma 433:7980
           this.timers.push(setTimeout(() => root.classList.remove("is-instant"), 60));
         });
       }

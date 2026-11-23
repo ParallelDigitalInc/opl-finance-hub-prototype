@@ -42,13 +42,14 @@
   };
 
   /* Timeline — vertical status timeline (382:42462).
-     items: [{ icon, state: done|current|action|todo, title, sub, subTone }] */
+     items: [{ icon, state: done|current|action|todo, title, sub, subTone, line, strong }]
+     line: "fade" = teal → warning gradient into an action step (431:7855). strong: SemiBold title. */
   ui.Timeline = ({ items }) => html`
     <div class="tl">${items.map((it, i) => OPL.raw(`
       <div class="tl__item tl__item--${it.state}">
         <div class="tl__rail"><span class="tl__node tl__node--${it.state}" style="--i:${i}">${icon(it.icon, 16)}</span>
-          ${i < items.length - 1 ? `<span class="tl__line ${it.state === "done" ? "tl__line--done" : ""}"></span>` : ""}</div>
-        <div class="tl__text"><p class="tl__title">${it.title}</p>${it.sub ? `<p class="tl__sub ${it.subTone ? `tl__sub--${it.subTone}` : ""}">${it.sub}</p>` : ""}</div>
+          ${i < items.length - 1 ? `<span class="tl__line ${it.line === "fade" ? "tl__line--fade" : it.state === "done" ? "tl__line--done" : ""}"></span>` : ""}</div>
+        <div class="tl__text"><p class="tl__title${it.strong ? " tl__title--strong" : ""}">${it.title}</p>${it.sub ? `<p class="tl__sub ${it.subTone ? `tl__sub--${it.subTone}` : ""}">${it.sub}</p>` : ""}</div>
       </div>`))}</div>`;
 
   /* InfoCard — collapsible card (382:42487 family). body: HTML */
@@ -71,19 +72,29 @@
     <div class="wa-row"><img class="wa-row__logo" src="${img("whatsapp.png")}" width="24" height="24" alt=""><span>${label}</span>
       ${ui.Toggle({ on, attrs: "data-wa" })}</div>`;
 
+  /* AprCard — "APR summary" (416:43894 / 431:8556): tinted APR head + 2×2 figures.
+     chip: optional success chip on the head ("Same as KFS", 431:8560). */
+  ui.AprCard = ({ s, chip }) => html`
+    <div class="kfs-apr">
+      <div class="kfs-apr__head"><img class="kfs-apr__tex" src="${img("hero-texture.jpg")}" alt=""><p>APR</p><p class="kfs-apr__v">${s.apr}</p>
+        ${chip ? OPL.raw(`<span class="ok-chip kfs-apr__chip">${icon("check-circle-chip", 14)}<span>${chip}</span></span>`) : ""}</div>
+      <div class="kfs-apr__grid">
+        <div><span>Loan amount</span><b>${s.loanAmount}</b></div>
+        <div><span>Tenure</span><b>${s.tenure}<i> months</i></b></div>
+        <div><span>Interest rate</span><b>${s.rate}<i> p.a.</i></b></div>
+        <div><span>Monthly EMI</span><b>${s.emi}</b></div>
+      </div>
+    </div>`;
+
+  /* KeyValueCard — "Sanction details" (431:8578): label left, value right, hairline rows */
+  ui.KeyValueCard = ({ rows }) => html`
+    <div class="kv-card">${rows.map(([k, v]) => OPL.raw(`<div class="kv-card__row"><span>${k}</span><b>${v}</b></div>`))}</div>`;
+
   /* KfsSummary — "KFS Summary" (416:43894): APR card, You repay split bar, fact chips */
   ui.KfsSummary = ({ s }) => html`
     <div class="kfs-sum">
       <h3 class="kfs-sum__title">KFS Summary</h3>
-      <div class="kfs-apr">
-        <div class="kfs-apr__head"><img class="kfs-apr__tex" src="${img("hero-texture.jpg")}" alt=""><p>APR</p><p class="kfs-apr__v">${s.apr}</p></div>
-        <div class="kfs-apr__grid">
-          <div><span>Loan amount</span><b>${s.loanAmount}</b></div>
-          <div><span>Tenure</span><b>${s.tenure}<i> months</i></b></div>
-          <div><span>Interest rate</span><b>${s.rate}<i> p.a.</i></b></div>
-          <div><span>Monthly EMI</span><b>${s.emi}</b></div>
-        </div>
-      </div>
+      ${ui.AprCard({ s })}
       <div class="kfs-repay">
         <div class="kfs-repay__head"><span>You repay</span><b>${s.repay}</b></div>
         <div class="kfs-repay__bar">${s.split.map((p) => OPL.raw(`<span style="flex:${p.w} 0 0;background:${p.color}"></span>`))}</div>
@@ -149,6 +160,38 @@
         <div class="ms__actions">
           ${ui.Button({ label: "Review KFS", block: true, attrs: "data-ms-review" })}
           <button class="ms__later" data-sheet-close>Later</button>
+        </div>
+      </div>
+    </div>`;
+
+  /* NeslSheetBody — "KFS accepted – Step 2 of 2 (Sign on NeSL)" sheet (433:8060) */
+  ui.NeslSheetBody = ({ d }) => html`
+    <div class="nesl-sheet">
+      <span class="sheet__grabber" data-sheet-drag></span>
+      <div class="nesl-sheet__head">
+        <div class="nesl-sheet__progress"><span class="ok-chip">${icon("check-circle-green", 14)}<span>${d.chip}</span></span><span class="nesl-sheet__step">${d.step}</span></div>
+        <h2 class="nesl-sheet__title">${d.title}</h2>
+      </div>
+      <ol class="nesl-steps">${d.steps.map((t, i) => OPL.raw(`
+        <li class="nesl-steps__item" style="--i:${i}"><span class="nesl-steps__rail"><span class="nesl-steps__no">${i + 1}</span>${i < d.steps.length - 1 ? '<span class="nesl-steps__line"></span>' : ""}</span><span class="nesl-steps__text">${t}</span></li>`))}</ol>
+      ${ui.NoteRow({ text: d.note, tone: "warning" })}
+      <div class="nesl-sheet__actions">
+        ${ui.Button({ label: d.cta, trailing: "arrow-square-out-white", block: true, attrs: "data-nesl-go" })}
+        <button class="ms__later" data-nesl-later>${d.later}</button>
+      </div>
+    </div>`;
+
+  /* MilestoneSigned — "Loan / Milestone sheet", State=Signed (431:8687). Hero inlined (SignedHeroSvg). */
+  ui.MilestoneSigned = ({ title, body, rows, cta, done }) => html`
+    <div class="ms ms--signed">
+      <span class="sheet__grabber" data-sheet-drag></span>
+      <div class="ms__hero">${OPL.raw(ui.SignedHeroSvg)}</div>
+      <div class="ms__content">
+        <div class="ms__msg"><h2>${title}</h2><p>${OPL.raw(body)}</p></div>
+        <div class="ms__card ms__card--rows">${rows.map(([k, v]) => OPL.raw(`<div class="ms__row"><span>${k}</span><b>${v}</b></div>`))}</div>
+        <div class="ms__actions">
+          ${ui.Button({ label: cta, block: true, attrs: "data-ms-view" })}
+          <button class="ms__later" data-ms-done>${done}</button>
         </div>
       </div>
     </div>`;

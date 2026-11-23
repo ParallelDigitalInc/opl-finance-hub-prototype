@@ -1,0 +1,30 @@
+/* ==========================================================================
+   Screens · NeSL hand-off (group E)
+   Portal steps: 390×723 screenshot under the status bar on the frame fill
+   (#F7FBFB; OTP #676D8E with a white status bar). Steps cross-fade like page loads.
+   Confirming (416:82947): white, loader centred (64 spinner, 20 gap), foot 32/32.
+   ========================================================================== */
+.nesl { position: absolute; inset: 0; overflow: hidden; background: #f7fbfb; }
+.nesl-view { position: absolute; inset: 0; background: #f7fbfb; }
+.nesl-view--dim { background: #676d8e; }
+.nesl-view.is-in { animation: nesl-load 220ms var(--ease-out) both; }
+@keyframes nesl-load { from { opacity: 0; } to { opacity: 1; } }
+.nesl-view .status-bar { background: transparent; }
+.nesl-view--dim .status-bar__time { color: #fff; }
+.nesl-view--dim .status-bar .ico { filter: brightness(0) invert(1); }
+
+.nesl-shot { position: absolute; left: 0; right: 0; top: var(--status-h); aspect-ratio: 390 / 723; }
+.nesl-shot > img { display: block; width: 100%; height: 100%; max-width: none; user-select: none; -webkit-user-drag: none; }
+.nesl-hit { position: absolute; border-radius: 10px; -webkit-tap-highlight-color: transparent; }
+.nesl-hit:active { background: rgba(15, 23, 42, 0.08); }
+
+.nesl-confirm { display: flex; flex-direction: column; background: var(--surface); padding-top: var(--status-h); }
+.nesl-confirm__loader { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--s20); padding-bottom: 47px; }
+.nesl-confirm__spin { width: 64px; height: 64px; animation: nesl-spin 900ms linear infinite; }
+@keyframes nesl-spin { to { transform: rotate(360deg); } }
+.nesl-confirm__msg { display: flex; flex-direction: column; align-items: center; gap: var(--s4); text-align: center; white-space: nowrap; }
+.nesl-confirm__msg h1 { font-size: 18px; line-height: 28px; font-weight: var(--fw-semibold); color: var(--foreground); }
+.nesl-confirm__msg p { font-size: 14px; line-height: 20px; color: var(--muted-foreground); }
+.nesl-confirm__foot { padding: 32px var(--gutter) max(32px, env(safe-area-inset-bottom)); font-size: 14px; line-height: 20px; color: var(--muted-foreground); text-align: center; }
+.nesl-confirm.is-in .nesl-confirm__msg { animation: enter-up 420ms var(--ease-out) 120ms both; }
+@media (prefers-reduced-motion: reduce) { .nesl-confirm__spin { animation-duration: 2.4s; } }

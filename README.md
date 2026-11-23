@@ -9,7 +9,7 @@ starts the HTML component kit that later mobile flows reuse.
 - **Component library:** `library.html` (tokens, icons and every component, rendered by the same functions)
 - **Figma:** `GHuBkYGEQZvQppv3v55EaA`, section *Finance Home* `416:82748`
 
-**Screens (v0.7.0):**
+**Screens (v0.8.0):**
 - **Home:** frames `382:34093`, `382:33823`, `382:36681`
 - **Loans overview:** `382:36150`. Home → "Explore Loans" pushes it; the back arrow or browser back pops it.
 - **Loan offers:** list `382:35324`, comparing `382:35666`, Sort sheet `393:505`, Filters sheet `393:869`. Reached from:
@@ -22,7 +22,11 @@ starts the HTML component kit that later mobile flows reuse.
   - **Application detail:** verifying (`382:42423`) or KFS ready (`382:42689`).
   - **"{Lender} approved your loan"** milestone sheet (`416:43921`).
   - **KFS reader** (group D, v0.7.0; `416:43474` → `416:43604`): from "Review Full KFS & Accept". Read to the last page, tick consent, then Accept KFS.
-  - Groups E–F (NeSL signing, disbursal) come next. Accept KFS shows a hotspot hint until then.
+  - **NeSL signing** (group E, v0.8.0):
+    - Accept KFS opens the Step 2 sheet (`433:7980`).
+    - The NeSL portal follows (six screenshots, `433:8115` … `416:83101`), then Confirming (`416:82947`), then Application · Signed with its milestone sheet (`431:8486`).
+    - "I'll come back later" or Cancel on NeSL leads to Application · Sign letter (`431:7803`).
+  - Group F (disbursal: `435:8001`, `435:8572`) comes next.
 
 ## Run it
 
@@ -90,13 +94,14 @@ Rules for every new screen and asset:
    - Opaque photos and textures are JPEG; transparent art is PNG; icons are SVG.
    - Max **150 KB per asset** and **700 KB total**, enforced by `tools/check.sh`.
    - Full-resolution originals live in `assets/_source/` for re-export and are never loaded.
-5. **Every image has a fixed CSS size**, so nothing shifts as it loads.
-6. **First paint is the boot layer.**
+5. **Screen-only images live in `assets/lazy/`** (for example the NeSL portal shots). They're fetched only by the screen that shows them, and never referenced from `index.html`. They have their own cap (150 KB each, 600 KB total) and don't count against the first-load total.
+6. **Every image has a fixed CSS size**, so nothing shifts as it loads.
+7. **First paint is the boot layer.**
    - Inline critical CSS in `index.html` paints the device and a neutral placeholder at first byte.
    - The first screen renders hidden (`.is-booting` pauses its CSS animations at frame 0) and reveals once fonts and above-the-fold images are ready, capped at 3 s.
-7. **Motion meant to be seen waits for the reveal.** Use `OPL.afterReveal(fn)` for entrance timers, auto-cycles and nudges. `OPL.countUp` and `OPL.fx.enter` / `fx.nudge` already do this. Never start visible motion on render.
-8. **Count-ups render their start value**, so there's no full→0 flash. They're timer-stepped so they finish in background tabs.
-9. **The pre-commit hook** (`tools/hooks`, enabled via `git config core.hooksPath tools/hooks`) rebuilds the bundles and runs the budget check; a failing budget blocks the commit.
+8. **Motion meant to be seen waits for the reveal.** Use `OPL.afterReveal(fn)` for entrance timers, auto-cycles and nudges. `OPL.countUp` and `OPL.fx.enter` / `fx.nudge` already do this. Never start visible motion on render.
+9. **Count-ups render their start value**, so there's no full→0 flash. They're timer-stepped so they finish in background tabs.
+10. **The pre-commit hook** (`tools/hooks`, enabled via `git config core.hooksPath tools/hooks`) rebuilds the bundles and runs the budget check; a failing budget blocks the commit.
 
 ## Fidelity rules
 
@@ -220,6 +225,18 @@ All of this is behaviour on existing elements. None of it adds UI:
 13. **Consent line break.** Page 4 breaks "…understood the / Key Fact Statement"; page 1 wraps after "Key Fact". Page 4's break is used in both states.
 14. **The KFS disabled button** is drawn as slate-200 fill with a #94A3B8 label at 50%. The DS's generic disabled state (45% opacity) isn't used here.
 15. **KFS for other lenders** reuses Citi's template with the lender's name: the letterhead name, grievance officer and LSP rows. Loan numbers and figures stay Citi's. This is **assumed**.
+
+## Figma flags · NeSL signing (group E)
+
+1. **The NeSL portal is screenshots.** The six "NeSL-Redirection" frames are recordings of NeSL's real site, shown as images with hotspots.
+   - The agreement frame has no visible "I AGREE" button (its note says to scroll to the bottom), so the whole document area advances.
+   - Cancel on OTP or the agreement returns to Application · Sign letter. Figma doesn't draw that link.
+2. **The sheet's note-row warning tile is `#FFEDD5`**, while the kit's Note row warning is `#FEF3C7`. This sheet uses its drawn colour; the kit is unchanged. Align them.
+3. **"Same as KFS" check icon:** its outer circle is Solar navy `#1C274C`, not green like the "KFS accepted" chip. Used as drawn; it looks unintended.
+4. **"Done" on the signed sheet** has no destination in Figma, so it closes the sheet, as "View application" does.
+5. **The Track Loans list has no card for sign or signed.** Those applications keep the KFS-ready card until a design exists.
+6. **Back after signing** returns to the KFS reader. The NeSL steps and loader don't stay in history (they use `replace`), but the KFS page does.
+7. **Timing is a prototype choice:** redirect 1.8 s, confirming 2.4 s.
 8. **Prototype behaviour:** about 5 s after Submit, the first lender "approves" and the milestone sheet plays. This simulates the async lender response so the full flow can be demoed.
 
 ## Versioning

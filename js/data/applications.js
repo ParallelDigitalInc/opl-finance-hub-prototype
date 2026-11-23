@@ -140,4 +140,61 @@
       },
     ],
   };
+
+  /* Group E · NeSL signing (Figma 433:7980 → NeSL-Redirection ×6 → 416:82947 → 431:8486; resume 431:7803).
+     The six NeSL frames are screenshots of the third-party portal (assets/lazy/nesl). Hotspot
+     rects are in image px (390 × 723 image, placed under the 47px status bar). Frame fill is
+     #F7FBFB behind every step except OTP (dim). */
+  OPL.data.nesl = {
+    sheet: {
+      chip: "KFS accepted", step: "Step 2 of 2", title: "Sign your sanction letter on NeSL",
+      steps: ["Verify OTP", "Read the Sanction Letter", "Confirm e-stamp", "eSign with Aadhaar"],
+      note: "Sign sanction letter before 25 Nov 2026",
+      cta: "Continue to NeSL", later: "I’ll come back later",
+    },
+    portal: [
+      { id: "redirect", figma: "433:8115", auto: 1800 },
+      { id: "otp", figma: "416:83009", dim: true, next: [138, 464, 52, 34], cancel: [202, 464, 54, 34] },   // frame fill #676D8E, white status bar
+      { id: "agreement", figma: "416:83028", next: [8, 16, 374, 488], cancel: [176, 591, 56, 32] },
+      { id: "estamp", figma: "416:83058", next: [166, 443, 58, 70] },
+      { id: "method", figma: "416:83077", next: [164, 700, 62, 23] },
+      { id: "aadhaar", figma: "416:83101", next: [198, 321, 183, 46] },
+    ],
+    confirm: {
+      figma: "416:82947", wait: 2400,
+      title: "Confirming your signature",
+      sub: "Checking with NeSL. This takes a few seconds.",
+      foot: "Do not press back, or close the application",
+    },
+  };
+
+  // Application states after the KFS (sign = left before signing 431:7803, signed = 431:8486)
+  Object.assign(OPL.data.applications, {
+    sign: {
+      title: "Sign Sanction Letter",
+      step3: "Review KFS and Sanction Letter",
+      step3Sub: "KFS accepted on 24 Nov · Sign by 25 Nov",
+      cta: "Sign on NeSL",
+    },
+    signed: {
+      title: "Sanction Letter Signed",
+      step3: "Review KFS and Sanction Letter",
+      step3Sub: "Signed on NeSL, 24 Nov",
+      summaryTitle: "Sanction Summary",
+      aprChip: "Same as KFS",
+      rows: [
+        ["Sanction letter no.", "SL/SRT/2026/1187"],
+        ["Sanction date", "24 Nov 2026"],
+        ["Final Loan Amount", "₹44,32,500"],
+        ["Security", "Collateral-free · CGTMSE cover"],
+        ["Money in", "3–4 working days after KYC"],
+      ],
+      sheet: {
+        title: "Sanction letter signed",
+        body: (name) => `${name} will reach out to you for<br>next steps on money disbursal.`,
+        rows: [["Final Loan Amount", "₹44,32,500"], ["Into account", "•••• 4521"], ["Money in", "3–4 working days"]],
+        cta: "View application", done: "Done",
+      },
+    },
+  });
 })();

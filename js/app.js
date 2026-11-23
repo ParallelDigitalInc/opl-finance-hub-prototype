@@ -22,12 +22,14 @@
     return "#" + new URLSearchParams(next).toString();
   };
 
-  OPL.go = (name, params = {}) => {
+  // replace: swap the current history entry (hand-offs like NeSL → loader → result,
+  // so Back doesn't land on a page that only makes sense once)
+  OPL.go = (name, params = {}, { replace = false } = {}) => {
     if (!OPL.screens[name]) return;
     const next = hashFor({ screen: name, ...params });
     if (next === location.hash || (name === screenName() && !Object.keys(params).length)) return;
-    history.pushState({ depth: depth + 1 }, "", next);
-    depth++;
+    if (replace) history.replaceState({ depth }, "", next);
+    else { history.pushState({ depth: depth + 1 }, "", next); depth++; }
     render({ dir: "forward" });
   };
   OPL.back = () => {
@@ -58,17 +60,19 @@
       return renderPanel(name);
     }
 
+    // Clean up the outgoing screen BEFORE rendering: when both pages are the same screen
+    // (e.g. application → application), a later leave() would cancel the new page's timers.
+    const old = currentPage;
+    if (old) { const leaving = OPL.screens[old.dataset.screen]; if (leaving && leaving.leave) leaving.leave(); }
+
     const page = document.createElement("div");
     page.className = "page";
     page.dataset.screen = name;
     screenEl.appendChild(page);
     OPL.screens[name].render(page);
 
-    const old = currentPage;
     currentPage = page;
     if (old) {
-      const leaving = OPL.screens[old.dataset.screen];
-      if (leaving && leaving.leave) leaving.leave();
       if (dir && !OPL.fx.motionOff()) {
         const [inC, outC] = dir === "back" ? ["is-pop-in", "is-pop-out"] : ["is-push-in", "is-push-out"];
         page.classList.add(inC);
