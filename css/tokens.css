@@ -41,6 +41,13 @@
   /* ---- Colour · status -------------------------------------------------- */
   --warning-bg: #ffedd5;              /* bg/warning-primary */
   --warning-fg: #a16207;              /* color-yellow-700 */
+  --success: #059669;                 /* tracker done line + icons */
+  --success-bg: #c7edd5;              /* tracker done step */
+  --risk-low-bg: #e1f3e4;             /* CMR "Low risk" pill */
+  --risk-low-fg: #2c8a47;
+  --amber-fg: #92400e;                /* "2 days left" deadline tag */
+  --chart-indigo: #4340d6;            /* borrowing donut · loans on EMI */
+  --chart-green: #5cbd7e;             /* borrowing donut · credit line used */
   --trust: #16a34a;                   /* green-600 — trust icon (proposed, not in DS yet) */
   --trust-fg: #15803d;                /* green-700 — trust line (proposed) */
 
@@ -64,7 +71,7 @@
 
   /* ---- Spacing (spacing/scale/*) ---------------------------------------- */
   --s1: 1px;  --s2: 2px;  --s4: 4px;  --s6: 6px;  --s8: 8px;
-  --s12: 12px; --s16: 16px; --s20: 20px; --s32: 32px; --s40: 40px;
+  --s12: 12px; --s16: 16px; --s20: 20px; --s24: 24px; --s32: 32px; --s40: 40px;
   --gutter: 20px;                     /* screen side padding */
   --section-gap: 40px;                /* between home sections */
 

@@ -5,6 +5,7 @@
 (function () {
   const { ui } = OPL;
   const d = OPL.data.home;
+  const lo = OPL.data.loansOverview;
   const root = document.getElementById("lib");
 
   const TOKENS = {
@@ -39,13 +40,17 @@
       name: "Button", node: "2:118", use: "Filled = the one main action. Text = lowest emphasis (View all). Large 44 · Small 32.",
       demos: [
         ["Filled · Large · trailing", ui.Button({ label: "See all loans (7)", trailing: "chevron-right-white" }), `ui.Button({ label, trailing: "chevron-right-white" })`],
+        ["Filled · Medium 38", ui.Button({ label: "Review KFS", size: "md", block: true }), `ui.Button({ label, size: "md", block: true })`],
         ["Filled · Small · leading", ui.Button({ label: "Request a Call", size: "sm", leading: "phone-calling-bold" }), `ui.Button({ label, size: "sm", leading: "phone-calling-bold" })`],
         ["Text · trailing", ui.Button({ label: "View all", variant: "text", trailing: "chevron-right-primary" }), `ui.Button({ label, variant: "text", trailing: "chevron-right-primary" })`],
       ],
     },
     {
       name: "IconButton · Avatar", node: "382:34257 · 382:34261", bg: "var(--hero-bg)", use: "Header actions on the hero surface.",
-      demos: [["", OPL.raw(`<div style="display:flex;gap:8px;align-items:center">${ui.IconButton({ icon: "bell-linear", label: "Notifications" })}${ui.IconButton({ icon: "headphones-round-sound-linear", label: "Support" })}${ui.Avatar()}</div>`), `ui.IconButton({ icon, label }) · ui.Avatar()`]],
+      demos: [
+        ["AppHeader · sub-page", OPL.raw(`<div style="width:390px">${ui.AppHeader({ title: lo.header.title, back: true, actions: lo.header.actions })}</div>`), `ui.AppHeader({ title, back: true, actions: [{ icon, label }] })`],
+        ["", OPL.raw(`<div style="display:flex;gap:8px;align-items:center">${ui.IconButton({ icon: "bell-linear", label: "Notifications" })}${ui.IconButton({ icon: "headphones-round-sound-linear", label: "Support" })}${ui.Avatar()}</div>`), `ui.IconButton({ icon, label }) · ui.Avatar()`],
+      ],
     },
     {
       name: "Logo", node: "382:34130", use: "Lender or scheme mark. Layered fills reproduce Figma crops exactly. Add marks to LOGOS in components.js.",
@@ -93,6 +98,22 @@
       demos: [["", OPL.raw(`<div style="width:350px">${ui.HelpCard(d.help)}</div>`), `ui.HelpCard({ title, subtitle, cta })`]],
     },
     {
+      name: "CmrPill", node: "382:36243", bg: "var(--hero-bg)", use: "Credit score summary on the Loans hero. 2px white stroke drawn inside.",
+      demos: [["", ui.CmrPill(lo.cmr), `ui.CmrPill({ label: "CMR - 2", risk: "Low risk" })`]],
+    },
+    {
+      name: "Tracker", node: "416:121737", use: "Flow / Application tracker v2, Style=Icon. Green done, amber needs you, grey upcoming. Plays in when scrolled into view.",
+      demos: [["Done · done · action", OPL.raw(`<div style="width:312px">${ui.Tracker({ steps: lo.applications.card.steps })}</div>`), `ui.Tracker({ steps: [{ icon, label, state }] })`]],
+    },
+    {
+      name: "ApplicationCard", node: "416:121715", use: "Your loan applications. Its stroke is in layout (unlike the match cards).",
+      demos: [["", OPL.raw(`<div style="width:354px">${ui.ApplicationCard(lo.applications.card)}</div>`), `ui.ApplicationCard({ logo, name, product, tag, figures, steps, cta })`]],
+    },
+    {
+      name: "BorrowingCard", node: "382:36253",
+      demos: [["", OPL.raw(`<div style="width:354px">${ui.BorrowingCard(lo.borrowing.card)}</div>`), `ui.BorrowingCard({ total, legend, available })`]],
+    },
+    {
       name: "PageNote", node: "proposed", use: "Quiet sign-off at the end of a scrolling page. Proposed — not in Figma yet.",
       demos: Object.entries(d.pageNotes).map(([k, n]) => [k, ui.PageNote(n), n.tone === "trust" ? `ui.PageNote({ tone: "trust", icon: "shield-check-bold-duotone", lines })` : `ui.PageNote({ lines: [lead, secondary] })`]),
     },
@@ -104,6 +125,7 @@
       name: "AiMitraFab · BottomNav", node: "382:34310 · 382:34337", bg: "#f1f5f8",
       demos: [
         ["", OPL.raw(`<div style="width:358px;display:grid;gap:8px;justify-items:end">${ui.AiMitraFab()}${ui.BottomNav({ items: d.nav, active: "finance" })}</div>`), `ui.AiMitraFab() · ui.BottomNav({ items, active })`],
+        ["BottomNav · section (Loans)", OPL.raw(`<div style="width:358px">${ui.BottomNav({ items: lo.nav, active: "overview", variant: "section" })}</div>`), `ui.BottomNav({ items, active, variant: "section" })`],
         ["Nudge (shown state)", OPL.raw(`<div style="width:358px;display:flex;justify-content:flex-end" class="lib-nudge">${ui.AiMitraFab({ nudge: d.aiNudge })}</div>`), `ui.AiMitraFab({ nudge: { lead, topic } })`],
       ],
     },

@@ -91,6 +91,7 @@
     },
 
     _timers: [],
+    leave() { this._clearTimers(); },
     _clearTimers() {
       this._timers.forEach((t) => { clearTimeout(t); clearInterval(t); }); this._timers = [];
       (this._observers || []).forEach((o) => o.disconnect()); this._observers = [];

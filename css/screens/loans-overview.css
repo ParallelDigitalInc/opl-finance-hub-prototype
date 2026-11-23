@@ -1,0 +1,38 @@
+/* ==========================================================================
+   Screen · Loans overview (Figma 382:36150)
+   Rhythm from the frame: title 127 → CMR pill 227 → offers rail 307 → CTA 555
+   → hero ends 624 → sections from 656, 24 apart → 127 bottom space (frame 1592).
+   ========================================================================== */
+
+.lo { position: relative; padding-bottom: 127px; --dy: calc(var(--status-h) - 47px); }
+
+/* ---- Hero -------------------------------------------------------------- */
+.lo-hero {
+  position: relative;
+  height: calc(624px + var(--dy));
+  padding-top: calc(127px + var(--dy));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+/* Visible hero layer = 416:121651 (it covers 382:36151 entirely):
+   no stroke, no blur overlay, texture at 30%, rounded bottom-left only. */
+.lo-hero__bg { position: absolute; inset: 0; overflow: hidden; background: var(--hero-bg); border-radius: 0 0 0 var(--r-xl); }
+.lo-hero__ellipse { position: absolute; left: calc(50% - 209px); top: calc(82px + var(--dy)); width: 418px; height: 418px; max-width: none; }
+.lo-hero__texture { position: absolute; left: calc(50% - 258.45px); top: calc(-10px + var(--dy)); width: 516.9px; height: 683px; max-width: none; opacity: 0.3; }
+.lo-hero__glow { position: absolute; left: calc(50% - 184px); top: calc(137px + var(--dy)); width: 369px; height: 232px; max-width: none; pointer-events: none; }
+.lo-hero__header { position: absolute; top: var(--status-h); left: 0; right: 0; z-index: 2; }
+
+.lo-hero__title { position: relative; width: 314px; display: flex; flex-direction: column; align-items: center; gap: var(--s8); text-align: center; }
+.lo-hero__eyebrow { font-size: 20px; line-height: 28px; font-weight: var(--fw-medium); color: var(--muted-foreground); }
+.lo-hero__amount { font-size: 30px; line-height: 36px; letter-spacing: -0.4px; font-weight: var(--fw-semibold); color: var(--foreground); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.lo-hero .cmr { position: relative; margin-top: 28px; translate: 0.5px 0; }
+.lo-hero__rail { position: relative; align-self: stretch; margin: 20px 0 -12px; }
+.lo-hero__cta { position: relative; align-self: stretch; margin: 16px var(--gutter) 0; }
+
+/* ---- Body -------------------------------------------------------------- */
+/* Figma's content column is 354 wide (cards) while the help card is 350. */
+.lo-body { display: flex; flex-direction: column; gap: 24px; padding: 32px 16px 0 var(--gutter); }
+.lo-section { display: flex; flex-direction: column; gap: var(--s16); }
+.lo-section__title { font-size: 20px; line-height: 28px; font-weight: var(--fw-medium); color: var(--foreground); }
+.lo-body .help { width: 350px; max-width: 100%; }

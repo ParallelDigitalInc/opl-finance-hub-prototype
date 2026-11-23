@@ -6,7 +6,7 @@
 (function () {
   const OPL = (window.OPL = window.OPL || {});
 
-  OPL.VERSION = "0.2.2";
+  OPL.VERSION = "0.3.0";
   OPL.FIGMA_FILE = "https://www.figma.com/design/GHuBkYGEQZvQppv3v55EaA/OPL----Internal-Playground--5-";
   OPL.figmaLink = (nodeId) => `${OPL.FIGMA_FILE}?node-id=${nodeId.replace(":", "-")}`;
 
@@ -74,6 +74,7 @@
   // outline on tap, so the presenter can show "this goes somewhere next".
   function initHotspots(root = document) {
     root.addEventListener("click", (e) => {
+      if (e.target.closest("[data-back]")) return OPL.back && OPL.back();
       const el = e.target.closest("[data-goto]");
       if (el) {
         const target = el.getAttribute("data-goto");

@@ -139,3 +139,6 @@
   color: var(--foreground);
   text-box: trim-both cap alphabetic;
 }
+
+/* Button · Medium 38 (DS Button size "Medium"; 416:121753) */
+.btn--md { height: 38px; padding: 10px 14px; gap: var(--s6); font-size: 13px; line-height: 18px; font-weight: var(--fw-semibold); }

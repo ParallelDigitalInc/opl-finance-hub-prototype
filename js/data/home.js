@@ -10,7 +10,7 @@
     hero: {
       loans: {
         eyebrow: "Get a loan up to",
-        amount: { prefix: "₹", value: 72, suffix: " Lakhs" },
+        amount: { prefix: "₹", value: 50, suffix: " Lakhs" },
         facts: [
           [{ text: "From", strong: false }, { text: " " }, { text: "9.45% p.a.", strong: true, accent: true }],
           [{ text: "7 offers", strong: true, accent: true }],
@@ -22,8 +22,8 @@
           { logo: "bob", title: "Bank of Baroda", subtitle: "Working Capital Loan", tint: "var(--tint-peach-soft)" },
           { logo: "axis", title: "Axis Bank", subtitle: "Working Capital Loan", tint: "var(--tint-pink)" },
         ],
-        cta: "See all loans (7)",
-        goto: "loan-offers",
+        cta: "Explore Loans",          // Figma updated 23 Nov (was "See all loans (7)")
+        goto: "loans-overview",
       },
       subsidies: {
         eyebrow: "Get assistance up to",
@@ -36,8 +36,8 @@
           { logo: "gujarat", ring: 2, title: "Gujarat Electronics Policy<br>(2022 - 28)", subtitle: "Science and Technology Department", tint: "var(--tint-blue)" },
           { logo: "gujaratGovt", ring: 1, title: "Aatmanirbhar<br>Gujarat 2022", subtitle: "Industries and Mines Department", tint: "var(--tint-peach)" },
         ],
-        cta: "See all subsidies (3)",
-        goto: "subsidy-list",
+        cta: "Explore Subsidies",      // 382:33823; 382:36681 still reads "See all subsidies (3)"
+        goto: "subsidies-overview",
       },
     },
 

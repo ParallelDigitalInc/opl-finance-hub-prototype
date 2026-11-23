@@ -10,7 +10,7 @@
 
   /* ------------------------------------------------------------------------
      Button — Figma "Button" 2:118 / 9:19
-     variant: "filled" | "text"   size: "lg" (44) | "sm" (32)
+     variant: "filled" | "text"   size: "lg" (44) | "md" (38) | "sm" (32)
      ------------------------------------------------------------------------ */
   ui.Button = ({ label, variant = "filled", size = "lg", leading, trailing, block = false, goto, attrs = "" }) => html`
     <button class="${cx("btn", `btn--${variant}`, `btn--${size}`, block && "btn--block")}" data-press
@@ -40,6 +40,8 @@
      ------------------------------------------------------------------------ */
   const LOGOS = {
     citi: { layers: [{ src: "logo-citi.png", crop: "width:270.83%;height:202.08%;left:-86.72%;top:-55.28%" }] },
+    // Same mark, the slightly different crop used on the Loans overview application card (416:121717)
+    citiApp: { layers: [{ src: "logo-citi.png", crop: "width:270.83%;height:202.08%;left:-85.42%;top:-51.04%" }] },
     bob: { layers: [{ src: "logo-bob.png", cover: true }] },
     // Axis Bank — logo from Figma Loan offers 382:35369
     axis: { bg: "#fff", layers: [{ src: "logo-axis.png", cover: true }] },
@@ -191,6 +193,60 @@
     </div>`;
 
   /* ------------------------------------------------------------------------
+     CmrPill — credit score summary in the Loans hero (382:36243)
+     ------------------------------------------------------------------------ */
+  ui.CmrPill = ({ label, risk, goto }) => html`
+    <button class="cmr" data-press ${goto ? OPL.raw(`data-goto="${goto}"`) : ""}>
+      <span class="cmr__lead"><span class="cmr__gauge">${icon("cmr-gauge", 24)}</span><span class="cmr__label">${label}</span></span>
+      <span class="cmr__trail"><span class="cmr__risk">${risk}</span><span class="cmr__chev">${icon("alt-arrow-left", 16)}</span></span>
+    </button>`;
+
+  /* Tracker — "Flow / Application tracker v2", Style=Icon (416:121737).
+     steps: [{ icon, label, state: "done" | "action" | "upcoming" }] */
+  ui.Tracker = ({ steps }) => html`
+    <div class="tracker">
+      <div class="tracker__track">${steps.map((s, i) => OPL.raw(
+        (i ? `<span class="tracker__line tracker__line--${steps[i - 1].state === "done" ? "done" : "todo"}" style="--i:${i}"></span>` : "") +
+        `<span class="tracker__step tracker__step--${s.state}" style="--i:${i}">${icon(s.icon, 16)}</span>`
+      ))}</div>
+      <div class="tracker__labels">${steps.map((s) => OPL.raw(`<p class="tracker__label tracker__label--${s.state}">${s.label}</p>`))}</div>
+    </div>`;
+
+  /* ApplicationCard — "Your loan applications" card (416:121715) */
+  ui.ApplicationCard = ({ logo, name, product, tag, figures, steps, cta, goto }) => html`
+    <article class="app-card">
+      <div class="app-card__lender">
+        ${ui.Logo({ id: logo, size: 40 })}
+        <div class="app-card__name"><p class="app-card__title">${name}</p><p class="app-card__sub">${product}</p></div>
+        ${tag ? OPL.raw(`<span class="app-card__tag">${tag}</span>`) : ""}
+      </div>
+      <div class="app-card__body">
+        <div class="app-card__main">
+          <div class="app-card__figures">${figures.map((f) => OPL.raw(`
+            <div class="figure figure--app"><span class="figure__label">${f.label}</span>
+              <span class="figure__value">${f.value}${f.unit ? `<span class="figure__unit">${f.unit}</span>` : ""}</span></div>`))}</div>
+          ${ui.Tracker({ steps })}
+        </div>
+        ${ui.Button({ label: cta, size: "md", block: true, goto })}
+      </div>
+    </article>`;
+
+  /* BorrowingCard — "Your Borrowing" summary (382:36253) */
+  ui.BorrowingCard = ({ total, legend, available, goto }) => html`
+    <article class="borrow" data-press ${goto ? OPL.raw(`data-goto="${goto}"`) : ""}>
+      <div class="borrow__total"><span class="figure__label">${total.label}</span><span class="borrow__amount">${total.value}</span></div>
+      <div class="borrow__row">
+        <img class="borrow__donut" src="${img("donut-borrowing.svg")}" width="103" height="103" alt="">
+        <div class="borrow__side">
+          <div class="borrow__legend">${legend.map((l) => OPL.raw(`
+            <div class="borrow__item">${icon(l.dot, 8)}<span class="borrow__item-label">${l.label}</span><span class="borrow__item-value">${l.value}</span></div>`))}</div>
+          <div class="figure figure--avail"><span class="figure__label">${available.label}</span>
+            <span class="figure__value">${available.value}<span class="figure__unit">${available.unit}</span></span></div>
+        </div>
+      </div>
+    </article>`;
+
+  /* ------------------------------------------------------------------------
      Chrome
      ------------------------------------------------------------------------ */
   ui.StatusBar = () => html`
@@ -199,13 +255,20 @@
       <span class="status-bar__icons">${icon("status-signal", 17)}${icon("status-wifi", 17)}${icon("status-battery", 22)}</span>
     </div>`;
 
-  ui.AppHeader = ({ title }) => html`
+  /* AppHeader — home (382:34252): title + bell, support, avatar.
+     Sub-page (382:36173): back arrow + title, custom actions. */
+  ui.AppHeader = ({ title, back = false, actions }) => html`
     <header class="app-header">
-      <h1 class="app-header__title">${title}</h1>
+      <div class="app-header__lead">
+        ${back ? OPL.raw(`<button class="app-header__back" aria-label="Back" data-press data-back>${icon("arrow-left", 24)}</button>`) : ""}
+        <h1 class="app-header__title">${title}</h1>
+      </div>
       <div class="app-header__actions">
-        ${ui.IconButton({ icon: "bell-linear", label: "Notifications", goto: "notifications" })}
-        ${ui.IconButton({ icon: "headphones-round-sound-linear", label: "Support", goto: "support" })}
-        ${ui.Avatar({ goto: "profile" })}
+        ${actions
+          ? actions.map((a) => ui.IconButton(a))
+          : [ui.IconButton({ icon: "bell-linear", label: "Notifications", goto: "notifications" }),
+             ui.IconButton({ icon: "headphones-round-sound-linear", label: "Support", goto: "support" }),
+             ui.Avatar({ goto: "profile" })]}
       </div>
     </header>`;
 
@@ -230,8 +293,10 @@
     </footer>`;
 
   /* BottomNav — floating pill nav (382:34337) */
-  ui.BottomNav = ({ items, active }) => html`
-    <nav class="nav">
+  /* variant: "main" (Finance hub tabs, 382:34337) | "section" (Loans tabs, 382:36322 —
+     tighter inactive items, tertiary labels, no icon pill on the active tab) */
+  ui.BottomNav = ({ items, active, variant = "main" }) => html`
+    <nav class="nav nav--${variant}">
       ${items.map((it) => OPL.raw(`
         <button class="nav__item ${it.id === active ? "is-active" : ""}" data-press ${it.id === active ? "" : `data-goto="${it.id}"`}>
           <span class="nav__pill">${icon(it.id === active ? it.iconActive : it.icon, 24)}</span>

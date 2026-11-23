@@ -1,5 +1,32 @@
 # Changelog
 
+## v0.3.0 — 23 Nov 2026 · Loans overview
+
+Synced from Figma `382:36150` (Loans overview). Home hero re-synced: "₹50 Lakhs", "Explore Loans" and "Explore Subsidies".
+
+**Added**
+
+- **Loans overview screen:**
+  - safe-borrowing hero with the CMR pill and its glow
+  - offers rail and "See all loans (7)"
+  - "Your loan applications" card with the tracker
+  - "Your Borrowing" card with the donut
+  - help card
+  - Loans section tab bar
+- **Router:** OPL.go pushes a page (slides in from the right, old page parallaxes and dims); back arrow, browser back and OPL.back pop it. History and URL are kept in sync, and the panel has a Screens switcher.
+- **New components:** CmrPill, Tracker (Application tracker v2 · Icon), ApplicationCard, BorrowingCard, Button size "md" (38), AppHeader sub-page (back + custom actions), BottomNav `variant: "section"`.
+- **fx.js:** shared screen behaviours.
+- **Motion:**
+  - the tracker steps pop in and the lines fill in sequence
+  - the action step pings twice
+  - the donut sweeps in on view
+  - the ₹50 L limit counts up
+  - the AI Mitra nudge reads "Ask anything about your loans"
+
+**Fixed**
+
+- The floating bar's 2px blur now applies only under its visible gradient, so content beneath the clear top stays crisp, as in Figma.
+
 ## v0.2.2 — 23 Nov 2026
 
 - The panel has a visible **Motion on / off** switch. Before this, `#motion=off` was a hidden URL flag that silently stopped the card cycle, the nudge and the entrance.

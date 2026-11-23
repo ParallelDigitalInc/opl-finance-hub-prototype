@@ -1,29 +1,78 @@
 /* ==========================================================================
-   Prototype shell — router, device scaling, variant panel.
+   Prototype shell — router (push/pop pages), device scaling, variant panel.
+   Navigation: OPL.go(name) pushes a page (slides in from the right) and a
+   browser history entry; OPL.back() / the browser back button pops it.
+   Variant changes re-render the current page in place.
    ========================================================================== */
 (function () {
   const screenEl = document.getElementById("screen");
   const panelEl = document.getElementById("panel");
   const wrap = document.querySelector(".device-wrap");
+  let currentPage = null;
+  let depth = 0;
 
-  OPL.current = null;
-  OPL.go = (name) => {
-    OPL.state.set({ screen: name });
+  const screenName = () => {
+    const st = OPL.state.get();
+    return OPL.screens[st.screen] ? st.screen : "home";
+  };
+  const hashFor = (patch) => {
+    const next = { ...OPL.state.get(), ...patch };
+    Object.keys(next).forEach((k) => (next[k] == null || (k === "screen" && next[k] === "home")) && delete next[k]);
+    return "#" + new URLSearchParams(next).toString();
   };
 
-  function render() {
+  OPL.go = (name) => {
+    if (!OPL.screens[name] || name === screenName()) return;
+    history.pushState({ depth: depth + 1 }, "", hashFor({ screen: name }));
+    depth++;
+    render({ dir: "forward" });
+  };
+  OPL.back = () => {
+    if (depth > 0) return history.back();
+    history.replaceState({ depth: 0 }, "", hashFor({ screen: null }));
+    render({ dir: "back" });
+  };
+
+  function render({ dir } = {}) {
     const st = OPL.state.get();
-    const name = OPL.screens[st.screen] ? st.screen : "home";
-    OPL.current = name;
+    const name = screenName();
     document.documentElement.dataset.hotspots = st.hotspots || "on";
     document.documentElement.dataset.frame = st.frame || "on";
-    OPL.screens[name].render(screenEl);
+
+    // Same screen (variant / panel change): re-render in place.
+    if (currentPage && currentPage.dataset.screen === name && !dir) {
+      OPL.screens[name].render(currentPage);
+      return renderPanel(name);
+    }
+
+    const page = document.createElement("div");
+    page.className = "page";
+    page.dataset.screen = name;
+    screenEl.appendChild(page);
+    OPL.screens[name].render(page);
+
+    const old = currentPage;
+    currentPage = page;
+    if (old) {
+      const leaving = OPL.screens[old.dataset.screen];
+      if (leaving && leaving.leave) leaving.leave();
+      if (dir && !OPL.fx.motionOff()) {
+        const [inC, outC] = dir === "back" ? ["is-pop-in", "is-pop-out"] : ["is-push-in", "is-push-out"];
+        page.classList.add(inC);
+        old.classList.add(outC);
+        old.style.pointerEvents = "none";
+        setTimeout(() => { old.remove(); page.classList.remove(inC); }, 440);
+      } else {
+        old.remove();
+      }
+    }
     renderPanel(name);
   }
 
   /* ---- fit the device to the viewport on a laptop/projector ------------- */
   function fit() {
-    if (window.innerWidth <= 500) { wrap.style.transform = ""; return; }
+    if (window.innerWidth <= 500) { wrap.style.transform = ""; wrap.style.margin = ""; return; }
+    wrap.style.transform = ""; wrap.style.margin = "";
     const h = wrap.offsetHeight, avail = window.innerHeight - 48;
     const s = Math.min(1, avail / h);
     wrap.style.transform = s < 1 ? `scale(${s})` : "";
@@ -52,21 +101,28 @@
       </div>
       <p class="panel__sub">OPL Finance Hub · HTML prototype</p>
 
-      ${reg ? `
+      <div class="panel__group">
+        <div class="panel__label"><span>Screens</span></div>
+        <div class="presets">${Object.entries(OPL.screens)
+          .map(([id, s]) => `<button class="preset ${id === name ? "is-on" : ""}" data-screen="${id}">${s.title}<small>${Object.values(s.figma || {})[0] || ""}</small></button>`)
+          .join("")}</div>
+      </div>
+
+      ${reg && reg.presets.length > 1 ? `
       <div class="panel__group">
         <div class="panel__label"><span>Figma frames</span></div>
         <div class="presets">${reg.presets
           .map((p) => `<button class="preset ${p === activePreset ? "is-on" : ""}" data-preset="${p.id}">${p.label}<small>${p.figma}</small></button>`)
           .join("")}</div>
-      </div>
-      ${reg.groups
+      </div>` : ""}
+      ${reg ? reg.groups
         .filter((g) => g.options.length > 1)
         .map((g) => `
         <div class="panel__group">
           <div class="panel__label"><span>${g.label}</span></div>
           ${seg(g.id, g.options, v[g.id])}
           ${g.note ? `<p class="panel__note">${g.note}</p>` : ""}
-        </div>`).join("")}` : ""}
+        </div>`).join("") : ""}
 
       <div class="panel__group">
         <div class="panel__label"><span>Prototype</span></div>
@@ -85,25 +141,42 @@
   }
 
   panelEl?.addEventListener("click", (e) => {
+    const scr = e.target.closest("[data-screen]");
+    if (scr) {
+      const target = scr.dataset.screen;
+      if (target === screenName()) return;
+      // Going "up" to home reads as a back; anything else pushes.
+      if (target === "home") { history.replaceState({ depth: 0 }, "", hashFor({ screen: null })); depth = 0; return render({ dir: "back" }); }
+      return OPL.go(target);
+    }
     const preset = e.target.closest("[data-preset]");
     if (preset) {
-      const p = OPL.variants[OPL.current].presets.find((x) => x.id === preset.dataset.preset);
+      const p = OPL.variants[OPL.current()].presets.find((x) => x.id === preset.dataset.preset);
       return OPL.state.set(p.set);
     }
     const btn = e.target.closest(".seg button");
-    if (btn) return OPL.state.set({ [btn.parentElement.dataset.group]: btn.dataset.value });
+    if (btn) {
+      const group = btn.parentElement.dataset.group;
+      return OPL.state.set({ [group]: group === "motion" && btn.dataset.value === "on" ? null : btn.dataset.value });
+    }
     if (e.target.closest("[data-replay]")) {
-      screenEl.querySelector(".scroller")?.scrollTo({ top: 0 });
+      currentPage?.querySelector(".scroller")?.scrollTo({ top: 0 });
       return render();
     }
   });
 
-  window.addEventListener("opl:state", render);
-  window.addEventListener("hashchange", render);
+  OPL.current = () => screenName();
+
+  window.addEventListener("opl:state", () => render());
+  window.addEventListener("popstate", (e) => {
+    depth = (e.state && e.state.depth) || 0;
+    render({ dir: "back" });
+  });
   window.addEventListener("resize", fit);
 
   OPL.initInteractions(screenEl);
+  history.replaceState({ depth: 0 }, "", location.hash || "#");
   render();
-  if (document.fonts) document.fonts.ready.then(fit); else fit();
+  if (document.fonts) document.fonts.ready.then(fit);
   fit();
 })();

@@ -191,3 +191,96 @@
 .notice__text strong { font-weight: var(--fw-semibold); color: var(--foreground); }
 .notice__close { position: relative; display: flex; }
 .notice__close::before { content: ""; position: absolute; inset: -12px; }
+
+/* ---- CmrPill (382:36243) — 2px white stroke drawn inside ---------------- */
+.cmr {
+  display: inline-flex;
+  align-items: center;
+  gap: 27px;
+  padding: var(--s12);
+  border-radius: var(--r-large);
+  background: rgba(255, 255, 255, 0.8);
+  outline: 2px solid #fff; outline-offset: -2px;
+  transition: transform var(--dur-press) var(--ease-out);
+}
+.cmr.is-pressed { transform: scale(0.97); }
+.cmr__lead { display: flex; align-items: center; gap: 10px; padding-left: var(--s8); }
+.cmr__gauge { position: relative; width: 24px; height: 12px; }
+.cmr__gauge .ico { position: absolute; left: -2.1px; top: -2.1px; width: 28.2px; height: 16.2px; max-width: none; }
+.cmr__label { font-size: 14px; line-height: 12.8px; font-weight: var(--fw-medium); color: var(--foreground); white-space: nowrap; }
+.cmr__trail { display: flex; align-items: center; gap: var(--s8); }
+.cmr__risk { padding: var(--s4) 10px; border-radius: var(--r-full); background: var(--risk-low-bg); font-size: 12px; line-height: 16px; font-weight: var(--fw-medium); color: var(--risk-low-fg); white-space: nowrap; }
+.cmr__chev .ico { transform: rotate(180deg) scaleY(-1); transition: translate var(--dur-fast) var(--ease-out); }
+.cmr.is-pressed .cmr__chev .ico { translate: 2px 0; }
+
+/* ---- Tracker · "Flow / Application tracker v2", Style=Icon (416:121737) -- */
+.tracker { display: flex; flex-direction: column; gap: var(--s8); }
+.tracker__track { display: flex; align-items: center; isolation: isolate; }
+.tracker__step { width: 30px; height: 30px; flex-shrink: 0; display: grid; place-items: center; border-radius: var(--r-full); }
+.tracker__step--done { background: var(--success-bg); }
+.tracker__step--action { background: var(--warning-bg); }
+.tracker__step--upcoming { background: var(--muted); }
+.tracker__line { flex: 1 1 0; height: 2px; transform-origin: 0 50%; }
+.tracker__line--done { background: var(--success); }
+.tracker__line--todo { background: var(--border); }
+.tracker__labels { display: flex; justify-content: space-between; }
+.tracker__label { flex: 1 1 0; min-width: 0; font-size: 12px; line-height: 16px; font-weight: var(--fw-medium); color: var(--foreground); }
+.tracker__label:nth-child(2) { text-align: center; }
+.tracker__label:last-child { text-align: right; }
+.tracker__label--action { font-weight: var(--fw-semibold); }
+/* progress plays in once the card is visible */
+.tracker.is-playing .tracker__step { animation: step-pop 420ms var(--ease-spring) both; animation-delay: calc(var(--i) * 260ms); }
+.tracker.is-playing .tracker__line { animation: line-fill 300ms var(--ease-out) both; animation-delay: calc(var(--i) * 260ms - 180ms); }
+.tracker.is-playing .tracker__step--action { animation: step-pop 420ms var(--ease-spring) both, step-ping 1.6s var(--ease-out) 2; animation-delay: calc(var(--i) * 260ms), calc(var(--i) * 260ms + 500ms); }
+@keyframes step-pop { from { transform: scale(0.4); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes line-fill { from { transform: scaleX(0); } to { transform: none; } }
+@keyframes step-ping { 0% { box-shadow: 0 0 0 0 rgba(180, 83, 9, 0.28); } 100% { box-shadow: 0 0 0 10px rgba(180, 83, 9, 0); } }
+
+/* ---- ApplicationCard (416:121715) — stroke IS in layout here ----------- */
+.app-card {
+  display: flex;
+  flex-direction: column;
+  padding: var(--s4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-large);
+  background: var(--surface);
+  box-shadow: var(--shadow-s);
+  overflow: hidden;
+}
+.app-card__lender { position: relative; display: flex; align-items: center; gap: var(--s12); min-height: 72px; padding: 14px var(--s4) 14px var(--s16); border-radius: 13px; background: var(--tint-blue); }
+.app-card__name { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: var(--s2); white-space: nowrap; }
+.app-card__title { font-size: 16px; line-height: 22px; font-weight: var(--fw-medium); color: var(--foreground); }
+.app-card__sub { font-size: 12px; line-height: 16px; color: var(--muted-foreground); }
+.app-card__tag { position: absolute; top: 0; right: var(--s4); padding: var(--s6) var(--s8); border-bottom-left-radius: var(--r-tag); background: var(--surface); font-size: 12px; line-height: 16px; font-weight: var(--fw-medium); color: var(--amber-fg); white-space: nowrap; }
+.app-card__body { display: flex; flex-direction: column; gap: var(--s32); padding: var(--s16); border-radius: 13px; background: var(--surface); }
+.app-card__main { display: flex; flex-direction: column; gap: var(--s20); }
+.app-card__figures { display: flex; gap: var(--s32); }
+.figure--app { gap: var(--s4); }
+.figure--app .figure__value { gap: 3px; }
+.figure--app .figure__unit, .figure--avail .figure__unit { font-weight: var(--fw-regular); color: var(--muted-foreground); }
+
+/* ---- BorrowingCard (382:36253) ----------------------------------------- */
+.borrow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s24, 24px);
+  padding: var(--s20);
+  border: 1px solid var(--border);
+  border-radius: var(--r-large);
+  background: var(--surface);
+  box-shadow: var(--shadow-s);
+  transition: transform var(--dur-press) var(--ease-out);
+}
+.borrow.is-pressed { transform: scale(0.98); }
+.borrow__total { display: flex; flex-direction: column; gap: var(--s2); white-space: nowrap; }
+.borrow__amount { font-size: 30px; line-height: 39px; font-weight: var(--fw-medium); color: var(--foreground); font-variant-numeric: tabular-nums; }
+.borrow__row { display: flex; align-items: center; gap: var(--s16); }
+.borrow__donut { width: 103px; height: 103px; flex-shrink: 0; }
+.borrow__side { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: var(--s16); }
+.borrow__legend { display: flex; flex-direction: column; gap: var(--s8); }
+.borrow__item { display: flex; align-items: center; gap: 5px; font-size: 14px; line-height: 20px; white-space: nowrap; }
+.borrow__item-label { flex: 1 1 0; color: var(--muted-foreground); }
+.borrow__item-value { font-weight: var(--fw-medium); color: var(--foreground); }
+.figure--avail .figure__value { gap: var(--s4); }
+.borrow.is-playing .borrow__donut { animation: donut-in 900ms var(--ease-out) both; }
+@keyframes donut-in { from { transform: rotate(-140deg) scale(0.82); opacity: 0; } to { transform: none; opacity: 1; } }

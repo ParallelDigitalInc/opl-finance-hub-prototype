@@ -7,6 +7,10 @@ starts the HTML component kit that later mobile flows reuse.
 - **Component library:** `library.html` (tokens, icons and every component, rendered by the same functions)
 - **Figma:** `GHuBkYGEQZvQppv3v55EaA`, section *Finance Home* `416:82748`
 
+**Screens (v0.3.0):**
+- **Home:** frames `382:34093`, `382:33823`, `382:36681`
+- **Loans overview:** `382:36150`. Home → "Explore Loans" pushes it; the back arrow or browser back pops it.
+
 ## Run it
 
 There is no build step. Open `index.html` directly, or serve the folder:
@@ -33,11 +37,12 @@ css/
   screens/home.css         layout only: rhythm and positions for this screen
 js/
   core.js                  OPL namespace, templating, URL state, press feedback, hotspots, count-up
+  fx.js                    shared behaviours: status-bar scroll, nudge, entrance, play-in-view, mouse drag
   components.js            OPL.ui.* (pure functions: props in, HTML out)
   variants.js              toggle registry per screen (presets = Figma frames)
   data/home.js             screen content, verbatim from Figma
   screens/home.js          screen render and behaviour
-  app.js                   router, device scaling, panel
+  app.js                   router (push/pop pages + history), device scaling, panel
   library.js               component library page
 assets/icons               Solar icons exported from Figma (colours baked in, as drawn)
 assets/img                 logos, avatar, hero texture, illustration
@@ -50,7 +55,8 @@ assets/img                 logos, avatar, hero texture, illustration
 4. Add its presets and toggles to `js/variants.js`.
 5. If a pattern is new, add it to `components.js`, the matching CSS file and `library.js`, with its Figma node ID.
 
-`data-goto="<screen>"` on any element links it. Until that screen exists, tapping it flashes a hotspot hint.
+Screens expose `render(page)` and `leave()`; `leave()` clears timers when the page is popped or replaced.
+`data-goto="<screen>"` on any element links it, and `data-back` pops the current page. Until that screen exists, tapping it flashes a hotspot hint.
 
 ## Fidelity rules
 
@@ -108,6 +114,15 @@ All of this is behaviour on existing elements. None of it adds UI:
 
     Sources: the Axis card copies Loan offers "Top 3 picks" `382:35360`, with its logo and `#FCF3F6` tint. Aatmanirbhar Gujarat 2022 ("Up to ₹1.2Cr") comes from the subsidy screens `164:1434`. Its department, "Industries and Mines Department", is real-world, but OPL should confirm it. The Govt. of Gujarat seal is from Wikimedia Commons ("Seal of Gujarat.svg"), cropped in CSS.
 11. Once cycling, the subsidy back card carries its own copy (Gujarat Electronics Policy) instead of Figma's duplicated MSME copy.
+
+## Figma flags · Loans overview (`382:36150`)
+
+1. **The offer cards drift from Home.** Titles are 18px, subtitles Figtree Medium, and the BoB labels use "Prodigy Sans". I used the Home MatchCard (title Medium 16, meta Geist Regular 12) to follow the card rules from the consistency pass. Say if 18px is intended.
+2. Fonts mapped to Geist: the status-bar time (Figtree) and the "See all loans (7)" label (Instrument Sans SemiBold → DS Button Medium 14).
+3. The visible hero layer (`416:121651`) rounds only the **bottom-left** corner, so the bottom-right is square. This is reproduced; confirm it's intended.
+4. The content column is 354 wide (application and borrowing cards), while the help card is 350 and the screen gutter is 20/16. Reproduced as drawn.
+5. The header icons and CMR chevron are Solar `#1C274C`, not ink.
+6. Home now matches the updated Figma: "₹50 Lakhs" and the "Explore Loans" / "Explore Subsidies" CTAs. `382:36681` still reads "See all subsidies (3)"; I used "Explore Subsidies" for both, since the hero carousel is shared. The Subsidies overview isn't designed yet, so that CTA shows a hotspot hint.
 
 ## Versioning
 

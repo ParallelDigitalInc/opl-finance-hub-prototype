@@ -84,6 +84,21 @@
     },
   };
 
+  OPL.variants["loans-overview"] = {
+    presets: [{ id: "default", label: "Loans overview", figma: "382:36150", set: {} }],
+    groups: [
+      {
+        id: "nudge",
+        label: "AI Mitra nudge",
+        default: "on",
+        options: [
+          { value: "on", label: "Shows once" },
+          { value: "off", label: "Off" },
+        ],
+      },
+    ],
+  };
+
   /** Resolve the current value of every group for a screen (URL → default). */
   OPL.variantValues = (screen) => {
     const reg = OPL.variants[screen];
