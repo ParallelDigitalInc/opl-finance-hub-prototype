@@ -4,7 +4,7 @@
 
 (function () {
 const OPL = (window.OPL = window.OPL || {});
-OPL.VERSION = "0.14.1";
+OPL.VERSION = "0.14.2";
 OPL.FIGMA_FILE = "https://www.figma.com/design/GHuBkYGEQZvQppv3v55EaA/OPL----Internal-Playground--5-";
 OPL.figmaLink = (nodeId) => `${OPL.FIGMA_FILE}?node-id=${nodeId.replace(":", "-")}`;
 const esc = (v) =>
@@ -4236,6 +4236,22 @@ const list = desk ? Object.entries(OPL.dscreens).filter(([id]) => !id.startsWith
 const active = desk ? dName(name) : name;
 const closed = panelClosed();
 panelEl.classList.toggle("is-collapsed", closed);
+const flowOf = (id) => (/^subsid/.test(id) ? "subsidies" : "loans");
+const FLOWS = [["loans", "Finance hub & loans"], ["subsidies", "Subsidies"]];
+const screens = list;                               // desktop view lists only the screens built for desktop
+const flows = FLOWS.map(([fid, flabel]) => {
+const fl = screens.filter(([id]) => flowOf(id) === fid);
+if (!fl.length) return "";
+const open = groupOpen(`flow-${fid}`, fid === flowOf(active));
+return `
+<div class="panel__flow ${open ? "" : "is-shut"}" data-pg="flow-${fid}">
+<button class="panel__flow-head" data-pg-toggle aria-expanded="${open}"><span>${flabel}</span><small>${fl.length}</small>${CHEV}</button>
+<div class="panel__gbody"><div class="panel__ginner"><div class="presets">${fl
+.map(([id, sc]) => `<button class="preset ${id === active ? "is-on" : ""}" data-screen="${id}">${sc.title}</button>`)
+.join("")}</div></div></div>
+</div>`;
+}).join("");
+const toggles = reg ? reg.groups.filter((g) => g.options.length > 1 && !g.hidden) : [];
 panelEl.innerHTML = `
 <div class="panel__head">
 <span class="panel__title">${scr.title}</span>
@@ -4246,46 +4262,51 @@ title="${closed ? "Show" : "Hide"} controls (P)" aria-label="${closed ? "Show" :
 </button>
 </div>
 <div class="panel__body" id="panel-body" ${closed ? "inert" : ""}><div class="panel__inner">
-<p class="panel__sub">OPL Finance Hub · HTML prototype</p>
 <div class="panel__group panel__group--device">
 <div class="panel__label"><span>View</span><span class="panel__kbd">D</span></div>
 ${seg("device", [{ value: "mobile", label: "Mobile" }, { value: "desktop", label: "Desktop" }], desk ? "desktop" : "mobile")}
 </div>
-<div class="panel__group">
-<div class="panel__label"><span>Screens</span>${desk ? `<span>${list.length} built for desktop</span>` : ""}</div>
-<div class="presets">${list
-.map(([id, s]) => `<button class="preset ${id === active ? "is-on" : ""}" data-screen="${id}">${s.title}<small>${Object.values(s.figma || {})[0] || ""}</small></button>`)
-.join("")}</div>
-</div>
-${reg && reg.presets.length > 1 ? `
-<div class="panel__group">
-<div class="panel__label"><span>Figma frames</span></div>
-<div class="presets">${reg.presets
-.map((p) => `<button class="preset ${p === activePreset ? "is-on" : ""}" data-preset="${p.id}">${p.label}<small>${p.figma}</small></button>`)
-.join("")}</div>
-</div>` : ""}
-${reg ? reg.groups
-.filter((g) => g.options.length > 1 && !g.hidden)
-.map((g) => `
-<div class="panel__group">
-<div class="panel__label"><span>${g.label}</span></div>
+${pgroup("screens", desk ? "Desktop screens" : "Screens", `<div class="panel__flows">${flows}</div>`, { count: screens.length })}
+${reg && reg.presets.length > 1 ? pgroup("frames", "Figma frames", `<div class="presets">${reg.presets
+.map((p) => `<button class="preset ${p === activePreset ? "is-on" : ""}" data-preset="${p.id}">${p.label}</button>`)
+.join("")}</div>`, { count: reg.presets.length, open: reg.presets.length <= 3 }) : ""}
+${toggles.length ? pgroup("options", "Options", toggles.map((g) => `
+<div class="panel__opt">
+<div class="panel__sublabel">${g.label}</div>
 ${seg(g.id, g.options, v[g.id])}
 ${g.note ? `<p class="panel__note">${g.note}</p>` : ""}
-</div>`).join("") : ""}
-<div class="panel__group">
-<div class="panel__label"><span>Prototype</span></div>
-<div style="display:grid;gap:8px">
+</div>`).join(""), { count: toggles.length, open: toggles.length <= 1 }) : ""}
+${pgroup("prototype", "Prototype", `<div style="display:grid;gap:8px">
 ${seg("hotspots", [{ value: "on", label: "Hotspot hints" }, { value: "off", label: "No hints" }], st.hotspots || "on")}
 ${seg("frame", [{ value: "on", label: "Device frame" }, { value: "off", label: "Bare screen" }], st.frame || "on")}
 ${seg("motion", [{ value: "on", label: "Motion on" }, { value: "off", label: "Motion off" }], st.motion === "off" ? "off" : "on")}
 <button class="panel__btn" data-replay>Replay entrance <span>↻</span></button>
-</div>
-</div>
-<div class="panel__group panel__links">
-${figmaNode ? `<a href="${OPL.figmaLink(figmaNode)}" target="_blank" rel="noopener">Open frame in Figma <span>${figmaNode} ↗</span></a>` : ""}
+<div class="panel__links">
+${figmaNode ? `<a href="${OPL.figmaLink(figmaNode)}" target="_blank" rel="noopener">Open frame in Figma <span>↗</span></a>` : ""}
 <a href="library.html" target="_blank">Component library <span>↗</span></a>
 </div>
+</div>`, { open: false })}
 </div></div>`;
+panelEl.querySelector(".panel__body").addEventListener("scroll", panelFade, { passive: true });
+panelFade();
+}
+const CHEV = `<svg class="panel__chev" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const GROUPS_KEY = "opl.panel.groups";
+const groupMem = (() => { try { return JSON.parse(localStorage.getItem(GROUPS_KEY)) || {}; } catch (_) { return {}; } })();
+const groupOpen = (id, dflt = true) => (id in groupMem ? groupMem[id] : dflt);
+function pgroup(id, label, content, { open = true, count } = {}) {
+const o = groupOpen(id, open);
+return `
+<div class="panel__group ${o ? "" : "is-shut"}" data-pg="${id}">
+<button class="panel__label panel__label--btn" data-pg-toggle aria-expanded="${o}"><span>${label}</span>${count ? `<small>${count}</small>` : ""}${CHEV}</button>
+<div class="panel__gbody"><div class="panel__ginner">${content}</div></div>
+</div>`;
+}
+function panelFade() {
+const b = panelEl && panelEl.querySelector(".panel__body");
+if (!b) return;
+panelEl.classList.toggle("has-above", b.scrollTop > 4);
+panelEl.classList.toggle("has-below", b.scrollTop + b.clientHeight < b.scrollHeight - 4);
 }
 const PANEL_KEY = "opl.panel";
 function panelClosed() {
@@ -4312,6 +4333,16 @@ togglePanel();
 });
 panelEl?.addEventListener("click", (e) => {
 if (e.target.closest("[data-panel-toggle]")) return togglePanel();
+const pg = e.target.closest("[data-pg-toggle]");
+if (pg) {
+const box = pg.closest("[data-pg]"), open = box.classList.contains("is-shut");
+box.classList.toggle("is-shut", !open);
+pg.setAttribute("aria-expanded", open);
+groupMem[box.dataset.pg] = open;
+try { localStorage.setItem(GROUPS_KEY, JSON.stringify(groupMem)); } catch (_) {}
+setTimeout(panelFade, 300);
+return;
+}
 if (panelEl.classList.contains("is-collapsed") && e.target.closest(".panel__head")) return togglePanel();
 const scr = e.target.closest("[data-screen]");
 if (scr) {

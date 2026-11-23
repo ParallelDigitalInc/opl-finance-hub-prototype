@@ -1,10 +1,22 @@
 # Changelog
 
-## v0.14.1 — 23 Nov 2026 · Overview cards stay in their grid
+## v0.14.2 — 23 Nov 2026 · Overview cards stay in their grid
 
 **Fixed**
 
 - **Desktop Overview:** after a chip filter or a sort, the match cards scattered into a staggered layout with stray commas. Shreya spotted it. The re-render wrote the card list as an array, which turns into text with a "," between items, and each comma took a grid cell. The list is now joined properly. The sidebar link for Govt. subsidies points at `subsidies-overview`.
+## v0.14.1 — 23 Nov 2026 · Tidier prototype panel
+
+- **The panel no longer looks cut off.** It had grown past the window as screens were added (about 1,800px of controls in a 700px window).
+  - **Fixed header:** the screen name, version and collapse chevron stay put, and the controls scroll beneath with a soft fade at whichever edge has more.
+  - **Foldable sections:** tap Screens, Figma frames, Options or Prototype to fold them. Each shows its count. Prototype starts folded. The browser remembers what you fold.
+  - **Screens grouped by flow:** "Finance hub & loans" (8) and "Subsidies" (4). The flow you're in opens, and the other folds to one line.
+  - **Quieter rows:** the Figma node IDs are gone from the screen and frame rows. Rows are tighter, and the subtitle line is dropped.
+  - "Open frame in Figma" and "Component library" now sit inside Prototype.
+  - Figma frames start folded on screens with four or more; Options start folded when there's more than one toggle.
+  - Result: with the default folds, every screen's panel fits a 760px-tall window without scrolling (checked on all 12 screens).
+  - **The blue ring on the selected screen or frame is drawn inside the row,** so the scrolling panel no longer clips its edges. Keyboard focus rings are inset too.
+  - Merged with the desktop view (v0.14.0). The **View: Mobile / Desktop** switch stays at the top, always open. In desktop view the Screens section lists only desktop-built screens, grouped by flow the same way.
 
 ## v0.14.0 — 23 Nov 2026 · Desktop view lands on main
 
