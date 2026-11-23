@@ -526,7 +526,11 @@
 .d-main .d-fab-wrap { transition: bottom 380ms var(--d-ease); }
 .d-main.has-bar .d-fab-wrap { bottom: 98px; }
 .d-btn--block { width: 100%; }
-.d-btn.is-popping { animation: d-bump 360ms var(--ease-spring); }
+/* Select → Selected: a quiet settle, not a bounce — the check fades in, the label holds */
+.d-btn.is-popping { animation: d-settle 240ms var(--d-ease); }
+.d-btn.is-popping .ico { animation: d-check-in 260ms var(--d-ease) 60ms both; }
+@keyframes d-settle { from { opacity: 0.6; transform: scale(0.985); } to { opacity: 1; transform: none; } }
+@keyframes d-check-in { from { opacity: 0; transform: translateX(-3px); } to { opacity: 1; transform: none; } }
 
 /* ---- Horizontal steps (440:134792) ------------------------------------------------------- */
 .d-steps { display: flex; align-items: flex-start; }
@@ -803,7 +807,7 @@
 }
 @keyframes d-col-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 .d-cmp__col:hover { outline-color: #d6dcf6; box-shadow: var(--d-shadow-hover); }
-.d-cmp__col.is-selected { outline: 1.5px solid var(--primary); outline-offset: -1.5px; box-shadow: 0 8px 24px -12px rgba(56, 88, 229, 0.35), 0 2px 12px rgba(15, 23, 42, 0.05); }
+.d-cmp__col.is-selected { outline: 1.5px solid var(--primary); outline-offset: -1.5px; box-shadow: 0 4px 16px -10px rgba(56, 88, 229, 0.28), 0 2px 12px rgba(15, 23, 42, 0.05); }
 .d-cmp__col.is-leaving { opacity: 0; transform: scale(0.96); }
 .d-cmp__head { margin: 0 4px; height: 156px; display: flex; flex-direction: column; gap: 12px; padding: 26px 0 16px 20px; border-radius: 14px; background: var(--tint); }
 .d-cmp__id { display: flex; align-items: flex-start; gap: 12px; width: calc(100% - 16px); }
@@ -851,7 +855,7 @@
 .d-cmp__browse .ico { transition: transform 200ms var(--d-ease); }
 .d-cmp__browse:hover { background: var(--primary-tint); box-shadow: inset 0 0 0 1px var(--primary); }
 .d-cmp__browse:hover .ico { transform: translateX(2px); }
-.d-cmp__col.is-selected:hover { outline-color: var(--primary); box-shadow: 0 12px 28px -12px rgba(56, 88, 229, 0.45), 0 2px 12px rgba(15, 23, 42, 0.05); }
+.d-cmp__col.is-selected:hover { outline-color: var(--primary); box-shadow: 0 8px 20px -12px rgba(56, 88, 229, 0.32), 0 2px 12px rgba(15, 23, 42, 0.05); }
 .d-cmp__foot .d-btn--tonal:hover { background: #e0e7fd; }
 .d-cmp__foot .d-btn--outlined:hover { background: var(--primary-tint); box-shadow: inset 0 0 0 1.5px var(--primary); }
 .d-cmp__info .ico { transition: transform 200ms var(--d-ease); }

@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.13.5 — 23 Nov 2026 · Quieter "Selected"
+
+- **Compare's Select → Selected** no longer bounces; Shreya found the 0.6 → 1.2 → 1 spring too dramatic. The button now settles in 240ms (slight fade and 98.5% scale to full) while the check slides in. The selected column's blue glow is softer too, at rest and on hover.
+
 ## v0.13.4 — 23 Nov 2026 · Compare that actually compares; tooltips stay in view
 
 **Changed**

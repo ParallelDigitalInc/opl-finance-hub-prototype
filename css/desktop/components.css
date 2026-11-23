@@ -277,7 +277,11 @@
 .d-main .d-fab-wrap { transition: bottom 380ms var(--d-ease); }
 .d-main.has-bar .d-fab-wrap { bottom: 98px; }
 .d-btn--block { width: 100%; }
-.d-btn.is-popping { animation: d-bump 360ms var(--ease-spring); }
+/* Select → Selected: a quiet settle, not a bounce — the check fades in, the label holds */
+.d-btn.is-popping { animation: d-settle 240ms var(--d-ease); }
+.d-btn.is-popping .ico { animation: d-check-in 260ms var(--d-ease) 60ms both; }
+@keyframes d-settle { from { opacity: 0.6; transform: scale(0.985); } to { opacity: 1; transform: none; } }
+@keyframes d-check-in { from { opacity: 0; transform: translateX(-3px); } to { opacity: 1; transform: none; } }
 
 /* ---- Horizontal steps (440:134792) ------------------------------------------------------- */
 .d-steps { display: flex; align-items: flex-start; }
