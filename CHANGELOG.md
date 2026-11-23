@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.14.3 — 23 Nov 2026 · Sticky actions in benefit sheets
+
+- **"Talk to an Expert" and "Apply Now" stay pinned to the bottom of every subsidy benefit sheet.** On a phone, the long sheets (Capital, Interest, Payroll) used to scroll them out of view.
+  - While there's more to read, the bar sits above the content with a hairline and a soft lift. It settles flat at the end.
+  - When a sheet fits, spacing is exactly as Figma: all ten sheets still match their Figma heights.
+  - The bar pads for the iPhone home indicator.
+
 ## v0.14.2 — 23 Nov 2026 · Overview cards stay in their grid
 
 **Fixed**

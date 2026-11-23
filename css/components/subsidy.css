@@ -237,15 +237,24 @@
 /* Body 416:48762: pt16 pb24 px20, sections 24 apart; scrolls when taller than the screen */
 .bsheet__body {
   display: flex; flex-direction: column; gap: var(--s24); min-height: 0; overflow-y: auto; overscroll-behavior: contain;
-  padding: var(--s16) var(--gutter) max(var(--s24), env(safe-area-inset-bottom));
+  padding: var(--s16) var(--gutter) 12px;          /* + the footer's 12 = Figma's 24 before the actions */
   scrollbar-width: none;
 }
 .bsheet__body::-webkit-scrollbar { display: none; }
+/* Actions pinned to the bottom of the sheet. Same spacing as Figma when the
+   content fits; a hairline + soft lift appears while content scrolls beneath. */
+.bsheet__foot {
+  flex-shrink: 0; display: flex; flex-direction: column; gap: var(--s12);
+  padding: 12px var(--gutter) max(var(--s24), env(safe-area-inset-bottom));
+  background: var(--surface); position: relative; z-index: 1;
+  transition: box-shadow var(--dur-base) var(--ease-out);
+}
+.bsheet__foot.is-raised { box-shadow: 0 -1px 0 var(--border), 0 -10px 18px -14px rgba(15, 23, 42, 0.35); }
+.bsheet.is-presenting .bsheet__foot { animation: enter-up 420ms var(--ease-out) both; animation-delay: 360ms; }
 .bsheet__sec { display: flex; flex-direction: column; flex-shrink: 0; }
 .bsheet__hero-block { gap: var(--s8); }
 .bsheet__facts { gap: var(--s16); }
 .bsheet__rates, .bsheet__conds { gap: var(--s16); }
-.bsheet__actions { gap: var(--s12); }
 .bsheet__h { font-size: 16px; line-height: 20px; font-weight: var(--fw-semibold); color: var(--foreground); }
 .bsheet__note { font-size: 12px; line-height: 18px; font-weight: var(--fw-medium); color: var(--muted-foreground); }
 

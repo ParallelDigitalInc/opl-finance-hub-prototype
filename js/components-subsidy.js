@@ -233,10 +233,10 @@
           <p class="bsheet__h">Conditions</p>
           <div class="clist">${s.conditions.map((c, i) => ui.SheetCondition(c, i))}</div>
         </div>
-        <div class="bsheet__sec bsheet__actions" style="--s:${r ? 4 : 3}">
-          <button class="btn btn--lg btn--filled btn--strong btn--block" data-press ${goto(actions.expert.goto)}>${sicon("sheet-headset-white", 16)}<span class="btn__label">${actions.expert.label}</span></button>
-          ${s.apply ? html`<button class="btn btn--md btn--ghost btn--block" data-press ${goto(actions.apply.goto)}><span class="btn__label">${actions.apply.label}</span>${sicon("arrow-right-up-primary", 16)}</button>` : ""}
-        </div>
+      </div>
+      <div class="bsheet__foot" data-sheet-foot>
+        <button class="btn btn--lg btn--filled btn--strong btn--block" data-press ${goto(actions.expert.goto)}>${sicon("sheet-headset-white", 16)}<span class="btn__label">${actions.expert.label}</span></button>
+        ${s.apply ? html`<button class="btn btn--md btn--ghost btn--block" data-press ${goto(actions.apply.goto)}><span class="btn__label">${actions.apply.label}</span>${sicon("arrow-right-up-primary", 16)}</button>` : ""}
       </div>`;
   };
 
