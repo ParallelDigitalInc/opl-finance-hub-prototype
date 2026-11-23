@@ -41,7 +41,7 @@
           <main class="lof">
             <div class="lof-bg">
               <img class="lof-bg__ellipse" src="${OPL.img("hero-ellipse.svg")}" alt="">
-              <img class="lof-bg__texture" src="${OPL.img("hero-texture.png")}" alt="">
+              <img class="lof-bg__texture" src="${OPL.img("hero-texture.jpg")}" alt="">
             </div>
             <div class="lof-header">${ui.AppHeader({ title: d.header.title, back: true, actions: d.header.actions })}</div>
 

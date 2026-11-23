@@ -17,7 +17,7 @@ starts the HTML component kit that later mobile flows reuse.
 
 ## Run it
 
-There is no build step. Open `index.html` directly, or serve the folder:
+Open `index.html` directly, or serve the folder. After editing anything in `css/` or `js/`, run `tools/build.sh`: pages load the `dist/` bundles. The pre-commit hook also runs it.
 
 ```bash
 cd ~/Documents/OPL/finance-hub-html && npx serve .
@@ -49,7 +49,12 @@ js/
   app.js                   router (push/pop pages + history), device scaling, panel
   library.js               component library page
 assets/icons               Solar icons exported from Figma (colours baked in, as drawn)
-assets/img                 logos, avatar, hero texture, illustration
+assets/img                 logos, avatar, hero texture, illustration (≤3× display size)
+assets/_source             full-res originals for re-export (never loaded)
+assets/fonts               Geist woff2, self-hosted
+dist/                      GENERATED bundles: app.css + app.js (don't edit)
+tools/build.sh             bundle + version-stamp · tools/check.sh: loading budget
+tools/hooks/pre-commit     runs both before every commit
 ```
 
 **Adding a screen:**
@@ -61,6 +66,26 @@ assets/img                 logos, avatar, hero texture, illustration
 
 Screens expose `render(page)` and `leave()`; `leave()` clears timers when the page is popped or replaced.
 `data-goto="<screen>"` on any element links it, and `data-back` pops the current page. Until that screen exists, tapping it flashes a hotspot hint.
+
+## Loading (guardrail)
+
+Measured 23 Nov 2026 in the in-app preview. Before: first paint 6.7 s, interactive 10.9 s, 62 requests, ~1.9 MB. After: **first paint 0.2 s, interactive 0.08 s, 23 requests, ~300 KB, no external requests, zero layout shift.**
+
+Rules for every new screen and asset:
+1. **Two requests for code.** Pages load only `dist/app.css` and `dist/app.js`, built by `tools/build.sh` from the ordered lists in that script. Add new source files to the lists there.
+2. **Cache-busting.** The build stamps `?v=<OPL.VERSION>` on both bundle URLs, so a deployed link or a phone never runs stale code. Bump `OPL.VERSION` with every release.
+3. **Fonts are self-hosted** (`assets/fonts`, Geist variable latin + latin-ext, which carries ₹) and preloaded. No Google Fonts in the prototype, so it works offline in a meeting room.
+4. **Images are ≤3× their displayed size.**
+   - Opaque photos and textures are JPEG; transparent art is PNG; icons are SVG.
+   - Max **150 KB per asset** and **700 KB total**, enforced by `tools/check.sh`.
+   - Full-resolution originals live in `assets/_source/` for re-export and are never loaded.
+5. **Every image has a fixed CSS size**, so nothing shifts as it loads.
+6. **First paint is the boot layer.**
+   - Inline critical CSS in `index.html` paints the device and a neutral placeholder at first byte.
+   - The first screen renders hidden (`.is-booting` pauses its CSS animations at frame 0) and reveals once fonts and above-the-fold images are ready, capped at 3 s.
+7. **Motion meant to be seen waits for the reveal.** Use `OPL.afterReveal(fn)` for entrance timers, auto-cycles and nudges. `OPL.countUp` and `OPL.fx.enter` / `fx.nudge` already do this. Never start visible motion on render.
+8. **Count-ups render their start value**, so there's no full→0 flash. They're timer-stepped so they finish in background tabs.
+9. **The pre-commit hook** (`tools/hooks`, enabled via `git config core.hooksPath tools/hooks`) rebuilds the bundles and runs the budget check; a failing budget blocks the commit.
 
 ## Fidelity rules
 

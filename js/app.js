@@ -6,6 +6,7 @@
    ========================================================================== */
 (function () {
   const screenEl = document.getElementById("screen");
+  if (!screenEl) { OPL.markRevealed && OPL.markRevealed(); return; }   // library page: no router
   const panelEl = document.getElementById("panel");
   const wrap = document.querySelector(".device-wrap");
   let currentPage = null;
@@ -176,7 +177,24 @@
 
   OPL.initInteractions(screenEl);
   history.replaceState({ depth: 0 }, "", location.hash || "#");
+
+  /* ---- boot: render hidden, reveal when fonts + first-screen images are ready ---- */
+  const timeout = (ms) => new Promise((r) => setTimeout(r, ms));
+  const imagesReady = (root) => Promise.all([...root.querySelectorAll("img")]
+    .filter((img) => img.getBoundingClientRect().top < window.innerHeight + 200)
+    .map((img) => (img.complete ? null : new Promise((r) => { img.onload = img.onerror = r; }))));
+  function reveal() {
+    const boot = document.getElementById("boot");
+    currentPage && currentPage.classList.remove("is-booting");
+    document.documentElement.classList.remove("is-booting");
+    OPL.markRevealed();
+    if (boot) { boot.classList.add("is-leaving"); setTimeout(() => boot.remove(), 360); }
+  }
   render();
-  if (document.fonts) document.fonts.ready.then(fit);
+  currentPage && currentPage.classList.add("is-booting");
   fit();
+  Promise.race([
+    Promise.all([document.fonts ? document.fonts.ready : null, imagesReady(screenEl)]),
+    timeout(3000),
+  ]).then(() => { fit(); reveal(); });
 })();

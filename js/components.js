@@ -32,8 +32,8 @@
      Two stacked images exactly as in Figma. */
   ui.Avatar = ({ goto } = {}) => html`
     <button class="avatar" aria-label="Profile" data-press ${goto ? OPL.raw(`data-goto="${goto}"`) : ""}>
-      <img class="avatar__bg" src="${img("avatar-bg.png")}" alt="">
-      <img class="avatar__fg" src="${img("avatar-person.png")}" alt="">
+      <img class="avatar__bg" src="${img("avatar-bg.jpg")}" alt="">
+      <img class="avatar__fg" src="${img("avatar-person.jpg")}" alt="">
     </button>`;
 
   /* ------------------------------------------------------------------------
@@ -355,7 +355,7 @@
   /* CompareTray — floating compare bar (382:35963). selected: [{ id, logo }] */
   ui.CompareTray = ({ selected, max = 3 }) => html`
     <div class="tray">
-      <img class="tray__texture" src="${img("hero-texture.png")}" alt="">
+      <img class="tray__texture" src="${img("hero-texture.jpg")}" alt="">
       <span class="tray__blur"></span>
       <div class="tray__head">
         <p class="tray__title">Comparing ${selected.length} of ${max} loans</p>

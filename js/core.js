@@ -6,7 +6,7 @@
 (function () {
   const OPL = (window.OPL = window.OPL || {});
 
-  OPL.VERSION = "0.5.0";
+  OPL.VERSION = "0.5.1";
   OPL.FIGMA_FILE = "https://www.figma.com/design/GHuBkYGEQZvQppv3v55EaA/OPL----Internal-Playground--5-";
   OPL.figmaLink = (nodeId) => `${OPL.FIGMA_FILE}?node-id=${nodeId.replace(":", "-")}`;
 
@@ -99,17 +99,29 @@
     });
   }
 
-  /* ---- count-up for hero amounts ----------------------------------------- */
-  OPL.countUp = (el, { to, prefix = "", suffix = "", duration = 900 } = {}) => {
-    if (OPL.reducedMotion()) { el.textContent = prefix + to + suffix; return; }
-    const t0 = performance.now();
-    const step = (t) => {
-      const k = Math.min(1, (t - t0) / duration);
-      const eased = 1 - Math.pow(1 - k, 3);
-      el.textContent = prefix + Math.round(to * eased) + suffix;
-      if (k < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
+  /* ---- reveal gate ---------------------------------------------------------
+     The first screen renders hidden behind the boot layer; motion that should be
+     *seen* (entrance, count-up, nudge, auto-cycles) waits for the reveal. */
+  OPL._revealed = false;
+  const revealQueue = [];
+  OPL.afterReveal = (fn) => { if (OPL._revealed) fn(); else revealQueue.push(fn); };
+  OPL.markRevealed = () => { OPL._revealed = true; revealQueue.splice(0).forEach((fn) => fn()); };
+
+  /* ---- count-up for hero amounts -----------------------------------------
+     Shows the start value immediately (no full→0 flash), animates after the
+     reveal. setTimeout-stepped so it also completes in background tabs. */
+  OPL.countUp = (el, { to, prefix = "", suffix = "", duration = 900, delay = 0 } = {}) => {
+    if (OPL.reducedMotion() || OPL.state.get().motion === "off") { el.textContent = prefix + to + suffix; return; }
+    el.textContent = prefix + 0 + suffix;
+    OPL.afterReveal(() => setTimeout(() => {
+      const t0 = Date.now();
+      const step = () => {
+        const k = Math.min(1, (Date.now() - t0) / duration);
+        el.textContent = prefix + Math.round(to * (1 - Math.pow(1 - k, 3))) + suffix;
+        if (k < 1) setTimeout(step, 16);
+      };
+      step();
+    }, delay));
   };
 
   OPL.initInteractions = (root) => { initPress(root); initHotspots(root); };

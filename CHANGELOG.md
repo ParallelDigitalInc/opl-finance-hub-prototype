@@ -1,5 +1,25 @@
 # Changelog
 
+## v0.5.1 — 23 Nov 2026 · Loading guardrail
+
+Measured in the preview pane:
+
+| | Before | After |
+|---|---|---|
+| First paint | 6.7 s | 0.2 s |
+| Interactive | 10.9 s | 0.08 s |
+| Requests | 62 | 23 |
+| Payload | ~1.9 MB | ~300 KB |
+| External requests | yes | none |
+| Layout shift | 0 | 0 |
+
+- **Bundles:** `dist/app.css` + `dist/app.js` replace 21 separate files. `tools/build.sh` builds them and stamps `?v=` for cache-busting.
+- **Geist is self-hosted** (variable, latin + latin-ext for ₹) and preloaded. The prototype no longer depends on Google Fonts.
+- **Images are resized to ≤3× display size;** photos and the texture are now JPEG. Biggest wins: illustration 640 → 119 KB, avatar 580 → 15 KB. Originals moved to `assets/_source/`.
+- **Boot layer:** inline critical CSS paints the device plus a placeholder instantly. The first screen reveals when fonts and above-the-fold images are ready (3 s cap), and the entrance, count-up, nudge and hero cycle start only then (`OPL.afterReveal`).
+- **Count-up** shows its start value immediately (no flash) and is timer-stepped, so it completes in background tabs.
+- **`tools/check.sh` enforces the budget** (150 KB per asset, 700 KB total, self-hosted fonts, 2 bundles). The versioned pre-commit hook in `tools/hooks` runs build and check.
+
 ## v0.5.0 — 23 Nov 2026 · Loan details sheet (proposed)
 
 - **Tapping an offer card on Loan offers** (Top picks or All offers) now opens a "Loan details" bottom sheet instead of a hotspot hint. The sheet:

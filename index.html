@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="is-booting">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -8,39 +8,51 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <title>OPL Finance Hub</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/tokens.css">
-  <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/components/primitives.css">
-  <link rel="stylesheet" href="css/components/cards.css">
-  <link rel="stylesheet" href="css/components/chrome.css">
-  <link rel="stylesheet" href="css/screens/home.css">
-  <link rel="stylesheet" href="css/screens/loans-overview.css">
-  <link rel="stylesheet" href="css/screens/loan-offers.css">
+
+  <!-- Loading guardrail (README → Loading): self-hosted font, preloaded; one CSS + one JS bundle. -->
+  <link rel="preload" href="assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/geist-latin-ext.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/img/hero-texture.jpg" as="image">
+
+  <!-- Critical CSS: paints the stage + device + boot layer at first byte, before the bundle arrives. -->
+  <style>
+    html, body { margin: 0; height: 100%; background: #e9edf2; }
+    .stage { min-height: 100%; display: flex; align-items: center; justify-content: center; gap: 48px; padding: 24px; box-sizing: border-box; }
+    .device { padding: 12px; border-radius: 58px; background: #0f172a; }
+    .screen { position: relative; width: 390px; height: 844px; border-radius: 46px; overflow: hidden; background: #fff; }
+    .boot { position: absolute; inset: 0; z-index: 100; background: #fff; transition: opacity 320ms ease; }
+    .boot.is-leaving { opacity: 0; pointer-events: none; }
+    .boot__hero { height: 418px; border-radius: 0 0 28px 28px; background: #ebf3ff; }
+    .boot__bar { position: absolute; left: 50%; height: 12px; border-radius: 6px; background: rgba(15, 23, 42, 0.06); transform: translateX(-50%); overflow: hidden; }
+    .boot__bar::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.7), transparent); animation: boot-shimmer 1.2s ease-in-out infinite; }
+    @keyframes boot-shimmer { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+    @media (prefers-reduced-motion: reduce) { .boot__bar::after { animation: none; } }
+    @media (max-width: 500px) {
+      .stage { padding: 0; display: block; background: #fff; }
+      .device { padding: 0; border-radius: 0; background: none; }
+      .screen { width: 100vw; height: 100dvh; border-radius: 0; }
+    }
+  </style>
+  <link rel="stylesheet" href="dist/app.css?v=0.5.1">
 </head>
 <body>
   <div class="stage">
     <div class="device-wrap">
       <div class="device">
-        <div class="screen" id="screen"></div>
+        <div class="screen" id="screen">
+          <!-- prototype chrome: neutral placeholder shown until fonts + first-screen images are ready -->
+          <div class="boot" id="boot" aria-hidden="true">
+            <div class="boot__hero"></div>
+            <span class="boot__bar" style="top:140px;width:120px"></span>
+            <span class="boot__bar" style="top:168px;width:180px;height:24px;border-radius:8px"></span>
+            <span class="boot__bar" style="top:250px;width:290px;height:96px;border-radius:16px"></span>
+            <span class="boot__bar" style="top:356px;width:334px;height:44px;border-radius:22px"></span>
+          </div>
+        </div>
       </div>
     </div>
     <aside class="panel" id="panel" aria-label="Prototype controls"></aside>
   </div>
-
-  <script src="js/core.js"></script>
-  <script src="js/components.js"></script>
-  <script src="js/fx.js"></script>
-  <script src="js/variants.js"></script>
-  <script src="js/data/home.js"></script>
-  <script src="js/data/loans-overview.js"></script>
-  <script src="js/data/loan-offers.js"></script>
-  <script src="js/screens/home.js"></script>
-  <script src="js/screens/loans-overview.js"></script>
-  <script src="js/screens/loan-offers.js"></script>
-  <script src="js/screens/compare-loans.js"></script>
-  <script src="js/app.js"></script>
+  <script src="dist/app.js?v=0.5.1"></script>
 </body>
 </html>

@@ -20,11 +20,11 @@
     const wrap = page.querySelector(".fab-wrap");
     if (!wrap || !wrap.querySelector(".fab-nudge") || motionOff()) return;
     const hide = () => wrap.classList.remove("is-nudging");
-    timers.push(setTimeout(() => {
+    OPL.afterReveal(() => timers.push(setTimeout(() => {
       wrap.classList.add("is-nudging");
       timers.push(setTimeout(hide, hold));
       page.querySelector(".scroller").addEventListener("scroll", hide, { once: true, passive: true });
-    }, delay));
+    }, delay)));
   };
 
   /* Play a one-shot animation (adds .is-playing) when an element scrolls into view. */
@@ -43,7 +43,7 @@
     if (motionOff()) return;
     els.filter(Boolean).forEach((el, i) => { el.classList.add("enter"); el.style.setProperty("--i", Math.min(i, 16)); });
     page.classList.remove("is-entering"); void page.offsetWidth; page.classList.add("is-entering");
-    setTimeout(() => page.classList.remove("is-entering"), holdMs);
+    OPL.afterReveal(() => setTimeout(() => page.classList.remove("is-entering"), holdMs));
   };
 
   /* Bottom sheets: open(id) / close(). Scrim tap, Escape and a downward drag on

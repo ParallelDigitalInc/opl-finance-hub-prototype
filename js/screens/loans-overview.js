@@ -25,7 +25,7 @@
             <section class="lo-hero">
               <div class="lo-hero__bg">
                 <img class="lo-hero__ellipse" src="${OPL.img("hero-ellipse.svg")}" alt="">
-                <img class="lo-hero__texture" src="${OPL.img("hero-texture.png")}" alt="">
+                <img class="lo-hero__texture" src="${OPL.img("hero-texture.jpg")}" alt="">
               </div>
               <img class="lo-hero__glow" src="${OPL.img("cmr-glow.svg")}" alt="">
               <div class="lo-hero__header">${ui.AppHeader({ title: d.header.title, back: true, actions: d.header.actions })}</div>
@@ -74,9 +74,7 @@
         ...page.querySelectorAll(".lo-section"),
         page.querySelector(".help"),
       ]);
-      if (!OPL.fx.motionOff()) {
-        this.timers.push(setTimeout(() => OPL.countUp(amt, { to: d.limit.value, prefix: d.limit.prefix, suffix: d.limit.suffix, duration: 1000 }), 150));
-      }
+      OPL.countUp(amt, { to: d.limit.value, prefix: d.limit.prefix, suffix: d.limit.suffix, duration: 1000, delay: 150 });
     },
   };
 })();

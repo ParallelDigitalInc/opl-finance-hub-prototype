@@ -63,7 +63,7 @@
             <section class="hero">
               <div class="hero__bg">
                 <img class="hero__ellipse" src="${OPL.img("hero-ellipse.svg")}" alt="">
-                <img class="hero__texture" src="${OPL.img("hero-texture.png")}" alt="">
+                <img class="hero__texture" src="${OPL.img("hero-texture.jpg")}" alt="">
               </div>
               <div class="hero__blur"></div>
               ${ui.AppHeader(d.header)}
@@ -115,11 +115,11 @@
       const setDots = (i) => {
         dots.querySelectorAll(".dot").forEach((d, k) => d.classList.toggle("is-active", k === i));
       };
-      const countHero = (i) => {
+      const countHero = (i, delay = 0) => {
         const amt = slides[i] && slides[i].querySelector(".hero__amount");
         if (!amt || counted.has(i) || amt.hasAttribute("data-static")) return;
         counted.add(i);
-        OPL.countUp(amt, { to: +amt.dataset.amount, prefix: amt.dataset.prefix, suffix: amt.dataset.suffix, duration: 1000 });
+        OPL.countUp(amt, { to: +amt.dataset.amount, prefix: amt.dataset.prefix, suffix: amt.dataset.suffix, duration: 1000, delay });
       };
       const onTrackScroll = () => {
         const w = track.clientWidth;
@@ -178,7 +178,7 @@
           const el = slide.querySelector("[data-stack]");
           const cycle = makeStack(el);
           const tick = () => { if (index === k && !heroHeld && !document.hidden) cycle(); };
-          this._timers.push(setTimeout(() => this._timers.push(setInterval(tick, 3200)), 2200));
+          OPL.afterReveal(() => this._timers.push(setTimeout(() => this._timers.push(setInterval(tick, 3200)), 2200)));
         });
       }
 
@@ -224,8 +224,8 @@
       screen.classList.remove("is-entering"); home.classList.remove("is-entering");
       void home.offsetWidth;
       screen.classList.add("is-entering"); home.classList.add("is-entering");
-      setTimeout(() => { screen.classList.remove("is-entering"); home.classList.remove("is-entering"); }, 4400);
-      if (countHero) setTimeout(() => countHero(startIndex), 150);
+      OPL.afterReveal(() => setTimeout(() => { screen.classList.remove("is-entering"); home.classList.remove("is-entering"); }, 4400));
+      if (countHero) countHero(startIndex, 150);
     },
   };
 

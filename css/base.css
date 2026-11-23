@@ -141,3 +141,6 @@ html[data-frame="off"] .screen { border-radius: 16px; }
 .panel__btn { width: 100%; }
 
 @media (max-width: 1000px) { .stage { flex-direction: column; } .panel { width: 100%; max-width: 414px; max-height: none; } }
+
+/* ---- Boot: entrance animations wait (paused at frame 0) until the reveal ---- */
+.page.is-booting, .page.is-booting * { animation-play-state: paused !important; }
