@@ -9,7 +9,7 @@
 (function () {
   const OPL = (window.OPL = window.OPL || {});
 
-  OPL.VERSION = "0.6.1";
+  OPL.VERSION = "0.6.2";
   OPL.FIGMA_FILE = "https://www.figma.com/design/GHuBkYGEQZvQppv3v55EaA/OPL----Internal-Playground--5-";
   OPL.figmaLink = (nodeId) => `${OPL.FIGMA_FILE}?node-id=${nodeId.replace(":", "-")}`;
 
@@ -747,7 +747,9 @@
     const shape = p.t === "r"
       ? `<rect x="${p.x}" y="${p.y}" width="5" height="12" rx="1.5" transform="rotate(${p.rot} ${p.x} ${p.y})" fill="${p.fill}"/>`
       : `<circle cx="${p.cx}" cy="${p.cy}" r="${p.r}" fill="${p.fill}"/>`;
-    return `<g class="cf" style="--dx:${dx}px;--dy:${dy}px;--spin:${spin}deg;--i:${i}">${shape}</g>`;
+    const fall = 150 + (i * 53) % 90;                      // falls out past the hero's bottom edge
+    const drift = ((i * 29) % 40) - 20;                    // a little sideways wander
+    return `<g class="cf" style="--dx:${dx}px;--dy:${dy}px;--spin:${spin}deg;--fall:${fall}px;--drift:${drift}px;--i:${i}">${shape}</g>`;
   }).join("")}</svg>`);
 
   /* MilestoneSheet body — "Loan / Milestone sheet", State=Approved (400:1873 / 416:44065) */
@@ -2538,13 +2540,12 @@
             ${ui.InfoCard({ title: "What to expect", body: d.verifying.expect(l.name).map((t) => ui.NoteRow({ text: t, tone: "info" })).join("") })}
             ${ui.InfoCard({ title: "Keep these documents ready", body: ui.DocList({ items: d.verifying.docs }) })}
             ${ui.InfoCard({ title: "Branch Details", body: ui.ContactList(branch) })}
-            <div class="appd-group"><h3 class="appd-group__title">Loan Application Details</h3>
-              ${ui.InfoCard({ title: "Loan Application Details", body: ui.DetailRows({ rows: [
+            ${ui.InfoCard({ title: "Loan Application Details", body: ui.DetailRows({ rows: [
                 ["Application No.", d.verifying.appNo, true],
                 ["Loan Amount", OPL.fx.longAmount(l.amountShort)],
                 ["Interest Rate", "Floating • 9.45%"],
                 ["Loan Type", titleCase(l.type)],
-              ] }) })}</div>
+              ] }) })}
             ${ui.WhatsAppRow({ label: d.whatsapp })}`;
 
       page.innerHTML = html`

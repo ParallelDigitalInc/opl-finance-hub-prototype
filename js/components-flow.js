@@ -119,7 +119,9 @@
     const shape = p.t === "r"
       ? `<rect x="${p.x}" y="${p.y}" width="5" height="12" rx="1.5" transform="rotate(${p.rot} ${p.x} ${p.y})" fill="${p.fill}"/>`
       : `<circle cx="${p.cx}" cy="${p.cy}" r="${p.r}" fill="${p.fill}"/>`;
-    return `<g class="cf" style="--dx:${dx}px;--dy:${dy}px;--spin:${spin}deg;--i:${i}">${shape}</g>`;
+    const fall = 150 + (i * 53) % 90;                      // falls out past the hero's bottom edge
+    const drift = ((i * 29) % 40) - 20;                    // a little sideways wander
+    return `<g class="cf" style="--dx:${dx}px;--dy:${dy}px;--spin:${spin}deg;--fall:${fall}px;--drift:${drift}px;--i:${i}">${shape}</g>`;
   }).join("")}</svg>`);
 
   /* MilestoneSheet body — "Loan / Milestone sheet", State=Approved (400:1873 / 416:44065) */

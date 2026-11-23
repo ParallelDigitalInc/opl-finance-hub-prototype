@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.6.2 — 23 Nov 2026 · Confetti exit + heading fix
+
+- **Confetti** now leaves after the burst: each piece hangs a beat, then falls 150–240 px with a little drift and spin and fades out, staggered 45 ms apart. The sheet ends clean.
+- **Application detail:** removed the duplicate "Loan Application Details" heading above the card of the same name.
+
 ## v0.6.1 — 23 Nov 2026 · Confetti that moves
 
 - **The approval sheet's confetti is now animated.** Its 16 pieces are inlined from Figma (`416:44065` › Confetti), so each one moves on its own:

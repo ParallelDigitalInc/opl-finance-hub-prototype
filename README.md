@@ -202,6 +202,8 @@ All of this is behaviour on existing elements. None of it adds UI:
    - KFS figures (₹45 L etc.)
    - `ringroad.surat@<lender>.example`
 7. **Strokes are in layout** on this section's info cards, status card, WhatsApp row and apply lenders card (unlike earlier match and offer cards).
+9. **Duplicate heading.** "Loan Application Details" appears twice in `382:42526` (section heading and card title). On Shreya's call (23 Nov) only the card title is kept.
+10. **Confetti exits.** Figma shows it resting around the mark. In the prototype it bursts to those spots, then falls away and fades (Shreya, 23 Nov).
 8. **Prototype behaviour:** about 5 s after Submit, the first lender "approves" and the milestone sheet plays. This simulates the async lender response so the full flow can be demoed.
 
 ## Versioning

@@ -168,13 +168,12 @@
             ${ui.InfoCard({ title: "What to expect", body: d.verifying.expect(l.name).map((t) => ui.NoteRow({ text: t, tone: "info" })).join("") })}
             ${ui.InfoCard({ title: "Keep these documents ready", body: ui.DocList({ items: d.verifying.docs }) })}
             ${ui.InfoCard({ title: "Branch Details", body: ui.ContactList(branch) })}
-            <div class="appd-group"><h3 class="appd-group__title">Loan Application Details</h3>
-              ${ui.InfoCard({ title: "Loan Application Details", body: ui.DetailRows({ rows: [
+            ${ui.InfoCard({ title: "Loan Application Details", body: ui.DetailRows({ rows: [
                 ["Application No.", d.verifying.appNo, true],
                 ["Loan Amount", OPL.fx.longAmount(l.amountShort)],
                 ["Interest Rate", "Floating • 9.45%"],
                 ["Loan Type", titleCase(l.type)],
-              ] }) })}</div>
+              ] }) })}
             ${ui.WhatsAppRow({ label: d.whatsapp })}`;
 
       page.innerHTML = html`

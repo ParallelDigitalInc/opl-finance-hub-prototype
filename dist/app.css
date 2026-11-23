@@ -1264,10 +1264,10 @@ html[data-frame="off"] .screen { border-radius: 16px; }
 .sheet-layer.is-open .ms__badge, .sheet-layer.is-open .ms__badge-bg { animation: ms-pop 420ms var(--ease-spring) 420ms both; }
 .ms__confetti { overflow: visible; }
 .ms__confetti .cf { transform-box: fill-box; transform-origin: center; }
-/* burst: from the lender mark to the Figma spot (overshoot, spin, settle); then a gentle drift */
+/* burst from the lender mark to its Figma spot, hang a beat, then fall away and fade */
 .sheet-layer.is-open .ms__confetti .cf {
-  animation: cf-burst 1150ms cubic-bezier(0.18, 0.89, 0.32, 1.12) both, cf-float 2.4s ease-in-out infinite alternate;
-  animation-delay: calc(var(--i) * 22ms + 180ms), calc(1400ms + var(--i) * 110ms);
+  animation: cf-burst 1150ms cubic-bezier(0.18, 0.89, 0.32, 1.12) both, cf-fall 1500ms cubic-bezier(0.55, 0, 0.85, 0.4) forwards;
+  animation-delay: calc(var(--i) * 22ms + 180ms), calc(1250ms + var(--i) * 45ms);
 }
 .sheet-layer.is-open .ms__content > * { animation: enter-up 420ms var(--ease-out) both; }
 .sheet-layer.is-open .ms__content > :nth-child(2) { animation-delay: 80ms; }
@@ -1282,9 +1282,10 @@ html[data-frame="off"] .screen { border-radius: 16px; }
   65% { transform: translate(calc(var(--dx) * -0.12), calc(var(--dy) * -0.12 - 10px)) scale(1.1) rotate(var(--spin)); }
   100% { transform: none; opacity: 1; }
 }
-@keyframes cf-float {
-  from { transform: translateY(0) rotate(0deg); }
-  to { transform: translateY(5px) rotate(14deg); }
+@keyframes cf-fall {
+  0% { transform: none; opacity: 1; }
+  70% { opacity: 0.85; }
+  100% { transform: translate(var(--drift), var(--fall)) rotate(calc(var(--spin) * 0.6)); opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) { .sheet-layer.is-open .ms__ripple, .sheet-layer.is-open .ms__glow1, .sheet-layer.is-open .ms__glow2, .sheet-layer.is-open .ms__confetti .cf { animation: none; } }
 
