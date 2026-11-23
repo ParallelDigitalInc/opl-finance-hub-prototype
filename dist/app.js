@@ -3737,6 +3737,7 @@ this.leave();
 const d = OPL.data.subsidyDetail;
 const v = OPL.variantValues("subsidy-detail");
 const b = d.benefits;
+const mine = OPL.estimate && OPL.estimate.result && OPL.estimate.result.total > 0 ? OPL.estimate.result : null;   // calculated estimate (shared with desktop)
 page.innerHTML = html`
 ${ui.StatusBar()}
 <div class="scroller">
@@ -3757,9 +3758,10 @@ ${ui.StatusBar()}
 <div class="sd-hero__copy">
 <p class="sd-hero__eyebrow"><span>${d.hero.eyebrow}</span>
 <button class="sd-hero__info" aria-label="How we estimate this" data-press data-goto="estimate-info">${OPL.sicon("info-circle-ink", 16)}</button></p>
-<p class="sd-hero__amount">${d.hero.prefix}${d.hero.value}${d.hero.suffix}</p>
+<p class="sd-hero__amount">${mine ? "Up to " + OPL.data.subsidyEstimate.fmt(mine.total, { tight: true }) : d.hero.prefix + d.hero.value + d.hero.suffix}</p>
+${mine ? OPL.raw(`<p class="sd-hero__note">Based on your ${mine.count} benefit${mine.count === 1 ? "" : "s"}</p>`) : ""}
 </div>
-<div class="sd-hero__cta">${ui.Button({ label: d.hero.cta.label, trailing: "chevron-right-white", block: true, strong: true, goto: d.hero.cta.goto })}</div>
+<div class="sd-hero__cta">${ui.Button({ label: mine ? "Recalculate" : d.hero.cta.label, trailing: "chevron-right-white", block: true, strong: true, goto: d.hero.cta.goto })}</div>
 </div>
 </section>
 <div class="sd-body">
@@ -3899,7 +3901,11 @@ page.querySelector(".sd-benefits .sd-section__title"),
 page.querySelector(".disclosure"),
 ]);
 if (!motionOff) page.querySelector(".sd-illus").classList.add("is-landing");
-countUpDecimal(page.querySelector(".sd-hero__amount"), {
+const calc = OPL.estimate && OPL.estimate.result && OPL.estimate.result.total > 0 ? OPL.estimate.result : null;
+if (calc && OPL.estimateKit) {                       // a calculated estimate: count to the user's number
+const el = page.querySelector(".sd-hero__amount");
+this.timers.push(setTimeout(() => OPL.estimateKit.countMoney(el, 0, calc.total, { dur: motionOff ? 0 : 900, tight: true, prefix: "Up to ", timers: this.timers }), motionOff ? 0 : 420));
+} else countUpDecimal(page.querySelector(".sd-hero__amount"), {
 to: d.hero.value, prefix: d.hero.prefix, suffix: d.hero.suffix, duration: 900, delay: 420, timers: this.timers,
 });
 OPL.fx.playInView(page, ".period, .xhelp, .how.is-open");
@@ -4158,6 +4164,7 @@ const rows = d.benefits.filter((b) => S.list.includes(b.id) && amt[b.id] > 0);  
 const total = rows.reduce((s, b) => s + amt[b.id], 0);
 this.rows = rows.map((b) => ({ id: b.id, amount: amt[b.id] }));
 this.total = total;
+S.result = { total, count: rows.length };           // the policy page (mobile hero, desktop card) shows it
 page.innerHTML = html`
 ${ui.StatusBar()}
 <div class="er">

@@ -83,7 +83,7 @@ Switch with **View → Desktop** in the panel, press **D**, or link `#device=des
    - The Explore options, the Sort options and the tooltip copy are proposed.
    - Choosing a state other than Gujarat filters to central schemes; that rule is assumed.
 9. **Add offers drawer:** the Select button is indigo `#4338CA` in Figma and shown as `#3858E5` here. The "n of 3 selected" counter is proposed.
-9. **Calculate estimate on desktop has no Figma frame.** It's a 520 side drawer over Subsidy details, modelled on the mobile sheet 416:76869 → 416:77363. The mobile cards scroll above a footer with a live "Your estimate" line and Build-up bar (a desktop addition), and the result plays in place in the drawer. Please confirm or draw the desktop frame.
+9. **Calculate estimate on desktop has no Figma frame.** It's a 560 modal over Subsidy details, modelled on the mobile sheet 416:76869 → 416:77363. The mobile cards scroll between a fixed header and a footer with a live "Your estimate" line and Build-up bar, and the result plays in place in the modal. Closing it updates the page's estimate card ("Up to ₹1.01Cr · Based on your 3 benefits", Recalculate); the mobile hero does the same. Please confirm or draw the desktop frame.
 
 ## Run it
 

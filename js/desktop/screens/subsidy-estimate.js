@@ -1,16 +1,18 @@
-/* Desktop · Govt. subsidies › Calculate estimate, as a side drawer over Subsidy details.
+/* Desktop · Govt. subsidies › Calculate estimate, as a modal over Subsidy details (v0.16.11;
+   it was a side drawer — a centred stage makes the calculated moment land harder).
    No desktop frame on "-> Final Desktop"; the mobile sheet is the model (section 416:76869:
    form 416:77107 / 416:76872 → result 416:77363), flagged in the README as designed in code.
 
    Form   the mobile benefit cards and "Add more benefits" chips scroll; the footer is the mobile
           action bar (Get Estimate + Talk to an Expert) with one desktop addition: a live
           "Your estimate" line and Build-up bar that re-count as you type.
-   Result Get Estimate turns the drawer into the mobile result in place: satin + rays behind the
+   Result Get Estimate turns the modal into the mobile result in place: satin + rays behind the
           header, a bundle lands per benefit while the total climbs, confetti from the stack.
           "Add more" turns it back into the form.
    State is the mobile kit's (OPL.estimateKit), so numbers carry across views and reopenings.
    Routes: #screen=subsidy-estimate / subsidy-estimate-result open Subsidy details with the
-   drawer up; the URL follows the drawer (silently) so a reload restores it. */
+   modal up; the URL follows the modal (silently) so a reload restores it. Closing hands the result
+   (S.result) back, and the page counts its estimate card to it. */
 (function () {
   const { html, raw } = OPL;
   const D = OPL.d;
@@ -105,27 +107,28 @@
   };
 
   /* ==========================================================================================
-     D.openEstimate(page, { result }) — the drawer
+     D.openEstimate(page, { result, onClose }) — the modal
      ========================================================================================== */
-  D.openEstimate = (page, { result = false } = {}) => {
+  D.openEstimate = (page, { result = false, onClose } = {}) => {
     const kit = K(), d = E(), S = kit.S, motionOff = D.motionOff();
     kit.ensure();
     if (result) fillDemo();
     const timers = [];
     let shown = {}, shownTotal = 0, mode = "form", closed = false;
 
-    const dr = D.openDrawer(page, {
-      title: d.title, width: 520,
-      body: `<div class="d-estd" data-estd></div>`,
-      footer: `<div class="d-estd__foot" data-estd-foot></div>`,
+    const dr = D.openModal(page, `
+      <div class="d-estm__head"><h2 class="d-estm__title">${d.title}</h2><button class="d-estm__x" data-modal-close aria-label="Close">${D.icon("close-circle-drawer", 24)}</button></div>
+      <div class="d-estd" data-estd></div>
+      <div class="d-estm__foot"><div class="d-estd__foot" data-estd-foot></div></div>`, {
+      width: 560, cls: "d-estm-layer",
       onClose: () => {
         closed = true;
         timers.forEach(clearTimeout);
         if (/^subsidy-estimate/.test(OPL.state.get().screen || "")) OPL.state.set({ screen: "subsidy-detail" }, { silent: true });
+        onClose && onClose(S.result || null);           // the page reflects what was calculated
       },
     });
-    const layer = dr.el, drawer = layer.querySelector(".d-drawer");
-    layer.classList.add("d-estd-layer");
+    const layer = dr.el, drawer = layer.querySelector(".d-modal");
     // satin + rays sit behind the header in the result state
     drawer.insertAdjacentHTML("afterbegin", `<div class="d-estd__bg" aria-hidden="true"><img src="${OPL.simg("estimate/satin-blue.jpg")}" alt=""></div><img class="d-estd__rays" src="${OPL.simg("estimate/rays.png")}" alt="" aria-hidden="true">`);
     const body = drawer.querySelector("[data-estd]"), foot = drawer.querySelector("[data-estd-foot]");
@@ -193,12 +196,13 @@
       timers.forEach(clearTimeout); timers.length = 0;
       const amt = kit.amounts();
       const list = d.benefits.filter((b) => S.list.includes(b.id) && amt[b.id] > 0);
+      S.result = { total: list.reduce((t, b) => t + amt[b.id], 0), count: list.length };   // shared: the page (and mobile) show it
       body.innerHTML = String(resultBody(list, amt));
       foot.innerHTML = String(resultFoot());
       layer.classList.remove("is-built");
       void layer.offsetWidth; layer.classList.add("is-result");
       route("subsidy-estimate-result");
-      // the drawer's opening focus would ring "Add more"; the result has nothing to type into
+      // keep focus off "Add more" when the result opens; there's nothing to type into
       timers.push(setTimeout(() => { if (document.activeElement && document.activeElement.matches("[data-add-more]")) document.activeElement.blur(); }, 360));
       if (motionOff) return;
       kit.loadCelebrate();
@@ -219,12 +223,13 @@
           kit.countMoney(body.querySelector(`[data-row-amt="${b.id}"]`), 0, amt[b.id], { dur: 520, timers });
           kit.countMoney(totalEl, from, running, { dur: 520, timers, onDone: k === list.length - 1 ? () => {
             er.classList.add("is-built"); layer.classList.add("is-built");
+            drawer.animate([{ transform: "scale(1)" }, { transform: "scale(1.015)" }, { transform: "scale(1)" }], { duration: 520, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)" });
             if (party) party.finale();
           } : null });
         }, START + k * STEP)));
       }, 120));
     };
-    // form ⇄ result crossfade inside the drawer
+    // form ⇄ result crossfade inside the modal
     const swap = (fn) => {
       if (motionOff) return fn();
       body.classList.add("is-swapping"); foot.classList.add("is-swapping");
@@ -233,7 +238,7 @@
 
     /* ---- events ---- */
     drawer.addEventListener("click", (e) => {
-      if (e.target.closest("[data-goto]")) return dr.close();       // Apply Online / Talk to an Expert leave the drawer
+      if (e.target.closest("[data-goto]")) return dr.close();       // Apply Online / Talk to an Expert leave the modal
       if (e.target.closest("[data-add-more]")) return swap(() => showForm({ fromResult: true }));
       if (mode !== "form") return;
 
@@ -302,7 +307,7 @@
     return dr;
   };
 
-  /* routes: Subsidy details with the drawer already up */
+  /* routes: Subsidy details with the modal already up */
   const withDrawer = (result) => ({
     title: `Govt. subsidies · ${result ? "Estimate result" : "Calculate estimate"}`,
     figma: { mobile: result ? "416:77363" : "416:77107" },
