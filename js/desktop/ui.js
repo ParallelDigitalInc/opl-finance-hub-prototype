@@ -328,8 +328,32 @@
     OPL.countUp(el, { to, prefix: m[1], suffix: m[3], duration: 900, delay: 120 });
   };
 
+  // Tooltips stay inside the main panel: on hover/focus, measure the bubble against the
+  // scroll area and nudge it sideways (or flip it below) before it fades in.
+  D.fitTips = (page) => {
+    const fit = (host) => {
+      const tip = host.querySelector(":scope > .d-tip");
+      const area = host.closest(".d-main__scroll, .d-drawer, .d-modal") || page;
+      if (!tip || !area) return;
+      tip.style.setProperty("--tip-shift", "0px");
+      tip.classList.remove("is-below");
+      const wrap = page.closest(".device-wrap");
+      const m = wrap && getComputedStyle(wrap).transform;
+      const sc = m && m !== "none" ? parseFloat(m.split("(")[1]) : 1;
+      const t = tip.getBoundingClientRect(), a = area.getBoundingClientRect(), pad = 12 * sc;
+      let dx = 0;
+      if (t.left < a.left + pad) dx = a.left + pad - t.left;
+      else if (t.right > a.right - pad) dx = a.right - pad - t.right;
+      tip.style.setProperty("--tip-shift", `${Math.round(dx / sc)}px`);
+      if (t.top < a.top + 72 * sc) tip.classList.add("is-below");     // under the sticky top bar
+    };
+    page.addEventListener("pointerover", (e) => { const h = e.target.closest(".d-tip")?.parentElement || e.target.closest(":has(> .d-tip)"); if (h) fit(h); });
+    page.addEventListener("focusin", (e) => { if (e.target.querySelector?.(":scope > .d-tip")) fit(e.target); });
+  };
+
   // Every desktop page: shell behaviours
   D.mountShell = (page) => {
+    D.fitTips(page);
     D.mountTabs(page);
     D.mountTopbar(page);
     D.mountFab(page);

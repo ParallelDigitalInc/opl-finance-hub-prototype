@@ -57,7 +57,7 @@ Switch with **View → Desktop** in the panel, press **D**, or link `#device=des
    - the Sort options (taken from mobile)
    - the compare toast
 6. **Loan Offers (`507:84666`):** every row shows ₹50 L · 9.45% · Yearly · 0.75% (placeholder figures as drawn). The "Processing fee" stat is Figtree in Figma and is shown in Geist.
-7. **Compare (`507:87387`):** Citi, SIDBI and Axis have identical terms in Figma, so "Show differences only" dims every row. SBI and HDFC have no desktop column, so they reuse the drawn values.
+7. **Compare (`507:87387`):** Figma draws Citi, SIDBI and Axis with identical terms. The prototype uses distinct sample terms per lender (v0.13.4, `js/desktop/data/loan-offers.js`) so the comparison means something. They need OPL's real figures.
 8. **Mixed controls:** the Compare checkbox is a 16px DS checkbox on the horizontal rows (`507:84775`) but a 20px Solar icon on the vertical cards. Both use the Solar icon here, for consistency.
 10. **Applications (`440:134641`):** the "View details" button label is indigo `#3730A3` and the WhatsApp toggle is `#4338CA` in Figma. The label is shown as `#3858E5`; the toggle is kept as drawn. The list card has no design for the signed or disbursal states, so it reuses the KFS-ready card, as mobile does.
 11. **NeSL (`524:105163`):** the frames are laid out as `476:231121` · `476:231334` · `476:231547` · `476:231761`. The prototype plays the unscrolled agreement (`476:231547`) first, then the scrolled one with I AGREE, then e-stamp, then OTP.

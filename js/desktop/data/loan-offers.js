@@ -53,18 +53,14 @@
     ],
   };
 
-  /* Compare (507:87387). Citi · SIDBI · Axis are drawn with identical terms; SBI and HDFC
-     have no desktop compare column in Figma, so they reuse the drawn values (flagged). */
-  const drawn = {
-    amount: "₹50 L",
-    interest: ["9.45% p.a.", "Floating · RBLR-linked"],
-    apr: ["10.54%", "yearly cost incl. fees"],
-    tenure: ["3 years"],
-    emi: ["₹1,60,048 / month", "Est. EMI"],
-    fee: ["₹29,500", "One time, incl. GST"],
-    collateral: ["Collateral-free", "CGTMSE"],
-    money: ["≈ 3–4 working days", "Estimate, after signing"],
-  };
+  /* Compare (507:87387). Figma draws Citi · SIDBI · Axis with identical terms, which makes the
+     comparison meaningless (Shreya: "not practical"). Each lender now has coherent terms of its
+     own, consistent with its cards (Overview 476:200124, Loan Offers 507:84666) and mobile:
+     - EMIs are real amortisation on the loan amount over 36 months.
+     - Cash credit limits show the monthly interest if the full limit is drawn.
+     - Fees are % of the loan amount; n = numbers used to pick the best value per row.
+     All of these are ASSUMED sample terms (flagged in the README). */
+  const v = (o) => o;
   dd.compare = {
     title: "Compare offers",
     max: 3,
@@ -73,7 +69,7 @@
     rows: [
       { id: "lender", label: "Lender" },
       { id: "amount", label: "Loan Amount" },
-      { id: "interest", label: "Interest", best: true },
+      { id: "interest", label: "Interest" },
       { id: "apr", label: "APR", info: "Annual Percentage Rate: the yearly cost of the loan including interest and fees." },
       { id: "tenure", label: "Tenure" },
       { id: "emi", label: "Monthly cost" },
@@ -83,12 +79,34 @@
     ],
     bestLabel: "Lowest",
     records: {
-      "pick-citi": { name: "Citi Bank", sub: "Working Capital Loan", tint: "#e9f1fb", logo: LOGO["pick-citi"], v: drawn },
-      "offer-sidbi": { name: "SIDBI", sub: "Working Capital Loan", tint: "#f4f7e4", logo: LOGO["offer-sidbi"], v: drawn },
-      "offer-axis": { name: "Axis Bank", sub: "ECGLS 5.0 Cash Credit Limit", tint: "#f7e9ef", logo: LOGO["offer-axis"], v: drawn },
-      sbi: { name: "State Bank of India", sub: "Cash Credit Limit", tint: "#e4f2fa", logo: LOGO.sbi, v: drawn, assumed: true },
-      "offer-hdfc": { name: "HDFC Bank", sub: "Working Capital Loan", tint: "#e9f1fb", logo: LOGO["offer-hdfc"], v: drawn, assumed: true },
+      "pick-citi": { name: "Citi Bank", sub: "Working Capital Loan", tint: "#e9f1fb", logo: LOGO["pick-citi"], v: v({
+        amount: "₹50 L", interest: ["9.45% p.a.", "Floating · RBLR-linked"], apr: ["10.54%", "yearly cost incl. fees"], tenure: ["3 years"],
+        emi: ["₹1,60,048 / month", "Est. EMI"], fee: ["₹75,000", "1.5% · one time, incl. GST"], collateral: ["Collateral-free", "CGTMSE"],
+        money: ["≈ 3–4 working days", "Estimate, after signing"] }),
+        n: { amount: 50, interest: 9.45, apr: 10.54, fee: 75000, money: 3 } },
+      "offer-sidbi": { name: "SIDBI", sub: "Working Capital Loan", tint: "#f4f7e4", logo: LOGO["offer-sidbi"], v: v({
+        amount: "₹50 L", interest: ["9.45% p.a.", "Floating · RBLR-linked"], apr: ["9.81%", "yearly cost incl. fees"], tenure: ["3 years"],
+        emi: ["₹1,60,048 / month", "Est. EMI"], fee: ["₹25,000", "0.5% · one time, incl. GST"], collateral: ["Collateral-free", "CGTMSE"],
+        money: ["≈ 5–7 working days", "Estimate, after signing"] }),
+        n: { amount: 50, interest: 9.45, apr: 9.81, fee: 25000, money: 5 } },
+      "offer-axis": { name: "Axis Bank", sub: "ECGLS 5.0 Cash Credit Limit", tint: "#f7e9ef", logo: LOGO["offer-axis"], v: v({
+        amount: "₹50 L", interest: ["9.85% p.a.", "Floating · Repo-linked"], apr: ["10.95%", "yearly cost incl. fees"], tenure: ["Renews yearly"],
+        emi: ["₹41,042 / month", "Interest if fully drawn"], fee: ["₹50,000", "1% · one time, incl. GST"], collateral: ["Needs collateral", "Property"],
+        money: ["≈ 6–8 working days", "Estimate, after signing"] }),
+        n: { amount: 50, interest: 9.85, apr: 10.95, fee: 50000, money: 6 } },
+      sbi: { name: "State Bank of India", sub: "Cash Credit Limit", tint: "#e4f2fa", logo: LOGO.sbi, v: v({
+        amount: "₹20 L", interest: ["9.25% p.a.", "Floating · EBLR-linked"], apr: ["9.71%", "yearly cost incl. fees"], tenure: ["Renews yearly"],
+        emi: ["₹15,417 / month", "Interest if fully drawn"], fee: ["₹13,000", "0.65% · one time, incl. GST"], collateral: ["Needs collateral", "Stock & receivables"],
+        money: ["≈ 7–10 working days", "Estimate, after signing"] }),
+        n: { amount: 20, interest: 9.25, apr: 9.71, fee: 13000, money: 7 } },
+      "offer-hdfc": { name: "HDFC Bank", sub: "Working Capital Loan", tint: "#e9f1fb", logo: LOGO["offer-hdfc"], v: v({
+        amount: "₹50 L", interest: ["9.60% p.a.", "Floating · RBLR-linked"], apr: ["10.12%", "yearly cost incl. fees"], tenure: ["3 years"],
+        emi: ["₹1,60,400 / month", "Est. EMI"], fee: ["₹20,000", "0.4% · one time, incl. GST"], collateral: ["Collateral-free", "CGTMSE"],
+        money: ["≈ 4–5 working days", "Estimate, after signing"] }),
+        n: { amount: 50, interest: 9.6, apr: 10.12, fee: 20000, money: 4 } },
     },
+    // Best value per row (green chip): which way wins, and its label
+    best: { amount: ["max", "Highest"], interest: ["min", "Lowest"], apr: ["min", "Lowest"], fee: ["min", "Lowest"], money: ["min", "Fastest"] },
     aliases: { "pick-sidbi": "offer-sidbi", "pick-axis": "offer-axis", "match-bob": null },
     // 507:87387 as drawn: Citi · SIDBI · Axis added, Citi selected
     figmaThree: { added: ["pick-citi", "offer-sidbi", "offer-axis"], selected: ["pick-citi"] },

@@ -1,5 +1,25 @@
 # Changelog
 
+## v0.13.4 — 23 Nov 2026 · Compare that actually compares; tooltips stay in view
+
+**Changed**
+
+- **Compare data.** Each lender now has distinct, coherent terms. Shreya: three identical columns are "not practical". The terms are consistent with each lender's cards and with mobile:
+  - **Citi:** 1.5% fee, fastest money.
+  - **SIDBI:** low fee and APR.
+  - **Axis:** ECGLS cash credit, needs property collateral.
+  - **SBI:** ₹20 L at 9.25%, cash credit.
+  - **HDFC:** lowest fee, collateral-free.
+
+  EMIs are real amortisation, and cash credit limits show the monthly interest if fully drawn. These are sample terms, flagged in the README.
+- **Best-value chips** are computed per row among the offers added: Loan Amount "Highest"; Interest, APR and Processing fee "Lowest"; Money in "Fastest". They appear only when the values differ.
+- **"Show differences only"** now folds away the rows that are the same for every offer (label and cells animate closed) instead of dimming everything.
+- Empty Compare slots match the height of the filled columns, so there's no gap above Select.
+
+**Fixed**
+
+- **Tooltips** near the panel edge (e.g. the APR info on Compare) ran off the left and were clipped. Tooltips now measure themselves on hover and focus, nudge sideways to stay inside the panel with the arrow still on the icon, and open below when there's no room under the top bar.
+
 ## v0.13.3 — 23 Nov 2026 · Desktop polish from a rendered audit (radii, strokes, shadows, hovers)
 
 An audit script ran on every desktop screen. It measured nested radii, icons clipped by their containers, shadows cut by `overflow: hidden`, and clickable elements with no `:hover` rule.

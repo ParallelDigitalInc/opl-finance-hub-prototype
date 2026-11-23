@@ -206,11 +206,15 @@
   width: max-content; max-width: 260px; padding: 10px 12px; border-radius: 10px;
   background: #0f172a; color: #f8fafc; font-size: 12px; line-height: 17px; font-weight: 400; letter-spacing: 0; text-align: left; white-space: normal;
   box-shadow: 0 12px 24px -8px rgba(15, 23, 42, 0.35);
-  opacity: 0; transform: translate(-50%, 4px); pointer-events: none;
+  opacity: 0; transform: translate(calc(-50% + var(--tip-shift, 0px)), 4px); pointer-events: none;
   transition: opacity 160ms, transform 200ms var(--d-ease);
 }
-.d-tip::after { content: ""; position: absolute; left: 50%; top: 100%; margin-left: -5px; border: 5px solid transparent; border-top-color: #0f172a; }
-:hover > .d-tip, :focus-visible > .d-tip { opacity: 1; transform: translate(-50%, 0); transition-delay: 120ms; }
+/* the arrow stays on the icon when the bubble is nudged to fit (D.fitTips) */
+.d-tip::after { content: ""; position: absolute; left: calc(50% - var(--tip-shift, 0px)); top: 100%; margin-left: -5px; border: 5px solid transparent; border-top-color: #0f172a; }
+:hover > .d-tip, :focus-visible > .d-tip { opacity: 1; transform: translate(calc(-50% + var(--tip-shift, 0px)), 0); transition-delay: 120ms; }
+/* no room above (near the top of the panel): open below */
+.d-tip.is-below { bottom: auto; top: calc(100% + 10px); }
+.d-tip.is-below::after { top: auto; bottom: 100%; border-top-color: transparent; border-bottom-color: #0f172a; }
 
 /* ---- Toast ---------------------------------------------------------------------- */
 .d-toast {
@@ -809,7 +813,7 @@
 .d-cmp__x:hover { opacity: 1; transform: rotate(90deg) scale(1.08); }
 .d-cmp__amount { display: flex; flex-direction: column; gap: 4px; white-space: nowrap; }
 .d-cmp__amount p { font-size: 12px; line-height: 20px; color: var(--muted-foreground); }
-.d-cmp__amount b { font-size: 24px; line-height: 36px; letter-spacing: -0.4px; font-weight: 600; color: var(--foreground); }
+.d-cmp__amount b { display: flex; align-items: center; gap: 10px; font-size: 24px; line-height: 36px; letter-spacing: -0.4px; font-weight: 600; color: var(--foreground); }
 .d-cmp__row { height: 80px; border-top: 1px solid #eef2ff; transition: opacity 240ms, background 200ms; }
 .d-cmp__row:first-of-type { border-top: 0; }
 .d-cmp__col .d-cmp__row:nth-child(2) { border-top: 0; }
@@ -824,12 +828,15 @@
 /* row hover: the whole row lights across label + columns */
 .d-cmp__grid[data-hover-row] .d-cmp__label[data-row].is-hover { color: var(--foreground); font-weight: 500; }
 .d-cmp__row.is-hover { background: #f8faff; }
-/* Show differences only: rows that are the same everywhere step back */
-.d-cmp__grid.is-diff .is-same { opacity: 0.32; }
+/* Show differences only: rows that are the same for every offer fold away (label + cells) */
+.d-cmp__label, .d-cmp__row { transition: height 320ms var(--d-ease), opacity 200ms, padding 320ms var(--d-ease), border-color 200ms, background 200ms; overflow: hidden; }
+.d-cmp__grid.is-diff .d-cmp__label.is-same:not([data-row="lender"]):not([data-row="amount"]),
+.d-cmp__grid.is-diff .d-cmp__row.is-same { height: 0; padding-top: 0; padding-bottom: 0; opacity: 0; border-color: transparent; }
+.d-cmp__grid.is-diff .d-cmp__label.is-same[data-row="amount"] { opacity: 0.45; }
 
 /* empty slot (507:118294) */
 .d-cmp__slot {
-  min-height: 739px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;
+  min-height: 0;          /* stretches to the row: label column (all empty) or the filled columns */ display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;
   padding: 28px 20px; border-radius: 20px; background: #fff; outline: 1px solid rgba(56, 88, 229, 0.1); outline-offset: -1px; box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
   animation: d-col-in 420ms var(--d-ease) both; animation-delay: calc(var(--i) * 60ms);
   transition: box-shadow 220ms, background 220ms;

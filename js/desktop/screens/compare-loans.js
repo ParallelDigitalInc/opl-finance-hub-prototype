@@ -21,7 +21,7 @@
     const [main, sub] = Array.isArray(v) ? v : [v];
     return html`<div class="d-cmp__cell">
       <div class="d-cmp__val"><p>${main}</p>${sub ? html`<small>${sub}</small>` : ""}</div>
-      ${best ? html`<span class="d-cmp__best">${C().bestLabel}</span>` : ""}
+      ${best ? html`<span class="d-cmp__best">${best}</span>` : ""}
     </div>`;
   };
 
@@ -29,8 +29,15 @@
     const c = C();
     const rec = c.records[id];
     const ids = addedIds();
-    const rates = ids.map((x) => parseFloat(c.records[x].v.interest[0]));
-    const isBest = (rowId) => rowId === "interest" && parseFloat(rec.v.interest[0]) === Math.min(...rates);
+    // best value per row among the added offers (only when they actually differ)
+    const bestLabel = (rowId) => {
+      const rule = c.best[rowId];
+      if (!rule || ids.length < 2) return "";
+      const vals = ids.map((x) => c.records[x].n[rowId]);
+      if (vals.every((x) => x === vals[0])) return "";
+      const win = rule[0] === "max" ? Math.max(...vals) : Math.min(...vals);
+      return rec.n[rowId] === win ? rule[1] : "";
+    };
     const on = sel.includes(id);
     return html`
       <div class="d-cmp__col ${on ? "is-selected" : ""}" data-col="${id}" style="--tint:${rec.tint};--i:${i}">
@@ -40,9 +47,9 @@
             <div class="d-cmp__name"><p class="d-card__name">${rec.name}</p><p class="d-card__sub">${rec.sub}</p></div>
             <button class="d-cmp__x" data-remove="${id}" aria-label="Remove ${rec.name}">${D.icon("close-circle-duo", 24)}</button>
           </div>
-          <div class="d-cmp__amount"><p>Loan up to</p><b>${rec.v.amount}</b></div>
+          <div class="d-cmp__amount"><p>Loan up to</p><b>${rec.v.amount}${bestLabel("amount") ? html`<span class="d-cmp__best">${bestLabel("amount")}</span>` : ""}</b></div>
         </div>
-        ${c.rows.slice(2).map((row) => html`<div class="d-cmp__row" data-row="${row.id}">${valueCell(row, rec, row.best && isBest(row.id))}</div>`)}
+        ${c.rows.slice(2).map((row) => html`<div class="d-cmp__row" data-row="${row.id}">${valueCell(row, rec, bestLabel(row.id))}</div>`)}
         <div class="d-cmp__foot">
           ${on
             ? D.btn({ label: c.selected, style: "tonal", size: "md", cls: "d-btn--block", icon: D.icon("check-leading", 16), attrs: `data-select="${id}" aria-pressed="true"` })
