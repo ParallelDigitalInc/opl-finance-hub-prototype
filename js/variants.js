@@ -10,11 +10,14 @@
     home: {
       // Presets = the exact frames in Figma. Picking one sets every group.
       presets: [
-        { id: "loans", label: "Loans first", figma: "382:34093", set: { order: "loans", emi: "off" } },
-        { id: "subsidies", label: "Subsidies first", figma: "382:33823", set: { order: "subsidies", emi: "off" } },
-        { id: "subsidies-emi", label: "Subsidies + EMI due", figma: "382:36681", set: { order: "subsidies", emi: "on" } },
+        { id: "loans", label: "Loans first", figma: "382:34093", set: { order: "loans", emi: "off", cmr: "off" } },
+        { id: "subsidies", label: "Subsidies first", figma: "382:33823", set: { order: "subsidies", emi: "off", cmr: "off" } },
+        { id: "subsidies-emi", label: "Subsidies + EMI due", figma: "382:36681", set: { order: "subsidies", emi: "on", cmr: "off" } },
+        // Proposed: CIBIL MSME Rank sheet from the "CMR score" quick action (gauge from desktop 476:200254)
+        { id: "cmr", label: "CMR score sheet", figma: "476:200254", set: { order: "loans", emi: "off", cmr: "on" } },
       ],
       groups: [
+        { id: "cmr", hidden: true, default: "off", options: [{ value: "off" }, { value: "on" }] },
         {
           id: "order",
           label: "Section order",
@@ -85,8 +88,12 @@
   };
 
   OPL.variants["loans-overview"] = {
-    presets: [{ id: "default", label: "Loans overview", figma: "382:36150", set: {} }],
+    presets: [
+      { id: "default", label: "Loans overview", figma: "382:36150", set: { cmr: "off" } },
+      { id: "cmr", label: "CMR score sheet", figma: "476:200254", set: { cmr: "on" } },   // proposed
+    ],
     groups: [
+      { id: "cmr", hidden: true, default: "off", options: [{ value: "off" }, { value: "on" }] },
       {
         id: "nudge",
         label: "AI Mitra nudge",

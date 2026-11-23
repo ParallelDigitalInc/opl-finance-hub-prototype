@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.16.3 — 23 Nov 2026 · 3D factory and pins for the new-unit art
+## v0.16.4 — 23 Nov 2026 · 3D factory and pins for the new-unit art
 
 The illustration I missed in v0.16.2 (Illustrations `558:103493`).
 
@@ -9,6 +9,16 @@ The illustration I missed in v0.16.2 (Illustrations `558:103493`).
 - **The smoke still drifts.** In Figma the two puffs are crops of the factory art, laid back over it. I cut them out of the base factory and animate them on top, placed relative to the factory so they scale with it in every box.
 - Rebuilt at 2× from the transparent sources and palette-compressed (2–9 KB each). The old flat SVGs are removed. The green ground ellipse is unchanged.
 
+## v0.16.3 — 23 Nov 2026 · CMR score sheet
+
+Shreya: build a bottom sheet for CMR score, using the desktop asset for the score, with what affects it and how to improve it for this business.
+
+- **New sheet, opened from Home's "CMR score" tile and the Loans "CMR - 2" pill.** Both were hotspots before.
+- **Score:** the desktop CIBIL MSME Rank gauge, at full colour and with no card behind it. The needle swings down from 10 to rank 2 as the number counts down.
+- **What shapes your rank:** five factors (repayment, credit line usage, enquiries, credit age, credit mix), each with a status. Each opens to explain why it matters.
+- **Your path to CMR-1:** a lead move with the business's own numbers (pay ₹4.80 L to bring usage from 45% to 30%), plus two quieter steps.
+- **Sticky footer:** "See loans for CMR-2".
+- Proposed, not in Figma; sample values are listed in README → CMR score sheet.
 ## v0.16.2 — 23 Nov 2026 · New illustrations (Figma "Illustrations" 558:102537 + 558:104693)
 
 Shreya's improved 3D illustrations, mobile and desktop:
