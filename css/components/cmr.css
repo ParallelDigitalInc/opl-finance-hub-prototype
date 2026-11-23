@@ -1,0 +1,128 @@
+/* ==========================================================================
+   CIBIL MSME Rank sheet (proposed) — shell is the benefit sheet's .bsheet
+   ========================================================================== */
+.cmrs__titles { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; }
+.cmrs__updated { font-size: 12px; line-height: 18px; color: var(--muted-foreground); }
+.cmrs__body { gap: var(--s32); padding-top: var(--s12); }
+.cmrs__sec { display: flex; flex-direction: column; gap: var(--s12); flex-shrink: 0; }
+.cmrs__h { display: flex; flex-direction: column; gap: 2px; }
+.cmrs__sub { font-size: 13px; line-height: 18px; color: var(--muted-foreground); }
+
+/* ---- Hero: the desktop gauge at 1.25×, on a soft blue field with the Loans hero glow ---- */
+.cmrs__hero { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: var(--s12); padding-top: var(--s8); }
+.cmrs__verdict { max-width: 30ch; text-align: center; text-wrap: balance; font-size: 13px; line-height: 19px; font-weight: var(--fw-medium); color: #334155; }
+
+.cmrg-wrap { width: 225px; height: 148px; }
+.cmrg { position: relative; width: 180px; height: 118px; transform: scale(1.25); transform-origin: 0 0; }
+.cmrg__bars, .cmrg__bars svg { width: 180px; height: 90px; overflow: visible; }
+.cmrg__bars path {
+  transform-box: view-box; transform-origin: 90px 90px;
+  opacity: 0; transform: scale(0.82) rotate(-8deg);
+  transition: opacity 340ms var(--ease-out) calc(var(--i) * 30ms), transform 560ms var(--ease-spring) calc(var(--i) * 30ms);
+}
+.cmrg.is-in .cmrg__bars path { opacity: 1; transform: none; }
+.cmrg.is-settled .cmrg__bars path { transition-delay: 0ms; }
+.cmrg.is-settled .cmrg__bars path.is-rank { animation: cmr-pulse 900ms var(--ease-out) both; }
+@keyframes cmr-pulse { 0% { transform: none; } 35% { transform: scale(1.08); } 100% { transform: scale(1.03); } }
+.cmrg__min, .cmrg__max { position: absolute; font-size: 10px; line-height: normal; font-weight: var(--fw-medium); color: var(--tertiary-foreground); }
+.cmrg__min { left: 10.5px; top: 96px; }
+.cmrg__max { left: 160.5px; top: 98px; }
+/* needle rotates about the gauge centre (90,90): 0° = rank 1, 180° = rank 10. It starts at 10 and swings down. */
+.cmrg__needle { position: absolute; left: 90px; top: 90px; width: 0; height: 0; transform: rotate(180deg); transition: transform 1150ms cubic-bezier(0.25, 1.15, 0.45, 1) 420ms; }
+.cmrg.is-in .cmrg__needle { transform: rotate(var(--rank-angle)); }
+.cmrg__tri { position: absolute; left: -55.4px; top: -6px; width: 12px; height: 12px; transform: rotate(-90deg); opacity: 0; transition: opacity 240ms 380ms; }
+.cmrg__tri img { position: absolute; left: 6.7%; right: 6.7%; top: 0; bottom: 25%; width: 86.6%; height: 75%; }
+.cmrg.is-in .cmrg__tri { opacity: 1; }
+.cmrg__read { position: absolute; left: 50%; top: 50px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.cmrg__rank { min-width: 2ch; text-align: center; font-size: 30px; line-height: 36px; letter-spacing: -0.4px; font-weight: var(--fw-semibold); color: #1e293b; font-variant-numeric: tabular-nums; opacity: 0; transform: translateY(6px) scale(0.9); transition: opacity 260ms 420ms, transform 520ms var(--ease-spring) 420ms; }
+.cmrg__chip { padding: 4px 10px; border-radius: var(--r-full); background: rgba(5, 150, 105, 0.1); font-size: 10px; line-height: 13px; font-weight: var(--fw-semibold); color: #047857; white-space: nowrap; opacity: 0; transform: translateY(4px) scale(0.9); transition: opacity 260ms 1500ms, transform 460ms var(--ease-spring) 1500ms; }
+.cmrg.is-in .cmrg__rank, .cmrg.is-in .cmrg__chip { opacity: 1; transform: none; }
+
+/* ---- Factors: one list, rows open to say why it matters ---------------------------- */
+.cmrs__factors, .cmrs__steps { list-style: none; margin: 0; padding-left: 0; }
+.cmrs__factors { display: flex; flex-direction: column; border-radius: var(--r-large); background: var(--surface); outline: 1px solid var(--border); outline-offset: -1px; overflow: hidden; }
+.cmrf + .cmrf { box-shadow: inset 0 1px 0 var(--border-subtle); }
+.cmrf__row { width: 100%; display: flex; align-items: center; gap: var(--s12); padding: 14px var(--s16); text-align: left; transition: background var(--dur-fast); -webkit-tap-highlight-color: transparent; }
+.cmrf__row:hover, .cmrf__row.is-pressed { background: var(--slate-50); }
+.cmrf__row:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; border-radius: var(--r-inner); }
+.cmrf__ico { flex-shrink: 0; width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: var(--primary-tint); }
+.cmrf__text { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.cmrf__meta { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.cmrf__name { font-size: 14px; line-height: 20px; font-weight: var(--fw-semibold); color: var(--foreground); }
+.cmrf__val { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; line-height: 16px; color: var(--muted-foreground); }
+.cmrf__status { flex-shrink: 0; padding: 2px 7px; border-radius: var(--r-full); font-size: 11px; line-height: 14px; font-weight: var(--fw-semibold); }
+.cmrf[data-status="good"] .cmrf__status { background: var(--risk-low-bg); color: var(--risk-low-fg); }
+.cmrf[data-status="fair"] .cmrf__status { background: #fef3c7; color: var(--amber-fg); }
+.cmrf__chev { flex-shrink: 0; transition: transform var(--dur-base) var(--ease-out); }
+.cmrf.is-open .cmrf__chev { transform: rotate(180deg); }
+.cmrf__panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--dur-base) var(--ease-out); }
+.cmrf.is-open .cmrf__panel { grid-template-rows: 1fr; }
+.cmrf__inner { min-height: 0; overflow: hidden; padding: 0 var(--s16) 0 64px; display: flex; flex-direction: column; gap: var(--s12); opacity: 0; transition: opacity var(--dur-fast), padding var(--dur-base) var(--ease-out); }
+.cmrf.is-open .cmrf__inner { opacity: 1; padding-bottom: var(--s16); transition-delay: 80ms, 0ms; }
+.cmrf__why { font-size: 13px; line-height: 19px; color: #334155; }
+.cmrf__impact { display: block; margin-bottom: 2px; font-size: 11px; line-height: 16px; font-weight: var(--fw-semibold); color: var(--primary); }
+
+/* usage meter: today's fill, with a tick where the target sits */
+.cmrm { display: flex; flex-direction: column; gap: 6px; }
+.cmrm__track { position: relative; height: 8px; border-radius: var(--r-full); background: var(--muted); }
+.cmrm__fill { position: absolute; inset: 0 auto 0 0; width: 0; border-radius: inherit; background: linear-gradient(90deg, #f59e0b, #d97706); transition: width 700ms var(--ease-out) 120ms; }
+.cmrf.is-open .cmrm__fill { width: var(--now); }
+.cmrm__tick { position: absolute; left: var(--target); top: -3px; bottom: -3px; width: 2px; margin-left: -1px; border-radius: 1px; background: var(--risk-low-fg); }
+.cmrm__labels { display: flex; justify-content: space-between; font-size: 11px; line-height: 16px; font-weight: var(--fw-medium); }
+.cmrm__now { color: var(--amber-fg); }
+.cmrm__target { display: inline-flex; align-items: center; gap: 6px; color: var(--risk-low-fg); white-space: nowrap; }
+.cmrm__target::before { content: ""; width: 2px; height: 10px; border-radius: 1px; background: currentColor; }
+
+/* ---- Path to CMR-1: one lead move with its own numbers, then two quieter steps ---- */
+.cmrp {
+  position: relative; display: flex; flex-direction: column; gap: var(--s8);
+  padding: var(--s16); border-radius: var(--r-large); overflow: hidden;
+  background: radial-gradient(120% 90% at 100% 0%, #e6eeff 0%, rgba(230, 238, 255, 0) 60%), var(--surface);
+  outline: 1px solid #d4e0fb; outline-offset: -1px;
+  box-shadow: 0 8px 20px -14px rgba(56, 88, 229, 0.45);
+}
+.cmrp__top { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--s4); }
+.cmrp__ico { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--primary-tint); outline: 1px solid #dbe5fd; outline-offset: -1px; }
+.cmrp__tag { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px 4px 8px; border-radius: var(--r-full); background: var(--primary); color: #fff; font-size: 11px; line-height: 14px; font-weight: var(--fw-semibold); position: relative; overflow: hidden; }
+.cmrp__tag .ico { filter: brightness(0) invert(1); }
+.cmrp__tag::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.55) 50%, transparent 70%); transform: translateX(-120%); }
+.cmrp.is-on .cmrp__tag::after { animation: cmr-shine 1100ms var(--ease-out) 900ms both; }
+@keyframes cmr-shine { to { transform: translateX(120%); } }
+.cmrp__title { font-size: 16px; line-height: 22px; font-weight: var(--fw-semibold); color: var(--foreground); }
+.cmrp__body { font-size: 13px; line-height: 19px; color: var(--muted-foreground); }
+.cmrp__shift { display: flex; flex-direction: column; gap: 6px; margin-top: var(--s4); }
+.cmrp__track { position: relative; height: 10px; border-radius: var(--r-full); background: var(--muted); }
+.cmrp__fill { position: absolute; inset: 0 auto 0 0; width: var(--from); border-radius: inherit; background: linear-gradient(90deg, #f59e0b, #d97706); transition: width 900ms var(--ease-out) 250ms, background 600ms 450ms; }
+.cmrp.is-on .cmrp__fill { width: var(--to); background: linear-gradient(90deg, #34d399, #059669); }
+.cmrp__mark { position: absolute; left: var(--to); top: -3px; bottom: -3px; width: 2px; margin-left: -1px; border-radius: 1px; background: var(--risk-low-fg); }
+.cmrp__nums { display: flex; justify-content: space-between; font-size: 12px; line-height: 16px; font-weight: var(--fw-semibold); }
+.cmrp__num { color: var(--amber-fg); font-variant-numeric: tabular-nums; transition: color 400ms 500ms; }
+.cmrp.is-on .cmrp__num { color: var(--risk-low-fg); }
+.cmrp__goal { color: var(--muted-foreground); font-weight: var(--fw-medium); opacity: 0; transition: opacity 300ms 1100ms; }
+.cmrp.is-on .cmrp__goal { opacity: 1; }
+.cmrp__link { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; margin-top: var(--s4); padding: 6px 0; font-size: 14px; line-height: 20px; font-weight: var(--fw-semibold); color: var(--primary); }
+.cmrp__link .ico { transition: transform var(--dur-fast) var(--ease-out); }
+.cmrp__link:hover .ico, .cmrp__link.is-pressed .ico { transform: translateX(3px); }
+
+.cmrs__steps { display: flex; flex-direction: column; gap: var(--s16); padding: var(--s8) var(--s4) 0; }
+.cmrstep { display: flex; gap: var(--s12); align-items: flex-start; }
+.cmrstep__ico { flex-shrink: 0; width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: var(--slate-50); outline: 1px solid var(--border); outline-offset: -1px; }
+.cmrstep__text { display: flex; flex-direction: column; gap: 2px; padding-top: 1px; }
+.cmrstep__title { font-size: 14px; line-height: 20px; font-weight: var(--fw-semibold); color: var(--foreground); }
+.cmrstep__body { font-size: 13px; line-height: 19px; color: var(--muted-foreground); }
+
+.cmrs__note { flex-shrink: 0; display: flex; gap: var(--s8); align-items: flex-start; padding: 12px 14px; border-radius: var(--r-inner); background: #f0fdf4; font-size: 12px; line-height: 18px; font-weight: var(--fw-medium); color: var(--trust-fg); }
+.cmrs__note .ico { flex-shrink: 0; }
+
+/* ---- Entrance (one authored moment: the gauge; the rest follows quietly) ---- */
+.bsheet.is-presenting .cmrs__hero { animation: enter-up 420ms var(--ease-out) both; animation-delay: 80ms; }
+.bsheet.is-presenting .cmrs__verdict { animation: enter-up 420ms var(--ease-out) both; animation-delay: 1600ms; }
+.bsheet.is-presenting .cmrs__sec { animation: enter-up 420ms var(--ease-out) both; animation-delay: 300ms; }
+.bsheet.is-presenting .cmrf { animation: enter-up 380ms var(--ease-out) both; animation-delay: calc(var(--i) * 55ms + 420ms); }
+.bsheet.is-presenting .cmrf__status { animation: cmr-pop 420ms var(--ease-spring) both; animation-delay: calc(var(--i) * 55ms + 640ms); }
+@keyframes cmr-pop { from { opacity: 0; transform: scale(0.7); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .cmrg__bars path, .cmrg__needle, .cmrg__tri, .cmrg__rank, .cmrg__chip, .cmrp__fill, .cmrm__fill, .cmrf__panel, .cmrf__inner { transition: none; }
+  .cmrg.is-settled .cmrg__bars path.is-rank, .cmrp.is-on .cmrp__tag::after { animation: none; }
+}

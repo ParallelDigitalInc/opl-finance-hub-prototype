@@ -351,6 +351,23 @@ All of this is behaviour on existing elements. None of it adds UI:
 - When the "new unit" card scrolls in, the ground rises, the factory settles, both map pins drop in with a bounce, and the smoke drifts up twice.
 - Press states: chips dip and their icons tilt, chevrons and arrows nudge the way they lead, and the phone icon rings.
 
+## Proposed · CMR score sheet (not in Figma)
+
+Opens from Home → "CMR score" and Loans overview → "CMR - 2" (both point at `cmr-score`). The panel preset "CMR score sheet" opens it on either screen.
+
+1. **The gauge is the desktop CIBIL MSME Rank asset** (`476:200254`, `assets/lazy/dsk/cmr-bars.svg` + `cmr-pointer.svg`) at 1.25×, with no card behind it. Rank 2, "Updated 25 Sep 2026" and the needle angle come from the desktop data.
+2. **Factors and the path to CMR-1 are proposed copy.**
+   - Credit line numbers are the Loans "Your Borrowing" card (₹14.70 L used of ₹33 L = 45%). The 30% target and "pay ₹4.80 L" follow from it.
+   - Sample values to replace with the CIBIL report fields: 24 months without a missed EMI, 3 enquiries in 90 days, oldest loan 6 years.
+   - Factor order and impact levels are general CIBIL guidance, not OPL's model. **Needs OPL sign-off.**
+3. **Icons** are Solar bold-duotone (`assets/lazy/cmr/`), colours baked in.
+
+**Motion:**
+- The bars sweep in, then the needle swings down from 10 to the rank while the number counts down with it. "Low risk" pops in, and the rank's bars pulse once.
+- Factor rows rise in one by one, and their status chips pop. A row opens to say why the factor matters; Credit line usage also shows a meter against the 30% mark.
+- The lead card's usage bar slides from amber 45% to green 30% when it scrolls into view, and its "Biggest lift" tag shines once.
+- The footer lifts with a hairline while content scrolls beneath it.
+
 ## Figma flags · Calculate estimate (`416:76869`)
 
 1. **The estimate is calculated, not copied.**

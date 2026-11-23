@@ -14,6 +14,7 @@ CSS=(
   css/components/chrome.css
   css/components/flow.css
   css/components/subsidy.css
+  css/components/cmr.css
   css/screens/home.css
   css/screens/loans-overview.css
   css/screens/loan-offers.css
@@ -31,6 +32,7 @@ JS=(
   js/components-flow.js
   js/components-subsidy.js
   js/fx.js
+  js/cmr.js
   js/variants.js
   js/data/home.js
   js/data/loans-overview.js
@@ -40,6 +42,7 @@ JS=(
   js/data/subsidy-detail.js
   js/data/subsidy-estimate.js
   js/data/subsidies-home.js
+  js/data/cmr.js
   js/screens/home.js
   js/screens/loans-overview.js
   js/screens/loan-offers.js

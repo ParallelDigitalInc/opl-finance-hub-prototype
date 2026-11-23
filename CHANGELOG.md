@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.16.3 — 23 Nov 2026 · CMR score sheet
+
+Shreya: build a bottom sheet for CMR score, using the desktop asset for the score, with what affects it and how to improve it for this business.
+
+- **New sheet, opened from Home's "CMR score" tile and the Loans "CMR - 2" pill.** Both were hotspots before.
+- **Score:** the desktop CIBIL MSME Rank gauge, at full colour and with no card behind it. The needle swings down from 10 to rank 2 as the number counts down.
+- **What shapes your rank:** five factors (repayment, credit line usage, enquiries, credit age, credit mix), each with a status. Each opens to explain why it matters.
+- **Your path to CMR-1:** a lead move with the business's own numbers (pay ₹4.80 L to bring usage from 45% to 30%), plus two quieter steps.
+- **Sticky footer:** "See loans for CMR-2".
+- Proposed, not in Figma; sample values are listed in README → CMR score sheet.
+
 ## v0.16.1 — 23 Nov 2026 · 14px inner radius everywhere
 
 Shreya: a tinted card inside a 16px white card should be 14px.

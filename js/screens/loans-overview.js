@@ -65,7 +65,10 @@
         const o = e.target.closest("[data-app-open]");
         if (o) OPL.go("application", { app: o.dataset.appOpen });
       });
-      { const sh = OPL.fx.sheets(page); OPL.fx.applySheet(page, sh); OPL.fx.loanDetail(page, sh); }   // offer cards → details → apply
+      { const sh = OPL.fx.sheets(page, { onClose: (id) => id === "cmr" && OPL.state.get().cmr && OPL.state.set({ cmr: null }, { silent: true }) });
+        OPL.fx.applySheet(page, sh); OPL.fx.loanDetail(page, sh);       // offer cards → details → apply
+        const cmr = OPL.fx.cmrSheet(page, sh, this.timers);             // "CMR - 2" pill
+        if (OPL.variantValues("loans-overview").cmr === "on") cmr.open({ instant: true }); }
       page.querySelectorAll(".rail").forEach(OPL.fx.mouseDrag);
       OPL.fx.playInView(page, ".tracker, .borrow");
       OPL.fx.nudge(page, this.timers);

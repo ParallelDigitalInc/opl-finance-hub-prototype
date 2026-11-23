@@ -109,7 +109,10 @@
       const counted = new Set();
 
       /* Loan details sheet from "Top loan matches" cards (shared with Loan offers) */
-      { const sh = OPL.fx.sheets(screen); OPL.fx.applySheet(screen, sh); OPL.fx.loanDetail(screen, sh); }
+      { const sh = OPL.fx.sheets(screen, { onClose: (id) => id === "cmr" && OPL.state.get().cmr && OPL.state.set({ cmr: null }, { silent: true }) });
+        OPL.fx.applySheet(screen, sh); OPL.fx.loanDetail(screen, sh);
+        const cmr = OPL.fx.cmrSheet(screen, sh, this._timers);          // "CMR score" quick action
+        if (v.cmr === "on") cmr.open({ instant: true }); }
 
       /* status bar surface on scroll */
       scroller.addEventListener("scroll", () => screen.classList.toggle("is-scrolled", scroller.scrollTop > 8), { passive: true });
