@@ -44,6 +44,41 @@ starts the HTML component kit that later mobile flows reuse.
   - **Result** `subsidy-estimate-result` (`416:77363`): replaces the form, so ✕ and Back return to the policy page. "Add more" swaps back to the form.
   - Hotspots for later: Talk to an Expert, Apply Now / Apply Online and the two links.
 
+## Desktop view (merged in v0.14.0)
+
+Switch with **View → Desktop** in the panel, press **D**, or link `#device=desktop`. The current screen and its params carry over. Desktop renders `OPL.dscreens` (in `js/desktop/`), a separate bundle loaded the first time you switch, so the mobile first load is unchanged.
+
+- **Source frame for the shell and card language:** `476:200124` "loans overview" (page *Finance Hub - Desktop Loans* `357:54674`).
+- **Mapping:** mobile Home has no desktop twin; the desktop sidebar opens on Loans, so `home` → `loans-overview` (`OPL.dalias`).
+- **Not on desktop yet:** a mobile screen keeps the desktop shell and offers "Open in mobile view".
+- **Files:** `css/desktop/` (shell, components, `screens/`) and `js/desktop/` (`ui.js` = `OPL.d.*`, `data/`, `screens/`). Desktop assets are in `assets/lazy/dsk`. `tools/build.sh` inlines the SVGs into `dist/desktop.js`.
+- **Adding a desktop screen:** put the data in `js/desktop/data/`, the screen in `js/desktop/screens/` (register `OPL.dscreens[<same name as mobile>]`), and the CSS in `css/desktop/screens/`. Add the files to `DCSS`/`DJS` in `build.sh`.
+
+**Desktop rules** (consistency with mobile):
+- Geist only.
+- CTA and links use `#3858E5`. Tonal "Apply Now" is `--soft-primary` with primary text, as on mobile.
+- Selected chip: `#F0F6FE` with a `#3858E5` stroke.
+- Strokes are drawn inside, except where the frame puts them in layout (business switcher).
+- Hover and focus states exist on every control. Pages crossfade their content; the shell never moves.
+
+**Desktop flags (kept as drawn; to confirm):**
+1. The desktop frame uses indigo `#4338CA` for links and `#3730A3`/`#EEF2FF` for the tonal button. They're shown as `#3858E5` to match mobile (the mobile consistency pass made the same change).
+2. Debt Profile figures (05 sanctioned, ₹4.65 L utilised, ₹2.80 L available, Term Loans 5) don't match the revised My Loans data (₹64.92 L outstanding).
+3. "Due on 31 Nov 2026" on the Gold loan row is not a real date.
+4. All three match cards show the same Est. EMI, ₹1,60,048, though SBI's loan is ₹20 L.
+5. Proposed, not in Figma:
+   - the CMR info tooltip copy and the chart info tooltip copy
+   - the filter empty state copy (after the old "No matches" frame `357:100347`)
+   - the Sort options (taken from mobile)
+   - the compare toast
+6. **Loan Offers (`507:84666`):** every row shows ₹50 L · 9.45% · Yearly · 0.75% (placeholder figures as drawn). The "Processing fee" stat is Figtree in Figma and is shown in Geist.
+7. **Compare (`507:87387`):** Figma draws Citi, SIDBI and Axis with identical terms. The prototype uses distinct sample terms per lender (v0.13.4, `js/desktop/data/loan-offers.js`) so the comparison means something. They need OPL's real figures.
+8. **Mixed controls:** the Compare checkbox is a 16px DS checkbox on the horizontal rows (`507:84775`) but a 20px Solar icon on the vertical cards. Both use the Solar icon here, for consistency.
+10. **Applications (`440:134641`):** the "View details" button label is indigo `#3730A3` and the WhatsApp toggle is `#4338CA` in Figma. The label is shown as `#3858E5`; the toggle is kept as drawn. The list card has no design for the signed or disbursal states, so it reuses the KFS-ready card, as mobile does.
+11. **NeSL (`524:105163`):** the frames are laid out as `476:231121` · `476:231334` · `476:231547` · `476:231761`. The prototype plays the unscrolled agreement (`476:231547`) first, then the scrolled one with I AGREE, then e-stamp, then OTP.
+12. **Compare tray (`524:106147`):** only the 1-picked state is drawn. "Add one more, or compare now" (2 picked) and "Ready to compare" (3 picked) are proposed copy. The texture is the hero texture (same 626×827 image).
+9. **Add offers drawer:** the Select button is indigo `#4338CA` in Figma and shown as `#3858E5` here. The "n of 3 selected" counter is proposed.
+
 ## Run it
 
 The working copy lives in `~/Code/opl-finance-hub-prototype`, outside iCloud. iCloud's "Optimize Mac Storage" offloads files under ~/Documents and stalls git, so don't keep a repo there.

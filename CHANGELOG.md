@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.10.2 — 23 Nov 2026 · Tidier prototype panel
+## v0.14.1 — 23 Nov 2026 · Tidier prototype panel
 
 - **The panel no longer looks cut off.** It had grown past the window as screens were added (about 1,800px of controls in a 700px window).
   - **Fixed header:** the screen name, version and collapse chevron stay put, and the controls scroll beneath with a soft fade at whichever edge has more.
@@ -11,6 +11,28 @@
   - Figma frames start folded on screens with four or more; Options start folded when there's more than one toggle.
   - Result: with the default folds, every screen's panel fits a 760px-tall window without scrolling (checked on all 12 screens).
   - **The blue ring on the selected screen or frame is drawn inside the row,** so the scrolling panel no longer clips its edges. Keyboard focus rings are inset too.
+  - Merged with the desktop view (v0.14.0). The **View: Mobile / Desktop** switch stays at the top, always open. In desktop view the Screens section lists only desktop-built screens, grouped by flow the same way.
+
+## v0.14.0 — 23 Nov 2026 · Desktop view lands on main
+
+Merges branch `flow/desktop` into main (which now has the subsidies flow, v0.10.0–v0.10.2). Its own version numbers (0.10.0–0.13.6) overlapped main's, so they're kept below as **flow/desktop** history, and this release is v0.14.0.
+
+**Added**
+
+- **Mobile ⇄ Desktop switch.** "View" in the panel, the **D** key, or `#device=desktop`. The current screen, the Compare picks and applications carry over between views.
+- **Desktop view of the loan journey**, built from the desktop Figma frames (page *Finance Hub - Desktop Loans* `357:54674`, shell and cards from `476:200124`):
+  - Overview (CIBIL MSME Rank gauge), Loan Offers with the sticky Compare tray, and Compare with the Add-offers drawer
+  - Apply, then Applications, then the Application page in every status
+  - KFS reader (two-pane), NeSL signing (desktop portal `524:105163`), then Confirming → Signed → Money on its way → Money received
+  - the same milestone delight as mobile
+- **Desktop loads on demand.** It's a separate bundle (`dist/desktop.*`), so the mobile first load is unchanged. Budgets in `tools/check.sh`: desktop 600 KB, desktop screen-only images 600 KB.
+- **Subsidies on desktop:** the subsidy screens from main open on desktop as "not designed for desktop yet", with a one-click switch to mobile. Desktop subsidy screens are not built.
+
+## v0.10.2 — 23 Nov 2026 · Bottom sheets close on phones
+
+- **The X on subsidy benefit sheets now closes them on touch.** The X sits inside the draggable header, so on a touchscreen, pressing it started drag-to-dismiss, which captures the pointer and retargets the tap to the header, and the close never fired. Buttons inside a sheet's grip no longer start a drag. This also fixes Filters "Clear all". Dragging the header still dismisses.
+- **Bottom buttons in sheets now work on iPhones.** The page uses `viewport-fit=cover`, but sheets didn't pad for the home-indicator area, so Cancel, Later, Done and "I'll come back later" sat where iOS treats a touch as the home gesture. Sheets now add `env(safe-area-inset-bottom)`. Nothing changes where there's no inset.
+- **Tapping the dimmed area closes sheets on iOS:** the scrim gets `cursor: pointer`, which iOS needs before it fires taps on a plain element.
 
 ## v0.10.1 — 23 Nov 2026 · Collapsible prototype panel
 
@@ -80,6 +102,200 @@ Merged from `flow/subsidies`. Synced from Figma:
   - Tick a second loan from anywhere and "Compare" is ready.
   - Unticking stays put.
   - On Loan offers itself nothing changes: the tray is already there.
+
+## flow/desktop history (merged in v0.14.0)
+
+### flow/desktop 0.13.6 — 23 Nov 2026 · Icons with masks render fully again
+
+**Fixed**
+
+- **Faint or missing strokes on 27 desktop icons**, including the Selected check, button arrows, the external-link arrow, the compare tray arrow, the tag icons, the notification and chat buttons and the sidebar toggle. Shreya spotted it on the Selected check and the arrows. Since v0.11.0, the build's SVG minifier stripped every `id`, including the ones those icons' masks, `<use>` and clip paths point to, so parts of each icon didn't draw.
+  - The inliner is now `tools/inline-icons.py`. It keeps referenced ids, and the build fails if any icon is left with a dangling reference.
+- **Compare tray arrow** was exported from the disabled button, so 50% opacity was baked in. It looked faded even when Compare was enabled. It now uses a full-strength copy (`bar-arrow-on`); the disabled state fades it in CSS.
+
+### flow/desktop 0.13.5 — 23 Nov 2026 · Quieter "Selected"
+
+- **Compare's Select → Selected** no longer bounces; Shreya found the 0.6 → 1.2 → 1 spring too dramatic. The button now settles in 240ms (slight fade and 98.5% scale to full) while the check slides in. The selected column's blue glow is softer too, at rest and on hover.
+
+### flow/desktop 0.13.4 — 23 Nov 2026 · Compare that actually compares; tooltips stay in view
+
+**Changed**
+
+- **Compare data.** Each lender now has distinct, coherent terms. Shreya: three identical columns are "not practical". The terms are consistent with each lender's cards and with mobile:
+  - **Citi:** 1.5% fee, fastest money.
+  - **SIDBI:** low fee and APR.
+  - **Axis:** ECGLS cash credit, needs property collateral.
+  - **SBI:** ₹20 L at 9.25%, cash credit.
+  - **HDFC:** lowest fee, collateral-free.
+
+  EMIs are real amortisation, and cash credit limits show the monthly interest if fully drawn. These are sample terms, flagged in the README.
+- **Best-value chips** are computed per row among the offers added: Loan Amount "Highest"; Interest, APR and Processing fee "Lowest"; Money in "Fastest". They appear only when the values differ.
+- **"Show differences only"** now folds away the rows that are the same for every offer (label and cells animate closed) instead of dimming everything.
+- Empty Compare slots match the height of the filled columns, so there's no gap above Select.
+
+**Fixed**
+
+- **Tooltips** near the panel edge (e.g. the APR info on Compare) ran off the left and were clipped. Tooltips now measure themselves on hover and focus, nudge sideways to stay inside the panel with the arrow still on the icon, and open below when there's no room under the top bar.
+
+### flow/desktop 0.13.3 — 23 Nov 2026 · Desktop polish from a rendered audit (radii, strokes, shadows, hovers)
+
+An audit script ran on every desktop screen. It measured nested radii, icons clipped by their containers, shadows cut by `overflow: hidden`, and clickable elements with no `:hover` rule.
+
+**Fixed**
+
+- **Nested radii.** Tinted inner boxes inside a 16px card are now **14px** everywhere (Shreya's rule): the CIBIL MSME Rank head, the horizontal offer head, the Compare column head and the Application card head (all were 16). The hero's glass panel stays 12px at its 6px inset, as drawn.
+- **Strokes cut off.** Card strokes were inset box-shadows, so any child touching the edge painted over them: the repayment chart fill, row hover backgrounds, the compare tray texture. They're now `outline` with a negative offset, drawn above children, as in the mobile kit. This covers cards, panels, Compare columns and slots, offer rows, application cards, the summary card, rail cards, the KFS document pane and the compare tray.
+- **Corner tags.** Tags poked out past the rounded head with a square corner ("Collateral-free", "Low Interest", Application ID). The heads now clip them, as mobile does since v0.9.2.
+- **Main panel right stroke.** It's drawn at the window edge, as in Figma.
+- **Shadows.** Compare columns and empty slots get a subtle shadow (Shreya). The KFS document pane and the summary card's shadow is now a real box-shadow, so nothing clips it. The Add-offers list has top room, so a hovered card's shadow isn't sliced.
+- **Hover states:**
+  - Compare rows light up across the label and every column, instead of one cell covering the column stroke.
+  - Every hover keeps selected states (outline colour changes, not a box-shadow swap).
+  - New hovers: rail accordion headers, copy buttons, WhatsApp toggle, KFS consent checkbox, Compare info icon.
+
+### flow/desktop 0.13.2 — 23 Nov 2026 · Compare tray + selection hovers
+
+**Added**
+
+- **Compare tray** (`524:106147`). Once you tick Compare on any card (Overview or Loan Offers), a tray sticks to the bottom of the main panel:
+  - "n of 3 picked" with a hint
+  - picked lenders as logo chips (each removable)
+  - dashed "Slot 2 / Slot 3" placeholders
+  - Clear all
+  - **Compare**, disabled until two are picked, which opens the Compare tab
+
+  It springs up on the first pick, each new chip pops in, and a fourth pick shakes the tray. The AI Mitra button and the page padding make room for it. It replaces the "added to compare" toast.
+
+**Fixed**
+
+- Hovering a **selected** Compare column or a **picked** offer in the Add-offers drawer swapped the blue selected outline for the grey hover one. Selected states now keep their outline, and hover only deepens it. Selected chips and checked checkboxes get their own hover too.
+
+### flow/desktop 0.13.1 — 23 Nov 2026 · Desktop NeSL as drawn
+
+Synced from Figma section "nesl" `524:105163`. Shreya: the desktop NeSL screens were wrong; they reused the mobile portal.
+
+**Fixed**
+
+- **"Sign your sanction letter on NeSL"** (`476:230861`) is now the desktop modal: a "KFS accepted" chip, Step 2 of 2, the four numbered steps, the deadline warning, Continue to NeSL and I'll come back later. It opens over the KFS, which shows as read with consent ticked (`476:230649`). It replaces the mobile sheet.
+- **NeSL portal** now uses the four desktop NeSL screens, in this order:
+  1. Agreement Preview (`476:231547`; a scroll or a click on the document reads it)
+  2. Agreement Preview at the end, with I AGREE (`476:231121`)
+  3. E-Stamp Details, with Next (`476:231334`)
+  4. NSDL eSign OTP, with Verify OTP (`476:231761`)
+
+  Each shows at its drawn size (1055 or 943 wide, r16) over the KFS and a dark overlay, with a hotspot on its real button. CANCEL returns to "Sign Sanction Letter".
+- Then Confirming (`476:231762`), then Signed with its milestone (`476:232230`), as before.
+
+**Changed**
+
+- Desktop screen-only images go in `assets/lazy/dsk/<screen>/`, with their own 600 KB cap in `tools/check.sh`. They load only on that screen. The NeSL shots are 1.5× JPEGs, 418 KB in total.
+
+### flow/desktop 0.13.0 — 23 Nov 2026 · Desktop loan journey complete: application page, KFS, NeSL, signed + disbursed
+
+Branch `flow/desktop`. Synced from section *final-loan applications* `440:134259`: application page `440:136328` (verifying) / `440:136512` (KFS ready) / `440:136901` (money on its way) / `440:137099` (money in account), sanction signed `440:136706`, KFS reader `440:134934`, NeSL `471:24999`… and confirming `440:135654`.
+
+**Added**
+
+- **Application page.** One screen covers every status:
+  - breadcrumbs
+  - summary card: tinted head with the Application ID tag, then a 4-figure strip with dividers
+  - status card: title and CTA, the mobile timeline, then "Before you sign" or "What to expect"
+  - Total Repayment card
+  - sticky 340 rail: Branch Details (copy buttons), Documents or documents to keep ready, WhatsApp, Withdraw
+- **KFS reader** (two-pane; the approved desktop merge of summary and PDF):
+  - left: the KFS pages with a file bar, a read-progress line and a floating page counter
+  - right: the APR card, You repay, fact chips and the consent card
+  - reading to the last page unlocks consent; the hint scrolls to the end
+  - Accept KFS opens the mobile "Sign on NeSL" Step 2 sheet in a modal
+- **NeSL signing.** The NeSL portal opens as a window over the dimmed application. It steps through the same portal screens as mobile, each with a hotspot on its real button, and Cancel returns to "Sign Sanction Letter". Then **Confirming your signature** shows, and the application returns Signed.
+- **Delight, same as mobile:**
+  - the **Sanction letter signed** milestone
+  - closing it starts the live demo: Money on its way, then Money received with the **Money disbursed** milestone (full confetti burst, amount counts up)
+  - `#ms=on` opens these directly
+- **The whole desktop journey now plays end to end:** Overview → Offers → Compare → Apply → Applications (approved) → Application → KFS → NeSL → Signed → Money on its way → Money received.
+
+**Fixed**
+
+- "View All", "View details" and other link arrows were indigo `#4338CA` (from the frame) next to `#3858E5` labels; they now use the primary chevron. Breadcrumb separators use the grey chevron.
+
+### flow/desktop 0.12.0 — 23 Nov 2026 · Desktop Applications + Apply, with the approval moment
+
+Branch `flow/desktop`. Synced from Figma `440:134641` (Your Applications) and `440:137299` ("Citi Bank approved your loan" over the list), in section *final-loan applications* `440:134259`.
+
+**Added**
+
+- **Loans › Applications** (`440:134641`):
+  - "Your Applications" header with its count and the **WhatsApp updates** pill (toggle).
+  - One card per application: tinted head, "2 days left" tag on KFS-ready cards, and figures with the CTA on one row. Verifying shows Loan offer and Interest with View details; KFS ready shows Final offer, Interest, APR and Monthly EMI with Review KFS.
+  - **Horizontal steps**: done (green), in progress (blue ring, part-filled connector), action (amber ring), to do (grey).
+  - The one-KFS-a-month note.
+- **Apply modal**: the mobile "Proceed applying" body in a 520 modal, opened by every Apply Now (Overview, Loan Offers) and by "Apply to selected lenders" on Compare. Submit creates the applications exactly as mobile does.
+- **Delight, as on mobile.** A few seconds after you submit, the first lender approves. Its card flips to KFS ready and the **approval milestone** opens in a 480 modal. It's the mobile `Loan / Milestone sheet` (confetti burst that falls away, ripple, breathing glow, logo and tick popping), so the moment is identical in both views. `#ms=on` opens it directly, as on mobile. "Review KFS" leads to the application page.
+- **Shared state.** Applications come from the mobile kit (`OPL.apps`), so an application submitted or advanced in one view shows the same status in the other.
+
+**Interaction layer**
+
+- Steps grow in one after another. The in-progress ring breathes and its connector inches forward; the action ring pings twice.
+- Cards lift on hover. View details and Review KFS nudge their chevron or arrow.
+- Modals spring in over a scrim and close on Esc or a scrim click.
+- Overlays now open with a reflow instead of `requestAnimationFrame`, so they also open in a background tab or a hidden preview pane.
+
+**Not on desktop yet** (opens the "isn't designed for desktop yet" page, with a one-click switch to mobile): Application page (`440:136328`, `440:136512`, `440:136901`, `440:137099`), KFS reader (`440:134934`), NeSL signing (`471:24999`…), and the Signed / Disbursed milestones (`440:136706`, `440:137099`).
+
+### flow/desktop 0.11.0 — 23 Nov 2026 · Desktop Loan Offers + Compare
+
+Branch `flow/desktop`. Synced from Figma `357:102436` (Loan Offers tab), `507:84666` (tagged offer rows), `507:85604` (Compare, empty), `507:86537` / `507:87387` (three added, Selected and the Apply bar) and `507:86111` / `507:85929` (Add offers drawer).
+
+**Added**
+
+- **Loans › Loan Offers**:
+  - **Top 3 matches**: the Overview cards.
+  - **All loan matches**: horizontal cards with a grey head, tag groups (Collateral-free · Lowest Fee · Needs Collateral · Subsidy-linked · Lowest Interest, using the Figma icons), and Loan up to · Interest · Renewal · Processing fee. Each card has Compare and Apply Now.
+  - Chip filters, including "Term loan" with its **New** badge, the Sort menu (FLIP re-order) and the empty state.
+- **Loans › Compare**:
+  - **Empty** (0 of 3): three "Add an offer" slots, each with "Browse all 7 offers".
+  - **Added**: lender columns with a tinted head, a remove button, and Interest / APR / Tenure / Monthly cost / Processing fee / Collateral / Money in rows. The "Lowest" chip is computed on Interest. "Show differences only" dims rows that are the same everywhere.
+  - **Select → Selected** per lender. The **Apply bar** rises with one or more selected, and the AI Mitra button lifts above it, as in `507:87387`.
+  - **Add offers to compare** drawer: search (live), chips, selectable offer rows (2px primary stroke and a bold check when picked, max 3 with a shake at the limit) and **Select**.
+- **One shared Compare selection.** The Compare checkboxes on Overview, Loan Offers (Top 3 and the list) and the mobile Loan offers screen all feed it. The Compare tab shows the count.
+- Tab icons switch to their Bold version on the active tab (Compare frame `507:85679`).
+
+**Changed**
+
+- `tools/build.sh` minifies the inlined desktop SVGs. `tools/check.sh` no longer counts those SVG files twice. Desktop is 277 KB on demand.
+
+### flow/desktop 0.10.0 — 23 Nov 2026 · Desktop view + Loans overview (desktop)
+
+Branch `flow/desktop`. Synced from Figma `476:200124` "loans overview" (page *Finance Hub - Desktop Loans* `357:54674`).
+
+**Added**
+
+- **Mobile ⇄ Desktop switch.** "View" in the panel, the `D` key, or `#device=desktop`. The screen and its params carry over, so the same state opens in either view. Desktop shows a 1440-wide browser window scaled to the space next to the panel; its height grows to fill the stage. On a phone (≤500px) it's always mobile.
+- **Desktop loads on demand.** It's a separate bundle (`dist/desktop.css` + `dist/desktop.js`, with icons inlined), fetched the first time you switch. Mobile first load is unchanged. `tools/check.sh` gives desktop its own budget (600 KB).
+- **Desktop shell** (`476:200125`, `476:200177`, `476:200199`): sidebar with business switcher and nav groups, sticky pill top bar (search, support, notifications, messages, EN/हिं), underline tabs (Overview · Loan Offers · Compare · Applications · My Loans), and the AI Mitra FAB.
+- **Loans › Overview** (`476:200124`):
+  - Safe Borrowing Limit hero with 3 quick picks and an AI row.
+  - **CIBIL MSME Rank** gauge, built from Figma's 20 bars (`476:200271`) so each bar can animate.
+  - Top loan matches: chips, Sort, Filters, and 3 tinted-head offer cards.
+  - Debt Profile: 3 stat tiles, Monthly Repayment Trend chart, and Term Loans.
+- **Desktop with no design yet**: a mobile screen without a desktop version keeps the desktop shell and offers "Open in mobile view", so the switch never dead-ends.
+
+**Interaction layer (prototype, behaviour on drawn elements)**
+
+- Hover, focus-visible and active states on every control:
+  - nav rows tint and their icon nudges
+  - tabs preview their underline
+  - cards lift 2px with a deeper shadow and a slate-300 stroke
+  - buttons, chips and pills darken and press to 0.97
+  - AI rows: the arrow slides and the Mitra mark turns
+  - quick-pick and stat icons pop
+- The tab underline glides from the previous tab to the new one. The content fades up between pages while the shell stays put.
+- The top bar frosts once content scrolls under it. ⌘K focuses search, which widens.
+- CMR gauge: the bars sweep in, the needle springs to rank 2, then the rank and the "Low Risk" chip settle. Hovering the gauge keeps your rank lit and dims the rest. The info icon shows a tooltip.
+- Chips filter the cards (AND), with an empty state and "Clear filters". The Sort menu re-orders the cards with a FLIP glide. Cards keep Figma's order until you pick a sort.
+- Compare checkboxes add to a shared selection (the same one mobile Loan offers uses), show a counter on the Compare tab, and raise a toast with "Compare now" (max 3).
+- The ₹50 Lakhs limit counts up. The repayment chart draws in left → right, then the point pings and its tooltip appears.
+- The unread dots ping twice, and the bell rings on hover. The AI Mitra nudge slides out once, as on mobile.
 
 ## v0.9.2 — 23 Nov 2026 · Days-left tag corner
 

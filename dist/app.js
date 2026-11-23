@@ -4,7 +4,7 @@
 
 (function () {
 const OPL = (window.OPL = window.OPL || {});
-OPL.VERSION = "0.10.2";
+OPL.VERSION = "0.14.1";
 OPL.FIGMA_FILE = "https://www.figma.com/design/GHuBkYGEQZvQppv3v55EaA/OPL----Internal-Playground--5-";
 OPL.figmaLink = (nodeId) => `${OPL.FIGMA_FILE}?node-id=${nodeId.replace(":", "-")}`;
 const esc = (v) =>
@@ -59,7 +59,7 @@ if (e.target.closest("[data-back]")) return OPL.back && OPL.back();
 const el = e.target.closest("[data-goto]");
 if (el) {
 const target = el.getAttribute("data-goto");
-if (OPL.screens && OPL.screens[target]) return OPL.go(target);
+if (OPL.hasScreen ? OPL.hasScreen(target) : OPL.screens && OPL.screens[target]) return OPL.go(target);
 flash([el]);
 return;
 }
@@ -931,7 +931,7 @@ document.addEventListener("keydown", (e) => { if (e.key === "Escape" && current 
 let startY = 0, dy = 0, dragging = false, t0 = 0;
 page.addEventListener("pointerdown", (e) => {
 const grip = e.target.closest("[data-sheet-drag]");
-if (!grip || !current) return;
+if (!grip || !current || e.target.closest("button")) return;
 dragging = true; startY = e.clientY; dy = 0; t0 = performance.now();
 current.classList.add("is-dragging");
 grip.setPointerCapture?.(e.pointerId);
@@ -4083,9 +4083,38 @@ const panelEl = document.getElementById("panel");
 const wrap = document.querySelector(".device-wrap");
 let currentPage = null;
 let depth = 0;
+OPL.dscreens = OPL.dscreens || {};
+OPL.dalias = { home: "loans-overview" };
+const isDesktop = () => OPL.state.get().device === "desktop" && window.innerWidth > 500;
+OPL.isDesktop = isDesktop;
+const dName = (name) => (OPL.dscreens[name] ? name : OPL.dscreens[OPL.dalias[name]] ? OPL.dalias[name] : null);
+OPL.hasScreen = (name) => (isDesktop() ? !!dName(name) || !!OPL.screens[name] : !!OPL.screens[name]);
+let dLoading = null;
+function loadDesktop() {
+if (OPL.dReady) return Promise.resolve();
+if (dLoading) return dLoading;
+dLoading = new Promise((resolve, reject) => {
+const v = OPL.VERSION;
+const css = document.createElement("link");
+css.rel = "stylesheet";
+css.href = `dist/desktop.css?v=${v}`;
+const cssReady = new Promise((r) => { css.onload = css.onerror = r; });
+document.head.appendChild(css);
+const js = document.createElement("script");
+js.src = `dist/desktop.js?v=${v}`;
+js.onload = () => cssReady.then(() => { OPL.dReady = true; resolve(); });
+js.onerror = reject;
+document.head.appendChild(js);
+});
+return dLoading;
+}
 const screenName = () => {
 const st = OPL.state.get();
-return OPL.screens[st.screen] ? st.screen : "home";
+return OPL.screens[st.screen] || OPL.dscreens[st.screen] ? st.screen : "home";
+};
+const impl = (name) => {
+if (isDesktop()) return OPL.dscreens[dName(name)] || OPL.dscreens.__missing;
+return OPL.screens[name] || OPL.screens.home;
 };
 const hashFor = (patch) => {
 const next = { ...OPL.state.get(), ...patch };
@@ -4093,7 +4122,7 @@ Object.keys(next).forEach((k) => (next[k] == null || (k === "screen" && next[k] 
 return "#" + new URLSearchParams(next).toString();
 };
 OPL.go = (name, params = {}, { replace = false } = {}) => {
-if (!OPL.screens[name]) return;
+if (!OPL.hasScreen(name)) return;
 const next = hashFor({ screen: name, ...params });
 if (next === location.hash || (name === screenName() && !Object.keys(params).length)) return;
 if (replace) history.replaceState({ depth }, "", next);
@@ -4108,31 +4137,47 @@ render({ dir: "back" });
 function render({ dir } = {}) {
 const st = OPL.state.get();
 const name = screenName();
-document.documentElement.dataset.hotspots = st.hotspots || "on";
-document.documentElement.dataset.frame = st.frame || "on";
-if (currentPage && currentPage.dataset.screen === name && !dir) {
+const device = isDesktop() ? "desktop" : "mobile";
+const root = document.documentElement;
+root.dataset.hotspots = st.hotspots || "on";
+root.dataset.frame = st.frame || "on";
+if (root.dataset.device !== device) { root.dataset.device = device; fit(); }
+if (device === "desktop" && !OPL.dReady) {
+loadDesktop().then(() => { render({ dir }); fit(); }, () => OPL.state.set({ device: null }));
+return;
+}
+const s = impl(name);
+if (currentPage && currentPage.dataset.screen === name && currentPage.dataset.device === device && !dir) {
 const fresh = document.createElement("div");
 fresh.className = currentPage.className.replace(/\b(is-push-in|is-pop-in|is-entering)\b/g, "").trim();
 fresh.dataset.screen = name;
+fresh.dataset.device = device;
 const scroll = currentPage.querySelector(".scroller")?.scrollTop || 0;
 currentPage.replaceWith(fresh);
 currentPage = fresh;
-const s = OPL.screens[name];
 if (s.leave) s.leave();
 s.render(fresh);
 const sc = fresh.querySelector(".scroller"); if (sc) sc.scrollTop = scroll;
 return renderPanel(name);
 }
 const old = currentPage;
-if (old) { const leaving = OPL.screens[old.dataset.screen]; if (leaving && leaving.leave) leaving.leave(); }
+if (old) {
+const reg = old.dataset.device === "desktop" ? OPL.dscreens : OPL.screens;
+const leaving = reg[old.dataset.screen] || (old.dataset.device === "desktop" && OPL.dscreens[OPL.dalias[old.dataset.screen]]);
+if (leaving && leaving.leave) leaving.leave();
+}
 const page = document.createElement("div");
 page.className = "page";
 page.dataset.screen = name;
+page.dataset.device = device;
 screenEl.appendChild(page);
-OPL.screens[name].render(page);
+s.render(page);
 currentPage = page;
 if (old) {
-if (dir && !OPL.fx.motionOff()) {
+if (device === "desktop" || old.dataset.device !== device) {
+old.remove();
+if (dir && old.dataset.device === device && !OPL.fx.motionOff()) page.classList.add("is-d-in");
+} else if (dir && !OPL.fx.motionOff()) {
 const [inC, outC] = dir === "back" ? ["is-pop-in", "is-pop-out"] : ["is-push-in", "is-push-out"];
 page.classList.add(inC);
 old.classList.add(outC);
@@ -4145,9 +4190,29 @@ old.remove();
 }
 renderPanel(name);
 }
+const D_W = 1440, D_MIN_H = 760;
 function fit() {
-if (window.innerWidth <= 500) { wrap.style.transform = ""; wrap.style.margin = ""; return; }
-wrap.style.transform = ""; wrap.style.margin = "";
+wrap.style.transform = ""; wrap.style.margin = ""; wrap.style.width = ""; wrap.style.height = "";
+screenEl.style.height = "";
+if (window.innerWidth <= 500) return;
+if (document.documentElement.dataset.device === "desktop") {
+const panelW = panelEl && getComputedStyle(panelEl).display !== "none" && !panelEl.classList.contains("is-collapsed") && window.innerWidth > 1000 ? panelEl.offsetWidth + 32 : 0;
+const chrome = wrap.offsetHeight - screenEl.offsetHeight;          // browser bar
+const availW = window.innerWidth - 48 - panelW;
+const availH = window.innerHeight - 48;
+const s = Math.min(1, availW / D_W);
+const h = Math.max(D_MIN_H, Math.floor((availH - chrome * s) / s));
+screenEl.style.height = `${h}px`;
+const fullH = h + chrome;
+wrap.style.width = `${D_W * s}px`;
+wrap.style.height = `${fullH * s}px`;
+wrap.style.transform = s < 1 ? `scale(${s})` : "";
+wrap.style.transformOrigin = "top left";
+wrap.style.visibility = "visible";
+return;
+}
+wrap.style.transformOrigin = "";
+wrap.style.visibility = "visible";
 const h = wrap.offsetHeight, avail = window.innerHeight - 48;
 const s = Math.min(1, avail / h);
 wrap.style.transform = s < 1 ? `scale(${s})` : "";
@@ -4160,32 +4225,36 @@ return `<div class="seg" data-group="${groupId}">${options
 }
 function renderPanel(name) {
 if (!panelEl) return;
-const reg = OPL.variants[name];
+const desk = isDesktop();
+const reg = desk ? OPL.dvariants?.[dName(name)] : OPL.variants[name];
 const st = OPL.state.get();
-const v = reg ? OPL.variantValues(name) : {};
+const v = reg ? (desk ? OPL.dvariantValues(dName(name)) : OPL.variantValues(name)) : {};
 const activePreset = reg?.presets.find((p) => Object.entries(p.set).every(([k, val]) => v[k] === val));
-const figmaNode = activePreset?.figma || Object.values(OPL.screens[name].figma || {})[0];
+const scr = impl(name);
+const figmaNode = activePreset?.figma || Object.values(scr.figma || {})[0];
+const list = desk ? Object.entries(OPL.dscreens).filter(([id]) => !id.startsWith("__")) : Object.entries(OPL.screens);
+const active = desk ? dName(name) : name;
 const closed = panelClosed();
 panelEl.classList.toggle("is-collapsed", closed);
 const flowOf = (id) => (/^subsid/.test(id) ? "subsidies" : "loans");
 const FLOWS = [["loans", "Finance hub & loans"], ["subsidies", "Subsidies"]];
-const screens = Object.entries(OPL.screens);
+const screens = list;                               // desktop view lists only the screens built for desktop
 const flows = FLOWS.map(([fid, flabel]) => {
-const list = screens.filter(([id]) => flowOf(id) === fid);
-if (!list.length) return "";
-const open = groupOpen(`flow-${fid}`, fid === flowOf(name));
+const fl = screens.filter(([id]) => flowOf(id) === fid);
+if (!fl.length) return "";
+const open = groupOpen(`flow-${fid}`, fid === flowOf(active));
 return `
 <div class="panel__flow ${open ? "" : "is-shut"}" data-pg="flow-${fid}">
-<button class="panel__flow-head" data-pg-toggle aria-expanded="${open}"><span>${flabel}</span><small>${list.length}</small>${CHEV}</button>
-<div class="panel__gbody"><div class="panel__ginner"><div class="presets">${list
-.map(([id, sc]) => `<button class="preset ${id === name ? "is-on" : ""}" data-screen="${id}">${sc.title}</button>`)
+<button class="panel__flow-head" data-pg-toggle aria-expanded="${open}"><span>${flabel}</span><small>${fl.length}</small>${CHEV}</button>
+<div class="panel__gbody"><div class="panel__ginner"><div class="presets">${fl
+.map(([id, sc]) => `<button class="preset ${id === active ? "is-on" : ""}" data-screen="${id}">${sc.title}</button>`)
 .join("")}</div></div></div>
 </div>`;
 }).join("");
 const toggles = reg ? reg.groups.filter((g) => g.options.length > 1 && !g.hidden) : [];
 panelEl.innerHTML = `
 <div class="panel__head">
-<span class="panel__title">${OPL.screens[name].title}</span>
+<span class="panel__title">${scr.title}</span>
 <span class="panel__ver">v${OPL.VERSION}</span>
 <button class="panel__toggle" data-panel-toggle aria-expanded="${!closed}" aria-controls="panel-body"
 title="${closed ? "Show" : "Hide"} controls (P)" aria-label="${closed ? "Show" : "Hide"} prototype controls">
@@ -4193,7 +4262,11 @@ title="${closed ? "Show" : "Hide"} controls (P)" aria-label="${closed ? "Show" :
 </button>
 </div>
 <div class="panel__body" id="panel-body" ${closed ? "inert" : ""}><div class="panel__inner">
-${pgroup("screens", "Screens", `<div class="panel__flows">${flows}</div>`, { count: screens.length })}
+<div class="panel__group panel__group--device">
+<div class="panel__label"><span>View</span><span class="panel__kbd">D</span></div>
+${seg("device", [{ value: "mobile", label: "Mobile" }, { value: "desktop", label: "Desktop" }], desk ? "desktop" : "mobile")}
+</div>
+${pgroup("screens", desk ? "Desktop screens" : "Screens", `<div class="panel__flows">${flows}</div>`, { count: screens.length })}
 ${reg && reg.presets.length > 1 ? pgroup("frames", "Figma frames", `<div class="presets">${reg.presets
 .map((p) => `<button class="preset ${p === activePreset ? "is-on" : ""}" data-preset="${p.id}">${p.label}</button>`)
 .join("")}</div>`, { count: reg.presets.length, open: reg.presets.length <= 3 }) : ""}
@@ -4274,24 +4347,37 @@ if (panelEl.classList.contains("is-collapsed") && e.target.closest(".panel__head
 const scr = e.target.closest("[data-screen]");
 if (scr) {
 const target = scr.dataset.screen;
-if (target === screenName()) return;
-if (target === "home") { history.replaceState({ depth: 0 }, "", hashFor({ screen: null })); depth = 0; return render({ dir: "back" }); }
+if (target === screenName() || (isDesktop() && target === dName(screenName()))) return;
+if (target === "home" || (isDesktop() && target === "loans-overview" && depth === 0)) { history.replaceState({ depth: 0 }, "", hashFor({ screen: null })); depth = 0; return render({ dir: "back" }); }
 return OPL.go(target);
 }
 const preset = e.target.closest("[data-preset]");
 if (preset) {
-const p = OPL.variants[OPL.current()].presets.find((x) => x.id === preset.dataset.preset);
+const reg = isDesktop() ? OPL.dvariants[dName(OPL.current())] : OPL.variants[OPL.current()];
+const p = reg.presets.find((x) => x.id === preset.dataset.preset);
 return OPL.state.set(p.set);
 }
 const btn = e.target.closest(".seg button");
 if (btn) {
 const group = btn.parentElement.dataset.group;
+if (group === "device") return setDevice(btn.dataset.value);
 return OPL.state.set({ [group]: group === "motion" && btn.dataset.value === "on" ? null : btn.dataset.value });
 }
 if (e.target.closest("[data-replay]")) {
 currentPage?.querySelector(".scroller")?.scrollTo({ top: 0 });
 return render();
 }
+});
+function setDevice(d) {
+if ((d === "desktop") === isDesktop()) return;
+if (d === "desktop" && window.innerWidth <= 500) return;
+OPL.state.set({ device: d === "desktop" ? "desktop" : null });
+}
+OPL.setDevice = setDevice;
+window.addEventListener("keydown", (e) => {
+if (e.metaKey || e.ctrlKey || e.altKey || e.key.toLowerCase() !== "d") return;
+if (e.target.closest && e.target.closest("input, textarea, [contenteditable]")) return;
+setDevice(isDesktop() ? "mobile" : "desktop");
 });
 OPL.current = () => screenName();
 OPL.rerender = () => { render(); return currentPage; };
@@ -4300,7 +4386,10 @@ window.addEventListener("popstate", (e) => {
 depth = (e.state && e.state.depth) || 0;
 render({ dir: "back" });
 });
-window.addEventListener("resize", fit);
+window.addEventListener("resize", () => {
+fit();
+if ((isDesktop() ? "desktop" : "mobile") !== document.documentElement.dataset.device) render();
+});
 OPL.initInteractions(screenEl);
 history.replaceState({ depth: 0 }, "", location.hash || "#");
 const timeout = (ms) => new Promise((r) => setTimeout(r, ms));
