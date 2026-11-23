@@ -1,0 +1,70 @@
+/* Desktop · Loans › Compare (507:85604 · 507:87387) — layout only.
+   Header row (title + "n of 3 added" · differences toggle) → 20 → tiers: 150 labels + 3 × 295
+   columns, gap 24, px20. Rows are 80 tall; the lender head spans Lender + Loan Amount. */
+.d-cmp { display: flex; flex-direction: column; gap: 20px; margin-top: 32px; padding-bottom: 8px; transition: padding 380ms var(--d-ease); }
+.d-main.has-bar .d-cmp { padding-bottom: 96px; }
+.d-cmp__bar { display: flex; align-items: center; justify-content: space-between; min-height: 28px; }
+.d-cmp__title { display: flex; align-items: center; gap: 16px; white-space: nowrap; }
+.d-cmp__title h2 { font-size: 20px; line-height: 28px; font-weight: 600; }
+.d-cmp__title span { font-size: 14px; line-height: 20px; color: var(--muted-foreground); }
+
+.d-cmp__grid { display: grid; grid-template-columns: 150px repeat(3, minmax(0, 1fr)); gap: 24px; padding: 0 20px; border-radius: 16px; background: #fff; }
+.d-cmp__labels { display: flex; flex-direction: column; }
+.d-cmp__label { height: 80px; display: flex; align-items: center; gap: 8px; padding: 28px 0 32px; border-bottom: 1px solid #f1f5f9; font-size: 14px; line-height: 20px; color: #334155; transition: opacity 240ms; }
+.d-cmp__label:nth-child(2) { border-bottom-color: #f8fafc; }
+.d-cmp__label:last-child { border-bottom: 0; }
+.d-cmp__info { position: relative; display: inline-grid; place-items: center; cursor: help; }
+
+/* column (507:87512): white, 1px #EBEEFC stroke, r16, pt4 */
+.d-cmp__col {
+  display: flex; flex-direction: column; padding-top: 4px; border-radius: 16px; background: #fff;
+  box-shadow: inset 0 0 0 1px #ebeefc;
+  animation: d-col-in 420ms var(--d-ease) both; animation-delay: calc(var(--i) * 60ms);
+  transition: box-shadow 220ms, transform 240ms var(--d-ease), opacity 240ms;
+}
+@keyframes d-col-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.d-cmp__col:hover { box-shadow: inset 0 0 0 1px #d6dcf6, var(--d-shadow-hover); }
+.d-cmp__col.is-selected { box-shadow: inset 0 0 0 1.5px var(--primary), 0 8px 24px -12px rgba(56, 88, 229, 0.35); }
+.d-cmp__col.is-leaving { opacity: 0; transform: scale(0.96); }
+.d-cmp__head { margin: 0 4px; height: 156px; display: flex; flex-direction: column; gap: 12px; padding: 26px 0 16px 20px; border-radius: 16px; background: var(--tint); }
+.d-cmp__id { display: flex; align-items: flex-start; gap: 12px; width: calc(100% - 16px); }
+.d-cmp__name { flex: 1; min-width: 0; }
+.d-cmp__name .d-card__name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.d-cmp__x { width: 24px; height: 24px; flex-shrink: 0; border-radius: 50%; opacity: 0.85; transition: transform 220ms var(--d-ease), opacity 160ms; }
+.d-cmp__x:hover { opacity: 1; transform: rotate(90deg) scale(1.08); }
+.d-cmp__amount { display: flex; flex-direction: column; gap: 4px; white-space: nowrap; }
+.d-cmp__amount p { font-size: 12px; line-height: 20px; color: var(--muted-foreground); }
+.d-cmp__amount b { font-size: 24px; line-height: 36px; letter-spacing: -0.4px; font-weight: 600; color: var(--foreground); }
+.d-cmp__row { height: 80px; border-top: 1px solid #eef2ff; transition: opacity 240ms, background 200ms; }
+.d-cmp__row:first-of-type { border-top: 0; }
+.d-cmp__col .d-cmp__row:nth-child(2) { border-top: 0; }
+.d-cmp__cell { height: 100%; display: flex; align-items: flex-start; gap: 8px; padding: 16px; }
+.d-cmp__row[data-row="tenure"] .d-cmp__cell, .d-cmp__cell--inline { align-items: center; }
+.d-cmp__cell--inline { gap: 16px; font-size: 16px; line-height: 24px; font-weight: 500; color: var(--foreground); white-space: nowrap; }
+.d-cmp__val { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; white-space: nowrap; }
+.d-cmp__val p { font-size: 16px; line-height: 24px; font-weight: 500; color: var(--foreground); }
+.d-cmp__val small { font-size: 14px; line-height: 20px; color: var(--tertiary-foreground); }
+.d-cmp__best { height: 24px; display: inline-flex; align-items: center; padding: 0 10px; border-radius: 999px; background: #f3f9f7; color: #047857; font-size: 12px; line-height: 16px; font-weight: 500; white-space: nowrap; }
+.d-cmp__foot { padding: 24px 16px 12px; margin-top: auto; }
+/* row hover: the whole row lights across label + columns */
+.d-cmp__grid:has(.d-cmp__row:hover) .d-cmp__row:hover { background: #fafbff; }
+/* Show differences only: rows that are the same everywhere step back */
+.d-cmp__grid.is-diff .is-same { opacity: 0.32; }
+
+/* empty slot (507:118294) */
+.d-cmp__slot {
+  min-height: 739px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;
+  padding: 28px 20px; border-radius: 20px; background: #fff; box-shadow: inset 0 0 0 1px rgba(56, 88, 229, 0.1);
+  animation: d-col-in 420ms var(--d-ease) both; animation-delay: calc(var(--i) * 60ms);
+  transition: box-shadow 220ms, background 220ms;
+}
+.d-cmp__slot:hover { background: #fbfcff; box-shadow: inset 0 0 0 1px rgba(56, 88, 229, 0.3); }
+.d-cmp__add { width: 48px; height: 48px; border-radius: 50%; transition: transform 320ms var(--ease-spring); }
+.d-cmp__slot:hover .d-cmp__add { transform: rotate(90deg) scale(1.06); }
+.d-cmp__slot-copy { display: flex; flex-direction: column; align-items: center; gap: 4px; white-space: nowrap; }
+.d-cmp__slot-copy p { font-size: 16px; line-height: 24px; font-weight: 500; }
+.d-cmp__slot-copy small { font-size: 14px; line-height: 20px; color: var(--muted-foreground); }
+.d-cmp__browse { display: inline-flex; align-items: center; gap: 4px; height: 32px; padding: 8px 12px; border-radius: 999px; background: #fff; box-shadow: inset 0 0 0 1px var(--border); font-size: 12px; line-height: 16px; font-weight: 600; color: var(--primary); transition: box-shadow 160ms, background 160ms; }
+.d-cmp__browse .ico { transition: transform 200ms var(--d-ease); }
+.d-cmp__browse:hover { background: var(--primary-tint); box-shadow: inset 0 0 0 1px var(--primary); }
+.d-cmp__browse:hover .ico { transform: translateX(2px); }

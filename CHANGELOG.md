@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.11.0 — 23 Nov 2026 · Desktop Loan Offers + Compare
+
+Branch `flow/desktop`. Synced from Figma `357:102436` (Loan Offers tab), `507:84666` (tagged offer rows), `507:85604` (Compare, empty), `507:86537` / `507:87387` (three added, Selected and the Apply bar) and `507:86111` / `507:85929` (Add offers drawer).
+
+**Added**
+
+- **Loans › Loan Offers**:
+  - **Top 3 matches**: the Overview cards.
+  - **All loan matches**: horizontal cards with a grey head, tag groups (Collateral-free · Lowest Fee · Needs Collateral · Subsidy-linked · Lowest Interest, using the Figma icons), and Loan up to · Interest · Renewal · Processing fee. Each card has Compare and Apply Now.
+  - Chip filters, including "Term loan" with its **New** badge, the Sort menu (FLIP re-order) and the empty state.
+- **Loans › Compare**:
+  - **Empty** (0 of 3): three "Add an offer" slots, each with "Browse all 7 offers".
+  - **Added**: lender columns with a tinted head, a remove button, and Interest / APR / Tenure / Monthly cost / Processing fee / Collateral / Money in rows. The "Lowest" chip is computed on Interest. "Show differences only" dims rows that are the same everywhere.
+  - **Select → Selected** per lender. The **Apply bar** rises with one or more selected, and the AI Mitra button lifts above it, as in `507:87387`.
+  - **Add offers to compare** drawer: search (live), chips, selectable offer rows (2px primary stroke and a bold check when picked, max 3 with a shake at the limit) and **Select**.
+- **One shared Compare selection.** The Compare checkboxes on Overview, Loan Offers (Top 3 and the list) and the mobile Loan offers screen all feed it. The Compare tab shows the count.
+- Tab icons switch to their Bold version on the active tab (Compare frame `507:85679`).
+
+**Changed**
+
+- `tools/build.sh` minifies the inlined desktop SVGs. `tools/check.sh` no longer counts those SVG files twice. Desktop is 277 KB on demand.
+
 ## v0.10.0 — 23 Nov 2026 · Desktop view + Loans overview (desktop)
 
 Branch `flow/desktop`. Synced from Figma `476:200124` "loans overview" (page *Finance Hub - Desktop Loans* `357:54674`).

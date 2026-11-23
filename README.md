@@ -56,6 +56,10 @@ Switch with **View → Desktop** in the panel, press **D**, or link `#device=des
    - the filter empty state copy (after the old "No matches" frame `357:100347`)
    - the Sort options (taken from mobile)
    - the compare toast
+6. **Loan Offers (`507:84666`):** every row shows ₹50 L · 9.45% · Yearly · 0.75% (placeholder figures as drawn). The "Processing fee" stat is Figtree in Figma and is shown in Geist.
+7. **Compare (`507:87387`):** Citi, SIDBI and Axis have identical terms in Figma, so "Show differences only" dims every row. SBI and HDFC have no desktop column, so they reuse the drawn values.
+8. **Mixed controls:** the Compare checkbox is a 16px DS checkbox on the horizontal rows (`507:84775`) but a 20px Solar icon on the vertical cards. Both use the Solar icon here, for consistency.
+9. **Add offers drawer:** the Select button is indigo `#4338CA` in Figma and shown as `#3858E5` here. The "n of 3 selected" counter is proposed.
 
 ## Run it
 

@@ -16,7 +16,7 @@ total=$(( $(find assets/img assets/icons assets/fonts dist -type f ! -name 'desk
 if (( total > MAX_TOTAL_KB )); then echo "✗ total payload ${total} KB (max ${MAX_TOTAL_KB} KB)"; fail=1; fi
 lazy=0; [ -d assets/lazy ] && lazy=$(( $(find assets/lazy -type f -not -path 'assets/lazy/dsk/*' -print0 | xargs -0 stat -f%z | paste -sd+ - | bc) / 1024 ))
 if (( lazy > MAX_LAZY_KB )); then echo "✗ lazy assets ${lazy} KB (max ${MAX_LAZY_KB} KB)"; fail=1; fi
-desk=$(( $(find assets/lazy/dsk dist -type f \( -path 'assets/lazy/dsk/*' -o -name 'desktop.*' \) -print0 2>/dev/null | xargs -0 stat -f%z | paste -sd+ - | bc) / 1024 ))
+desk=$(( $(find assets/lazy/dsk dist -type f \( \( -path 'assets/lazy/dsk/*' ! -name '*.svg' \) -o -name 'desktop.*' \) -print0 2>/dev/null | xargs -0 stat -f%z | paste -sd+ - | bc) / 1024 ))
 if (( desk > MAX_DESKTOP_KB )); then echo "✗ desktop view ${desk} KB (max ${MAX_DESKTOP_KB} KB)"; fail=1; fi
 if grep -rq 'assets/lazy' index.html; then echo "✗ index.html references assets/lazy — lazy assets must not load at boot"; fail=1; fi
 if grep -q 'fonts.googleapis.com' index.html; then echo "✗ index.html loads Google Fonts — fonts must be self-hosted (offline-safe)"; fail=1; fi

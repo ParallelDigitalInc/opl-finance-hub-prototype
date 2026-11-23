@@ -1,0 +1,7 @@
+/* Desktop · Loans › Loan Offers (357:102436) — layout only.
+   tabs → 32 → Top 3 matches (title 28 + 20 + cards 399) → 24 → All loan matches. */
+.d-offers { display: flex; flex-direction: column; gap: 24px; margin-top: 32px; }
+.d-offers__top { display: flex; flex-direction: column; gap: 20px; }
+.d-offers__all { display: flex; flex-direction: column; gap: 20px; }
+.d-offers .d-sh__title { line-height: 28px; }
+.d-rows-list { display: flex; flex-direction: column; gap: 20px; }

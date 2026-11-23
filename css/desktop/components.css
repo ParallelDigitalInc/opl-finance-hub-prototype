@@ -185,3 +185,95 @@
 /* ---- Panels (white, 1px slate-200, r16, Shadow/xs — 476:200583) --------------------------------- */
 .d-panel { position: relative; border-radius: 16px; background: #fff; box-shadow: inset 0 0 0 1px var(--border), var(--d-shadow-xs); overflow: hidden; }
 .d-panel__title { display: flex; align-items: center; gap: 10px; font-size: 18px; line-height: 28px; letter-spacing: -0.4px; font-weight: 500; color: var(--muted-foreground); }
+
+/* ---- Tags on tinted heads (507:84710) — white, r-bl 12, px8 py6, gap 12, 14px rule ---- */
+.d-tags { display: inline-flex; align-items: center; gap: 12px; padding: 6px 8px; border-radius: 0 0 0 12px; background: #fff; flex-shrink: 0; align-self: flex-start; }
+.d-tag { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; line-height: normal; font-weight: 500; white-space: nowrap; }
+.d-tag--blue { color: var(--primary); }
+.d-tag--green { color: #047857; }
+.d-tag--amber { color: #92400e; }
+.d-tags__rule { width: 1px; height: 14px; }
+.d-chip__badge { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 21px; margin: -1px 0; border-radius: 999px; background: #c7d2fe; color: #3730a3; font-size: 12px; line-height: 1; font-weight: 500; }
+
+/* ---- Offer card · horizontal (507:84700): 2px #F1F5F9 stroke inside, grey head r16 ---- */
+.d-row-card {
+  position: relative; display: flex; flex-direction: column; padding: 4px 4px 0;
+  border-radius: 16px; background: #fff; box-shadow: inset 0 0 0 2px #f1f5f9;
+  cursor: pointer; transition: transform 260ms var(--d-ease), box-shadow 260ms var(--d-ease);
+}
+.d-row-card:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 2px #e2e8f0, var(--d-shadow-hover); }
+.d-row-card:hover .d-logo { transform: scale(1.06); }
+.d-row-card:focus-visible { box-shadow: inset 0 0 0 2px var(--primary), var(--d-focus); }
+.d-row-card__head { display: flex; align-items: flex-start; justify-content: space-between; padding: 0 0 16px 20px; border-radius: 16px; background: var(--muted); transition: background 200ms; }
+.d-row-card:hover .d-row-card__head { background: #edf1f6; }
+.d-row-card__id { display: flex; align-items: flex-start; gap: 12px; padding-top: 16px; }
+.d-row-card__figs { display: flex; align-items: flex-end; gap: 48px; padding: 16px 12px; }
+.d-fig--fee { gap: 4px; height: auto; }
+.d-fig--fee .d-fig__value { font-size: 18px; line-height: 28px; font-weight: 600; }
+.d-row-card__spacer { flex: 1; }
+.d-row-card__foot { display: flex; align-items: center; gap: 16px; margin-left: auto; padding: 0 8px 0 0; }
+
+/* selectable rows in the Add-offers drawer (507:86137): checkbox first, 2px primary when picked */
+.d-row-card--pick .d-row-card__head { padding-left: 12px; }
+.d-row-card--pick .d-row-card__id { align-items: center; }
+.d-row-card--pick .d-row-card__figs { gap: 48px; }
+.d-row-card__check { position: relative; width: 20px; height: 20px; flex-shrink: 0; }
+.d-row-card__check .ico { position: absolute; inset: 0; transition: opacity 160ms, transform 260ms var(--ease-spring); }
+.d-row-card__check .d-check__on { opacity: 0; transform: scale(0.6); }
+.d-row-card--pick.is-picked { box-shadow: inset 0 0 0 2px var(--primary); }
+.d-row-card--pick.is-picked .d-check__on { opacity: 1; transform: none; }
+.d-row-card--pick.is-picked .d-check__off { opacity: 0; }
+.d-row-card--pick:hover { transform: none; }
+
+/* ---- Toggle (DS 269:2) --------------------------------------------------------------- */
+.d-toggle { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; line-height: 20px; color: var(--muted-foreground); border-radius: 8px; }
+.d-toggle__track { position: relative; width: 36px; height: 20px; border-radius: 999px; background: #cbd5e1; transition: background 200ms; }
+.d-toggle__knob { position: absolute; left: 2px; top: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.2); transition: transform 260ms var(--ease-spring), width 160ms; }
+.d-toggle:hover .d-toggle__track { background: #b8c3d1; }
+.d-toggle:active .d-toggle__knob { width: 20px; }
+.d-toggle.is-on .d-toggle__track { background: var(--primary); }
+.d-toggle.is-on .d-toggle__knob { transform: translateX(16px); }
+.d-toggle.is-on:active .d-toggle__knob { transform: translateX(12px); }
+
+/* ---- Drawer (507:86111): 591 wide, p24, r16 left, 0 12 40 rgba(15,23,41,.18) ------------- */
+.d-drawer-layer { position: absolute; inset: 0; z-index: 60; pointer-events: none; }
+.d-drawer-layer.is-open { pointer-events: auto; }
+.d-scrim { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.45); opacity: 0; transition: opacity 280ms; }
+.d-drawer-layer.is-open .d-scrim { opacity: 1; }
+.d-drawer {
+  position: absolute; right: 0; top: 0; bottom: 0;
+  display: flex; flex-direction: column; gap: 16px; padding: 24px 24px 0;
+  border-radius: 16px 0 0 16px; background: #fff; box-shadow: 0 12px 40px rgba(15, 23, 41, 0.18);
+  transform: translateX(104%); transition: transform 380ms var(--d-ease);
+}
+.d-drawer-layer.is-open .d-drawer { transform: none; }
+.d-drawer__head { display: flex; align-items: flex-start; justify-content: space-between; }
+.d-drawer__title { font-size: 20px; line-height: 28px; font-weight: 600; }
+.d-drawer__x { width: 24px; height: 24px; border-radius: 50%; transition: transform 220ms var(--d-ease); }
+.d-drawer__x:hover { transform: rotate(90deg); }
+.d-drawer__body { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 16px; overflow: hidden; }
+.d-drawer__list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; margin: 0 -24px; padding: 0 24px 24px; scrollbar-width: thin; }
+.d-drawer__none { padding: 32px 0; text-align: center; color: var(--muted-foreground); font-size: 14px; }
+.d-drawer__foot { display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin: 0 -24px; padding: 16px 24px 24px; border-top: 1px solid #eef2ff; background: #fff; }
+.d-drawer__count { margin-right: auto; font-size: 14px; line-height: 20px; color: var(--muted-foreground); transition: color 160ms; }
+.d-drawer__count.is-max { color: #b45309; }
+.d-drawer__cta { width: 200px; }
+.d-dsearch { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-radius: 999px; background: #fff; box-shadow: inset 0 0 0 1px var(--border); transition: box-shadow 160ms; cursor: text; }
+.d-dsearch:hover { box-shadow: inset 0 0 0 1px var(--d-border-hover); }
+.d-dsearch:focus-within { box-shadow: inset 0 0 0 1px var(--primary), var(--d-focus); }
+.d-dsearch input { flex: 1; border: 0; outline: none; background: none; font: inherit; font-size: 14px; line-height: 20px; color: var(--foreground); }
+.d-dsearch input::placeholder { color: #94a3b8; }
+.d-drawer__chips { flex-wrap: wrap; }
+
+/* ---- Apply bar (507:87775) — white, top rule, px40 py16, rises when a lender is selected ---- */
+.d-applybar {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 25;
+  display: flex; justify-content: flex-end; height: 77px; padding: 16px 40px;
+  background: #fff; border-top: 1px solid var(--border);
+  transform: translateY(100%); transition: transform 380ms var(--d-ease);
+}
+.d-applybar.is-up { transform: none; }
+.d-main .d-fab-wrap { transition: bottom 380ms var(--d-ease); }
+.d-main.has-bar .d-fab-wrap { bottom: 98px; }
+.d-btn--block { width: 100%; }
+.d-btn.is-popping { animation: d-bump 360ms var(--ease-spring); }

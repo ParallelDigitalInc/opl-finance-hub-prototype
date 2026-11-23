@@ -89,9 +89,9 @@
 
   /* ---- Loans tabs (476:200199) --------------------------------------------- */
   const TABS = [
-    { id: "overview", label: "Overview", icon: "tab-widget-active", goto: "loans-overview" },
-    { id: "offers", label: "Loan Offers", icon: "tab-banknote-2", goto: "loan-offers" },
-    { id: "compare", label: "Compare", icon: "tab-mirror-left", goto: "compare-loans" },
+    { id: "overview", label: "Overview", icon: "tab-widget-outline", iconOn: "tab-widget-active", goto: "loans-overview" },
+    { id: "offers", label: "Loan Offers", icon: "tab-banknote-2", iconOn: "nav-banknote-active", goto: "loan-offers" },
+    { id: "compare", label: "Compare", icon: "tab-mirror-left", iconOn: "tab-mirror-bold", goto: "compare-loans" },
     { id: "applications", label: "Applications", icon: "tab-document-text", goto: "applications" },
     { id: "myloans", label: "My Loans", icon: "tab-notes", goto: "my-loans" },
   ];
@@ -99,7 +99,7 @@
     <div class="d-tabs" role="tablist" data-active="${active}">
       ${TABS.map((t) => html`
         <button class="d-tab ${t.id === active ? "is-active" : ""}" role="tab" aria-selected="${t.id === active}" data-tab="${t.id}" data-goto="${t.goto}">
-          ${D.icon(t.icon, 14)}<span>${t.label}</span>${counts[t.id] ? html`<span class="d-tab__count">${counts[t.id]}</span>` : ""}
+          ${D.icon(t.id === active && t.iconOn ? t.iconOn : t.icon, 14)}<span>${t.label}</span>${counts[t.id] ? html`<span class="d-tab__count">${counts[t.id]}</span>` : ""}
         </button>`)}
       <span class="d-tabs__rest"></span>
       <span class="d-tabs__ink" aria-hidden="true"></span>
@@ -186,8 +186,8 @@
         </div>
         <dl class="d-rows">${o.details.map(([k, v]) => html`<div class="d-row"><dt>${k}</dt><dd>${v}</dd></div>`)}</dl>
         <div class="d-card__foot">
-          ${D.checkbox({ label: "Compare", checked: compared, attrs: `data-compare="${o.id}"` })}
-          ${D.btn({ label: "Apply Now", style: "tonal", size: "md", goto: "d-apply", attrs: `data-apply="${o.id}"` })}
+          ${D.checkbox({ label: "Compare", checked: compared, attrs: `data-compare="${o.compareId || o.id}"` })}
+          ${D.btn({ label: "Apply Now", style: "tonal", size: "md", goto: "d-apply", attrs: `data-apply="${o.compareId || o.id}"` })}
         </div>
       </div>
     </article>`;
@@ -364,5 +364,198 @@
     requestAnimationFrame(() => t.classList.add("is-in"));
     clearTimeout(D._toastT);
     D._toastT = setTimeout(() => { t.classList.remove("is-in"); setTimeout(() => t.remove(), 300); }, 3200);
+  };
+})();
+
+/* ==========================================================================
+   Offer lists, drawers, toggles — Loan Offers (357:102436 / 507:84666) and
+   Compare (507:87387, drawer 507:86111).
+   ========================================================================== */
+(function () {
+  const { html, raw } = OPL;
+  const D = OPL.d;
+
+  // Chip filters + sorts shared by Overview, Loan Offers and the Compare drawer
+  D.CHIP_TEST = {
+    "Collateral-free": (m) => m.collateralFree,
+    "Working Capital": (m) => m.workingCapital,
+    "Term loan": (m) => m.term,
+    "Fee under 1%": (m) => m.fee < 1,
+  };
+  D.SORTS = {
+    "Lowest interest": (a, b) => a.meta.rate - b.meta.rate,
+    "Highest loan amount": (a, b) => b.meta.amount - a.meta.amount,
+    "Lowest EMI": (a, b) => a.meta.emi - b.meta.emi,
+    "Lowest processing fee": (a, b) => a.meta.fee - b.meta.fee,
+  };
+  D.SORT_OPTIONS = Object.keys(D.SORTS);
+
+  // Tag group on a tinted head: icon + text, divided by a 14px slate-300 rule (507:84710)
+  D.tags = (tags) => html`
+    <span class="d-tags">${tags.map((t, i) => html`${i ? D.icon("tag-divider", 14, "d-tags__rule") : ""}<span class="d-tag d-tag--${t.tone}">${D.icon(t.icon, 14)}${t.text}</span>`)}</span>`;
+
+  // Chip with an optional "New" badge (507:84681)
+  D.chipX = (c, { selected = false } = {}) => html`
+    <button class="d-chip ${selected ? "is-selected" : ""}" aria-pressed="${selected}" data-chip="${c.label}">${c.label}${c.badge ? html`<span class="d-chip__badge">${c.badge}</span>` : ""}</button>`;
+
+  // Sort pill + menu and Filters pill (476:200427 · 476:200432)
+  D.sortFilter = (sort, { filtersGoto = "" } = {}) => html`
+    <div class="d-toolbar__right">
+      <div class="d-menu-anchor">
+        <button class="d-pill d-pill--sort" data-menu="sort" aria-haspopup="menu" aria-expanded="false">
+          ${D.icon("list-arrow-down", 16)}<span class="d-pill__muted">Sort by</span><b>${sort}</b>${D.icon("chevron-muted", 14, "d-pill__chev")}
+        </button>
+        <div class="d-menu" role="menu" data-menu-for="sort">
+          ${D.SORT_OPTIONS.map((o) => html`<button class="d-menu__item ${o === sort ? "is-on" : ""}" role="menuitemradio" aria-checked="${o === sort}" data-sort="${o}">${o}${o === sort ? D.micon("check-circle-chip", 16) : ""}</button>`)}
+        </div>
+      </div>
+      <button class="d-pill" ${filtersGoto ? raw(`data-goto="${filtersGoto}"`) : ""} data-filters>${D.icon("filter", 16)}<span>Filters</span>${D.icon("chevron-muted", 14, "d-pill__chev")}</button>
+    </div>`;
+
+  // Offer card · horizontal (507:84700): grey head with logo + tags, figures row + footer
+  D.offerRow = (o, { compared = false, selectable = false, selected = false } = {}) => html`
+    <article class="d-row-card ${selectable ? "d-row-card--pick" : ""} ${selected ? "is-picked" : ""}" data-offer="${o.id}" tabindex="0" ${selectable ? raw(`role="checkbox" aria-checked="${selected}"`) : ""}>
+      <div class="d-row-card__head">
+        <div class="d-row-card__id">
+          ${selectable ? html`<span class="d-row-card__check">${D.icon("check-square", 20, "d-check__off")}${D.icon("check-square-bold", 20, "d-check__on")}</span>` : ""}
+          ${D.logo(o.logo)}
+          <div><p class="d-card__name">${o.name}</p><p class="d-card__sub">${o.sub}</p></div>
+        </div>
+        ${D.tags(o.tags)}
+      </div>
+      <div class="d-row-card__figs">
+        ${o.figures.map((f) => html`<div class="d-fig"><p class="d-fig__label">${f.label}</p><p class="d-fig__value">${f.value}${f.unit ? html`<small>${f.unit}</small>` : ""}</p></div>`)}
+        <div class="d-fig d-fig--fee"><p class="d-fig__label">Processing fee</p><p class="d-fig__value">${o.fee}</p></div>
+        ${selectable ? "" : html`
+          <span class="d-row-card__spacer"></span>
+          <div class="d-row-card__foot">
+            ${D.checkbox({ label: "Compare", checked: compared, attrs: `data-compare="${o.id}"` })}
+            ${D.btn({ label: "Apply Now", style: "tonal", size: "md", goto: "d-apply", attrs: `data-apply="${o.id}"` })}
+          </div>`}
+      </div>
+    </article>`;
+
+  // Toggle (DS 269:2): 36×20 track, slate-300 off / primary on
+  D.toggle = ({ on = false, label, attrs = "" }) => html`
+    <button class="d-toggle ${on ? "is-on" : ""}" role="switch" aria-checked="${on}" ${raw(attrs)}>
+      <span class="d-toggle__label">${label}</span><span class="d-toggle__track"><span class="d-toggle__knob"></span></span>
+    </button>`;
+
+  // Right drawer (507:86111): 591 wide, r16 on the left, scrim, Esc / scrim / close to dismiss
+  D.openDrawer = (page, { title, body, footer, width = 591, onClose }) => {
+    const host = page.querySelector(".d-app");
+    const el = document.createElement("div");
+    el.className = "d-drawer-layer";
+    el.innerHTML = String(html`
+      <div class="d-scrim" data-drawer-close></div>
+      <aside class="d-drawer" role="dialog" aria-modal="true" aria-label="${title}" style="width:${width}px">
+        <div class="d-drawer__head"><p class="d-drawer__title">${title}</p><button class="d-drawer__x" data-drawer-close aria-label="Close">${D.icon("close-circle-drawer", 24)}</button></div>
+        <div class="d-drawer__body">${raw(body)}</div>
+        ${footer ? html`<div class="d-drawer__foot">${raw(footer)}</div>` : ""}
+      </aside>`);
+    host.appendChild(el);
+    const close = () => {
+      el.classList.remove("is-open");
+      document.removeEventListener("keydown", onKey, true);
+      setTimeout(() => el.remove(), 320);
+      onClose && onClose();
+    };
+    const onKey = (e) => { if (e.key === "Escape") { e.stopPropagation(); close(); } };
+    document.addEventListener("keydown", onKey, true);
+    el.addEventListener("click", (e) => { if (e.target.closest("[data-drawer-close]")) close(); });
+    requestAnimationFrame(() => el.classList.add("is-open"));
+    setTimeout(() => el.querySelector("input, button:not([data-drawer-close])")?.focus({ preventScroll: true }), 340);
+    return { el, close };
+  };
+
+  // Sort menu + chip clicks for a list (shared by Overview + Loan Offers)
+  D.bindListControls = (page, st, refresh) => {
+    const closeMenus = () => page.querySelectorAll(".d-menu.is-open").forEach((m) => {
+      m.classList.remove("is-open");
+      page.querySelector(`[data-menu="${m.dataset.menuFor}"]`)?.setAttribute("aria-expanded", "false");
+    });
+    page.addEventListener("click", (e) => {
+      const chip = e.target.closest(".d-toolbar [data-chip]");
+      if (chip) {
+        const c = chip.dataset.chip;
+        st.chips = st.chips.includes(c) ? st.chips.filter((x) => x !== c) : [...st.chips, c];
+        chip.classList.toggle("is-selected");
+        chip.setAttribute("aria-pressed", st.chips.includes(c));
+        return refresh();
+      }
+      if (e.target.closest("[data-clear-chips]")) {
+        st.chips = [];
+        page.querySelectorAll(".d-toolbar [data-chip].is-selected").forEach((c) => { c.classList.remove("is-selected"); c.setAttribute("aria-pressed", "false"); });
+        return refresh();
+      }
+      const menuBtn = e.target.closest("[data-menu]");
+      if (menuBtn) {
+        const menu = page.querySelector(`[data-menu-for="${menuBtn.dataset.menu}"]`);
+        const open = !menu.classList.contains("is-open");
+        closeMenus();
+        menu.classList.toggle("is-open", open);
+        menuBtn.setAttribute("aria-expanded", open);
+        if (open) menu.querySelector(".is-on")?.focus({ preventScroll: true });
+        return;
+      }
+      const sort = e.target.closest("[data-sort]");
+      if (sort) {
+        st.sort = sort.dataset.sort;
+        st.sorted = true;
+        page.querySelector(".d-pill--sort b").textContent = st.sort;
+        page.querySelectorAll("[data-sort]").forEach((b) => {
+          const on = b.dataset.sort === st.sort;
+          b.classList.toggle("is-on", on);
+          b.setAttribute("aria-checked", on);
+          b.querySelector(".ico")?.remove();
+          if (on) b.insertAdjacentHTML("beforeend", String(D.micon("check-circle-chip", 16)));
+        });
+        closeMenus();
+        return refresh();
+      }
+      if (!e.target.closest(".d-menu")) closeMenus();
+    });
+    page.addEventListener("keydown", (e) => { if (e.key === "Escape") closeMenus(); });
+  };
+
+  // FLIP: re-render a list and let items glide to their new slots
+  D.flip = (box, html, page, axis = "y") => {
+    const before = new Map([...box.querySelectorAll("[data-offer]")].map((el) => [el.dataset.offer, el.getBoundingClientRect()]));
+    box.innerHTML = html;
+    if (D.motionOff()) return;
+    const wrap = page.closest(".device-wrap");
+    const m = wrap && getComputedStyle(wrap).transform;
+    const s = m && m !== "none" ? parseFloat(m.split("(")[1]) : 1;
+    box.querySelectorAll("[data-offer]").forEach((el, i) => {
+      const b = before.get(el.dataset.offer);
+      const a = el.getBoundingClientRect();
+      if (b) {
+        const dx = (b.left - a.left) / s, dy = (b.top - a.top) / s;
+        if (dx || dy) el.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: "none" }], { duration: 420, easing: "cubic-bezier(0.22, 1, 0.36, 1)" });
+      } else {
+        el.animate([{ opacity: 0, transform: "translateY(8px) scale(0.98)" }, { opacity: 1, transform: "none" }], { duration: 320, delay: i * 40, easing: "cubic-bezier(0.22, 1, 0.36, 1)", fill: "backwards" });
+      }
+    });
+  };
+
+  // Compare checkbox on any card → shared selection, tab counter, toast
+  D.toggleCompare = (page, id, name) => {
+    const ok = D.compare.toggle(id);
+    if (!ok) { D.toast(page, "You can compare up to 3 loans", { action: "Compare", goto: "compare-loans" }); return null; }
+    const on = D.compare.get().includes(id);
+    page.querySelectorAll(`[data-compare="${id}"]`).forEach((c) => { c.classList.toggle("is-checked", on); c.setAttribute("aria-checked", on); });
+    D.updateCompareCount(page);
+    if (on) D.toast(page, `${name} added to compare`, { action: "Compare now", goto: "compare-loans" });
+    return on;
+  };
+  D.updateCompareCount = (page) => {
+    const n = D.compare.get().length;
+    const tab = page.querySelector('.d-tab[data-tab="compare"]');
+    if (!tab) return;
+    let badge = tab.querySelector(".d-tab__count");
+    if (!n) { badge?.remove(); return; }
+    if (!badge) { badge = document.createElement("span"); badge.className = "d-tab__count"; tab.appendChild(badge); }
+    badge.textContent = n;
+    badge.classList.remove("is-bump"); void badge.offsetWidth; badge.classList.add("is-bump");
   };
 })();

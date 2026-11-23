@@ -230,34 +230,16 @@
 
         const cmp = e.target.closest("[data-compare]");
         if (cmp) {
-          const card = data().matches.cards.find((c) => c.id === cmp.dataset.compare);
-          const ok = D.compare.toggle(card.compareId);
-          if (!ok) return D.toast(page, "You can compare up to 3 loans", { action: "Compare", goto: "compare-loans" });
-          const on = D.compare.get().includes(card.compareId);
-          cmp.classList.toggle("is-checked", on);
-          cmp.setAttribute("aria-checked", on);
-          this.updateCompareCount(page);
-          if (on) D.toast(page, `${card.name} added to compare`, { action: "Compare now", goto: "compare-loans" });
-          return;
+          const card = data().matches.cards.find((c) => c.compareId === cmp.dataset.compare);
+          return D.toggleCompare(page, card.compareId, card.name);
         }
         const apply = e.target.closest("[data-apply]");
         if (apply) {
-          const card = data().matches.cards.find((c) => c.id === apply.dataset.apply);
-          if (OPL.hasScreen("d-apply")) { e.stopPropagation(); return OPL.go("d-apply", { lender: card.compareId }); }
+          if (OPL.hasScreen("d-apply")) { e.stopPropagation(); return OPL.go("d-apply", { lender: apply.dataset.apply }); }
           return;                                   // not built yet: core flashes the hotspot
         }
       });
       page.addEventListener("keydown", (e) => { if (e.key === "Escape") closeMenus(); });
-    },
-
-    updateCompareCount(page) {
-      const n = D.compare.get().length;
-      const tab = page.querySelector('.d-tab[data-tab="compare"]');
-      let badge = tab.querySelector(".d-tab__count");
-      if (!n) { badge?.remove(); return; }
-      if (!badge) { badge = document.createElement("span"); badge.className = "d-tab__count"; tab.appendChild(badge); }
-      badge.textContent = n;
-      badge.classList.remove("is-bump"); void badge.offsetWidth; badge.classList.add("is-bump");
-    },
+    }
   };
 })();
