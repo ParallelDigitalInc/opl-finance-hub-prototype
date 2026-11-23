@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.16.8 — 23 Nov 2026 · Desktop frame fits short windows · no repeated "Open till"
+
+- **The desktop frame now fits the window's height as well as its width.** In a short window the frame (760px minimum) used to run past the bottom and get cropped. That cut off the Calculate estimate drawer's footer (live estimate, Get Estimate) and anything else at the bottom: apply bars, modal actions. It now scales down to fit instead. Shreya: "getting cut".
+- **Subsidy details (cover photo) no longer says "Open till 30 Sep 2029" twice.** The pill beside the department now reads **"Open for applications"**, and the date stays in the policy period card right below. This is adapted copy, flagged.
+
 ## v0.16.7 — 23 Nov 2026 · CMR sheet: CRED-style factor tiles
 
 Shreya: the factor cards are hard to scan and don't look great; she likes what CRED does. Remove the subtitle and the two quieter steps.
