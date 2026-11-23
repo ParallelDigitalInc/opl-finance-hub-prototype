@@ -1,8 +1,12 @@
 # Changelog
 
-## Unreleased · `flow/subsidies` · Subsidy details
+## v0.10.0 — 23 Nov 2026 · Subsidies: home, details, benefit sheets, Calculate estimate
 
-Synced from Figma: section "Subsidy Home - First Cut" `416:44852`, frames `416:44853` (collapsed) and `416:45617` (expanded).
+Merged from `flow/subsidies`. Synced from Figma:
+- Subsidies home `524:103425`
+- Subsidy details `416:44852` (`416:44853` / `416:45617`)
+- Benefit sheets `416:47994`
+- Calculate estimate `416:76869` (`416:77107`, `416:76872`, `416:77363`)
 
 **Added**
 
@@ -40,6 +44,58 @@ Synced from Figma: section "Subsidy Home - First Cut" `416:44852`, frames `416:4
   - JS and CSS: leading indentation too, since no template text is whitespace-sensitive.
   - Loading caps raised (agreed 23 Nov 2026): first load **900 KB** (was 700), screen-only assets **1000 KB** (was 600). Per-asset stays 150 KB.
 - Lazy SVGs: removed Figma boilerplate and unused ids, and rounded paths to 2 decimals (−34 KB).
+
+## v0.9.4 — 23 Nov 2026 · Footer morph between sections
+
+- **The bottom nav now visibly changes when you move between sections** (Finance hub tabs ↔ Loans tabs). It used to slide away with the page, so the switch went unnoticed.
+  - The bar holds still while the page slides underneath (a CSS counter-move synced to the push/pop).
+  - The old tabs drop out, the new tabs rise in one after another, the bar gives a soft primary glow, and the active tab's pill pops.
+  - Within a section (e.g. Loans overview → Track Loans) the bar simply stays put and only the active tab changes.
+  - Pages without a nav are unaffected. Motion off and reduced motion skip it.
+
+## v0.9.3 — 23 Nov 2026 · Compare from anywhere
+
+- **Ticking "Compare" in a Loan details sheet on Home or Loans overview now does something.** It used to add the loan to the compare selection silently, because those screens have no compare tray.
+  - The tick pops, the sheet closes, and **Loan offers** opens.
+  - The loan's card is ticked, the compare tray slides in ("Comparing 1 of 3 loans"), and the empty slot nudges for another pick.
+  - Tick a second loan from anywhere and "Compare" is ready.
+  - Unticking stays put.
+  - On Loan offers itself nothing changes: the tray is already there.
+
+## v0.9.2 — 23 Nov 2026 · Days-left tag corner
+
+- **The "2 days left" tag on application cards** (Loans overview and Track Loans) is now clipped to the tinted lender block's 13px corner, as in Figma (`416:121716` has overflow clip). Its square top-right corner used to poke out past the curve.
+
+## v0.9.1 — 23 Nov 2026 · Home → Track Loans
+
+- **The "Track Loans" quick action on the Finance hub home** now opens the Track Loan Applications list (`382:41059`). It pointed at an unbuilt `track-loans` id and only showed a hotspot hint. The list shows your submitted applications, or the Figma state if you haven't applied in this session, and Back returns home.
+
+## v0.9.0 — 23 Nov 2026 · Disbursal (group F), loan journey complete
+
+Synced from Figma `435:8001` (Money on its way) and `435:8572` (Money received + Disbursed milestone sheet).
+
+**Added**
+
+- **Application · Money on Its Way** (`435:8001`):
+  - "Expected by 30 Nov" under the title.
+  - A fourth timeline step, "Money Disbursal", in progress: blue ring node that pings, teal→blue connector.
+  - **Disbursal Details**: amount card with Expected by, Monthly EMI and First EMI, plus an info note.
+  - Branch Details, a new **Documents** card (Signed sanction letter, Key Fact Statement), WhatsApp, and the nav.
+- **Application · Money Received** (`435:8572`):
+  - Every step done ("Money in Account · Received on 27 Nov").
+  - The card shows Into account, Received on, First EMI and Monthly EMI.
+  - Documents comes before Branch Details, as drawn.
+- **"Disbursed" milestone sheet**: the hero is inlined (a full burst of 26 confetti pieces, ripple, and the wallet mark popping), and the amount counts up from ₹0 to ₹44,32,500. "View my loan" leads to My Loans (a hotspot for now), and "Done" closes the sheet.
+- **The whole loan journey now plays end to end.** When you close the "Sanction letter signed" sheet, Money on its way follows after 3.5 s, then Money received and the Disbursed sheet after 6 s more. This is prototype timing; the presets jump straight to each state.
+- **Components:** `FigureCard` (amount head plus cells, with borders exactly where Figma draws them) and `LinkList` (document rows). The Timeline gets a `progress` state, `line: "fade-blue"` and a `pad` option.
+
+**Fixed (precision)**
+
+- **Timelines:** steps whose node Figma names "current" sit flush with their text and tuck their connector 1px (a 73px rail), and the last step no longer tucks.
+  - KFS ready went from 249 to **252** (as drawn).
+  - Signed and Money on its way are exact too (266 and 374).
+- **APR and amount cards** draw their stroke inside the layout (header at 5,5), so the KFS Summary card is now 253 tall, as drawn.
+- **Body padding** is 16/24 in the signed and disbursal states, as drawn.
 
 ## v0.8.0 — 23 Nov 2026 · NeSL signing (group E)
 

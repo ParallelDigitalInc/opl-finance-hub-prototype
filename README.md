@@ -9,7 +9,7 @@ starts the HTML component kit that later mobile flows reuse.
 - **Component library:** `library.html` (tokens, icons and every component, rendered by the same functions)
 - **Figma:** `GHuBkYGEQZvQppv3v55EaA`, section *Finance Home* `416:82748`
 
-**Screens (v0.8.0):**
+**Screens (v0.10.0):**
 - **Home:** frames `382:34093`, `382:33823`, `382:36681`
 - **Loans overview:** `382:36150`. Home → "Explore Loans" pushes it; the back arrow or browser back pops it.
 - **Loan offers:** list `382:35324`, comparing `382:35666`, Sort sheet `393:505`, Filters sheet `393:869`. Reached from:
@@ -26,12 +26,13 @@ starts the HTML component kit that later mobile flows reuse.
     - Accept KFS opens the Step 2 sheet (`433:7980`).
     - The NeSL portal follows (six screenshots, `433:8115` … `416:83101`), then Confirming (`416:82947`), then Application · Signed with its milestone sheet (`431:8486`).
     - "I'll come back later" or Cancel on NeSL leads to Application · Sign letter (`431:7803`).
-  - Group F (disbursal: `435:8001`, `435:8572`) comes next.
+  - **Disbursal** (group F, v0.9.0): Money on its way (`435:8001`), then Money received with the Disbursed sheet (`435:8572`). After the signed sheet closes, these follow on their own (3.5 s, then 6 s).
+  - **The loan journey is complete:** offers → compare → apply → track → approved → KFS → NeSL → signed → disbursed.
 - **Subsidies home** (`524:103425`), screen `subsidies-overview`: Finance Home → "Explore Subsidies". It's the gateway to every subsidy.
   - The "Top subsidies" cards are Home's subsidy match cards and open Subsidy details.
   - Central and State filter the rail live.
   - The benefit-type chips, View all, Sector, Import & Export, "Schemes in Gujarat" and Explore Now lead to the subsidy listing (`subsidy-list`), which isn't designed yet, so they show a hotspot hint.
-- **Subsidy details** (branch `flow/subsidies`; section "Subsidy Home - First Cut" `416:44852`):
+- **Subsidy details** (section "Subsidy Home - First Cut" `416:44852`):
   - Gujarat Textile Policy 2024, collapsed `416:44853` and expanded `416:45617` (panel presets).
   - Reached from any Home "Top subsidy matches" card.
   - "See other benefits" and "How it works" open and close in place.
@@ -137,6 +138,8 @@ Geometry was checked against Figma on 23 Nov 2026:
 
 ## Motion and behaviour (prototype layer)
 
+- **Footer morph** (`fx.navMorph`, v0.9.4): on push/pop the bottom nav holds still. When the tab set changes (Finance hub ↔ Loans), the tabs swap in place with a stagger and the active pill pops. Not in Figma; it's an interaction layer.
+
 All of this is behaviour on existing elements. None of it adds UI:
 
 - **Entrance:** hero copy → back card → front card → CTA → dots → quick actions → sections, staggered 55ms apart. The ₹ amount counts up once.
@@ -204,7 +207,7 @@ All of this is behaviour on existing elements. None of it adds UI:
 6. **Toggle On state.** The DS Toggle is drawn Off only, so "On" (primary track) is inferred.
 7. **Sort and filters change state only.** All three All-offers cards share the same figures, so sort updates the chip but doesn't reorder; quick and sheet filters toggle without filtering. "Show 4 offers" is static.
 8. **Not built yet:** Apply now and "Apply to N lenders" show hotspot hints.
-9. **Loan details sheet (proposed, v0.5.0; not in Figma).** Tapping an offer card's head opens a bottom sheet built only from existing parts:
+9. **Loan details sheet (proposed, v0.5.0; not in Figma).** Ticking Compare on Home or Loans overview opens Loan offers with the compare tray (v0.9.3). Tapping an offer card's head opens a bottom sheet built only from existing parts:
    - the card's tinted head (tags, logo, name)
    - a 2×2 figures panel on slate-50, the Sanction summary pattern: Loan up to, Interest, APR, Est. EMI
    - detail rows in the card's style: Loan type, Tenure, Pay on, Processing fee, Collateral, Money in
@@ -252,6 +255,18 @@ All of this is behaviour on existing elements. None of it adds UI:
 5. **The Track Loans list has no card for sign or signed.** Those applications keep the KFS-ready card until a design exists.
 6. **Back after signing** returns to the KFS reader. The NeSL steps and loader don't stay in history (they use `replace`), but the KFS page does.
 7. **Timing is a prototype choice:** redirect 1.8 s, confirming 2.4 s.
+
+## Figma flags · Disbursal (group F)
+
+1. **Stray cell border.** In Money on its way, the Disbursal card's "First EMI" cell has its right border on the card's outer edge, and there's no divider between Monthly EMI and First EMI. Money received puts its dividers between cells. Reproduced as drawn; probably meant to sit between the cells.
+2. **The wallet icon is primary blue on the green "done" node** in Money received; the other done icons are green. Used as drawn.
+3. **The Money received note** still says "…may call you to confirm details before sending the money", after the money has arrived.
+4. **The amount card's texture** is 20% in Money on its way and 30% in Money received (and on the APR cards). Both are used as drawn.
+5. **The tab is labelled "Applications"** in the disbursal frames, like Loans overview; the application list frame says "Track Loans".
+6. **The WhatsApp card is 347 wide** in every application frame, while the other cards are 350. 350 is used.
+7. **Unbuilt destinations show hotspot hints:** "View my loan" (My Loans), and the Documents rows (sanction letter, KFS PDF).
+8. **The Track Loans list** has no card for the disbursal states; they keep the KFS card.
+9. **First load is 687 KB of the 700 KB budget**, mostly from the two inlined milestone heroes. The next big addition should move something to `assets/lazy` or trim.
 8. **Prototype behaviour:** about 5 s after Submit, the first lender "approves" and the milestone sheet plays. This simulates the async lender response so the full flow can be demoed.
 
 ## Figma flags · Subsidy details (`416:44852`)

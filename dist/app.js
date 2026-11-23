@@ -4,7 +4,7 @@
 
 (function () {
 const OPL = (window.OPL = window.OPL || {});
-OPL.VERSION = "0.8.0";
+OPL.VERSION = "0.10.0";
 OPL.FIGMA_FILE = "https://www.figma.com/design/GHuBkYGEQZvQppv3v55EaA/OPL----Internal-Playground--5-";
 OPL.figmaLink = (nodeId) => `${OPL.FIGMA_FILE}?node-id=${nodeId.replace(":", "-")}`;
 const esc = (v) =>
@@ -514,10 +514,10 @@ ${ui.Button({ label: a.submit(lenders.length), block: true, strong: true, attrs:
 };
 ui.Timeline = ({ items }) => html`
 <div class="tl">${items.map((it, i) => OPL.raw(`
-<div class="tl__item tl__item--${it.state}">
+<div class="tl__item tl__item--${it.state}${it.pad === 0 ? " tl__item--flush" : ""}">
 <div class="tl__rail"><span class="tl__node tl__node--${it.state}" style="--i:${i}">${icon(it.icon, 16)}</span>
-${i < items.length - 1 ? `<span class="tl__line ${it.line === "fade" ? "tl__line--fade" : it.state === "done" ? "tl__line--done" : ""}"></span>` : ""}</div>
-<div class="tl__text"><p class="tl__title${it.strong ? " tl__title--strong" : ""}">${it.title}</p>${it.sub ? `<p class="tl__sub ${it.subTone ? `tl__sub--${it.subTone}` : ""}">${it.sub}</p>` : ""}</div>
+${i < items.length - 1 ? `<span class="tl__line ${it.line ? `tl__line--${it.line}` : it.state === "done" ? "tl__line--done" : ""}"></span>` : ""}</div>
+<div class="tl__text"${it.pad != null ? ` style="padding-top:${it.pad}px"` : ""}><p class="tl__title${it.strong ? " tl__title--strong" : ""}">${it.title}</p>${it.sub ? `<p class="tl__sub ${it.subTone ? `tl__sub--${it.subTone}` : ""}">${it.sub}</p>` : ""}</div>
 </div>`))}</div>`;
 ui.InfoCard = ({ title, body }) => html`
 <section class="info-card is-open">
@@ -535,8 +535,8 @@ ui.DetailRows = ({ rows }) => OPL.raw(rows.map(([l, v, copy]) => `
 ui.WhatsAppRow = ({ label, on = true }) => html`
 <div class="wa-row"><img class="wa-row__logo" src="${img("whatsapp.png")}" width="24" height="24" alt=""><span>${label}</span>
 ${ui.Toggle({ on, attrs: "data-wa" })}</div>`;
-ui.AprCard = ({ s, chip }) => html`
-<div class="kfs-apr">
+ui.AprCard = ({ s, chip, bordered }) => html`
+<div class="${cx("kfs-apr", bordered && "kfs-apr--bordered")}">
 <div class="kfs-apr__head"><img class="kfs-apr__tex" src="${img("hero-texture.jpg")}" alt=""><p>APR</p><p class="kfs-apr__v">${s.apr}</p>
 ${chip ? OPL.raw(`<span class="ok-chip kfs-apr__chip">${icon("check-circle-chip", 14)}<span>${chip}</span></span>`) : ""}</div>
 <div class="kfs-apr__grid">
@@ -639,6 +639,28 @@ ui.MilestoneSigned = ({ title, body, rows, cta, done }) => html`
 <div class="ms__card ms__card--rows">${rows.map(([k, v]) => OPL.raw(`<div class="ms__row"><span>${k}</span><b>${v}</b></div>`))}</div>
 <div class="ms__actions">
 ${ui.Button({ label: cta, block: true, attrs: "data-ms-view" })}
+<button class="ms__later" data-ms-done>${done}</button>
+</div>
+</div>
+</div>`;
+ui.FigureCard = ({ label, value, tex = 0.3, rows }) => html`
+<div class="kfs-apr kfs-apr--bordered fig-card">
+<div class="kfs-apr__head" style="--tex:${tex}"><img class="kfs-apr__tex" src="${img("hero-texture.jpg")}" alt=""><p>${label}</p><p class="kfs-apr__v">${value}</p></div>
+<div class="fig-card__cells">${rows.map((r) => OPL.raw(`<div class="fig-card__row">${r.map((c) =>
+`<div class="${cx(c.b && "is-b", c.r && "is-r")}"><span>${c.l}</span><b>${c.v}</b></div>`).join("")}</div>`))}</div>
+</div>`;
+ui.LinkList = ({ items }) => OPL.raw(items.map((it) => `
+<button class="link-row" data-press data-goto="${it.goto}"><span class="contact-row__tile">${icon("document-text-20-primary", 20)}</span>
+<span class="link-row__label">${it.label}</span>${icon("alt-arrow-right-muted", 16)}</button>`).join(""));
+ui.MilestoneDisbursed = ({ eyebrow, amount, rows, cta, done }) => html`
+<div class="ms ms--signed ms--disbursed">
+<span class="sheet__grabber" data-sheet-drag></span>
+<div class="ms__hero">${OPL.raw(ui.DisbursedHeroSvg)}</div>
+<div class="ms__content">
+<div class="ms__msg ms__msg--amount"><p>${eyebrow}</p><h2 data-ms-amount="${amount}">${amount}</h2></div>
+<div class="ms__card ms__card--rows">${rows.map(([k, v]) => OPL.raw(`<div class="ms__row"><span>${k}</span><b>${v}</b></div>`))}</div>
+<div class="ms__actions">
+${ui.Button({ label: cta, block: true, goto: "my-loans" })}
 <button class="ms__later" data-ms-done>${done}</button>
 </div>
 </div>
@@ -968,11 +990,48 @@ const det = e.target.closest("[data-detail]");
 if (det) return open(det.dataset.detail);
 const dc = e.target.closest("[data-detail-compare]");
 if (dc) {
-const changed = (onCompare || defaultToggle)(dc.dataset.detailCompare, dc);
+const id = dc.dataset.detailCompare, was = lo().sel.includes(id);
+const changed = (onCompare || defaultToggle)(id, dc);
 if (changed) { paintFoot(); page.querySelector("[data-detail-compare]")?.classList.add("is-popping"); }
+if (changed && !onCompare && !was) {
+lo().arriveWithTray = true;
+setTimeout(() => { sheets.close(); setTimeout(() => OPL.go("loan-offers", { compare: null, sheet: null }), motionOff() ? 0 : 260); }, motionOff() ? 0 : 380);
+}
 }
 });
 return { open, paintFoot };
+};
+fx.navMorph = (oldPage, newPage, dir) => {
+const oldNav = oldPage.querySelector(".nav"), newNav = newPage.querySelector(".nav");
+if (!oldNav || !newNav || motionOff() || !newNav.animate) return;
+const ease = "cubic-bezier(0.22, 1, 0.36, 1)", spring = "cubic-bezier(0.34, 1.56, 0.64, 1)";
+const W = newPage.offsetWidth;
+newNav.style.setProperty("--hold-from", `${dir === "back" ? 0.28 * W : -W}px`);
+newNav.classList.add(dir === "back" ? "is-hold-pop" : "is-hold-push");
+setTimeout(() => newNav.classList.remove("is-hold-pop", "is-hold-push"), 460);
+oldNav.style.visibility = "hidden";
+const labels = (n) => [...n.querySelectorAll(".nav__label")].map((l) => l.textContent).join("|");
+if (labels(oldNav) === labels(newNav)) {
+const pill = newNav.querySelector(".nav__item.is-active");
+pill?.animate([{ backgroundColor: "rgba(56, 88, 229, 0)" }, {}], { duration: 260, easing: ease });
+return;
+}
+const ghost = oldNav.cloneNode(true);
+ghost.classList.add("nav--ghost");
+ghost.setAttribute("aria-hidden", "true");
+ghost.style.visibility = "visible";
+newNav.appendChild(ghost);
+const out = [...ghost.querySelectorAll(".nav__item")], inc = [...newNav.querySelectorAll(":scope > .nav__item")];
+out.forEach((it, i) => it.animate([{ opacity: 1, transform: "none" }, { opacity: 0, transform: "translateY(12px)" }],
+{ duration: 200, delay: i * 30, easing: "cubic-bezier(0.4, 0, 1, 1)", fill: "forwards" }));
+inc.forEach((it, i) => it.animate([{ opacity: 0, transform: "translateY(14px)" }, { opacity: 1, transform: "none" }],
+{ duration: 380, delay: 170 + i * 50, easing: ease, fill: "backwards" }));
+const active = newNav.querySelector(":scope > .nav__item.is-active .nav__pill");
+active?.animate([{ transform: "scale(1)" }, { transform: "scale(1.18)" }, { transform: "none" }],
+{ duration: 460, delay: 170 + inc.length * 50 + 80, easing: spring });
+newNav.animate([{ boxShadow: "0 4px 12px rgba(0,0,0,.04), 0 0 0 0 rgba(56,88,229,0)" }, { boxShadow: "0 4px 12px rgba(0,0,0,.04), 0 0 0 4px rgba(56,88,229,.14)" }, { boxShadow: "0 4px 12px rgba(0,0,0,.04), 0 0 0 0 rgba(56,88,229,0)" }],
+{ duration: 700, delay: 140, easing: "ease-out" });
+setTimeout(() => ghost.remove(), 800);
 };
 fx.bareSheet = (page, id) => {
 page.insertAdjacentHTML("beforeend", `<div class="sheet-layer" data-sheet="${id}" hidden>
@@ -1219,10 +1278,12 @@ presets: [
 { id: "kfs", label: "KFS ready (Citi)", figma: "382:42689", set: { app: "pick-citi", apps: "figma", st: "", ms: "off" } },
 { id: "sign", label: "Sign letter (resume)", figma: "431:7803", set: { app: "pick-citi", apps: "figma", st: "sign", ms: "off" } },
 { id: "signed", label: "Letter signed + sheet", figma: "431:8486", set: { app: "pick-citi", apps: "figma", st: "signed", ms: "on" } },
+{ id: "disbursing", label: "Money on its way", figma: "435:8001", set: { app: "pick-citi", apps: "figma", st: "disbursing", ms: "off" } },
+{ id: "disbursed", label: "Money received + sheet", figma: "435:8572", set: { app: "pick-citi", apps: "figma", st: "disbursed", ms: "on" } },
 ],
 groups: [
 { id: "app", hidden: true, default: "", options: [{ value: "" }, { value: "offer-sidbi" }, { value: "pick-citi" }] },
-{ id: "st", hidden: true, default: "", options: [{ value: "" }, { value: "sign" }, { value: "signed" }] },
+{ id: "st", hidden: true, default: "", options: ["", "sign", "signed", "disbursing", "disbursed"].map((value) => ({ value })) },
 { id: "ms", hidden: true, default: "off", options: [{ value: "off" }, { value: "on" }] },
 { id: "apps", hidden: true, default: "live", options: [{ value: "live" }, { value: "figma" }] },
 ],
@@ -1303,7 +1364,7 @@ goto: "subsidies-overview",
 },
 quickActions: [
 { icon: "round-graph-bold-duotone", label: "CMR<br>score", goto: "cmr-score" },
-{ icon: "bill-list-bold-duotone", label: "Track<br>Loans", goto: "track-loans" },
+{ icon: "bill-list-bold-duotone", label: "Track<br>Loans", goto: "applications" },   // → Track Loan Applications (382:41059)
 { icon: "diploma-verified-bold-duotone", label: "Debt<br>Snapshot", goto: "debt-snapshot" },
 { icon: "calendar-bold-duotone", label: "View<br>EMIs", goto: "view-emis" },
 ],
@@ -1783,6 +1844,33 @@ cta: "View application", done: "Done",
 },
 },
 });
+Object.assign(OPL.data.applications, {
+disbursing: {
+title: "Money on Its Way",
+sub: "Expected by 30 Nov",
+step4: "Money Disbursal",
+step4Sub: (name) => `${name} is processing the disbursal`,
+note: (name) => `${name} may call you to confirm details before disbursal of final loan amount.`,
+card: { label: "Final Loan Amount", value: "₹44,32,500", tex: 0.2,
+rows: [[{ l: "Expected by", v: "30 Nov", b: 1 }], [{ l: "Monthly EMI", v: "₹1,44,043" }, { l: "First EMI", v: "5 Jan 2027", r: 1 }]] },
+},
+disbursed: {
+title: "Money Received",
+step4: "Money in Account",
+step4Sub: "Received on 27 Nov",
+note: (name) => `${name} may call you to confirm details before sending the money.`,
+card: { label: "Final Loan Amount", value: "₹44,32,500", tex: 0.3,
+rows: [[{ l: "Into account", v: "•••• 4521", b: 1, r: 1 }, { l: "Received on", v: "27 Nov", b: 1 }], [{ l: "First EMI", v: "5 Jan 2027", r: 1 }, { l: "Monthly EMI", v: "₹1,44,043" }]] },
+sheet: {
+eyebrow: "Money disbursed to your account", amount: "₹44,32,500",
+rows: [["Monthly EMI", "₹1,44,043"], ["First EMI", "5 Jan 2027"], ["Number of EMIs", "36"]],
+cta: "View my loan", done: "Done",
+},
+},
+disbursalTitle: "Disbursal Details",
+docs: [{ label: "Signed sanction letter", goto: "sanction-letter" }, { label: "Key Fact Statement", goto: "kfs-document" }],
+demo: { toDisbursing: 3500, toDisbursed: 6000 },
+});
 })();
 
 ;
@@ -1790,7 +1878,8 @@ cta: "View application", done: "Done",
 /* ==== js/data/signed-hero.js ==== */
 
 OPL.ui = OPL.ui || {};
-OPL.ui.SignedHeroSvg = '<svg class="mss" viewBox="0 0 390 176" width="390" height="176" fill="none" aria-hidden="true"><g><g class="ms__confetti"><g class="cf" style="--dx:-99.7px;--dy:-73.3px;--spin:-180deg;--fall:150px;--drift:-20px;--i:0"><rect x="292.162" y="157.322" width="5" height="12" rx="1.5" transform="rotate(6 292.162 157.322)" fill="#FFBB00"/></g><g class="cf" style="--dx:117.0px;--dy:-28.0px;--spin:217deg;--fall:203px;--drift:9px;--i:1"><rect x="75.4642" y="112.018" width="5" height="12" rx="1.5" transform="rotate(-1 75.4642 112.018)" fill="#A5B4FC"/></g><g class="cf" style="--dx:-94.6px;--dy:20.0px;--spin:-254deg;--fall:166px;--drift:-2px;--i:2"><rect x="287.058" y="63.9925" width="5" height="12" rx="1.5" transform="rotate(24 287.058 63.9925)" fill="#3858E5"/></g><g class="cf" style="--dx:92.1px;--dy:-27.5px;--spin:291deg;--fall:219px;--drift:-13px;--i:3"><rect x="100.386" y="111.532" width="5" height="12" rx="1.5" transform="rotate(-33 100.386 111.532)" fill="#FFBB00"/></g><g class="cf" style="--dx:-114.4px;--dy:-68.0px;--spin:-328deg;--fall:182px;--drift:16px;--i:4"><circle cx="309.41" cy="158.005" r="4" fill="#14B8A6"/></g><g class="cf" style="--dx:-93.9px;--dy:-15.7px;--spin:365deg;--fall:235px;--drift:5px;--i:5"><circle cx="288.851" cy="105.702" r="2.5" fill="#3858E5"/></g><g class="cf" style="--dx:147.8px;--dy:60.7px;--spin:-202deg;--fall:198px;--drift:-6px;--i:6"><rect x="44.7369" y="23.3174" width="5" height="12" rx="1.5" transform="rotate(-13 44.7369 23.3174)" fill="#3858E5"/></g><g class="cf" style="--dx:-162.1px;--dy:47.3px;--spin:239deg;--fall:161px;--drift:-17px;--i:7"><rect x="354.578" y="36.7218" width="5" height="12" rx="1.5" transform="rotate(-21 354.578 36.7218)" fill="#3858E5"/></g><g class="cf" style="--dx:89.4px;--dy:5.0px;--spin:-276deg;--fall:214px;--drift:12px;--i:8"><rect x="103.087" y="79.0171" width="5" height="12" rx="1.5" transform="rotate(-21 103.087 79.0171)" fill="#14B8A6"/></g><g class="cf" style="--dx:-100.7px;--dy:14.5px;--spin:313deg;--fall:177px;--drift:1px;--i:9"><rect x="293.215" y="69.5013" width="5" height="12" rx="1.5" transform="rotate(32 293.215 69.5013)" fill="#FFBB00"/></g><g class="cf" style="--dx:-110.1px;--dy:-76.8px;--spin:-350deg;--fall:230px;--drift:-10px;--i:10"><circle cx="305.134" cy="166.848" r="3.5" fill="#3858E5"/></g><g class="cf" style="--dx:101.3px;--dy:-18.4px;--spin:187deg;--fall:193px;--drift:19px;--i:11"><rect x="91.2254" y="102.419" width="5" height="12" rx="1.5" transform="rotate(27 91.2254 102.419)" fill="#14B8A6"/></g></g><circle class="mss__ripple" cx="195" cy="90" r="77.25" stroke-width="1.5" stroke="#14B8A6" stroke-opacity="0.35"/><circle class="mss__glow" cx="195" cy="90" r="66" fill="#3858E5" fill-opacity="0.06"/><circle class="mss__glow mss__glow--2" cx="195" cy="90" r="50" fill="#3858E5" fill-opacity="0.1"/><g class="mss__core" filter="url(#mss-filter0_d_0_513)"><circle cx="195" cy="90" r="37.5" fill="white" stroke="#E2E8F0"/></g><g class="mss__mark"><path opacity="0.5" d="M176.667 90C176.667 81.3576 176.667 77.0364 179.352 74.3515C182.036 71.6667 186.358 71.6667 195 71.6667C203.642 71.6667 207.964 71.6667 210.648 74.3515C213.333 77.0364 213.333 81.3576 213.333 90C213.333 98.6424 213.333 102.964 210.648 105.648C207.964 108.333 203.642 108.333 195 108.333C186.358 108.333 182.036 108.333 179.352 105.648C176.667 102.964 176.667 98.6424 176.667 90Z" fill="#3858E5"/><g><path d="M198.211 93.8364C198.619 93.5179 198.99 93.1475 199.73 92.4068L208.964 83.1729C209.187 82.9497 209.085 82.5652 208.787 82.4617C207.697 82.0835 206.279 81.3736 204.953 80.0473C203.627 78.7209 202.917 77.3031 202.538 76.2131C202.435 75.9149 202.05 75.8127 201.827 76.0359L192.593 85.2699L192.593 85.2699C191.853 86.0106 191.482 86.3809 191.164 86.7892C190.788 87.2709 190.466 87.7921 190.203 88.3436C189.98 88.8111 189.815 89.308 189.483 90.3017L189.055 91.5858L188.375 93.6275L187.737 95.542C187.574 96.031 187.701 96.5702 188.065 96.9347C188.43 97.2992 188.969 97.4265 189.458 97.2635L191.373 96.6253L193.414 95.9447L194.698 95.5167L194.698 95.5167C195.692 95.1854 196.189 95.0198 196.657 94.797C197.208 94.5342 197.729 94.2121 198.211 93.8364Z" fill="#3858E5"/><path d="M211.855 80.2818C213.826 78.3109 213.826 75.1156 211.855 73.1448C209.885 71.174 206.689 71.174 204.718 73.1448L204.422 73.4416C204.326 73.5376 204.278 73.5856 204.231 73.6497C204.112 73.814 204.037 74.0533 204.041 74.2562C204.042 74.3354 204.054 74.3993 204.077 74.527C204.122 74.7778 204.205 75.1446 204.357 75.5822C204.661 76.4573 205.234 77.6061 206.314 78.6861C207.394 79.766 208.543 80.3394 209.418 80.643C209.856 80.7948 210.222 80.8783 210.473 80.9233C210.601 80.9462 210.665 80.9577 210.744 80.9592C210.947 80.9632 211.186 80.8882 211.35 80.769C211.415 80.7225 211.463 80.6746 211.558 80.5787L211.559 80.5786L211.855 80.2818Z" fill="#3858E5"/></g></g><circle class="mss__badge" cx="219" cy="114" r="16" fill="white"/><g class="mss__badge"><path d="M229.833 114C229.833 119.983 224.983 124.833 219 124.833C213.017 124.833 208.167 119.983 208.167 114C208.167 108.017 213.017 103.167 219 103.167C224.983 103.167 229.833 108.017 229.833 114ZM223.366 110.717C223.683 111.034 223.683 111.549 223.366 111.866L217.95 117.283C217.632 117.6 217.118 117.6 216.8 117.283L214.634 115.116C214.317 114.799 214.317 114.284 214.634 113.967C214.951 113.65 215.466 113.65 215.783 113.967L217.375 115.559L219.796 113.138L222.217 110.717C222.534 110.4 223.049 110.4 223.366 110.717Z" fill-rule="evenodd" clip-rule="evenodd" fill="#16A34A"/></g></g><defs><filter id="mss-filter0_d_0_513" x="145" y="42" width="100" height="100" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset dy="2"/><feGaussianBlur stdDeviation="6"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0"/><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_0_513"/><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_0_513" result="shape"/></filter></defs></svg>\n';
+OPL.ui.SignedHeroSvg = '<svg class="mss" viewBox="0 0 390 176" width="390" height="176" fill="none" aria-hidden="true"><g><g class="ms__confetti"><g class="cf" style="--dx:-99.7px;--dy:-73.3px;--spin:-180deg;--fall:150px;--drift:-20px;--i:0"><rect x="292.162" y="157.322" width="5" height="12" rx="1.5" transform="rotate(6 292.162 157.322)" fill="#FFBB00"/></g><g class="cf" style="--dx:117.0px;--dy:-28.0px;--spin:217deg;--fall:203px;--drift:9px;--i:1"><rect x="75.4642" y="112.018" width="5" height="12" rx="1.5" transform="rotate(-1 75.4642 112.018)" fill="#A5B4FC"/></g><g class="cf" style="--dx:-94.6px;--dy:20.0px;--spin:-254deg;--fall:166px;--drift:-2px;--i:2"><rect x="287.058" y="63.9925" width="5" height="12" rx="1.5" transform="rotate(24 287.058 63.9925)" fill="#3858E5"/></g><g class="cf" style="--dx:92.1px;--dy:-27.5px;--spin:291deg;--fall:219px;--drift:-13px;--i:3"><rect x="100.386" y="111.532" width="5" height="12" rx="1.5" transform="rotate(-33 100.386 111.532)" fill="#FFBB00"/></g><g class="cf" style="--dx:-114.4px;--dy:-68.0px;--spin:-328deg;--fall:182px;--drift:16px;--i:4"><circle cx="309.41" cy="158.005" r="4" fill="#14B8A6"/></g><g class="cf" style="--dx:-93.9px;--dy:-15.7px;--spin:365deg;--fall:235px;--drift:5px;--i:5"><circle cx="288.851" cy="105.702" r="2.5" fill="#3858E5"/></g><g class="cf" style="--dx:147.8px;--dy:60.7px;--spin:-202deg;--fall:198px;--drift:-6px;--i:6"><rect x="44.7369" y="23.3174" width="5" height="12" rx="1.5" transform="rotate(-13 44.7369 23.3174)" fill="#3858E5"/></g><g class="cf" style="--dx:-162.1px;--dy:47.3px;--spin:239deg;--fall:161px;--drift:-17px;--i:7"><rect x="354.578" y="36.7218" width="5" height="12" rx="1.5" transform="rotate(-21 354.578 36.7218)" fill="#3858E5"/></g><g class="cf" style="--dx:89.4px;--dy:5.0px;--spin:-276deg;--fall:214px;--drift:12px;--i:8"><rect x="103.087" y="79.0171" width="5" height="12" rx="1.5" transform="rotate(-21 103.087 79.0171)" fill="#14B8A6"/></g><g class="cf" style="--dx:-100.7px;--dy:14.5px;--spin:313deg;--fall:177px;--drift:1px;--i:9"><rect x="293.215" y="69.5013" width="5" height="12" rx="1.5" transform="rotate(32 293.215 69.5013)" fill="#FFBB00"/></g><g class="cf" style="--dx:-110.1px;--dy:-76.8px;--spin:-350deg;--fall:230px;--drift:-10px;--i:10"><circle cx="305.134" cy="166.848" r="3.5" fill="#3858E5"/></g><g class="cf" style="--dx:101.3px;--dy:-18.4px;--spin:187deg;--fall:193px;--drift:19px;--i:11"><rect x="91.2254" y="102.419" width="5" height="12" rx="1.5" transform="rotate(27 91.2254 102.419)" fill="#14B8A6"/></g></g><circle class="mss__ripple" cx="195" cy="90" r="77.25" stroke-width="1.5" stroke="#14B8A6" stroke-opacity="0.35"/><circle class="mss__glow" cx="195" cy="90" r="66" fill="#3858E5" fill-opacity="0.06"/><circle class="mss__glow mss__glow--2" cx="195" cy="90" r="50" fill="#3858E5" fill-opacity="0.1"/><g class="mss__core" filter="url(#sign-filter0_d_0_513)"><circle cx="195" cy="90" r="37.5" fill="white" stroke="#E2E8F0"/></g><g class="mss__mark"><path opacity="0.5" d="M176.667 90C176.667 81.3576 176.667 77.0364 179.352 74.3515C182.036 71.6667 186.358 71.6667 195 71.6667C203.642 71.6667 207.964 71.6667 210.648 74.3515C213.333 77.0364 213.333 81.3576 213.333 90C213.333 98.6424 213.333 102.964 210.648 105.648C207.964 108.333 203.642 108.333 195 108.333C186.358 108.333 182.036 108.333 179.352 105.648C176.667 102.964 176.667 98.6424 176.667 90Z" fill="#3858E5"/><g><path d="M198.211 93.8364C198.619 93.5179 198.99 93.1475 199.73 92.4068L208.964 83.1729C209.187 82.9497 209.085 82.5652 208.787 82.4617C207.697 82.0835 206.279 81.3736 204.953 80.0473C203.627 78.7209 202.917 77.3031 202.538 76.2131C202.435 75.9149 202.05 75.8127 201.827 76.0359L192.593 85.2699L192.593 85.2699C191.853 86.0106 191.482 86.3809 191.164 86.7892C190.788 87.2709 190.466 87.7921 190.203 88.3436C189.98 88.8111 189.815 89.308 189.483 90.3017L189.055 91.5858L188.375 93.6275L187.737 95.542C187.574 96.031 187.701 96.5702 188.065 96.9347C188.43 97.2992 188.969 97.4265 189.458 97.2635L191.373 96.6253L193.414 95.9447L194.698 95.5167L194.698 95.5167C195.692 95.1854 196.189 95.0198 196.657 94.797C197.208 94.5342 197.729 94.2121 198.211 93.8364Z" fill="#3858E5"/><path d="M211.855 80.2818C213.826 78.3109 213.826 75.1156 211.855 73.1448C209.885 71.174 206.689 71.174 204.718 73.1448L204.422 73.4416C204.326 73.5376 204.278 73.5856 204.231 73.6497C204.112 73.814 204.037 74.0533 204.041 74.2562C204.042 74.3354 204.054 74.3993 204.077 74.527C204.122 74.7778 204.205 75.1446 204.357 75.5822C204.661 76.4573 205.234 77.6061 206.314 78.6861C207.394 79.766 208.543 80.3394 209.418 80.643C209.856 80.7948 210.222 80.8783 210.473 80.9233C210.601 80.9462 210.665 80.9577 210.744 80.9592C210.947 80.9632 211.186 80.8882 211.35 80.769C211.415 80.7225 211.463 80.6746 211.558 80.5787L211.559 80.5786L211.855 80.2818Z" fill="#3858E5"/></g></g><circle class="mss__badge" cx="219" cy="114" r="16" fill="white"/><g class="mss__badge"><path d="M229.833 114C229.833 119.983 224.983 124.833 219 124.833C213.017 124.833 208.167 119.983 208.167 114C208.167 108.017 213.017 103.167 219 103.167C224.983 103.167 229.833 108.017 229.833 114ZM223.366 110.717C223.683 111.034 223.683 111.549 223.366 111.866L217.95 117.283C217.632 117.6 217.118 117.6 216.8 117.283L214.634 115.116C214.317 114.799 214.317 114.284 214.634 113.967C214.951 113.65 215.466 113.65 215.783 113.967L217.375 115.559L219.796 113.138L222.217 110.717C222.534 110.4 223.049 110.4 223.366 110.717Z" fill-rule="evenodd" clip-rule="evenodd" fill="#16A34A"/></g></g><defs><filter id="sign-filter0_d_0_513" x="145" y="42" width="100" height="100" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset dy="2"/><feGaussianBlur stdDeviation="6"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0"/><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_0_513"/><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_0_513" result="shape"/></filter></defs></svg>\n';
+OPL.ui.DisbursedHeroSvg = '<svg class="mss" viewBox="0 0 390 196" width="390" height="196" fill="none" aria-hidden="true"><g><g class="ms__confetti"><g class="cf" style="--dx:149.6px;--dy:13.6px;--spin:-180deg;--fall:150px;--drift:-20px;--i:0"><rect x="42.9328" y="80.4152" width="5" height="12" rx="1.5" transform="rotate(59 42.9328 80.4152)" fill="#14B8A6"/></g><g class="cf" style="--dx:90.9px;--dy:-72.5px;--spin:217deg;--fall:203px;--drift:9px;--i:1"><circle cx="104.099" cy="172.48" r="3" fill="#3858E5"/></g><g class="cf" style="--dx:-168.1px;--dy:-56.2px;--spin:-254deg;--fall:166px;--drift:-2px;--i:2"><rect x="360.555" y="150.172" width="5" height="12" rx="1.5" transform="rotate(18 360.555 150.172)" fill="#A5B4FC"/></g><g class="cf" style="--dx:-140.2px;--dy:-64.1px;--spin:291deg;--fall:219px;--drift:-13px;--i:3"><rect x="332.652" y="158.133" width="5" height="12" rx="1.5" transform="rotate(2 332.652 158.133)" fill="#14B8A6"/></g><g class="cf" style="--dx:-166.2px;--dy:-87.5px;--spin:-328deg;--fall:182px;--drift:16px;--i:4"><rect x="358.684" y="181.516" width="5" height="12" rx="1.5" transform="rotate(19 358.684 181.516)" fill="#FFBB00"/></g><g class="cf" style="--dx:-137.8px;--dy:-38.4px;--spin:365deg;--fall:235px;--drift:5px;--i:5"><circle cx="332.848" cy="138.383" r="3.5" fill="#3858E5"/></g><g class="cf" style="--dx:89.4px;--dy:-52.1px;--spin:-202deg;--fall:198px;--drift:-6px;--i:6"><circle cx="105.591" cy="152.127" r="3.5" fill="#3858E5"/></g><g class="cf" style="--dx:109.7px;--dy:-16.5px;--spin:239deg;--fall:161px;--drift:-17px;--i:7"><circle cx="85.3007" cy="116.479" r="3.5" fill="#14B8A6"/></g><g class="cf" style="--dx:135.0px;--dy:32.6px;--spin:-276deg;--fall:214px;--drift:12px;--i:8"><rect x="57.5002" y="61.3797" width="5" height="12" rx="1.5" transform="rotate(44 57.5002 61.3797)" fill="#14B8A6"/></g><g class="cf" style="--dx:36.0px;--dy:85.9px;--spin:313deg;--fall:177px;--drift:1px;--i:9"><circle cx="158.962" cy="14.0626" r="3" fill="#3858E5"/></g><g class="cf" style="--dx:-162.6px;--dy:-38.0px;--spin:-350deg;--fall:230px;--drift:-10px;--i:10"><rect x="355.143" y="131.971" width="5" height="12" rx="1.5" transform="rotate(-15 355.143 131.971)" fill="#14B8A6"/></g><g class="cf" style="--dx:171.8px;--dy:-55.3px;--spin:187deg;--fall:193px;--drift:19px;--i:11"><circle cx="23.1987" cy="155.346" r="2.5" fill="#A5B4FC"/></g><g class="cf" style="--dx:-79.4px;--dy:-83.9px;--spin:-224deg;--fall:156px;--drift:8px;--i:12"><rect x="271.905" y="177.909" width="5" height="12" rx="1.5" transform="rotate(-33 271.905 177.909)" fill="#A5B4FC"/></g><g class="cf" style="--dx:160.3px;--dy:-22.4px;--spin:261deg;--fall:209px;--drift:-3px;--i:13"><rect x="32.2442" y="116.389" width="5" height="12" rx="1.5" transform="rotate(30 32.2442 116.389)" fill="#14B8A6"/></g><g class="cf" style="--dx:94.9px;--dy:-17.3px;--spin:-298deg;--fall:172px;--drift:-14px;--i:14"><circle cx="100.08" cy="117.307" r="3" fill="#A5B4FC"/></g><g class="cf" style="--dx:155.2px;--dy:-31.0px;--spin:335deg;--fall:225px;--drift:15px;--i:15"><circle cx="39.7887" cy="131.013" r="3.5" fill="#FFBB00"/></g><g class="cf" style="--dx:137.3px;--dy:-71.6px;--spin:-372deg;--fall:188px;--drift:4px;--i:16"><circle cx="57.7081" cy="171.578" r="3" fill="#A5B4FC"/></g><g class="cf" style="--dx:-108.0px;--dy:-38.3px;--spin:209deg;--fall:151px;--drift:-7px;--i:17"><circle cx="303.049" cy="138.265" r="3" fill="#14B8A6"/></g><g class="cf" style="--dx:124.0px;--dy:67.9px;--spin:-246deg;--fall:204px;--drift:-18px;--i:18"><circle cx="70.9722" cy="32.0598" r="2.5" fill="#14B8A6"/></g><g class="cf" style="--dx:84.6px;--dy:-79.5px;--spin:283deg;--fall:167px;--drift:11px;--i:19"><circle cx="110.449" cy="179.522" r="3" fill="#14B8A6"/></g><g class="cf" style="--dx:165.8px;--dy:3.4px;--spin:-320deg;--fall:220px;--drift:0px;--i:20"><rect x="26.6603" y="90.5708" width="5" height="12" rx="1.5" transform="rotate(21 26.6603 90.5708)" fill="#A5B4FC"/></g><g class="cf" style="--dx:155.1px;--dy:85.4px;--spin:357deg;--fall:183px;--drift:-11px;--i:21"><circle cx="39.8841" cy="14.581" r="3" fill="#3858E5"/></g><g class="cf" style="--dx:-99.4px;--dy:-85.2px;--spin:-194deg;--fall:236px;--drift:18px;--i:22"><rect x="291.885" y="179.164" width="5" height="12" rx="1.5" transform="rotate(-36 291.885 179.164)" fill="#3858E5"/></g><g class="cf" style="--dx:114.5px;--dy:79.5px;--spin:231deg;--fall:199px;--drift:7px;--i:23"><circle cx="80.5334" cy="20.505" r="3" fill="#3858E5"/></g><g class="cf" style="--dx:132.9px;--dy:76.1px;--spin:-268deg;--fall:162px;--drift:-4px;--i:24"><rect x="59.6464" y="17.9423" width="5" height="12" rx="1.5" transform="rotate(19 59.6464 17.9423)" fill="#3858E5"/></g><g class="cf" style="--dx:104.9px;--dy:-27.2px;--spin:305deg;--fall:215px;--drift:-15px;--i:25"><rect x="87.6477" y="121.185" width="5" height="12" rx="1.5" transform="rotate(60 87.6477 121.185)" fill="#3858E5"/></g></g><circle class="mss__ripple" cx="195" cy="100" r="77.25" stroke-width="1.5" stroke="#14B8A6" stroke-opacity="0.35"/><circle class="mss__glow" cx="195" cy="100" r="66" fill="#3858E5" fill-opacity="0.06"/><circle class="mss__glow mss__glow--2" cx="195" cy="100" r="50" fill="#3858E5" fill-opacity="0.1"/><g class="mss__core" filter="url(#disb-filter0_d_0_466)"><circle cx="195" cy="100" r="37.5" fill="white" stroke="#E2E8F0"/></g><g class="mss__mark"><path d="M183.153 96.0239C183.153 95.3532 183.692 94.8096 184.357 94.8096H190.783C191.449 94.8096 191.988 95.3532 191.988 96.0239C191.988 96.6945 191.449 97.2381 190.783 97.2381H184.357C183.692 97.2381 183.153 96.6945 183.153 96.0239Z" fill="#3858E5"/><path d="M210.314 96.6729C210.21 96.6666 210.097 96.6666 209.98 96.6667L209.951 96.6667H205.358C201.573 96.6667 198.333 99.5601 198.333 103.333C198.333 107.107 201.573 110 205.358 110H209.951L209.98 110C210.097 110 210.21 110 210.314 109.994C211.852 109.899 213.212 108.731 213.326 107.099C213.333 106.992 213.333 106.877 213.333 106.77L213.333 106.741V99.9259L213.333 99.8969C213.333 99.79 213.333 99.6746 213.326 99.5676C213.212 97.9356 211.852 96.7672 210.314 96.6729ZM204.951 105.111C205.926 105.111 206.716 104.315 206.716 103.333C206.716 102.351 205.926 101.556 204.951 101.556C203.976 101.556 203.186 102.351 203.186 103.333C203.186 104.315 203.976 105.111 204.951 105.111Z" fill-rule="evenodd" clip-rule="evenodd" fill="#3858E5"/><path opacity="0.5" d="M210.232 96.6692C210.232 94.7015 210.161 92.5908 208.903 91.0776C208.782 90.9316 208.652 90.7897 208.515 90.6521C207.267 89.4048 205.686 88.8513 203.732 88.5886C201.833 88.3333 199.407 88.3333 196.344 88.3333H192.823C189.76 88.3333 187.334 88.3333 185.435 88.5886C183.481 88.8513 181.899 89.4048 180.652 90.6521C179.405 91.8993 178.851 93.4809 178.589 95.435C178.333 97.3337 178.333 99.7597 178.333 102.823V103.011C178.333 106.074 178.333 108.5 178.589 110.398C178.851 112.352 179.405 113.934 180.652 115.181C181.899 116.429 183.481 116.982 185.435 117.245C187.334 117.5 189.76 117.5 192.823 117.5H196.344C199.407 117.5 201.833 117.5 203.732 117.245C205.686 116.982 207.267 116.429 208.515 115.181C208.855 114.84 209.145 114.474 209.391 114.081C210.142 112.882 210.232 111.412 210.232 109.997C210.152 110 210.067 110 209.98 110L205.358 110C201.573 110 198.333 107.107 198.333 103.333C198.333 99.5601 201.573 96.6667 205.358 96.6667L209.98 96.6667C210.067 96.6666 210.152 96.6666 210.232 96.6692Z" fill="#3858E5"/><path d="M191.836 84.2869L188.333 86.6542L185.445 88.5873C187.342 88.3333 189.765 88.3333 192.823 88.3333H196.344C199.407 88.3333 201.833 88.3333 203.732 88.5886C204.114 88.6399 204.481 88.7024 204.835 88.7789L201.667 86.6667L198.146 84.2869C196.265 83.0155 193.717 83.0155 191.836 84.2869Z" fill="#3858E5"/></g><circle class="mss__badge" cx="219" cy="124" r="16" fill="white"/><g class="mss__badge"><path d="M229.833 124C229.833 129.983 224.983 134.833 219 134.833C213.017 134.833 208.167 129.983 208.167 124C208.167 118.017 213.017 113.167 219 113.167C224.983 113.167 229.833 118.017 229.833 124ZM223.366 120.717C223.683 121.034 223.683 121.549 223.366 121.866L217.95 127.283C217.632 127.6 217.118 127.6 216.8 127.283L214.634 125.116C214.317 124.799 214.317 124.284 214.634 123.967C214.951 123.65 215.466 123.65 215.783 123.967L217.375 125.559L219.796 123.138L222.217 120.717C222.534 120.4 223.049 120.4 223.366 120.717Z" fill-rule="evenodd" clip-rule="evenodd" fill="#16A34A"/></g></g><defs><filter id="disb-filter0_d_0_466" x="145" y="52" width="100" height="100" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset dy="2"/><feGaussianBlur stdDeviation="6"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0"/><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_0_466"/><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_0_466" result="shape"/></filter></defs></svg>\n';
 
 ;
 
@@ -2584,7 +2673,16 @@ const main = page.querySelector(".lof");
 const sync = () => { const h = floating.offsetHeight; main.style.setProperty("--lof-pad", (h <= 172 ? h - 5 : h + 10) + "px"); };
 if (window.ResizeObserver) { this._ro = new ResizeObserver(sync); this._ro.observe(floating); }
 sync();
-this.paintCompare(page, false);
+if (this.arriveWithTray && this.sel.length) {
+this.arriveWithTray = false;
+const keep = this.sel; this.sel = []; this.paintCompare(page, false); this.sel = keep;
+this.timers.push(setTimeout(() => {
+if (!page.isConnected) return;
+this.paintCompare(page, true);
+page.querySelectorAll("[data-offer].is-selected [data-compare]").forEach((b) => { b.classList.remove("is-popping"); void b.offsetWidth; b.classList.add("is-popping"); });
+this.timers.push(setTimeout(() => { const add = page.querySelector(".tray__add"); if (add) { add.classList.remove("is-nudge"); void add.offsetWidth; add.classList.add("is-nudge"); } }, 520));
+}, OPL.fx.motionOff() ? 0 : 480));
+} else this.paintCompare(page, false);
 page.addEventListener("click", (e) => {
 const t = e.target;
 const cmp = t.closest("[data-compare]");
@@ -2845,7 +2943,7 @@ const apps = currentApps();
 const v = OPL.variantValues("applications");
 const cards = apps.map((a) => {
 const l = lender(a.id);
-return a.status === "kfs" || a.status === "sign" || a.status === "signed"   // later states reuse the KFS card (no list design yet)
+return ["kfs", "sign", "signed", "disbursing", "disbursed"].includes(a.status)   // later states reuse the KFS card (no list design yet)
 ? ui.ApplicationCard({
 id: a.id, logo: l.logo, name: l.name, product: l.type, tint: l.tint, tag: d.kfs.daysLeft,
 figures: [{ label: "Final offer", value: d.kfs.finalOffer }, rate], steps: kfsSteps,
@@ -2922,32 +3020,54 @@ const v = OPL.variantValues("application");
 const status = v.st || OPL.apps.statusOf(id);
 const l = lender(id);
 const kfs = status === "kfs", sign = status === "sign", signed = status === "signed";
+const disbursing = status === "disbursing", disbursed = status === "disbursed", money = disbursing || disbursed;
 const footCta = kfs ? d.kfs.cta : sign ? d.sign.cta : "";
 const branch = d.branch(l.slug);
-const timeline = sign || signed
+const timeline = money
 ? [
 { icon: "plain-2", state: "done", title: `Sent to ${l.name}`, sub: d.sentAt },
-{ icon: "buildings", state: "done", title: "Lender Verification", sub: d.verifiedOn, line: sign ? "fade" : "" },
+{ icon: "buildings", state: "done", title: "Lender Verification", sub: d.verifiedOn, pad: 0 },
+{ icon: "document-text-done", state: "done", title: d.signed.step3, sub: d.signed.step3Sub, pad: 0, line: disbursing ? "fade-blue" : "" },
+disbursing
+? { icon: "wallet-money", state: "progress", title: d.disbursing.step4, sub: d.disbursing.step4Sub(l.name), pad: 6 }
+: { icon: "wallet-money", state: "done", strong: true, title: d.disbursed.step4, sub: d.disbursed.step4Sub, pad: 6 },
+]
+: sign || signed
+? [
+{ icon: "plain-2", state: "done", title: `Sent to ${l.name}`, sub: d.sentAt },
+{ icon: "buildings", state: "done", title: "Lender Verification", sub: d.verifiedOn, line: sign ? "fade" : "", pad: 0 },
 signed
-? { icon: "document-text-done", state: "done", strong: true, title: d.signed.step3, sub: d.signed.step3Sub }
-: { icon: "document-text", state: "action", title: d.sign.step3, sub: d.sign.step3Sub },
+? { icon: "document-text-done", state: "done", strong: true, title: d.signed.step3, sub: d.signed.step3Sub, pad: 6 }
+: { icon: "document-text", state: "action", title: d.sign.step3, sub: d.sign.step3Sub, pad: 6 },
 ]
 : kfs
 ? [
 { icon: "plain-2", state: "done", title: `Sent to ${l.name}`, sub: d.sentAt },
-{ icon: "buildings", state: "done", title: "Lender Verification", sub: d.verifiedOn },
-{ icon: "document-text", state: "action", title: d.kfs.title },
+{ icon: "buildings", state: "done", title: "Lender Verification", sub: d.verifiedOn, pad: 0 },   // 382:42737 flush, rail 73
+{ icon: "document-text", state: "action", title: d.kfs.title, pad: 6 },
 ]
 : [
 { icon: "plain-2", state: "done", title: `Sent to ${l.name}`, sub: d.sentAt },
 { icon: "buildings-primary", state: "current", title: "Lender Verification", sub: d.verifying.progress, subTone: "primary" },
 { icon: "document-text-muted", state: "todo", title: d.verifying.todo },
 ];
-const body = signed
+const disbursal = money && (disbursing ? d.disbursing : d.disbursed);
+const branchCard = ui.InfoCard({ title: "Branch Details", body: ui.ContactList(branch) });
+const docsCard = ui.InfoCard({ title: "Documents", body: ui.LinkList({ items: d.docs }) });
+const body = money
+? html`
+<section class="appd-group">
+<h3 class="appd-group__title">${d.disbursalTitle}</h3>
+${ui.FigureCard(disbursal.card)}
+${ui.NoteRow({ text: disbursal.note(l.name), tone: "info" })}
+</section>
+${disbursing ? html`${branchCard}${docsCard}` : html`${docsCard}${branchCard}`}
+${ui.WhatsAppRow({ label: d.whatsapp })}`
+: signed
 ? html`
 <section class="appd-group">
 <h3 class="appd-group__title">${d.signed.summaryTitle}</h3>
-${ui.AprCard({ s: d.kfs.summary, chip: d.signed.aprChip })}
+${ui.AprCard({ s: d.kfs.summary, chip: d.signed.aprChip, bordered: true })}
 ${ui.KeyValueCard({ rows: d.signed.rows })}
 </section>
 ${ui.InfoCard({ title: "Branch Details", body: ui.ContactList(branch) })}
@@ -2975,7 +3095,7 @@ ${ui.WhatsAppRow({ label: d.whatsapp })}`;
 page.innerHTML = html`
 ${ui.StatusBar()}
 <div class="scroller">
-<main class="${OPL.cx("appd", footCta && "appd--kfs", signed && "appd--signed")}" style="--app-tint:${l.tint}">
+<main class="${OPL.cx("appd", footCta && "appd--kfs", signed && "appd--signed", money && "appd--money")}" style="--app-tint:${l.tint}">
 <section class="appd-top">
 <header class="appd-header">
 <button class="app-header__back" aria-label="Back" data-press data-back>${OPL.icon("arrow-left-b", 24)}</button>
@@ -2983,7 +3103,8 @@ ${ui.StatusBar()}
 ${ui.IconButton({ icon: "headphones-round-sound-linear", label: "Support", goto: "support" })}
 </header>
 <div class="appd-status">
-<h2 class="appd-status__title">${signed ? d.signed.title : sign ? d.sign.title : kfs ? d.kfs.title : d.verifying.title(l.name)}</h2>
+<h2 class="appd-status__title">${disbursed ? d.disbursed.title : disbursing ? d.disbursing.title : signed ? d.signed.title : sign ? d.sign.title : kfs ? d.kfs.title : d.verifying.title(l.name)}</h2>
+${disbursing ? OPL.raw(`<p class="appd-status__sub">${d.disbursing.sub}</p>`) : ""}
 ${ui.Timeline({ items: timeline })}
 </div>
 </section>
@@ -2993,21 +3114,49 @@ ${ui.Timeline({ items: timeline })}
 </div>
 <div class="${OPL.cx("floating", footCta && "floating--above-foot", signed && "floating--fab-only")}">
 ${ui.AiMitraFab({ nudge: d.aiNudge })}
-${kfs || sign || signed ? "" : ui.BottomNav({ items: OPL.data.loansOverview.nav, active: "applications", variant: "section" })}
+${kfs || sign || signed ? "" : ui.BottomNav({
+items: money ? OPL.data.loansOverview.nav.map((it) => ({ ...it, label: it.overviewLabel || it.label })) : OPL.data.loansOverview.nav,
+active: "applications", variant: "section" })}
 </div>
 ${kfs ? OPL.raw(`<div class="appd-foot">${ui.Button({ label: d.kfs.cta, block: true, goto: "kfs" })}</div>`) : ""}
 ${sign ? OPL.raw(`<div class="appd-foot">${ui.Button({ label: d.sign.cta, trailing: "arrow-square-out-white", block: true, attrs: 'data-sign-nesl' })}</div>`) : ""}`;
-this.wire(page, { id, l, signed, v });
+this.wire(page, { id, l, signed, disbursing, disbursed, v });
 },
-openSigned(page, l) {
+openSigned(page, l, { live, id } = {}) {
 const d = A().signed.sheet;
-const sheets = OPL.fx.sheets(page);
+let advanced = false;
+const sheets = OPL.fx.sheets(page, { onClose: () => {
+if (!live || advanced) return; advanced = true;
+this.timers.push(setTimeout(() => {
+if (!page.isConnected) return;
+OPL.apps.setStatus(id, "disbursing"); this.progressNext = true; OPL.rerender();
+}, OPL.fx.motionOff() ? 300 : A().demo.toDisbursing));
+} });
 const body = OPL.fx.bareSheet(page, "signed");
 body.innerHTML = ui.MilestoneSigned({ ...d, body: d.body(l.name) }).toString();
 page.addEventListener("click", (e) => { if (e.target.closest("[data-ms-view], [data-ms-done]")) sheets.close(); });
 sheets.open("signed");
 },
-wire(page, { id, l, signed, v }) {
+openDisbursed(page) {
+const d = A().disbursed.sheet;
+const sheets = OPL.fx.sheets(page);
+const body = OPL.fx.bareSheet(page, "disbursed");
+body.innerHTML = ui.MilestoneDisbursed(d).toString();
+page.addEventListener("click", (e) => { if (e.target.closest("[data-ms-done]")) sheets.close(); });
+sheets.open("disbursed");
+const el = body.querySelector("[data-ms-amount]");
+const to = Number(d.amount.replace(/[^\d]/g, ""));
+if (!OPL.fx.motionOff() && !OPL.reducedMotion()) {
+const t0 = Date.now() + 260, dur = 1100;
+const tick = () => {
+const k = Math.max(0, Math.min(1, (Date.now() - t0) / dur)), e = 1 - Math.pow(1 - k, 3);
+el.textContent = "₹" + Math.round(to * e).toLocaleString("en-IN");
+if (k < 1 && el.isConnected) this.timers.push(setTimeout(tick, 16));
+};
+el.textContent = "₹0"; tick();
+}
+},
+wire(page, { id, l, signed, disbursing, disbursed, v }) {
 OPL.fx.statusOnScroll(page);
 OPL.fx.playInView(page, ".tl, .kfs-repay");
 OPL.fx.nudge(page, this.timers);
@@ -3028,7 +3177,18 @@ if (e.target.closest("[data-sign-nesl]")) return OPL.go("nesl", { app: id, step:
 });
 if (signed && (this.celebrate || v.ms === "on")) {
 const fresh = this.celebrate; this.celebrate = false;
-OPL.afterReveal(() => this.timers.push(setTimeout(() => page.isConnected && this.openSigned(page, l), fresh && !OPL.fx.motionOff() ? 460 : 0)));
+OPL.afterReveal(() => this.timers.push(setTimeout(() => page.isConnected && this.openSigned(page, l, { live: fresh, id }), fresh && !OPL.fx.motionOff() ? 460 : 0)));
+}
+if (disbursing && this.progressNext) {
+this.progressNext = false;
+this.timers.push(setTimeout(() => {
+if (!page.isConnected) return;
+OPL.apps.setStatus(id, "disbursed"); this.celebrateMoney = true; OPL.rerender();
+}, OPL.fx.motionOff() ? 300 : A().demo.toDisbursed));
+}
+if (disbursed && (this.celebrateMoney || v.ms === "on")) {
+const fresh = this.celebrateMoney; this.celebrateMoney = false;
+OPL.afterReveal(() => this.timers.push(setTimeout(() => page.isConnected && this.openDisbursed(page), fresh && !OPL.fx.motionOff() ? 700 : 0)));
 }
 },
 };
@@ -3976,6 +4136,7 @@ if (dir && !OPL.fx.motionOff()) {
 const [inC, outC] = dir === "back" ? ["is-pop-in", "is-pop-out"] : ["is-push-in", "is-push-out"];
 page.classList.add(inC);
 old.classList.add(outC);
+OPL.fx.navMorph(old, page, dir);
 old.style.pointerEvents = "none";
 setTimeout(() => { old.remove(); page.classList.remove(inC); }, 440);
 } else {
