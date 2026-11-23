@@ -144,7 +144,7 @@
 /* ---- Content + title -------------------------------------------------------- */
 .d-content { padding-top: 20px; }
 .d-title { font-size: 30px; line-height: 40px; letter-spacing: -0.4px; font-weight: 400; color: var(--foreground); }
-.d-crumbs { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; font-size: 14px; line-height: 20px; color: var(--muted-foreground); }
+.d-crumbs { display: flex; align-items: center; gap: 6px; margin-bottom: 20px; font-size: 14px; line-height: 20px; color: var(--muted-foreground); }
 .d-crumbs__link { color: var(--muted-foreground); transition: color 140ms; }
 .d-crumbs__link:hover { color: var(--primary); }
 .d-crumbs__here { color: var(--foreground); font-weight: 500; }
@@ -201,20 +201,22 @@
 .d-fab-wrap.is-nudging .d-fab-nudge { opacity: 1; transform: none; }
 
 /* ---- Tooltip ------------------------------------------------------------------ */
-.d-tip {
-  position: absolute; left: 50%; bottom: calc(100% + 10px); z-index: 40;
+/* inline .d-tip is the source text only; D.fitTips shows it as .d-tip--float in a layer above
+   everything, so no clipping container can cut it */
+.d-tip { display: none; }
+.d-tip--float {
+  display: block; position: absolute; z-index: 95; left: 0; top: 0;
   width: max-content; max-width: 260px; padding: 10px 12px; border-radius: 10px;
   background: #0f172a; color: #f8fafc; font-size: 12px; line-height: 17px; font-weight: 400; letter-spacing: 0; text-align: left; white-space: normal;
   box-shadow: 0 12px 24px -8px rgba(15, 23, 42, 0.35);
-  opacity: 0; transform: translate(calc(-50% + var(--tip-shift, 0px)), 4px); pointer-events: none;
-  transition: opacity 160ms, transform 200ms var(--d-ease);
+  opacity: 0; transform: translateY(4px); pointer-events: none;
+  transition: opacity 140ms, transform 180ms var(--d-ease);
 }
-/* the arrow stays on the icon when the bubble is nudged to fit (D.fitTips) */
-.d-tip::after { content: ""; position: absolute; left: calc(50% - var(--tip-shift, 0px)); top: 100%; margin-left: -5px; border: 5px solid transparent; border-top-color: #0f172a; }
-:hover > .d-tip, :focus-visible > .d-tip { opacity: 1; transform: translate(calc(-50% + var(--tip-shift, 0px)), 0); transition-delay: 120ms; }
-/* no room above (near the top of the panel): open below */
-.d-tip.is-below { bottom: auto; top: calc(100% + 10px); }
-.d-tip.is-below::after { top: auto; bottom: 100%; border-top-color: transparent; border-bottom-color: #0f172a; }
+.d-tip--float.is-below { transform: translateY(-4px); }
+.d-tip--float.is-on { opacity: 1; transform: none; transition-delay: 100ms; }
+/* the arrow stays on the icon even when the bubble slides to fit */
+.d-tip--float::after { content: ""; position: absolute; left: var(--arrow-x, 50%); top: 100%; margin-left: -5px; border: 5px solid transparent; border-top-color: #0f172a; }
+.d-tip--float.is-below::after { top: auto; bottom: 100%; border-top-color: transparent; border-bottom-color: #0f172a; }
 
 /* ---- Toast ---------------------------------------------------------------------- */
 .d-toast {

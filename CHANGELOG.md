@@ -11,6 +11,13 @@ Shreya: the factor cards are hard to scan and don't look great; she likes what C
 - **Each tile:** a status dot beside the figure, with the impact and the coloured status along a dashed footer. Figures count up as the tiles rise in.
 - **Tap a tile and it flips** to say why the factor matters, in the business's numbers. "Tap a card to see why" sits beside the heading.
 - **Removed:** the subtitle "From your CIBIL report, biggest effect first", and the two steps under "Your path to CMR-1" (wait for Citi, autopay).
+## v0.16.6 — 23 Nov 2026 · Tooltips never get cut off · more room under breadcrumbs
+
+- **Desktop info tooltips can't be clipped any more.** Shreya: "still getting cut in many places", e.g. Estimated benefits on Subsidy details. Every tip now opens in one floating layer above the app, positioned from its icon, instead of inside the card. Rounded cards that hide their overflow, scrolling panels, drawers and modals can no longer crop it.
+  - It opens above and flips below when it would run under the top bar. It slides sideways to stay 12px inside the window, with the arrow kept on the icon.
+  - It closes on scroll or click, and works on keyboard focus too.
+  - The inline tip markup stays as the source text, so every existing tip (CMR rank, trend, estimate, Compare APR) moved over with no changes.
+- **Breadcrumbs have 20px under them**, up from 8, before the title or hero on Subsidy details, the application page and KFS.
 
 ## v0.16.5 — 23 Nov 2026 · Back goes up, not to the last page seen
 

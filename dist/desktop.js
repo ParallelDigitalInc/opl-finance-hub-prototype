@@ -339,25 +339,43 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
 
   // Tooltips stay inside the main panel: on hover/focus, measure the bubble against the
   // scroll area and nudge it sideways (or flip it below) before it fades in.
+  /* Tooltips float in one layer at the top of the app, positioned from the icon. Inline .d-tip
+     markup stays as the source text, but nothing that clips (rounded cards with overflow:hidden,
+     scrolling panels, drawers) can cut the bubble off. Opens above; flips below near the top bar;
+     slides sideways to stay 12px inside the window, with the arrow kept on the icon. */
   D.fitTips = (page) => {
-    const fit = (host) => {
-      const tip = host.querySelector(":scope > .d-tip");
-      const area = host.closest(".d-main__scroll, .d-drawer, .d-modal") || page;
-      if (!tip || !area) return;
-      tip.style.setProperty("--tip-shift", "0px");
-      tip.classList.remove("is-below");
-      const wrap = page.closest(".device-wrap");
-      const m = wrap && getComputedStyle(wrap).transform;
-      const sc = m && m !== "none" ? parseFloat(m.split("(")[1]) : 1;
-      const t = tip.getBoundingClientRect(), a = area.getBoundingClientRect(), pad = 12 * sc;
-      let dx = 0;
-      if (t.left < a.left + pad) dx = a.left + pad - t.left;
-      else if (t.right > a.right - pad) dx = a.right - pad - t.right;
-      tip.style.setProperty("--tip-shift", `${Math.round(dx / sc)}px`);
-      if (t.top < a.top + 56 * sc) tip.classList.add("is-below");     // under the sticky top bar
+    const app = page.querySelector(".d-app");
+    if (!app) return;
+    let layer = null, host = null, hideT = 0;
+    const scale = () => { const r = app.getBoundingClientRect(); return r.width / (app.offsetWidth || r.width) || 1; };
+    const show = (h) => {
+      const src = h.querySelector(":scope > .d-tip");
+      if (!src || h === host) return;
+      clearTimeout(hideT);
+      host = h;
+      if (!layer) { layer = document.createElement("div"); layer.className = "d-tip d-tip--float"; layer.setAttribute("role", "tooltip"); app.appendChild(layer); }
+      layer.textContent = src.textContent;
+      layer.classList.remove("is-below", "is-on");
+      const sc = scale(), a = app.getBoundingClientRect(), r = h.getBoundingClientRect();
+      const cx = (r.left + r.width / 2 - a.left) / sc, top = (r.top - a.top) / sc, bottom = (r.bottom - a.top) / sc;
+      const w = layer.offsetWidth, ht = layer.offsetHeight, pad = 12, gap = 10;
+      const below = top - gap - ht < 64;                                   // no room under the top bar: open below
+      let left = cx - w / 2;
+      left = Math.max(pad, Math.min(left, app.offsetWidth - pad - w));
+      layer.style.left = `${Math.round(left)}px`;
+      layer.style.top = `${Math.round(below ? bottom + gap : top - gap - ht)}px`;
+      layer.style.setProperty("--arrow-x", `${Math.round(cx - left)}px`);
+      layer.classList.toggle("is-below", below);
+      void layer.offsetWidth; layer.classList.add("is-on");
     };
-    page.addEventListener("pointerover", (e) => { const h = e.target.closest(".d-tip")?.parentElement || e.target.closest(":has(> .d-tip)"); if (h) fit(h); });
-    page.addEventListener("focusin", (e) => { if (e.target.querySelector?.(":scope > .d-tip")) fit(e.target); });
+    const hide = () => { host = null; if (layer) layer.classList.remove("is-on"); };
+    const hostOf = (el) => el && (el.closest(".d-tip")?.parentElement || el.closest(":has(> .d-tip)"));
+    page.addEventListener("pointerover", (e) => { const h = hostOf(e.target); if (h) show(h); });
+    page.addEventListener("pointerout", (e) => { if (host && !host.contains(e.relatedTarget)) { clearTimeout(hideT); hideT = setTimeout(hide, 60); } });
+    page.addEventListener("focusin", (e) => { if (e.target.querySelector?.(":scope > .d-tip")) show(e.target); });
+    page.addEventListener("focusout", () => hide());
+    page.addEventListener("scroll", hide, true);
+    page.addEventListener("pointerdown", hide);
   };
 
   document.addEventListener("click", (e) => {
