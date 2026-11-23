@@ -76,7 +76,8 @@
             <div class="filter-group"><p class="filter-group__label">${g.label}</p>
               <div class="filter-group__chips">${g.options.map((o) => ui.Chip({ label: o, bordered: true, selected: this.filters.has(o), attrs: `data-filter="${o}"` })).join("")}</div></div>`))}</div>`,
           footer: ui.Button({ label: d.filtersCta, block: true, attrs: "data-sheet-done" }),
-        })}`;
+        })}
+        ${ui.Sheet({ id: "detail", title: "Loan details", body: OPL.raw(`<div class="sheet-detail" data-detail-body></div>`), footer: OPL.raw(`<div data-detail-foot></div>`) })}`;
 
       this.wire(page, d, v);
     },
@@ -100,6 +101,18 @@
 
       page.addEventListener("click", (e) => {
         const t = e.target;
+        const det = t.closest("[data-detail]");
+        if (det) return this.openDetail(page, det.dataset.detail, sheets);
+        const dc = t.closest("[data-detail-compare]");
+        if (dc) {
+          const id = dc.dataset.detailCompare, was = this.sel.includes(id);
+          this.toggleCompare(page, id, dc);          // full → shakes this button + the tray
+          if (this.sel.includes(id) !== was) {
+            this.paintDetailFoot(page);
+            page.querySelector("[data-detail-compare]").classList.add("is-popping");
+          }
+          return;
+        }
         const cmp = t.closest("[data-compare]");
         if (cmp) return this.toggleCompare(page, cmp.dataset.compare, cmp);
         const rm = t.closest("[data-compare-remove]");
@@ -140,12 +153,28 @@
       ]);
     },
 
+    /* Loan details sheet (proposed): the tapped card, expanded. */
+    openDetail(page, id, sheets) {
+      const offer = this.allCards().find((c) => c.id === id);
+      const cl = OPL.data.compareLoans;
+      const record = cl.records[cl.aliases[id] || id];
+      page.querySelector("[data-detail-body]").innerHTML = ui.LoanDetail({ offer, record }).toString();
+      page.querySelector("[data-detail-body]").scrollTop = 0;
+      this.detailId = id;
+      this.paintDetailFoot(page);
+      sheets.open("detail");
+    },
+    paintDetailFoot(page) {
+      if (!this.detailId) return;
+      page.querySelector("[data-detail-foot]").innerHTML = ui.LoanDetailFoot({ id: this.detailId, selected: this.sel.includes(this.detailId) }).toString();
+    },
+
     toggleCompare(page, id, btn) {
       const d = OPL.data.loanOffers;
       if (this.sel.includes(id)) this.sel = this.sel.filter((x) => x !== id);
       else if (this.sel.length >= d.compareMax) {
         // full: shake the tray and the card instead of adding a fourth
-        const tray = page.querySelector(".tray"), card = btn.closest(".offer");
+        const tray = page.querySelector(".tray"), card = btn.closest(".offer") || btn;
         [tray, card].forEach((el) => { if (!el) return; el.classList.remove("is-shake"); void el.offsetWidth; el.classList.add("is-shake"); });
         if (navigator.vibrate) navigator.vibrate([8, 40, 8]);
         return;

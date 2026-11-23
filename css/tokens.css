@@ -51,6 +51,7 @@
   --tag-amber: #854d0e;               /* "Needs collateral" tag */
   --best: #15803d;                    /* best value in Compare loans */
   --soft-primary: #eef2fe;            /* "Selected" button */
+  --slate-50: #f8fafc;                /* 2×2 figures panel (Sanction summary 419:2484) */
   --hairline: #f1f5f9;                /* Compare loans grid lines */
   --scrim: rgba(15, 23, 42, 0.45);    /* sheet scrim */
   --chart-indigo: #4340d6;            /* borrowing donut · loans on EMI */

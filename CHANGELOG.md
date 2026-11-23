@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.5.0 — 23 Nov 2026 · Loan details sheet (proposed)
+
+- **Tapping an offer card on Loan offers** (Top picks or All offers) now opens a "Loan details" bottom sheet instead of a hotspot hint. The sheet:
+  - expands the card's tinted head
+  - shows a 2×2 figures panel and detail rows
+  - has a Compare checkbox synced with the card and tray (a 4th pick shakes it), plus "Apply now"
+- **Built from existing components** (`ui.LoanDetail`, `ui.LoanDetailFoot`, `ui.Sheet`); new token `--slate-50`. Not in Figma, so it's marked as proposed in the README and the library.
+
 ## v0.4.3 — 23 Nov 2026 · Compare: assumed data + add slot
 
 - **Every "—" in Compare loans is replaced with assumed placeholder figures** for Axis and HDFC (APR, fee, collateral detail, Money in). Each record lists them in `assumed: [...]`; the README has the full set.

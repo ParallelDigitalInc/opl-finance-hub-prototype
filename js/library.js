@@ -125,6 +125,10 @@
       ],
     },
     {
+      name: "LoanDetail sheet", node: "proposed", use: "Proposed — not in Figma. Tapping an offer card opens this in a bottom sheet: the card's head, a 2×2 figures panel (Sanction summary pattern), detail rows, and Compare + Apply now.",
+      demos: [["HDFC · All offers", OPL.raw(`<div style="width:390px;background:#fff;border-radius:24px 24px 0 0;box-shadow:0 -1px 0 var(--border);padding-bottom:16px"><div class="sheet__head"><h2 class="sheet__title">Loan details</h2></div><div class="sheet-detail">${ui.LoanDetail({ offer: of.offers[2], record: cl.records["offer-hdfc"] })}</div><div class="sheet__foot">${ui.LoanDetailFoot({ id: "x", selected: false })}</div></div>`), `ui.LoanDetail({ offer, record }) · ui.LoanDetailFoot({ id, selected })`]],
+    },
+    {
       name: "Chip · bordered + selected", node: "392:490",
       demos: [["Filters · Sort · quick · selected", OPL.raw(`<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">${ui.Chip({ icon: "tuning-2", label: "Filters", bordered: true })}${ui.Chip({ icon: "sort-vertical", label: "Lowest interest", bordered: true, trailing: "chevron-down" })}<span class="chip-divider"></span>${ui.Chip({ label: "Term loan" })}${ui.Chip({ label: "Working capital", bordered: true, selected: true })}</div>`), `ui.Chip({ label, bordered, selected, trailing })`]],
     },

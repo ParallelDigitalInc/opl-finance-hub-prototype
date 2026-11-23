@@ -264,7 +264,7 @@
      ------------------------------------------------------------------------ */
   ui.OfferCard = ({ id, kind = "offer", logo, tint, tags = [], title, subtitle, figures, details, selected = false }) => html`
     <article class="${cx("offer", `offer--${kind}`, selected && "is-selected")}" style="--tint:${tint}" data-offer="${id}">
-      <div class="offer__head" data-press data-goto="loan-detail">
+      <div class="offer__head" data-press data-detail="${id}">
         <div class="offer__tags">${tags.map((t) => OPL.raw(`<span class="offer__tag offer__tag--${t.tone}">${t.text}</span>`))}</div>
         <div class="offer__id">
           ${ui.Logo({ id: logo, size: 40 })}
@@ -286,6 +286,51 @@
         ${ui.Button({ label: "Apply now", variant: "tonal", size: "md", trailing: "arrow-right-primary", goto: "apply-loan" })}
       </div>
     </article>`;
+
+  /* LoanDetail — body of the "Loan details" sheet (proposed; not in Figma).
+     Built from existing parts: the card's tinted head, a 2×2 figures panel (as on the
+     Sanction summary), and the card's detail-row style. */
+  ui.LoanDetail = ({ offer, record }) => {
+    const r = (record && record.values) || {};
+    const card = Object.fromEntries(offer.details);
+    const coll = Array.isArray(r.collateral) ? r.collateral : [];
+    const rows = [
+      ["Loan type", r.type],
+      ["Tenure", card["Tenure"] || r.tenure],
+      card["Pay on"] && ["Pay on", card["Pay on"]],
+      ["Processing fee", card["Fee"] || r.fee],
+      coll.length && ["Collateral", coll[1] ? `${coll[0]} · ${coll[1]}` : coll[0]],
+      ["Money in", r.money],
+    ].filter((x) => x && x[1]);
+    const figs = [
+      offer.figures[0],
+      offer.figures[1],
+      { label: "APR", value: r.apr },
+      { label: "Est. EMI", value: r.emi || card["Est. EMI"] },
+    ].filter((f) => f && f.value);
+    return html`
+      <div class="detail" style="--tint:${offer.tint}">
+        <div class="offer__head detail__head">
+          <div class="offer__tags">${offer.tags.map((t) => OPL.raw(`<span class="offer__tag offer__tag--${t.tone}">${t.text}</span>`))}</div>
+          <div class="offer__id detail__id">
+            ${ui.Logo({ id: offer.logo, size: 44 })}
+            <div class="offer__text"><p class="offer__title">${offer.title}</p><p class="offer__sub">${offer.subtitle}</p></div>
+          </div>
+        </div>
+        <div class="detail__figs">${figs.map((f) => OPL.raw(`
+          <div class="figure"><span class="figure__label">${f.label}</span>
+            <span class="figure__value">${f.value}${f.unit ? `<span class="figure__unit">${f.unit}</span>` : ""}</span></div>`))}</div>
+        <div class="detail__rows">${rows.map(([l, v]) => OPL.raw(`<div class="offer__row"><span>${l}</span><span>${v}</span></div>`))}</div>
+      </div>`;
+  };
+  ui.LoanDetailFoot = ({ id, selected }) => html`
+    <div class="detail__foot">
+      <button class="offer__compare" data-detail-compare="${id}" aria-pressed="${selected}">
+        <img class="ico offer__check" src="assets/icons/${selected ? "check-square-checked" : "check-square"}.svg" width="24" height="24" alt="">
+        <span>Compare</span>
+      </button>
+      ${ui.Button({ label: "Apply now", trailing: "chevron-right-white", goto: "apply-loan", attrs: 'style="flex:1"' })}
+    </div>`;
 
   /* SortOption — "Loan offers / Sort option" 393:504 */
   ui.SortOption = ({ label, selected = false }) => html`

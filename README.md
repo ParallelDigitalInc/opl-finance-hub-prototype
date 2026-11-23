@@ -147,7 +147,14 @@ All of this is behaviour on existing elements. None of it adds UI:
 5. **Hero texture.** It's 50% in the compare state and 30% in the list; I used 30%.
 6. **Toggle On state.** The DS Toggle is drawn Off only, so "On" (primary track) is inferred.
 7. **Sort and filters change state only.** All three All-offers cards share the same figures, so sort updates the chip but doesn't reorder; quick and sheet filters toggle without filtering. "Show 4 offers" is static.
-8. **Not built yet:** offer detail, Apply now, and "Apply to N lenders" show hotspot hints.
+8. **Not built yet:** Apply now and "Apply to N lenders" show hotspot hints.
+9. **Loan details sheet (proposed, v0.5.0; not in Figma).** Tapping an offer card's head opens a bottom sheet built only from existing parts:
+   - the card's tinted head (tags, logo, name)
+   - a 2×2 figures panel on slate-50, the Sanction summary pattern: Loan up to, Interest, APR, Est. EMI
+   - detail rows in the card's style: Loan type, Tenure, Pay on, Processing fee, Collateral, Money in
+   - a footer with Compare (synced with the card and tray) and "Apply now"
+
+   Card values win where card and Compare data differ. Needs a Figma frame to become source of truth.
 
 ## Versioning
 
