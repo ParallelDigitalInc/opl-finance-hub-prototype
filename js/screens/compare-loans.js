@@ -35,11 +35,11 @@
                 actions: [{ icon: "headphones-round-sound-linear", label: "Support", goto: "support" }] })}
               <div class="cl-diff"><span>${d.diffLabel}</span>${ui.Toggle({ on: false, attrs: "data-diff" })}</div>
             </div>
-            <div class="cl-table">${ui.CompareTable({ rows: d.rows, lenders: this.cols })}</div>
+            <div class="cl-table">${ui.CompareTable({ rows: d.rows, lenders: this.cols, addSlot: this.cols.length < d.max, addLabel: d.addLabel })}</div>
           </main>
         </div>
         <div class="cl-foot">
-          ${ui.ComparePick({ label: d.pickLabel, lenders: this.cols })}
+          ${ui.ComparePick({ label: d.pickLabel, lenders: this.cols, addSlot: this.cols.length < d.max })}
           <div class="cl-cta">${ui.Button({ label: d.cta(this.selectedCount()), block: true, strong: true, goto: "apply-lenders", attrs: "data-cta" })}</div>
         </div>`;
 
@@ -70,6 +70,7 @@
 
       page.addEventListener("click", (e) => {
         const t = e.target;
+        if (t.closest("[data-compare-more]")) return OPL.back();   // back to the list to tick another
         if (t.closest("[data-diff]")) {
           this.diff = !this.diff;
           const tg = t.closest("[data-diff]");
@@ -95,6 +96,14 @@
           this.timers.push(setTimeout(() => {
             page.querySelectorAll(`[data-col="${id}"]`).forEach((el) => el.remove());
             this.computeBest(d); this.paintBest(page);
+            // a slot just freed up → offer it at the end
+            if (this.cols.length < d.max && !page.querySelector(".ct-col--add")) {
+              const scrollEl = page.querySelector("[data-ct-scroll]"), pickEl = page.querySelector("[data-ct-pick]");
+              scrollEl.insertAdjacentHTML("beforeend", ui.CompareAddCol({ rows: d.rows, label: d.addLabel }).toString());
+              pickEl.insertAdjacentHTML("beforeend", `<div class="ct-pick__cell" data-col="add"></div>`);
+              page.querySelectorAll('[data-col="add"]').forEach((el) => el.classList.add("is-adding"));
+              if (this.diff) this.paintDiff(page, d);
+            }
             this.paintCta(page, d); this.paintDiff(page, d);
             if (this.cols.length <= 1) page.querySelectorAll(".ct-card__x").forEach((b) => (b.style.visibility = "hidden"));
           }, OPL.fx.motionOff() ? 0 : 320));

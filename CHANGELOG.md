@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.4.3 — 23 Nov 2026 · Compare: assumed data + add slot
+
+- **Every "—" in Compare loans is replaced with assumed placeholder figures** for Axis and HDFC (APR, fee, collateral detail, Money in). Each record lists them in `assumed: [...]`; the README has the full set.
+- **"Add loan" column:** shown at the end of Compare loans while a 3rd slot is free. It appears when you remove a column, and tapping it goes back to Loan offers. The pick row gets a matching blank cell.
+
 ## v0.4.2 — 23 Nov 2026 · Compare tray polish
 
 - **Tray corners:** the compare tray clips to its 16px radius. The backdrop-blur layer had been breaking the rounded clipping, so the clip is now explicit with `clip-path`, and the shadow moved to the wrapper.

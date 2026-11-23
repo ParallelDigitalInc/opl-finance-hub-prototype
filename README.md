@@ -132,7 +132,11 @@ All of this is behaviour on existing elements. None of it adds UI:
 
 1. **Compare loans follows the selection** (decided 23 Nov). Columns are the ticked offers, in the order they were ticked; opened directly, it shows the Figma set (Citi, SIDBI, SBI). Removing a column un-ticks it on the list.
    - Green means the best value in the row among the lenders on screen: max loan amount, min interest, APR, fee and Money in. It needs 2+ known values that differ. EMI isn't coloured, as in Figma. This rule reproduces Figma's greens for the drawn set.
-   - **Data OPL needs to supply:** Axis and HDFC have no Compare data in Figma. Their APR, Money in, and (for the All-offers cards) the processing fee show "—", and CGTMSE cover is unknown.
+   - **Assumed data (placeholders, replace with OPL's):** Figma has no Compare figures for Axis or HDFC, so these are made-up but plausible. They're tagged `assumed: [...]` in `js/data/loan-offers.js`.
+     - Axis pick: APR 10.62%, EMI ₹1.58 L/mo, Money in ~4-6 days, CGTMSE
+     - Axis offer: APR 11.20%, fee 1%, collateral "Property", Money in ~6-8 days
+     - HDFC offer: APR 10.95%, fee 0.9%, collateral "Property / FD", Money in ~5-7 days
+   - **Add loan column:** with fewer than 3 loans, a trailing "Add loan" column (the tray's + icon) returns to the list to tick another.
    - Derived values:
      - "Needed" collateral, from the "Needs collateral" tag
      - EMI ₹1,50,690 → "₹1.51 L/mo"

@@ -330,8 +330,14 @@
   ui.Toggle = ({ on = false, attrs = "" }) => html`
     <button class="${cx("toggle", on && "is-on")}" role="switch" aria-checked="${on}" ${OPL.raw(attrs)}><span class="toggle__knob"></span></button>`;
 
-  /* CompareTable — Compare loans grid (382:37840) + pick row (382:37990) */
-  ui.CompareTable = ({ rows, lenders }) => {
+  /* CompareTable — Compare loans grid (382:37840) + pick row (382:37990).
+     addSlot: trailing "Add loan" column when a slot is free (uses the tray's add icon). */
+  ui.CompareAddCol = ({ rows, label = "Add loan" }) =>
+    OPL.raw(`<div class="ct-col ct-col--add" data-col="add">
+      <div class="ct-head"><button class="ct-add" data-compare-more data-press>${icon("add-circle", 28)}<span>${label}</span></button></div>
+      ${rows.map((r) => `<div class="ct-cell ct-value" data-row="${r.id}" style="--h:${r.h}px"></div>`).join("")}
+    </div>`);
+  ui.CompareTable = ({ rows, lenders, addSlot = false, addLabel }) => {
     const label = (r) => `<div class="ct-cell ct-label" data-row="${r.id}" style="--h:${r.h}px">
       <div class="ct-label__main" style="gap:${r.gap || 4}px"><span>${r.label}</span>${r.info ? icon("info-circle", 14) : ""}</div>
       ${r.sub ? `<span class="ct-sub">${r.sub}</span>` : ""}</div>`;
@@ -354,15 +360,17 @@
               <p class="ct-card__name">${l.name}</p></div></div></div>
             ${rows.map((r) => value(l, r)).join("")}
           </div>`))}
+          ${addSlot ? ui.CompareAddCol({ rows, label: addLabel }) : ""}
         </div>
       </div>`;
   };
-  ui.ComparePick = ({ label, lenders }) => html`
+  ui.ComparePick = ({ label, lenders, addSlot = false }) => html`
     <div class="ct-pick">
       <div class="ct-pick__label">${label}</div>
       <div class="ct-pick__scroll" data-ct-pick>
         ${lenders.map((l) => OPL.raw(`<div class="ct-pick__cell" data-col="${l.id}">
           ${ui.Button({ label: l.selected ? "Selected" : "Select", variant: l.selected ? "soft" : "outlined", size: "md", block: true, attrs: `data-pick="${l.id}"` })}</div>`))}
+        ${addSlot ? OPL.raw(`<div class="ct-pick__cell" data-col="add"></div>`) : ""}
       </div>
     </div>`;
 

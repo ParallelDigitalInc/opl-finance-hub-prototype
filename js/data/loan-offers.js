@@ -120,22 +120,26 @@
         values: { type: "Term loan · CGTMSE", amount: "Up to ₹45 L", interest: "9.75% p.a.", apr: "10.07%", tenure: "3 years",
           emi: "₹1.45 L/mo", fee: "0.44%", collateral: ["Not needed", "CGTMSE"], money: "~7-10 days" },
       },
-      // From the Axis "Top 3 picks" card (382:35360)
+      // From the Axis "Top 3 picks" card (382:35360). ASSUMED (placeholder, not in Figma): apr, emi, CGTMSE, money.
       "pick-axis": {
         name: "Axis Bank", logo: "axis", tint: "var(--tint-pink)",
-        values: { type: "Working capital loan", amount: "Up to ₹50 L", interest: "9.45% p.a.", apr: "—", tenure: "Renews yearly",
-          emi: "—", fee: "0.75%", collateral: ["Not needed"], money: "—" },
+        values: { type: "Working capital loan", amount: "Up to ₹50 L", interest: "9.45% p.a.", apr: "10.62%", tenure: "Renews yearly",
+          emi: "₹1.58 L/mo", fee: "0.75%", collateral: ["Not needed", "CGTMSE"], money: "~4-6 days" },
+        assumed: ["apr", "emi", "money"],
       },
       // From the Axis / HDFC All-offers cards (382:35525, 382:35571). EMI ₹1,50,690 → ₹1.51 L/mo.
+      // ASSUMED (placeholder, not in Figma): apr, fee, collateral sub, money.
       "offer-axis": {
         name: "Axis Bank", logo: "axis", tint: "var(--tint-pink)",
-        values: { type: "Cash credit limit", amount: "Up to ₹50 L", interest: "9.45% p.a.", apr: "—", tenure: "Renews yearly",
-          emi: "₹1.51 L/mo", fee: "—", collateral: ["Needed"], money: "—" },
+        values: { type: "Cash credit limit", amount: "Up to ₹50 L", interest: "9.45% p.a.", apr: "11.20%", tenure: "Renews yearly",
+          emi: "₹1.51 L/mo", fee: "1%", collateral: ["Needed", "Property"], money: "~6-8 days" },
+        assumed: ["apr", "fee", "collateral", "money"],
       },
       "offer-hdfc": {
         name: "HDFC Bank", logo: "hdfcMark", tint: "var(--tint-blue)",
-        values: { type: "Cash credit limit", amount: "Up to ₹50 L", interest: "9.45% p.a.", apr: "—", tenure: "Renews yearly",
-          emi: "₹1.51 L/mo", fee: "—", collateral: ["Needed"], money: "—" },
+        values: { type: "Cash credit limit", amount: "Up to ₹50 L", interest: "9.45% p.a.", apr: "10.95%", tenure: "Renews yearly",
+          emi: "₹1.51 L/mo", fee: "0.9%", collateral: ["Needed", "Property / FD"], money: "~5-7 days" },
+        assumed: ["apr", "fee", "collateral", "money"],
       },
     },
     aliases: { "pick-sidbi": "offer-sidbi" },  // same SIDBI product
@@ -143,6 +147,8 @@
     bestRules: { amount: "max", interest: "min", apr: "min", fee: "min", money: "min" },
     // Shown when the screen is opened without a selection (panel / direct link): the Figma frame as drawn
     figmaDefault: [{ id: "pick-citi", selected: true }, { id: "offer-sidbi", selected: true }, { id: "sbi", selected: false }],
+    max: 3,
+    addLabel: "Add loan",
     pickLabel: "Pick your loan",
     cta: (n) => `Apply to ${n} lender${n === 1 ? "" : "s"}`,
   };
