@@ -46,6 +46,57 @@
     setTimeout(() => page.classList.remove("is-entering"), holdMs);
   };
 
+  /* Bottom sheets: open(id) / close(). Scrim tap, Escape and a downward drag on
+     the grip close it. onClose fires after the sheet has animated away. */
+  fx.sheets = (page, { onClose } = {}) => {
+    let current = null;
+    const open = (id, { instant = false } = {}) => {
+      const layer = page.querySelector(`[data-sheet="${id}"]`);
+      if (!layer) return;
+      if (current && current !== layer) close({ silent: true });
+      current = layer;
+      layer.hidden = false;
+      layer.style.setProperty("--drag", "0px");
+      if (instant || motionOff()) { layer.classList.add("is-open"); return; }
+      requestAnimationFrame(() => requestAnimationFrame(() => layer.classList.add("is-open")));
+      setTimeout(() => layer.classList.add("is-open"), 40);
+    };
+    const close = ({ silent = false } = {}) => {
+      const layer = current;
+      if (!layer) return;
+      current = null;
+      layer.classList.remove("is-open", "is-dragging");
+      layer.style.setProperty("--drag", "0px");
+      setTimeout(() => { layer.hidden = true; if (!silent && onClose) onClose(layer.dataset.sheet); }, motionOff() ? 0 : 420);
+    };
+    page.addEventListener("click", (e) => { if (e.target.closest("[data-sheet-close]")) close(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && current && page.isConnected) close(); });
+    // drag to dismiss
+    let startY = 0, dy = 0, dragging = false, t0 = 0;
+    page.addEventListener("pointerdown", (e) => {
+      const grip = e.target.closest("[data-sheet-drag]");
+      if (!grip || !current) return;
+      dragging = true; startY = e.clientY; dy = 0; t0 = performance.now();
+      current.classList.add("is-dragging");
+      grip.setPointerCapture?.(e.pointerId);
+    });
+    page.addEventListener("pointermove", (e) => {
+      if (!dragging || !current) return;
+      dy = Math.max(0, e.clientY - startY);
+      current.style.setProperty("--drag", dy + "px");
+    });
+    const end = () => {
+      if (!dragging || !current) return;
+      dragging = false;
+      current.classList.remove("is-dragging");
+      const v = dy / Math.max(1, performance.now() - t0);
+      if (dy > 90 || v > 0.6) close(); else current.style.setProperty("--drag", "0px");
+    };
+    page.addEventListener("pointerup", end);
+    page.addEventListener("pointercancel", end);
+    return { open, close, isOpen: () => !!current };
+  };
+
   /* Drag-to-scroll with a mouse (presenting on a laptop). */
   fx.mouseDrag = (el) => {
     let down = false, sx = 0, sl = 0, moved = false;

@@ -7,9 +7,13 @@ starts the HTML component kit that later mobile flows reuse.
 - **Component library:** `library.html` (tokens, icons and every component, rendered by the same functions)
 - **Figma:** `GHuBkYGEQZvQppv3v55EaA`, section *Finance Home* `416:82748`
 
-**Screens (v0.3.0):**
+**Screens (v0.4.0):**
 - **Home:** frames `382:34093`, `382:33823`, `382:36681`
 - **Loans overview:** `382:36150`. Home → "Explore Loans" pushes it; the back arrow or browser back pops it.
+- **Loan offers:** list `382:35324`, comparing `382:35666`, Sort sheet `393:505`, Filters sheet `393:869`. Reached from:
+  - Loans overview → "See all loans (7)" or the Offers tab
+  - Home → "View all" on Top loan matches
+- **Compare loans:** `382:37839`. Loan offers → tray "Compare" (2+ loans selected).
 
 ## Run it
 
@@ -123,6 +127,19 @@ All of this is behaviour on existing elements. None of it adds UI:
 4. The content column is 354 wide (application and borrowing cards), while the help card is 350 and the screen gutter is 20/16. Reproduced as drawn.
 5. The header icons and CMR chevron are Solar `#1C274C`, not ink.
 6. Home now matches the updated Figma: "₹50 Lakhs" and the "Explore Loans" / "Explore Subsidies" CTAs. `382:36681` still reads "See all subsidies (3)"; I used "Explore Subsidies" for both, since the hero carousel is shared. The Subsidies overview isn't designed yet, so that CTA shows a hotspot hint.
+
+## Figma flags · Loan offers flow (`416:121835`)
+
+1. **Compare loans doesn't match the selection.**
+   - The compare state selects SIDBI + Axis, but Compare loans shows Citi, SIDBI and a third lender.
+   - Figma has no compare data for Axis or HDFC, so the screen shows its three drawn columns whatever you pick. I need either data for every offer or a fixed demo set.
+2. **The third Compare column** is labelled "SIDBI" but carries the SBI logo and different figures. It's shown as **SBI**.
+3. **"Top 3 picks" draws only 2 cards.** I added SIDBI as the third, using only Figma values: its All-offers card, plus the 0.5% processing fee from Compare loans.
+4. **Nav doesn't match.** Loan offers uses the Finance hub tabs (Home · Business · Finance · Grow), while Loans overview uses the Loans tabs, whose Offers tab leads here. Kept as drawn.
+5. **Hero texture.** It's 50% in the compare state and 30% in the list; I used 30%.
+6. **Toggle On state.** The DS Toggle is drawn Off only, so "On" (primary track) is inferred.
+7. **Sort and filters change state only.** All three All-offers cards share the same figures, so sort updates the chip but doesn't reorder; quick and sheet filters toggle without filtering. "Show 4 offers" is static.
+8. **Not built yet:** offer detail, Apply now, and "Apply to N lenders" show hotspot hints.
 
 ## Versioning
 

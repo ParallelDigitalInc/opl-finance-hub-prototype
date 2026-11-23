@@ -10,10 +10,12 @@
 
   /* ------------------------------------------------------------------------
      Button — Figma "Button" 2:118 / 9:19
-     variant: "filled" | "text"   size: "lg" (44) | "md" (38) | "sm" (32)
+     variant: "filled" | "text" | "tonal" (#F5F7FA, Apply now) | "soft" (#EEF2FE, Selected)
+              | "outlined" (Select) | "white" (tray Compare)
+     size: "lg" (44) | "md" (38) | "sm" (32)   strong: SemiBold label (Compare loans CTA)
      ------------------------------------------------------------------------ */
-  ui.Button = ({ label, variant = "filled", size = "lg", leading, trailing, block = false, goto, attrs = "" }) => html`
-    <button class="${cx("btn", `btn--${variant}`, `btn--${size}`, block && "btn--block")}" data-press
+  ui.Button = ({ label, variant = "filled", size = "lg", leading, trailing, block = false, strong = false, goto, attrs = "" }) => html`
+    <button class="${cx("btn", `btn--${variant}`, `btn--${size}`, block && "btn--block", strong && "btn--strong")}" data-press
       ${goto ? OPL.raw(`data-goto="${goto}"`) : ""} ${OPL.raw(attrs)}>
       ${leading ? icon(leading, size === "sm" ? 14 : 16) : ""}
       <span class="btn__label">${label}</span>
@@ -45,6 +47,12 @@
     bob: { layers: [{ src: "logo-bob.png", cover: true }] },
     // Axis Bank — logo from Figma Loan offers 382:35369
     axis: { bg: "#fff", layers: [{ src: "logo-axis.png", cover: true }] },
+    // Loan offers marks (382:35481 SIDBI, 382:35579 HDFC) on white
+    sidbiMark: { bg: "#fff", layers: [{ src: "mark-sidbi.svg", crop: "width:21.767px;height:26px;left:calc(50% - 11px);top:calc(50% - 13px)" }] },
+    hdfcMark: { bg: "#fff", layers: [{ src: "mark-hdfc.svg", crop: "left:22.5%;top:22.5%;width:53.06%;height:52.5%" }] },
+    // Compare loans logos (382:37905, 382:37933) — contained on white
+    sidbi: { bg: "#fff", layers: [{ src: "logo-sidbi.png", contain: true }] },
+    sbi: { bg: "#fff", layers: [{ src: "logo-sbi.png", contain: true }] },
     // Govt. of Gujarat seal — Wikimedia Commons "Seal of Gujarat.svg", cropped to the emblem
     gujaratGovt: { ring: 1, bg: "#fff", layers: [{ src: "logo-gujarat-govt.png", crop: "width:74%;height:auto;left:13%;top:9%" }] },
     msme: {
@@ -68,7 +76,9 @@
     const r = ring ?? def.ring ?? 0;
     return html`<span class="logo" style="--logo:${size}px;--ring:${r}px${def.bg ? `;--logo-bg:${def.bg}` : ""}">
       <span class="logo__fill">${def.layers.map((l) =>
-        l.cover
+        l.contain
+          ? OPL.raw(`<img class="logo__cover" style="object-fit:contain" src="${img(l.src)}" alt="">`)
+          : l.cover
           ? OPL.raw(`<img class="logo__cover" src="${img(l.src)}" alt="">`)
           : OPL.raw(`<img class="logo__crop" style="${l.crop}" src="${img(l.src)}" alt="">`)
       )}</span></span>`;
@@ -137,11 +147,13 @@
     </div>`;
 
   /* Chip — filter-by-need chip with optional count badge (382:34182) */
-  ui.Chip = ({ icon: name, label, count, selected = false, goto }) => html`
-    <button class="${cx("chip", selected && "is-selected")}" data-press ${goto ? OPL.raw(`data-goto="${goto}"`) : ""}>
-      ${icon(name, 18)}
+  /* bordered: Filters/Sort chips (392:490). trailing: e.g. chevron-down. attrs: data hooks. */
+  ui.Chip = ({ icon: name, label, count, selected = false, bordered = false, trailing, goto, attrs = "" }) => html`
+    <button class="${cx("chip", selected && "is-selected", bordered && "chip--bordered")}" data-press ${goto ? OPL.raw(`data-goto="${goto}"`) : ""} ${OPL.raw(attrs)}>
+      ${name ? icon(name, 18) : ""}
       <span class="chip__label">${label}</span>
       ${count != null ? OPL.raw(`<span class="badge">${count}</span>`) : ""}
+      ${trailing ? icon(trailing, 16) : ""}
     </button>`;
 
   /* ------------------------------------------------------------------------
@@ -247,6 +259,114 @@
     </article>`;
 
   /* ------------------------------------------------------------------------
+     OfferCard — Loan offers cards. kind "pick" (300w, 382:35360) | "offer" (350w, 382:35473)
+     tags: [{ text, tone: "blue" | "green" | "amber" }]   details: [[label, value]]
+     ------------------------------------------------------------------------ */
+  ui.OfferCard = ({ id, kind = "offer", logo, tint, tags = [], title, subtitle, figures, details, selected = false }) => html`
+    <article class="${cx("offer", `offer--${kind}`, selected && "is-selected")}" style="--tint:${tint}" data-offer="${id}">
+      <div class="offer__head" data-press data-goto="loan-detail">
+        <div class="offer__tags">${tags.map((t) => OPL.raw(`<span class="offer__tag offer__tag--${t.tone}">${t.text}</span>`))}</div>
+        <div class="offer__id">
+          ${ui.Logo({ id: logo, size: 40 })}
+          <div class="offer__text"><p class="offer__title">${title}</p><p class="offer__sub">${subtitle}</p></div>
+        </div>
+      </div>
+      <div class="offer__figs">
+        <div class="offer__figrow">${figures.map((f) => OPL.raw(`
+          <div class="figure"><span class="figure__label">${f.label}</span>
+            <span class="figure__value">${f.value}${f.unit ? `<span class="figure__unit">${f.unit}</span>` : ""}</span></div>`))}</div>
+        <span class="offer__divider"></span>
+      </div>
+      <div class="offer__details">${details.map(([l, v]) => OPL.raw(`<div class="offer__row"><span>${l}</span><span>${v}</span></div>`))}</div>
+      <div class="offer__foot">
+        <button class="offer__compare" data-compare="${id}" aria-pressed="${selected}">
+          <img class="ico offer__check" src="assets/icons/${selected ? "check-square-checked" : "check-square"}.svg" width="24" height="24" alt="">
+          <span>Compare</span>
+        </button>
+        ${ui.Button({ label: "Apply now", variant: "tonal", size: "md", trailing: "arrow-right-primary", goto: "apply-loan" })}
+      </div>
+    </article>`;
+
+  /* SortOption — "Loan offers / Sort option" 393:504 */
+  ui.SortOption = ({ label, selected = false }) => html`
+    <button class="${cx("sort-opt", selected && "is-selected")}" data-sort="${label}" data-press>
+      <span class="sort-opt__label">${label}</span>
+      ${selected ? OPL.raw(`<img class="ico" src="assets/icons/radio-selected.svg" width="20" height="20" alt="">`) : OPL.raw(`<span class="sort-opt__radio"></span>`)}
+    </button>`;
+
+  /* Sheet — bottom sheet (393:851 / 393:869). Opened/closed with OPL.fx.sheet. */
+  ui.Sheet = ({ id, title, action, body, footer }) => html`
+    <div class="sheet-layer" data-sheet="${id}" hidden>
+      <div class="sheet-scrim" data-sheet-close></div>
+      <section class="sheet" role="dialog" aria-label="${title}">
+        <div class="sheet__grip" data-sheet-drag><span class="sheet__grabber"></span>
+          <div class="sheet__head"><h2 class="sheet__title">${title}</h2>${action ? OPL.raw(`<button class="sheet__action" data-sheet-action>${action}</button>`) : ""}</div>
+        </div>
+        ${OPL.raw(String(body))}
+        ${footer ? OPL.raw(`<div class="sheet__foot">${footer}</div>`) : ""}
+      </section>
+    </div>`;
+
+  /* CompareTray — floating compare bar (382:35963). selected: [{ id, logo }] */
+  ui.CompareTray = ({ selected, max = 3 }) => html`
+    <div class="tray">
+      <img class="tray__texture" src="${img("hero-texture.png")}" alt="">
+      <span class="tray__blur"></span>
+      <div class="tray__head">
+        <p class="tray__title">Comparing ${selected.length} of ${max} loans</p>
+        <button class="tray__clear" data-compare-clear>Clear all</button>
+      </div>
+      <div class="tray__row">
+        <div class="tray__logos">
+          ${selected.map((s) => OPL.raw(`<span class="tray__slot" data-slot="${s.id}">${ui.Logo({ id: s.logo, size: 44 })}
+            <button class="tray__remove" data-compare-remove="${s.id}" aria-label="Remove">${icon("close-circle", 20)}</button></span>`))}
+          ${Array.from({ length: Math.max(0, max - selected.length) }, () => OPL.raw(`<button class="tray__add" data-compare-add aria-label="Add a loan">${icon("add-circle", 44)}</button>`))}
+        </div>
+        ${ui.Button({ label: "Compare", variant: "white", size: "md", trailing: "arrow-right-primary", attrs: "data-compare-go" })}
+      </div>
+    </div>`;
+
+  /* Toggle — DS Toggle 269:2 (Off as drawn; On state inferred: primary track) */
+  ui.Toggle = ({ on = false, attrs = "" }) => html`
+    <button class="${cx("toggle", on && "is-on")}" role="switch" aria-checked="${on}" ${OPL.raw(attrs)}><span class="toggle__knob"></span></button>`;
+
+  /* CompareTable — Compare loans grid (382:37840) + pick row (382:37990) */
+  ui.CompareTable = ({ rows, lenders }) => {
+    const label = (r) => `<div class="ct-cell ct-label" data-row="${r.id}" style="--h:${r.h}px">
+      <div class="ct-label__main" style="gap:${r.gap || 4}px"><span>${r.label}</span>${r.info ? icon("info-circle", 14) : ""}</div>
+      ${r.sub ? `<span class="ct-sub">${r.sub}</span>` : ""}</div>`;
+    const value = (l, r) => {
+      const v = l.values[r.id];
+      const best = l.best.includes(r.id);
+      return `<div class="${cx("ct-cell ct-value", r.small && "ct-value--small", best && "is-best")}" data-row="${r.id}" style="--h:${r.h}px">
+        ${Array.isArray(v) ? `<span>${v[0]}</span><span class="ct-sub">${v[1]}</span>` : `<span>${v}</span>`}</div>`;
+    };
+    return html`
+      <div class="ct">
+        <div class="ct-labels">
+          <div class="ct-cell ct-label ct-label--lender"><span>Lender</span></div>
+          ${rows.map((r) => OPL.raw(label(r)))}
+        </div>
+        <div class="ct-scroll" data-ct-scroll>
+          ${lenders.map((l) => OPL.raw(`<div class="ct-col" data-col="${l.id}">
+            <div class="ct-head"><div class="ct-card"><div class="ct-card__inner" style="background:${l.tint}">
+              <div class="ct-card__top">${ui.Logo({ id: l.logo, size: 28 })}<button class="ct-card__x" data-col-remove="${l.id}" aria-label="Remove ${l.name}">${icon("x-16", 16)}</button></div>
+              <p class="ct-card__name">${l.name}</p></div></div></div>
+            ${rows.map((r) => value(l, r)).join("")}
+          </div>`))}
+        </div>
+      </div>`;
+  };
+  ui.ComparePick = ({ label, lenders }) => html`
+    <div class="ct-pick">
+      <div class="ct-pick__label">${label}</div>
+      <div class="ct-pick__scroll" data-ct-pick>
+        ${lenders.map((l) => OPL.raw(`<div class="ct-pick__cell" data-col="${l.id}">
+          ${ui.Button({ label: l.selected ? "Selected" : "Select", variant: l.selected ? "soft" : "outlined", size: "md", block: true, attrs: `data-pick="${l.id}"` })}</div>`))}
+      </div>
+    </div>`;
+
+  /* ------------------------------------------------------------------------
      Chrome
      ------------------------------------------------------------------------ */
   ui.StatusBar = () => html`
@@ -257,10 +377,10 @@
 
   /* AppHeader — home (382:34252): title + bell, support, avatar.
      Sub-page (382:36173): back arrow + title, custom actions. */
-  ui.AppHeader = ({ title, back = false, actions }) => html`
-    <header class="app-header">
+  ui.AppHeader = ({ title, back = false, backIcon = "arrow-left", compact = false, actions }) => html`
+    <header class="${cx("app-header", compact && "app-header--compact")}">
       <div class="app-header__lead">
-        ${back ? OPL.raw(`<button class="app-header__back" aria-label="Back" data-press data-back>${icon("arrow-left", 24)}</button>`) : ""}
+        ${back ? OPL.raw(`<button class="app-header__back" aria-label="Back" data-press data-back>${icon(backIcon, 24)}</button>`) : ""}
         <h1 class="app-header__title">${title}</h1>
       </div>
       <div class="app-header__actions">

@@ -1,5 +1,36 @@
 # Changelog
 
+## v0.4.0 — 23 Nov 2026 · Loan offers + Compare loans
+
+Synced from Figma section "Loans" `416:121835`:
+- list `382:35324`
+- compare state `382:35666`
+- Sort sheet `393:505`
+- Filters sheet `393:869`
+- Compare loans `382:37839`
+
+**Added**
+
+- **Loan offers screen:**
+  - Top 3 picks rail (Axis, Citi, plus SIDBI added from Figma values)
+  - "All offers (6)" with the Filters chip, Sort chip, divider and quick filters
+  - offer cards: SIDBI, Axis, HDFC
+- **Compare selection:** the checkbox toggles a 2px primary outline. The compare tray replaces the AI Mitra button: "Comparing N of 3 loans", logos with remove buttons, + slots and "Compare". A 4th pick shakes the tray, the + scrolls to All offers, and Compare with one loan nudges the + slot.
+- **Sort sheet:** radio rows apply on tap and auto-close; the chip label updates.
+- **Filters sheet:** multi-select chips, "Clear all", "Show 4 offers". Sheets close on scrim tap, Escape or drag-down.
+- **Compare loans screen:**
+  - sticky header with "Show differences only" (collapses rows where every lender matches)
+  - sticky label column with horizontally scrolling lender columns and best values in green
+  - removable columns
+  - a Selected/Select pick row synced to the scroll
+  - "Apply to N lenders"
+- **New components:** OfferCard, SortOption, Sheet, CompareTray, Toggle, CompareTable, ComparePick. Button variants `tonal`, `soft`, `outlined` and `white`, plus `strong`. Chip `bordered`/trailing/icon-less. AppHeader `compact`/`backIcon`. Logos: SIDBI and HDFC marks, plus the SIDBI and SBI logos.
+- **Panel presets** for the four Loan offers frames. `OPL.state.set(…, { silent })` keeps the URL in sync without re-rendering.
+
+**Fixed**
+
+- The Logo component is now block-level, so it renders inside non-flex parents.
+
 ## v0.3.1 — 23 Nov 2026 · Loans overview tweaks
 
 - The offer cards in the Loans overview's first fold use **18px titles**, as drawn in `382:36202` (`MatchCard size: "lg"`). Home stays at 16px.

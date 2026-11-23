@@ -1,0 +1,33 @@
+/* ==========================================================================
+   Screens · Loan offers (382:35324) + Compare loans (382:37839)
+   Loan offers rhythm: "Top 3 picks" 127 → rail 171 (cards 410) → hero ends 605
+   → "All offers (6)" 637 → chips 681 → cards 735, 342 apart → 167 bottom.
+   ========================================================================== */
+
+.lof { position: relative; padding: calc(127px + var(--dy)) 0 var(--lof-pad, 167px); --dy: calc(var(--status-h) - 47px); }
+.lof-bg { position: absolute; left: 0; right: 0; top: 0; height: calc(605px + var(--dy)); overflow: hidden; background: var(--hero-bg); border-radius: 0 0 0 var(--r-xl); }
+.lof-bg__ellipse { position: absolute; left: calc(50% - 209px); top: calc(82px + var(--dy)); width: 418px; height: 418px; max-width: none; }
+.lof-bg__texture { position: absolute; left: calc(50% - 258.45px); top: calc(-10px + var(--dy)); width: 516.9px; height: 683px; max-width: none; opacity: 0.3; }
+.lof-header { position: absolute; top: var(--status-h); left: 0; right: 0; z-index: 2; }
+
+.lof-picks, .lof-all { position: relative; display: flex; flex-direction: column; gap: var(--s16); }
+.lof-title { padding: 0 var(--gutter); font-size: 20px; line-height: 28px; font-weight: var(--fw-medium); color: var(--foreground); }
+.lof-rail { align-items: center; }
+.lof-all { margin-top: 56px; }
+.lof-chips { margin: -12px 0; }
+.lof-list { display: flex; flex-direction: column; align-items: center; gap: var(--s16); margin-top: 2px; padding: 0 var(--gutter); }
+
+/* floating: tray replaces the AI Mitra button while comparing (382:35962) */
+.floating__tray { width: 100%; display: none; }
+.floating.has-tray .floating__tray { display: block; }
+.floating.has-tray .fab-wrap { display: none; }
+.floating__tray.is-in { animation: tray-in 420ms var(--ease-out) both; }
+@keyframes tray-in { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* ---- Compare loans ------------------------------------------------------ */
+.cl { padding-bottom: 153px; }
+.cl-head { position: sticky; top: 0; z-index: 10; padding-top: var(--status-h); background: #fff; border-bottom: 1px solid #cbd5e1; filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.04)); }
+.cl-diff { display: flex; align-items: center; justify-content: space-between; padding: var(--s12) var(--s24); background: var(--muted); font-size: 14px; line-height: 20px; font-weight: var(--fw-medium); color: var(--muted-foreground); }
+.cl-table { margin-top: 0; } /* table starts at 156, right under the sticky header */
+.cl-foot { position: absolute; left: 0; right: 0; bottom: 0; z-index: 20; background: #fff; }
+.cl-cta { height: 77px; padding: var(--s16) var(--s20); border-top: 1px solid var(--border); padding-bottom: max(16px, env(safe-area-inset-bottom)); }

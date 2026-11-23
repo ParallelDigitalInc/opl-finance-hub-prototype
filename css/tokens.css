@@ -34,6 +34,7 @@
   --tint-blue: #e9f1fb;
   --tint-peach: #fbf0e9;
   --tint-peach-soft: #fcf6f3;         /* hero back card (loan) */
+  --tint-olive: #eeeee5;              /* SIDBI card — Loan offers 382:35475 */
   --tint-pink: #fcf3f6;               /* Axis card — Loan offers 382:35362 */
   --help-bg: #f1f6fe;
   --badge-bg: #cbd6f9;
@@ -46,6 +47,12 @@
   --risk-low-bg: #e1f3e4;             /* CMR "Low risk" pill */
   --risk-low-fg: #2c8a47;
   --amber-fg: #92400e;                /* "2 days left" deadline tag */
+  --tag-green: #047857;               /* "Lowest interest" tag */
+  --tag-amber: #854d0e;               /* "Needs collateral" tag */
+  --best: #15803d;                    /* best value in Compare loans */
+  --soft-primary: #eef2fe;            /* "Selected" button */
+  --hairline: #f1f5f9;                /* Compare loans grid lines */
+  --scrim: rgba(15, 23, 42, 0.45);    /* sheet scrim */
   --chart-indigo: #4340d6;            /* borrowing donut · loans on EMI */
   --chart-green: #5cbd7e;             /* borrowing donut · credit line used */
   --trust: #16a34a;                   /* green-600 — trust icon (proposed, not in DS yet) */

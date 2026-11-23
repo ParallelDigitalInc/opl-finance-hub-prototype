@@ -99,6 +99,28 @@
     ],
   };
 
+  OPL.variants["loan-offers"] = {
+    presets: [
+      { id: "list", label: "Offers list", figma: "382:35324", set: { compare: "none", sheet: "none" } },
+      { id: "compare", label: "Comparing 2 loans", figma: "382:35666", set: { compare: "figma", sheet: "none" } },
+      { id: "sort", label: "Sort sheet", figma: "393:505", set: { compare: "none", sheet: "sort" } },
+      { id: "filters", label: "Filters sheet", figma: "393:869", set: { compare: "none", sheet: "filters" } },
+    ],
+    groups: [
+      { id: "compare", hidden: true, default: "none", options: [{ value: "none" }, { value: "figma" }] },
+      { id: "sheet", hidden: true, default: "none", options: [{ value: "none" }, { value: "sort" }, { value: "filters" }] },
+      {
+        id: "nudge", label: "AI Mitra nudge", default: "on",
+        options: [{ value: "on", label: "Shows once" }, { value: "off", label: "Off" }],
+      },
+    ],
+  };
+
+  OPL.variants["compare-loans"] = {
+    presets: [{ id: "default", label: "Compare loans", figma: "382:37839", set: {} }],
+    groups: [],
+  };
+
   /** Resolve the current value of every group for a screen (URL → default). */
   OPL.variantValues = (screen) => {
     const reg = OPL.variants[screen];

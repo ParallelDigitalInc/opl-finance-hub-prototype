@@ -176,3 +176,5 @@
 .nav--section .nav__item.is-active { padding: var(--s8) 0; }
 .nav--section .nav__label { color: var(--tertiary-foreground); }
 .nav--section .nav__item.is-active .nav__label { color: var(--primary); }
+
+.app-header--compact { padding-top: var(--s12); padding-bottom: var(--s12); }

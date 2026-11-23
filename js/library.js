@@ -6,6 +6,8 @@
   const { ui } = OPL;
   const d = OPL.data.home;
   const lo = OPL.data.loansOverview;
+  const of = OPL.data.loanOffers;
+  const cl = OPL.data.compareLoans;
   const root = document.getElementById("lib");
 
   const TOKENS = {
@@ -41,6 +43,7 @@
       demos: [
         ["Filled · Large · trailing", ui.Button({ label: "See all loans (7)", trailing: "chevron-right-white" }), `ui.Button({ label, trailing: "chevron-right-white" })`],
         ["Filled · Medium 38", ui.Button({ label: "Review KFS", size: "md", block: true }), `ui.Button({ label, size: "md", block: true })`],
+        ["Tonal · Soft · Outlined · White (38)", OPL.raw(`<div style="display:flex;gap:8px;flex-wrap:wrap;background:#f1f6fe;padding:12px;border-radius:12px">${ui.Button({ label: "Apply now", variant: "tonal", size: "md", trailing: "arrow-right-primary" })}${ui.Button({ label: "Selected", variant: "soft", size: "md" })}${ui.Button({ label: "Select", variant: "outlined", size: "md" })}${ui.Button({ label: "Compare", variant: "white", size: "md", trailing: "arrow-right-primary" })}</div>`), `ui.Button({ label, variant: "tonal" | "soft" | "outlined" | "white", size: "md" })`],
         ["Filled · Small · leading", ui.Button({ label: "Request a Call", size: "sm", leading: "phone-calling-bold" }), `ui.Button({ label, size: "sm", leading: "phone-calling-bold" })`],
         ["Text · trailing", ui.Button({ label: "View all", variant: "text", trailing: "chevron-right-primary" }), `ui.Button({ label, variant: "text", trailing: "chevron-right-primary" })`],
       ],
@@ -112,6 +115,33 @@
     {
       name: "BorrowingCard", node: "382:36253",
       demos: [["", OPL.raw(`<div style="width:354px">${ui.BorrowingCard(lo.borrowing.card)}</div>`), `ui.BorrowingCard({ total, legend, available })`]],
+    },
+    {
+      name: "OfferCard", node: "pick 382:35360 · offer 382:35473", use: "Loan offers cards. Compare checkbox toggles a 2px primary outline (382:35815); Apply now is a Tonal Medium button.",
+      demos: [
+        ["Pick (300)", ui.OfferCard({ ...of.picks[1], kind: "pick" }), `ui.OfferCard({ kind: "pick", logo, tint, tags, title, subtitle, figures, details })`],
+        ["Offer (350) · selected", ui.OfferCard({ ...of.offers[0], kind: "offer", selected: true }), `ui.OfferCard({ kind: "offer", …, selected: true })`],
+      ],
+    },
+    {
+      name: "Chip · bordered + selected", node: "392:490",
+      demos: [["Filters · Sort · quick · selected", OPL.raw(`<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">${ui.Chip({ icon: "tuning-2", label: "Filters", bordered: true })}${ui.Chip({ icon: "sort-vertical", label: "Lowest interest", bordered: true, trailing: "chevron-down" })}<span class="chip-divider"></span>${ui.Chip({ label: "Term loan" })}${ui.Chip({ label: "Working capital", bordered: true, selected: true })}</div>`), `ui.Chip({ label, bordered, selected, trailing })`]],
+    },
+    {
+      name: "SortOption · Sheet", node: "393:504 · 393:851", use: "Sort rows apply on tap and close the sheet (no CTA). Sheets close on scrim tap, Escape or a downward drag.",
+      demos: [["Sort options", OPL.raw(`<div style="width:350px">${of.sortOptions.map((o, i) => ui.SortOption({ label: o, selected: i === 0 })).join("")}</div>`), `ui.SortOption({ label, selected }) · ui.Sheet({ id, title, action, body, footer })`]],
+    },
+    {
+      name: "CompareTray", node: "382:35966", bg: "#f1f5f8", use: "Replaces the AI Mitra button while loans are selected. Max 3; a 4th shakes the tray.",
+      demos: [["2 of 3", OPL.raw(`<div style="width:358px">${ui.CompareTray({ selected: [{ id: "a", logo: "sidbiMark" }, { id: "b", logo: "axis" }] })}</div>`), `ui.CompareTray({ selected: [{ id, logo }], max: 3 })`]],
+    },
+    {
+      name: "Toggle", node: "269:2", use: "Off as drawn; On inferred from the primary colour.",
+      demos: [["Off · On", OPL.raw(`<div style="display:flex;gap:16px">${ui.Toggle({})}${ui.Toggle({ on: true })}</div>`), `ui.Toggle({ on })`]],
+    },
+    {
+      name: "CompareTable", node: "382:37840 · pick row 382:37990", use: "Sticky label column, horizontally scrolling lender columns, best values in green.",
+      demos: [["", OPL.raw(`<div style="width:390px;overflow:hidden;border-radius:12px;box-shadow:inset 0 0 0 1px var(--border)">${ui.CompareTable({ rows: cl.rows.slice(0, 4), lenders: cl.lenders })}${ui.ComparePick({ label: cl.pickLabel, lenders: cl.lenders })}</div>`), `ui.CompareTable({ rows, lenders }) · ui.ComparePick({ label, lenders })`]],
     },
     {
       name: "PageNote", node: "proposed", use: "Quiet sign-off at the end of a scrolling page. Proposed — not in Figma yet.",

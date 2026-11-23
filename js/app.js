@@ -116,7 +116,7 @@
           .join("")}</div>
       </div>` : ""}
       ${reg ? reg.groups
-        .filter((g) => g.options.length > 1)
+        .filter((g) => g.options.length > 1 && !g.hidden)
         .map((g) => `
         <div class="panel__group">
           <div class="panel__label"><span>${g.label}</span></div>
