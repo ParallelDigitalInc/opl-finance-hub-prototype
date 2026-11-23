@@ -2977,7 +2977,7 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
 ;
 
 /* ==== js/desktop/screens/subsidy-estimate.js ==== */
-/* Desktop · Govt. subsidies › Calculate estimate, as a modal over Subsidy details (v0.16.11;
+/* Desktop · Govt. subsidies › Calculate estimate, as a modal over Subsidy details (v0.16.12;
    it was a side drawer — a centred stage makes the calculated moment land harder).
    No desktop frame on "-> Final Desktop"; the mobile sheet is the model (section 416:76869:
    form 416:77107 / 416:76872 → result 416:77363), flagged in the README as designed in code.

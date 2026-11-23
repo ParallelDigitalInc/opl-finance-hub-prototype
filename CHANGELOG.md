@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.16.12 — 23 Nov 2026 · Calculate estimate is a modal, and the page remembers the result
+
+Shreya asked for a modal for more delight when the estimate is calculated, and for the result to show outside once closed.
+
+- **Calculate estimate opens as a 560 modal** over Subsidy details, replacing the side drawer. The box keeps one height for form and result, so the calculated moment swaps in place with no jump:
+  - Form: the mobile cards scroll between a fixed header and a footer with the live "Your estimate", Build-up bar, Get Estimate and Talk to an Expert.
+  - Result: satin and rays bloom, a bundle lands per benefit while the total climbs, confetti bursts from the stack, and the whole modal gives a small bounce at the end.
+- **Closing the modal updates the page.** The estimate card (both details versions) counts from its old figure to yours, **"Up to ₹1.01Cr"**, glows once, and adds **"Based on your 3 benefits"**. Its button becomes **Recalculate**. Re-renders keep it.
+- **Mobile too.** The result is saved to the shared estimate state from either view, so the mobile Subsidy details hero shows your number, the note and Recalculate as well. Mobile's own result screen now saves it too.
+- The URL still follows the modal (`subsidy-estimate` / `subsidy-estimate-result`).
+
 ## v0.16.11 — 23 Nov 2026 · Desktop AI questions change with context
 
 Shreya: on desktop, wherever there's AI, the questions should change subtly in context.
