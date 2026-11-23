@@ -4694,7 +4694,7 @@ const panelW = panelEl && getComputedStyle(panelEl).display !== "none" && !panel
 const chrome = wrap.offsetHeight - screenEl.offsetHeight;          // browser bar
 const availW = window.innerWidth - 48 - panelW;
 const availH = window.innerHeight - 48;
-const s = Math.min(1, availW / D_W);
+const s = Math.min(1, availW / D_W, availH / (D_MIN_H + chrome));
 const h = Math.max(D_MIN_H, Math.floor((availH - chrome * s) / s));
 screenEl.style.height = `${h}px`;
 const fullH = h + chrome;

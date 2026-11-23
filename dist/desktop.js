@@ -1138,7 +1138,7 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
     detail: {
       crumbs: "Govt. subsidies",
       department: "Industries and Mines Department · State Government",
-      status: "Open till 30 Sep 2029",
+      status: "Open for applications",   // the date lives in the policy period card right below (Shreya: "repeating info") — adapted, flagged
       estimate: { eyebrow: "Estimated benefits", prefix: "Up to ", amount: "₹1.2Cr", cta: "Calculate Estimate", apply: "Apply Now" },
       info: "An estimate for a unit like yours, from the policy's rates. Calculate it for your own investment.",   // proposed tooltip
       howTitle: "How to apply",

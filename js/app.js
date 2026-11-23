@@ -192,7 +192,9 @@
       const chrome = wrap.offsetHeight - screenEl.offsetHeight;          // browser bar
       const availW = window.innerWidth - 48 - panelW;
       const availH = window.innerHeight - 48;
-      const s = Math.min(1, availW / D_W);
+      // fit the width AND the height: in a short window the frame (min 760 tall) used to overflow
+      // the window and lose its bottom (drawer footers, the apply bar) — now it scales down instead
+      const s = Math.min(1, availW / D_W, availH / (D_MIN_H + chrome));
       const h = Math.max(D_MIN_H, Math.floor((availH - chrome * s) / s));
       screenEl.style.height = `${h}px`;
       const fullH = h + chrome;
