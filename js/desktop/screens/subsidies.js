@@ -115,7 +115,7 @@
             <div class="d-ov__top d-sub__top">
               ${limitHero(s.hero)}
               <section class="d-refine" data-enter>
-                <img class="d-refine__art" src="${OPL.d.iconSrc("refine-illustration")}" width="160" height="82" alt="">
+                <img class="d-refine__art" src="assets/lazy/dsk/refine-art.png" width="165" height="87" alt="">   <!-- 558:104693 -->
                 <div class="d-refine__copy"><h3>${s.refine.title}</h3><p>${s.refine.body}</p></div>
                 ${D.btn({ label: s.refine.cta, style: "filled", size: "lg", cls: "d-btn--block", iconRight: D.icon("arrow-white-16", 16), goto: "subsidy-refine" })}
               </section>

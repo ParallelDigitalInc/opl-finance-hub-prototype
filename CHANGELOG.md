@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.16.2 — 23 Nov 2026 · New illustrations (Figma "Illustrations" 558:102537 + 558:104693)
+
+Shreya's improved 3D illustrations, mobile and desktop:
+
+- **Subsidy details hero:** notes and coins on a cream plinth (131 × 94), replacing the five flat SVG layers. Used on the mobile hero and in the desktop cover rail's estimate card. It drops onto its plinth and settles.
+- **Estimate result:** a blue 3D plinth with one money bundle per benefit, built from the loose layers so each benefit still lands its own bundle (148 × 110, as drawn in `558:103771`). This covers the mobile result and the desktop estimate drawer. More than three benefits stack further bundles on top.
+- **Refine your matches** (desktop Subsidies home): new document art (`558:104693`, 165 × 87).
+- Assets are rebuilt at 2× from the transparent source images (Figma only exports them at 1×) and palette-compressed to about 10 KB each. The old SVG layers are removed, so lazy assets dropped from 612 to 598 KB.
+- **Not used yet:** the Aatmanirbhar Gujarat building art and the loose coin stack. The prototype has no Aatmanirbhar details screen.
+
 ## v0.16.1 — 23 Nov 2026 · 14px inner radius everywhere
 
 Shreya: a tinted card inside a 16px white card should be 14px.

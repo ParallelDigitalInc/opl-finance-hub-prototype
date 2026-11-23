@@ -60,11 +60,7 @@
               </header>
               <div class="sd-hero__body">
                 <div class="sd-illus" aria-hidden="true">
-                  <img class="sd-illus__l sd-illus__base" src="${OPL.simg("hero-plinth-base.svg")}" alt="">
-                  <img class="sd-illus__l sd-illus__top" src="${OPL.simg("hero-plinth-top.svg")}" alt="">
-                  <img class="sd-illus__l sd-illus__notes" src="${OPL.simg("hero-notes.svg")}" alt="">
-                  <img class="sd-illus__l sd-illus__coins-a" src="${OPL.simg("hero-coins-a.svg")}" alt="">
-                  <img class="sd-illus__l sd-illus__coins-b" src="${OPL.simg("hero-coins-b.svg")}" alt="">
+                  <img class="sd-illus__art" src="${OPL.simg("hero-money.png")}" width="131" height="94" alt="">   <!-- Illustrations 558:102537 -->
                 </div>
                 <div class="sd-hero__copy">
                   <p class="sd-hero__eyebrow"><span>${d.hero.eyebrow}</span>
