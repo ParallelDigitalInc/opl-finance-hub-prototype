@@ -174,13 +174,13 @@
 .d-sd__period > * { box-shadow: none !important; outline: 0 !important; }
 /* estimate spotlight (524:102114): white p4 r16, cream gradient inner r14 */
 .d-sd__est { padding: 4px; border-radius: 16px; background: #fff; box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05), var(--shadow-s); }
-.d-sd__est-in { position: relative; overflow: hidden; display: flex; flex-direction: column; padding: 16px 20px; border-radius: 14px; background: linear-gradient(90deg, #fdf7ed, #faebd1); }
+.d-sd__est-in { position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 20px 20px 16px; border-radius: 14px; background: linear-gradient(90deg, #fdf7ed, #faebd1); }
 .d-sd__est-in::before { content: ""; position: absolute; inset: 0; background: url("../assets/lazy/dsk/subsidy/estimate-texture.png") center bottom / cover; mix-blend-mode: luminosity; opacity: 0.6; pointer-events: none; }
 .d-sd__est-in > * { position: relative; }
-.d-sd__illus { position: absolute !important; right: 4px; top: 32px; transform: scale(0.94); transform-origin: top right; margin: 0; }
-.d-sd__est-amt { display: flex; align-items: baseline; gap: 6px; font-size: 40px; line-height: 48px; font-weight: 500; color: var(--foreground); }
-.d-sd__est-amt span { font-size: 20px; font-weight: 400; color: #334155; }
-.d-sd__est-actions { margin-top: 36px; display: flex; flex-direction: column; gap: 8px; }
+/* illustration on top, then the copy, as the mobile hero (558:103930): art · 16 · eyebrow · amount */
+.d-sd__illus { margin: 0 0 16px; }
+.d-sd__est-amt { font-size: 40px; line-height: 52px; font-weight: 500; color: var(--foreground); white-space: nowrap; font-variant-numeric: tabular-nums; }   /* "Up to" in the same style as the amount */
+.d-sd__est-actions { align-self: stretch; margin-top: 24px; display: flex; flex-direction: column; gap: 8px; }
 .d-sd__est-actions .d-btn--outlined { background: transparent; box-shadow: inset 0 0 0 1px #cbd5e1; }
 .d-sd__est-actions .d-btn--outlined:hover { background: rgba(255, 255, 255, 0.6); box-shadow: inset 0 0 0 1px var(--primary); }
 

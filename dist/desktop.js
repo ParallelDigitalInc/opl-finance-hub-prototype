@@ -2856,7 +2856,7 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
                     <div class="d-sd__est-in">
                       ${money()}
                       <p class="d-sd__eyebrow">${est.eyebrow}${info(s.info)}</p>
-                      <p class="d-sd__est-amt"><span>${est.prefix}</span>${est.amount}</p>
+                      <p class="d-sd__est-amt">${est.prefix}${est.amount}</p>
                       <div class="d-sd__est-actions">
                         ${D.btn({ label: est.cta, style: "filled", size: "lg", cls: "d-btn--block", iconRight: D.icon("btn-arrow-white", 16), attrs: "data-estimate aria-haspopup=\"dialog\"" })}
                         ${D.btn({ label: est.apply, style: "outlined", size: "lg", cls: "d-btn--block d-btn--neutral", iconRight: D.icon("arrow-up-right-primary", 16), goto: "application-portal" })}
