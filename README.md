@@ -74,6 +74,8 @@ Geometry was checked against Figma on 23 Nov 2026:
 All of this is behaviour on existing elements. None of it adds UI:
 
 - **Entrance:** hero copy → back card → front card → CTA → dots → quick actions → sections, staggered 55ms apart. The ₹ amount counts up once.
+- **Hero offer cards (cycling):** every 3.2s on the visible slide, the front card tucks under the CTA, the peeking card grows into the front, and the next offer slides into the peek. It pauses while you touch the hero. The rest state is exactly Figma's. Loans cycle Citi → BoB → Axis; subsidies cycle MSME Competitive → Gujarat Electronics → Aatmanirbhar Gujarat. "Static (Figma)" in the panel turns it off.
+- **AI Mitra nudge:** about 2s after load, "Ask anything about **loans & subsidies**" slides out from behind the button. It tucks back after about 4s, or as soon as you scroll. It shows once per load; the topic is set per page in the screen data (`aiNudge`).
 - **Hero carousel:** native swipe with snap. The back card has parallax (it moves more than the front card) and the copy fades as it slides. The dots stay in sync, and tapping a dot changes slide. Optional auto-advance turns the active dot's fill into a 5s progress bar; touching pauses it.
 - **Press states:**
   - cards scale to 0.98
@@ -98,13 +100,21 @@ All of this is behaviour on existing elements. None of it adds UI:
 7. The fact pill's text style is "label/medium" (Figtree) but renders in Geist. Geist is used.
 8. The EMI banner reads "due on 12 Nov", which is in the past relative to today's demo date.
 9. Inactive nav items are 57 tall while the active one is 56, so labels sit 1.5px higher. This is reproduced.
+10. Not in Figma, added on request (v0.2.0):
+    - the third rail cards
+    - the cycling stack
+    - the AI Mitra nudge
+    - the page-end note (off by default)
+
+    Sources: the Axis card copies Loan offers "Top 3 picks" `382:35360`, with its logo and `#FCF3F6` tint. Aatmanirbhar Gujarat 2022 ("Up to ₹1.2Cr") comes from the subsidy screens `164:1434`. Its department, "Industries and Mines Department", is real-world, but OPL should confirm it. The Govt. of Gujarat seal is from Wikimedia Commons ("Seal of Gujarat.svg"), cropped in CSS.
+11. Once cycling, the subsidy back card carries its own copy (Gujarat Electronics Policy) instead of Figma's duplicated MSME copy.
 
 ## Versioning
 
 | | |
 |---|---|
 | Scheme | `0.MINOR.PATCH` until hand-off, then `1.0.0` |
-| MINOR | a new screen or flow is added (0.2 = next flow, …) |
+| MINOR | a new screen, flow or component/behaviour is added |
 | PATCH | fidelity fixes or a Figma re-sync of existing screens |
 | Tag | every version is a git tag `vX.Y.Z`; the CHANGELOG lists the Figma nodes synced and the date |
 | Single source | `OPL.VERSION` in `js/core.js` (shown in the panel) |

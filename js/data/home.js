@@ -15,8 +15,13 @@
           [{ text: "From", strong: false }, { text: " " }, { text: "9.45% p.a.", strong: true, accent: true }],
           [{ text: "7 offers", strong: true, accent: true }],
         ],
-        back: { kind: "loan", logo: "bob", title: "Bank of Baroda", subtitle: "Working Capital Loan", tint: "var(--tint-peach-soft)" },
-        front: { kind: "loan", logo: "citi", title: "Citi Bank", subtitle: "Working Capital Loan", tint: "var(--tint-blue)" },
+        // Cycle order — first two are the Figma rest state (front Citi, back BoB).
+        // Axis from Loan offers 382:35360.
+        stack: [
+          { logo: "citi", title: "Citi Bank", subtitle: "Working Capital Loan", tint: "var(--tint-blue)" },
+          { logo: "bob", title: "Bank of Baroda", subtitle: "Working Capital Loan", tint: "var(--tint-peach-soft)" },
+          { logo: "axis", title: "Axis Bank", subtitle: "Working Capital Loan", tint: "var(--tint-pink)" },
+        ],
         cta: "See all loans (7)",
         goto: "loan-offers",
       },
@@ -24,9 +29,13 @@
         eyebrow: "Get assistance up to",
         amount: { prefix: "₹", value: 1, suffix: " Crore", static: true },
         facts: null,
-        // Back card: Figma shows the Gujarat mark with MSME Competitive copy (382:34005).
-        back: { kind: "subsidy", logo: "gujarat", ring: 2, title: "MSME Competitive<br>Lean Scheme", subtitle: "MSME Champions Scheme", tint: "var(--tint-blue)" },
-        front: { kind: "subsidy", logo: "msme", ring: 1, title: "MSME Competitive<br>Lean Scheme", subtitle: "MSME Champions Scheme", tint: "var(--tint-peach)" },
+        // Figma's back card (382:34005) shows the Gujarat mark with MSME copy;
+        // now that it cycles to the front it carries its own scheme copy.
+        stack: [
+          { logo: "msme", ring: 1, title: "MSME Competitive<br>Lean Scheme", subtitle: "MSME Champions Scheme", tint: "var(--tint-peach)" },
+          { logo: "gujarat", ring: 2, title: "Gujarat Electronics Policy<br>(2022 - 28)", subtitle: "Science and Technology Department", tint: "var(--tint-blue)" },
+          { logo: "gujaratGovt", ring: 1, title: "Aatmanirbhar<br>Gujarat 2022", subtitle: "Industries and Mines Department", tint: "var(--tint-peach)" },
+        ],
         cta: "See all subsidies (3)",
         goto: "subsidy-list",
       },
@@ -55,6 +64,13 @@
           figures: [{ label: "Loan up to", value: "₹50 L" }, { label: "Interest", value: "9.45%", unit: "p.a." }],
           goto: "loan-detail",
         },
+        {
+          // Loan offers "Top 3 picks" 382:35360
+          kind: "loan", tag: "Collateral-free", tint: "var(--tint-pink)", logo: "axis",
+          title: "Axis Bank", subtitle: "Working Capital Loan",
+          figures: [{ label: "Loan up to", value: "₹50 L" }, { label: "Interest", value: "9.45%", unit: "p.a." }],
+          goto: "loan-detail",
+        },
       ],
     },
 
@@ -79,6 +95,13 @@
           figures: [{ label: "Assistance up to", value: "Up to ₹2.4L" }],
           goto: "subsidy-detail",
         },
+        {
+          // Aatmanirbhar Gujarat 2022 — subsidy screens 164:1434 ("Up to ₹1.2Cr")
+          kind: "subsidy", tag: "State Government", tint: "var(--tint-peach)", logo: "gujaratGovt",
+          title: "Aatmanirbhar<br>Gujarat 2022", subtitle: "Industries and Mines Department",
+          figures: [{ label: "Assistance up to", value: "Up to ₹1.2Cr" }],
+          goto: "subsidy-detail",
+        },
       ],
     },
 
@@ -87,6 +110,16 @@
       subtitle: "Get help with loans and subsidies",
       cta: "Request a Call",
       goto: "request-call",
+    },
+
+    // AI Mitra nudge — page-aware topic
+    aiNudge: { lead: "Ask anything about", topic: "loans & subsidies" },
+
+    // Page-end note options (picked in the panel; see variants.js)
+    pageNotes: {
+      indicative: ["Rates and amounts are indicative", "Final terms are set by the lender after review"],
+      caughtup: ["You're all caught up", "New matches appear as your business profile grows"],
+      trust: ["Offers from RBI-regulated banks and NBFCs", "Your data is shared only with your consent"],
     },
 
     emi: {

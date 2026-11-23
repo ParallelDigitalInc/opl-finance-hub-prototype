@@ -53,12 +53,10 @@
 .hero__facts { display: flex; gap: var(--s8); align-self: stretch; }
 
 .hero__stack { display: flex; flex-direction: column; align-items: center; width: 100%; }
-.hero__cards { display: inline-grid; grid-template: max-content / max-content; place-items: start; margin-bottom: -20px; }
-.hero__cards > * { grid-area: 1 / 1; }
-.hero__cards .hero-card--back { margin-left: 47.5px; translate: calc(var(--p) * 56px) 0; }
-.hero__cards .hero-card:not(.hero-card--back) { margin-top: 17px; translate: calc(var(--p) * 16px) 0; }
-.hero__slide--subsidies .hero__cards { margin-bottom: -12px; }
-.hero__slide--subsidies .hero__cards .hero-card:not(.hero-card--back) { margin-top: 16px; }
+.hero__stack .hero-stack { margin-bottom: -20px; }
+.hero__slide--subsidies .hero__stack .hero-stack { margin-bottom: -12px; }
+.hero__stack .stack-item[data-pos="back"] { translate: calc(var(--p) * 56px) 0; }
+.hero__stack .stack-item[data-pos="front"] { translate: calc(var(--p) * 16px) 0; }
 .hero__stack .btn { position: relative; }
 
 .home .dots { margin-top: 8px; }
@@ -85,19 +83,24 @@
 
 .home .help { margin: var(--section-gap) var(--gutter) 0; }
 
+/* ---- Page-end note (optional, see variants) -------------------------- */
+.home.has-note { padding-bottom: 196px; } /* clears the 172px floating bottom */
+.page-note { margin: 32px var(--gutter) 0; display: grid; gap: var(--s2); justify-items: center; text-align: center; }
+.page-note p { max-width: 300px; font-size: 12px; line-height: 16px; color: var(--tertiary-foreground); text-wrap: balance; }
+.page-note p:first-child { font-weight: var(--fw-medium); color: var(--muted-foreground); }
+
 /* ---- Entrance choreography -------------------------------------------- */
 .enter { --i: 0; }
 .is-entering .enter { animation: enter-up var(--dur-slow) var(--ease-out) both; animation-delay: calc(var(--i) * 55ms + 80ms); }
-.is-entering .hero-card--back.enter { animation-name: enter-back; }
-.is-entering .hero-card:not(.hero-card--back).enter { animation-name: enter-front; }
+.is-entering .stack-item[data-pos="back"] > .enter { animation-name: enter-back; }
+.is-entering .stack-item[data-pos="front"] > .enter { animation-name: enter-front; }
 .is-entering .rail .match.enter { animation-name: enter-left; }
 @keyframes enter-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
-@keyframes enter-back { from { opacity: 0; transform: translateY(22px) scale(0.94); } to { opacity: var(--o, 1); transform: none; } }
+@keyframes enter-back { from { opacity: 0; transform: translateY(22px) scale(0.94); } to { opacity: 1; transform: none; } }
 @keyframes enter-front { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
 @keyframes enter-left { from { opacity: 0; transform: translateX(28px); } to { opacity: 1; transform: none; } }
-.hero-card--back.hero-card--subsidy { --o: 0.8; }
 
 @media (prefers-reduced-motion: reduce) {
   .is-entering .enter { animation: none !important; }
-  .hero__titleblock, .hero__cards > * { translate: none !important; }
+  .hero__titleblock, .stack-item { translate: none !important; }
 }

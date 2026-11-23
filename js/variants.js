@@ -44,6 +44,36 @@
           note: "Prototype behaviour. Off matches Figma's static dot.",
         },
         {
+          id: "stack",
+          label: "Hero offer cards",
+          default: "cycle",
+          options: [
+            { value: "cycle", label: "Cycling" },
+            { value: "static", label: "Static (Figma)" },
+          ],
+        },
+        {
+          id: "nudge",
+          label: "AI Mitra nudge",
+          default: "on",
+          options: [
+            { value: "on", label: "Shows once" },
+            { value: "off", label: "Off" },
+          ],
+        },
+        {
+          id: "note",
+          label: "Page-end note",
+          default: "off",
+          options: [
+            { value: "off", label: "None" },
+            { value: "indicative", label: "Indicative" },
+            { value: "caughtup", label: "Caught up" },
+            { value: "trust", label: "Trust" },
+          ],
+          note: "Proposed copy — not in Figma yet.",
+        },
+        {
           id: "heroBg",
           label: "Hero background",
           default: "ice",

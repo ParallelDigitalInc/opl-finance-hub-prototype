@@ -18,10 +18,7 @@
           ${d.facts ? OPL.raw(`<div class="hero__facts">${d.facts.map((parts) => ui.FactPill({ parts })).join("")}</div>`) : ""}
         </div>
         <div class="hero__stack">
-          <div class="hero__cards">
-            ${ui.HeroCard({ ...d.back, scale: 194 / 289 })}
-            ${ui.HeroCard(d.front)}
-          </div>
+          ${ui.HeroStack({ kind: key === "loans" ? "loan" : "subsidy", cards: d.stack })}
           ${ui.Button({ label: d.cta, trailing: "chevron-right-white", block: true, goto: d.goto })}
         </div>
       </div>
@@ -62,7 +59,7 @@
       screen.innerHTML = html`
         ${ui.StatusBar()}
         <div class="scroller">
-          <main class="home" style="${cssVars}">
+          <main class="${OPL.cx("home", v.note !== "off" && "has-note")}" style="${cssVars}">
             <section class="hero">
               <div class="hero__bg">
                 <img class="hero__ellipse" src="${OPL.img("hero-ellipse.svg")}" alt="">
@@ -79,10 +76,11 @@
             <div class="quick">${d.quickActions.map((q) => ui.QuickAction(q))}</div>
             ${sections}
             ${ui.HelpCard(d.help)}
+            ${v.note !== "off" ? ui.PageNote({ lines: d.pageNotes[v.note] }) : ""}
           </main>
         </div>
         <div class="floating">
-          ${ui.AiMitraFab()}
+          ${ui.AiMitraFab({ nudge: v.nudge === "on" ? d.aiNudge : null })}
           ${v.emi === "on"
             ? OPL.raw(`<div class="floating__slot"><div><div class="floating__slot-inner">${ui.NoticeBanner(d.emi)}</div></div></div>`)
             : ""}
@@ -92,7 +90,12 @@
       this.wire(screen, v);
     },
 
+    _timers: [],
+    _clearTimers() { this._timers.forEach((t) => { clearTimeout(t); clearInterval(t); }); this._timers = []; },
+
     wire(screen, v) {
+      this._clearTimers();
+      const motionOff = OPL.state.get().motion === "off" || OPL.reducedMotion();
       const scroller = screen.querySelector(".scroller");
       const track = screen.querySelector(".hero__track");
       const slides = [...track.children];
@@ -155,6 +158,31 @@
         });
       }
 
+      /* hero offer cards: cycle the stack on the visible slide */
+      let heroHeld = false;
+      track.addEventListener("pointerdown", () => (heroHeld = true));
+      ["pointerup", "pointercancel", "pointerleave"].forEach((t) => track.addEventListener(t, () => (heroHeld = false)));
+      if (v.stack === "cycle" && !motionOff) {
+        slides.forEach((slide, k) => {
+          const el = slide.querySelector("[data-stack]");
+          const cycle = makeStack(el);
+          const tick = () => { if (index === k && !heroHeld && !document.hidden) cycle(); };
+          this._timers.push(setTimeout(() => this._timers.push(setInterval(tick, 3200)), 2200));
+        });
+      }
+
+      /* AI Mitra nudge: slides out once after the entrance, tucks back after ~4s
+         (or as soon as the user starts scrolling) */
+      const fabWrap = screen.querySelector(".fab-wrap");
+      if (fabWrap && fabWrap.querySelector(".fab-nudge") && !motionOff) {
+        const hide = () => fabWrap.classList.remove("is-nudging");
+        this._timers.push(setTimeout(() => {
+          fabWrap.classList.add("is-nudging");
+          this._timers.push(setTimeout(hide, 4200));
+          scroller.addEventListener("scroll", hide, { once: true, passive: true });
+        }, 1900));
+      }
+
       /* drag-to-scroll for rails with a mouse (presenting on a laptop) */
       screen.querySelectorAll(".rail, .hero__track").forEach(enableMouseDrag);
 
@@ -169,8 +197,8 @@
       const slide = screen.querySelectorAll(".hero__slide")[startIndex];
       const order = [
         slide.querySelector(".hero__titleblock"),
-        slide.querySelector(".hero-card--back"),
-        slide.querySelector(".hero-card:not(.hero-card--back)"),
+        slide.querySelector('.stack-item[data-pos="back"] > .hero-card'),
+        slide.querySelector('.stack-item[data-pos="front"] > .hero-card'),
         slide.querySelector(".btn"),
         screen.querySelector(".dots"),
         ...screen.querySelectorAll(".qa"),
@@ -189,6 +217,35 @@
       if (countHero) setTimeout(() => countHero(startIndex), 150);
     },
   };
+
+  /* Stack cycle: front → tucks under the CTA; back → front; next queued → back.
+     With two cards the old front re-enters as the back card. */
+  function makeStack(el) {
+    const items = [...el.querySelectorAll(".stack-item")];
+    const order = items.map((_, i) => i);
+    const assign = () => items.forEach((it, k) => {
+      const r = order.indexOf(k);
+      it.dataset.pos = r === 0 ? "front" : r === 1 ? "back" : "queue";
+    });
+    let busy = false;
+    return function step() {
+      if (busy || items.length < 2) return;
+      busy = true;
+      const leaving = items[order[0]];
+      leaving.dataset.pos = "leave";
+      order.push(order.shift());
+      items[order[0]].dataset.pos = "front";
+      if (items.length > 2) items[order[1]].dataset.pos = "back";
+      setTimeout(() => {
+        leaving.classList.add("is-instant");
+        leaving.dataset.pos = "queue";
+        void leaving.offsetWidth;
+        leaving.classList.remove("is-instant");
+        assign();
+        busy = false;
+      }, 700);
+    };
+  }
 
   function enableMouseDrag(el) {
     let down = false, sx = 0, sl = 0, moved = false;

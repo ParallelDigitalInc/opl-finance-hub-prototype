@@ -44,6 +44,37 @@
 .hero-card--subsidy .hero-card__sub { line-height: calc(16px * var(--s)); }
 .hero-card--back.hero-card--subsidy { opacity: 0.8; }
 
+/* ---- HeroStack — cycling offer cards ----------------------------------
+   Rest state = Figma: back card is the front card scaled 194/289 from its
+   top centre (→ 47.5px inset, top 0); front card sits --front-y lower.  */
+.hero-stack {
+  --front-y: 17px; --card-h: 95px; --back-scale: 0.6713;
+  position: relative;
+  isolation: isolate; /* keep card z-order inside the stack so the CTA stays on top */
+  width: 289px;
+  height: calc(var(--front-y) + var(--card-h));
+}
+.hero-stack--subsidy { --front-y: 16px; --card-h: 110px; }
+.stack-item {
+  position: absolute;
+  top: 0; left: 0;
+  width: 289px;
+  transform-origin: 50% 0;
+  transition: transform 680ms var(--ease-out), opacity 420ms var(--ease-out);
+  will-change: transform, opacity;
+}
+.stack-item .hero-card__inner { transition: opacity 420ms var(--ease-out); }
+.stack-item[data-pos="front"] { z-index: 3; transform: translateY(var(--front-y)); }
+.stack-item[data-pos="back"]  { z-index: 2; transform: scale(var(--back-scale)); }
+.stack-item[data-pos="queue"] { z-index: 1; transform: translateY(-6px) scale(0.6); opacity: 0; }
+.stack-item[data-pos="leave"] { z-index: 1; transform: translateY(calc(var(--front-y) + 34px)) scale(0.94); opacity: 0; }
+.stack-item.is-instant { transition: none; }
+.stack-item.is-instant .hero-card__inner { transition: none; }
+/* back-card treatments as drawn: loan → inner at 80%; subsidy → whole card at 80% */
+.stack-item[data-pos="back"] .hero-card--loan .hero-card__inner { opacity: 0.8; }
+.stack-item[data-pos="back"] .hero-card--subsidy { opacity: 0.8; }
+.hero-card--subsidy { transition: opacity 420ms var(--ease-out); }
+
 /* ---- MatchCard (loan 382:34123 · subsidy 382:34197) -------------------- */
 .match {
   flex: 0 0 289px;

@@ -31,6 +31,7 @@
     "settings-bold-duotone", "cpu-bold-duotone", "verified-check-bold-duotone", "money-bag-bold-duotone", "calendar-mark-bold",
     "phone-calling-bold", "bell-linear", "headphones-round-sound-linear", "home-angle-linear", "shop-linear", "course-up-linear",
     "chevron-right-primary", "chevron-right-white", "x", "ai-mitra-logo"];
+  // Logos: citi, bob, msme, gujarat (Figma, Finance Home); axis (Figma, Loan offers); gujaratGovt (Wikimedia Commons)
 
   const COMPONENTS = [
     {
@@ -47,7 +48,7 @@
     },
     {
       name: "Logo", node: "382:34130", use: "Lender or scheme mark. Layered fills reproduce Figma crops exactly. Add marks to LOGOS in components.js.",
-      demos: [["citi · bob · msme · gujarat", OPL.raw(`<div style="display:flex;gap:12px">${["citi", "bob", "msme", "gujarat"].map((id) => ui.Logo({ id, size: 40 })).join("")}</div>`), `ui.Logo({ id: "citi", size: 40 })`]],
+      demos: [["citi · bob · axis · msme · gujarat · gujaratGovt", OPL.raw(`<div style="display:flex;gap:12px">${["citi", "bob", "axis", "msme", "gujarat", "gujaratGovt"].map((id) => ui.Logo({ id, size: 40 })).join("")}</div>`), `ui.Logo({ id: "citi", size: 40 })`]],
     },
     {
       name: "FactPill · CarouselDots", node: "382:34270 · 382:34097", bg: "var(--hero-bg)",
@@ -74,8 +75,9 @@
     {
       name: "HeroCard", node: "front 382:34286 · back 382:34276", bg: "var(--hero-bg)", use: "Stacked offer in the hero. One component scaled by --s (back = 194/289).",
       demos: [
-        ["Loan · front / back", OPL.raw(`<div style="display:grid;gap:16px;justify-items:start">${ui.HeroCard(d.hero.loans.front)}${ui.HeroCard({ ...d.hero.loans.back, scale: 194 / 289 })}</div>`), `ui.HeroCard({ kind: "loan", logo, title, subtitle, tint, scale })`],
-        ["Subsidy · front / back", OPL.raw(`<div style="display:grid;gap:16px;justify-items:start">${ui.HeroCard(d.hero.subsidies.front)}${ui.HeroCard({ ...d.hero.subsidies.back, scale: 194 / 289 })}</div>`), `ui.HeroCard({ kind: "subsidy", … })`],
+        ["Loan · stack (cycles in the prototype)", ui.HeroStack({ kind: "loan", cards: d.hero.loans.stack }), `ui.HeroStack({ kind: "loan", cards: [front, back, …queued] })`],
+        ["Subsidy · stack", ui.HeroStack({ kind: "subsidy", cards: d.hero.subsidies.stack }), `ui.HeroStack({ kind: "subsidy", cards })`],
+        ["Single card · front / back scale", OPL.raw(`<div style="display:grid;gap:16px;justify-items:start">${ui.HeroCard({ kind: "loan", ...d.hero.loans.stack[0] })}${ui.HeroCard({ kind: "loan", ...d.hero.loans.stack[1], scale: 194 / 289 })}</div>`), `ui.HeroCard({ kind, logo, title, subtitle, tint, scale })`],
       ],
     },
     {
@@ -90,12 +92,19 @@
       demos: [["", OPL.raw(`<div style="width:350px">${ui.HelpCard(d.help)}</div>`), `ui.HelpCard({ title, subtitle, cta })`]],
     },
     {
+      name: "PageNote", node: "proposed", use: "Quiet sign-off at the end of a scrolling page. Proposed — not in Figma yet.",
+      demos: Object.entries(d.pageNotes).map(([k, lines]) => [k, ui.PageNote({ lines }), `ui.PageNote({ lines: [primary, secondary] })`]),
+    },
+    {
       name: "NoticeBanner", node: "382:36897", use: "Dismissible reminder that sits above the nav.",
       demos: [["EMI due", OPL.raw(`<div style="width:358px">${ui.NoticeBanner(d.emi)}</div>`), `ui.NoticeBanner({ icon, parts: [{ text, strong }] })`]],
     },
     {
       name: "AiMitraFab · BottomNav", node: "382:34310 · 382:34337", bg: "#f1f5f8",
-      demos: [["", OPL.raw(`<div style="width:358px;display:grid;gap:8px;justify-items:end">${ui.AiMitraFab()}${ui.BottomNav({ items: d.nav, active: "finance" })}</div>`), `ui.AiMitraFab() · ui.BottomNav({ items, active })`]],
+      demos: [
+        ["", OPL.raw(`<div style="width:358px;display:grid;gap:8px;justify-items:end">${ui.AiMitraFab()}${ui.BottomNav({ items: d.nav, active: "finance" })}</div>`), `ui.AiMitraFab() · ui.BottomNav({ items, active })`],
+        ["Nudge (shown state)", OPL.raw(`<div style="width:358px;display:flex;justify-content:flex-end" class="lib-nudge">${ui.AiMitraFab({ nudge: d.aiNudge })}</div>`), `ui.AiMitraFab({ nudge: { lead, topic } })`],
+      ],
     },
   ];
 
@@ -136,7 +145,7 @@
 
     ${COMPONENTS.map((c) => `
       <section class="lib-sec" id="${slug(c.name)}">
-        <h2>${c.name} <a href="${OPL.figmaLink(c.node.match(/\d+:\d+/)[0])}" target="_blank" rel="noopener">${c.node} ↗</a></h2>
+        <h2>${c.name} ${(() => { const m = c.node.match(/\d+:\d+/); return m ? `<a href="${OPL.figmaLink(m[0])}" target="_blank" rel="noopener">${c.node} ↗</a>` : `<small>${c.node}</small>`; })()}</h2>
         ${c.use ? `<p class="lib-use">${c.use}</p>` : ""}
         <div class="demos">${c.demos.map(([label, out, code]) => `
           <figure class="demo">
@@ -146,6 +155,7 @@
       </section>`).join("")}
   `;
 
+  root.querySelectorAll(".lib-nudge .fab-wrap").forEach((e) => e.classList.add("is-nudging"));
   OPL.initInteractions(root);
   // On the library page, hotspot taps should not navigate.
   OPL.screens = {};

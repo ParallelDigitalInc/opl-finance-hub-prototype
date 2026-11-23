@@ -63,6 +63,43 @@
 .floating__slot.is-gone { grid-template-rows: 0fr; margin-top: calc(var(--s8) * -1); }
 .floating__slot.is-leaving .notice { transform: translateX(calc(100% + 24px)); opacity: 0; transition: transform var(--dur-base) var(--ease-out), opacity var(--dur-fast); }
 
+/* ---- AI Mitra nudge — slides out from behind the button, then tucks back */
+.fab-wrap { position: relative; display: flex; }
+.fab-wrap .fab { z-index: 1; }
+.fab-nudge {
+  position: absolute;
+  right: 30px;
+  top: 50%;
+  height: 44px;
+  margin-top: -22px;
+  display: flex;
+  align-items: center;
+  padding: 0 42px 0 16px;
+  border-radius: var(--r-full);
+  background: var(--surface);
+  outline: 1px solid var(--border); outline-offset: -1px;
+  box-shadow: var(--shadow-m);
+  white-space: nowrap;
+  clip-path: inset(0 0 0 100% round 22px);
+  pointer-events: none;
+  transition: clip-path 560ms var(--ease-out);
+}
+.fab-nudge__text {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: var(--fw-medium);
+  color: var(--muted-foreground);
+  opacity: 0;
+  translate: 10px 0;
+  transition: opacity 260ms var(--ease-out), translate 420ms var(--ease-out);
+}
+.fab-nudge__text strong { font-weight: var(--fw-semibold); color: var(--foreground); }
+.fab-wrap.is-nudging .fab-nudge { clip-path: inset(0 0 0 0 round 22px); pointer-events: auto; }
+.fab-wrap.is-nudging .fab-nudge__text { opacity: 1; translate: 0 0; transition-delay: 200ms; }
+.fab-wrap.is-nudging .fab { animation: fab-nod 560ms var(--ease-spring); }
+@keyframes fab-nod { 0% { transform: scale(1); } 40% { transform: scale(1.08); } 100% { transform: scale(1); } }
+.fab-nudge.is-pressed { transform: scale(0.98); }
+
 /* ---- AiMitraFab (382:34310) -------------------------------------------- */
 .fab {
   position: relative;

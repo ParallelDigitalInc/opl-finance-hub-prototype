@@ -41,6 +41,10 @@
   const LOGOS = {
     citi: { layers: [{ src: "logo-citi.png", crop: "width:270.83%;height:202.08%;left:-86.72%;top:-55.28%" }] },
     bob: { layers: [{ src: "logo-bob.png", cover: true }] },
+    // Axis Bank — logo from Figma Loan offers 382:35369
+    axis: { bg: "#fff", layers: [{ src: "logo-axis.png", cover: true }] },
+    // Govt. of Gujarat seal — Wikimedia Commons "Seal of Gujarat.svg", cropped to the emblem
+    gujaratGovt: { ring: 1, bg: "#fff", layers: [{ src: "logo-gujarat-govt.png", crop: "width:74%;height:auto;left:13%;top:9%" }] },
     msme: {
       ring: 1,
       layers: [
@@ -60,7 +64,7 @@
   ui.Logo = ({ id, size = 40, ring }) => {
     const def = LOGOS[id];
     const r = ring ?? def.ring ?? 0;
-    return html`<span class="logo" style="--logo:${size}px;--ring:${r}px">
+    return html`<span class="logo" style="--logo:${size}px;--ring:${r}px${def.bg ? `;--logo-bg:${def.bg}` : ""}">
       <span class="logo__fill">${def.layers.map((l) =>
         l.cover
           ? OPL.raw(`<img class="logo__cover" src="${img(l.src)}" alt="">`)
@@ -99,6 +103,19 @@
           </div>
         </div>
       </div>
+    </div>`;
+
+  /* ------------------------------------------------------------------------
+     HeroStack — the hero's offer cards, cycling. Figma shows the rest state
+     (front + peeking back card); the cycle promotes the back card to the
+     front and tucks the old front card under the CTA.
+     kind: "loan" | "subsidy"; cards: HeroCard props (first = front).
+     ------------------------------------------------------------------------ */
+  ui.HeroStack = ({ kind, cards }) => html`
+    <div class="${cx("hero-stack", `hero-stack--${kind}`)}" data-stack>
+      ${cards.map((c, i) => OPL.raw(
+        `<div class="stack-item" data-pos="${i === 0 ? "front" : i === 1 ? "back" : "queue"}">${ui.HeroCard({ ...c, kind })}</div>`
+      ))}
     </div>`;
 
   /* ------------------------------------------------------------------------
@@ -193,10 +210,20 @@
     </header>`;
 
   /* AiMitraFab — 60px assistant button (382:34310) */
-  ui.AiMitraFab = () => html`
-    <button class="fab" aria-label="Ask AI Mitra" data-press data-goto="ai-mitra">
-      ${icon("ai-mitra-logo", 24)}
-    </button>`;
+  /* nudge: { lead, topic } — a momentary line that slides out from behind the
+     button to say what AI Mitra can help with on this page. */
+  ui.AiMitraFab = ({ nudge } = {}) => html`
+    <div class="fab-wrap">
+      ${nudge ? OPL.raw(`<button class="fab-nudge" data-goto="ai-mitra" tabindex="-1" aria-hidden="true">
+        <span class="fab-nudge__text">${nudge.lead} <strong>${nudge.topic}</strong></span></button>`) : ""}
+      <button class="fab" aria-label="Ask AI Mitra${nudge ? ` — ${nudge.lead} ${nudge.topic}` : ""}" data-press data-goto="ai-mitra">
+        ${icon("ai-mitra-logo", 24)}
+      </button>
+    </div>`;
+
+  /* PageNote — quiet sign-off at the end of a scrolling page */
+  ui.PageNote = ({ lines }) => html`
+    <footer class="page-note">${lines.map((l) => OPL.raw(`<p>${l}</p>`))}</footer>`;
 
   /* BottomNav — floating pill nav (382:34337) */
   ui.BottomNav = ({ items, active }) => html`
