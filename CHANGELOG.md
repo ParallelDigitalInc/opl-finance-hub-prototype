@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.10.1 — 23 Nov 2026 · Collapsible prototype panel
+
+- **The prototype panel collapses for presenting.**
+  - The chevron in its header (or the **P** key) folds it into a small pill pinned top-right, showing the screen name and version. The phone then centres on its own.
+  - Tap the pill or press P to bring the panel back.
+  - The browser remembers your choice. A link with `#panel=closed` (or `open`) sets it for whoever opens it.
+
 ## v0.10.0 — 23 Nov 2026 · Subsidies: home, details, benefit sheets, Calculate estimate
 
 Merged from `flow/subsidies`. Synced from Figma:

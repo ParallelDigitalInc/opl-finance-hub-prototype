@@ -4,7 +4,7 @@
 
 (function () {
 const OPL = (window.OPL = window.OPL || {});
-OPL.VERSION = "0.10.0";
+OPL.VERSION = "0.10.1";
 OPL.FIGMA_FILE = "https://www.figma.com/design/GHuBkYGEQZvQppv3v55EaA/OPL----Internal-Playground--5-";
 OPL.figmaLink = (nodeId) => `${OPL.FIGMA_FILE}?node-id=${nodeId.replace(":", "-")}`;
 const esc = (v) =>
@@ -4165,11 +4165,18 @@ const st = OPL.state.get();
 const v = reg ? OPL.variantValues(name) : {};
 const activePreset = reg?.presets.find((p) => Object.entries(p.set).every(([k, val]) => v[k] === val));
 const figmaNode = activePreset?.figma || Object.values(OPL.screens[name].figma || {})[0];
+const closed = panelClosed();
+panelEl.classList.toggle("is-collapsed", closed);
 panelEl.innerHTML = `
 <div class="panel__head">
 <span class="panel__title">${OPL.screens[name].title}</span>
 <span class="panel__ver">v${OPL.VERSION}</span>
+<button class="panel__toggle" data-panel-toggle aria-expanded="${!closed}" aria-controls="panel-body"
+title="${closed ? "Show" : "Hide"} controls (P)" aria-label="${closed ? "Show" : "Hide"} prototype controls">
+<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M4 10l4-4 4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</button>
 </div>
+<div class="panel__body" id="panel-body" ${closed ? "inert" : ""}><div class="panel__inner">
 <p class="panel__sub">OPL Finance Hub · HTML prototype</p>
 <div class="panel__group">
 <div class="panel__label"><span>Screens</span></div>
@@ -4204,9 +4211,35 @@ ${seg("motion", [{ value: "on", label: "Motion on" }, { value: "off", label: "Mo
 <div class="panel__group panel__links">
 ${figmaNode ? `<a href="${OPL.figmaLink(figmaNode)}" target="_blank" rel="noopener">Open frame in Figma <span>${figmaNode} ↗</span></a>` : ""}
 <a href="library.html" target="_blank">Component library <span>↗</span></a>
-</div>`;
+</div>
+</div></div>`;
 }
+const PANEL_KEY = "opl.panel";
+function panelClosed() {
+const st = OPL.state.get();
+if (st.panel === "closed" || st.panel === "open") return st.panel === "closed";
+try { return localStorage.getItem(PANEL_KEY) === "closed"; } catch (_) { return false; }
+}
+function togglePanel() {
+const closed = !panelEl.classList.contains("is-collapsed");
+try { localStorage.setItem(PANEL_KEY, closed ? "closed" : "open"); } catch (_) {}
+if (OPL.state.get().panel) OPL.state.set({ panel: closed ? "closed" : "open" }, { silent: true });
+panelEl.classList.toggle("is-collapsed", closed);
+const btn = panelEl.querySelector("[data-panel-toggle]");
+btn.setAttribute("aria-expanded", !closed);
+btn.title = `${closed ? "Show" : "Hide"} controls (P)`;
+btn.setAttribute("aria-label", `${closed ? "Show" : "Hide"} prototype controls`);
+panelEl.querySelector(".panel__body").toggleAttribute("inert", closed);
+setTimeout(fit, 320);
+}
+document.addEventListener("keydown", (e) => {
+if (!panelEl || e.metaKey || e.ctrlKey || e.altKey || e.key.toLowerCase() !== "p") return;
+if (e.target.closest && e.target.closest("input, textarea, select, [contenteditable]")) return;
+togglePanel();
+});
 panelEl?.addEventListener("click", (e) => {
+if (e.target.closest("[data-panel-toggle]")) return togglePanel();
+if (panelEl.classList.contains("is-collapsed") && e.target.closest(".panel__head")) return togglePanel();
 const scr = e.target.closest("[data-screen]");
 if (scr) {
 const target = scr.dataset.screen;

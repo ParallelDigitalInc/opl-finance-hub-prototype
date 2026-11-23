@@ -57,7 +57,9 @@ cd ~/Code/opl-finance-hub-prototype && npx serve .
 On a phone (≤ 500px wide) the prototype goes full-bleed with no shell and no panel, and
 uses the real status bar and safe areas. Any state can be linked through the URL hash, for example:
 
-`index.html#order=subsidies&emi=on` · `#autoplay=on` · `#frame=off` · `#hotspots=off` · `#motion=off`
+`index.html#order=subsidies&emi=on` · `#autoplay=on` · `#frame=off` · `#hotspots=off` · `#motion=off` · `#panel=closed`
+
+While presenting, press **P** (or use the chevron in the panel header) to fold the controls panel into a small pill; the browser remembers it.
 
 ## Structure
 
