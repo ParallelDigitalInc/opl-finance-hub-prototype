@@ -77,6 +77,7 @@
         const [inC, outC] = dir === "back" ? ["is-pop-in", "is-pop-out"] : ["is-push-in", "is-push-out"];
         page.classList.add(inC);
         old.classList.add(outC);
+        OPL.fx.navMorph(old, page, dir);
         old.style.pointerEvents = "none";
         setTimeout(() => { old.remove(); page.classList.remove(inC); }, 440);
       } else {

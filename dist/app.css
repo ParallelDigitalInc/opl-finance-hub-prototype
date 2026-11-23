@@ -1090,6 +1090,13 @@ html[data-frame="off"] .screen { border-radius: 16px; }
 
 .app-header--compact { padding-top: var(--s12); padding-bottom: var(--s12); }
 
+/* Footer morph (fx.navMorph): the outgoing tabs, cloned over the incoming nav */
+.nav { position: relative; }
+.nav--ghost { position: absolute; inset: 0; background: none; outline: none; box-shadow: none; pointer-events: none; }
+.nav.is-hold-push { animation: nav-hold 420ms var(--ease-out) both; }   /* = .page.is-push-in */
+.nav.is-hold-pop { animation: nav-hold 380ms var(--ease-out) both; }    /* = .page.is-pop-in */
+@keyframes nav-hold { from { transform: translateX(var(--hold-from)); } to { transform: none; } }
+
 /* ==== css/components/flow.css ==== */
 /* ==========================================================================
    Loan application flow components (Figma 416:122660)

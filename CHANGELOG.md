@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.9.4 — 23 Nov 2026 · Footer morph between sections
+
+- **The bottom nav now visibly changes when you move between sections** (Finance hub tabs ↔ Loans tabs). It used to slide away with the page, so the switch went unnoticed.
+  - The bar holds still while the page slides underneath (a CSS counter-move synced to the push/pop).
+  - The old tabs drop out, the new tabs rise in one after another, the bar gives a soft primary glow, and the active tab's pill pops.
+  - Within a section (e.g. Loans overview → Track Loans) the bar simply stays put and only the active tab changes.
+  - Pages without a nav are unaffected. Motion off and reduced motion skip it.
+
 ## v0.9.3 — 23 Nov 2026 · Compare from anywhere
 
 - **Ticking "Compare" in a Loan details sheet on Home or Loans overview now does something.** It used to add the loan to the compare selection silently, because those screens have no compare tray.

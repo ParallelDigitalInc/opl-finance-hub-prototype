@@ -123,6 +123,8 @@ Geometry was checked against Figma on 23 Nov 2026:
 
 ## Motion and behaviour (prototype layer)
 
+- **Footer morph** (`fx.navMorph`, v0.9.4): on push/pop the bottom nav holds still. When the tab set changes (Finance hub ↔ Loans), the tabs swap in place with a stagger and the active pill pops. Not in Figma; it's an interaction layer.
+
 All of this is behaviour on existing elements. None of it adds UI:
 
 - **Entrance:** hero copy → back card → front card → CTA → dots → quick actions → sections, staggered 55ms apart. The ₹ amount counts up once.
