@@ -68,16 +68,12 @@
         ${navItem({ id: "help", label: "Help & Support", icon: "nav-headphones" }, active)}
         ${navItem({ id: "settings", label: "Settings", icon: "nav-settings" }, active)}
       </div>
-    </aside>
-    <button class="d-side-handle" data-side-toggle aria-label="${D.sideCollapsed ? "Expand" : "Collapse"} sidebar" aria-expanded="${!D.sideCollapsed}">
-      <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 3.5 5.5 8l4.5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <span class="d-rail-tip" aria-hidden="true"><span data-side-tip>${D.sideCollapsed ? "Expand" : "Collapse"} sidebar</span><kbd>[</kbd></span>
-    </button>`;
+    </aside>`;
 
   /* ---- Top bar (476:200177) ----------------------------------------------- */
   D.topbar = () => html`
     <header class="d-top">
-      <button class="d-top__toggle" data-side-toggle aria-label="${D.sideCollapsed ? "Expand" : "Collapse"} sidebar" aria-expanded="${!D.sideCollapsed}">${D.icon("top-sidebar-toggle", 40)}</button>
+      <button class="d-top__toggle" data-side-toggle aria-label="${D.sideCollapsed ? "Expand" : "Collapse"} sidebar" aria-expanded="${!D.sideCollapsed}">${D.icon("top-sidebar-toggle", 40)}<span class="d-rail-tip d-rail-tip--below" aria-hidden="true"><span data-side-tip>${D.sideCollapsed ? "Expand" : "Collapse"} sidebar</span><kbd>[</kbd></span></button>
       <label class="d-search">
         ${D.icon("top-search", 14)}
         <input class="d-search__input" type="search" placeholder="Search everything..." aria-label="Search everything">
@@ -354,7 +350,7 @@
       if (t.left < a.left + pad) dx = a.left + pad - t.left;
       else if (t.right > a.right - pad) dx = a.right - pad - t.right;
       tip.style.setProperty("--tip-shift", `${Math.round(dx / sc)}px`);
-      if (t.top < a.top + 72 * sc) tip.classList.add("is-below");     // under the sticky top bar
+      if (t.top < a.top + 56 * sc) tip.classList.add("is-below");     // under the sticky top bar
     };
     page.addEventListener("pointerover", (e) => { const h = e.target.closest(".d-tip")?.parentElement || e.target.closest(":has(> .d-tip)"); if (h) fit(h); });
     page.addEventListener("focusin", (e) => { if (e.target.querySelector?.(":scope > .d-tip")) fit(e.target); });

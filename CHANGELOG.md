@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.15.5 — 23 Nov 2026 · Sidebar and top bar cleanup
+
+Shreya's feedback on the collapsed sidebar:
+
+- **Removed the edge arrow** on the sidebar border; it didn't work out. The top-bar button is the toggle (and **[** still works). Hovering it shows "Collapse/Expand sidebar [".
+- **Rail icons are bigger when collapsed.** They grow from 16 to 20px in a 48 × 40 slot, because 16px is sized to sit beside a label. The business avatar grows to 28. Both animate with the rail.
+- **Tighter top bar:** 56 tall with 16px sides, down from the frame's 72 / 32. It now spans the whole panel, so the toggle stays 16px from the sidebar even when the sidebar is collapsed and the page column centres. The sticky right rails (application page, Subsidy details) and the tooltip flip point follow the new height.
+
 ## v0.15.4 — 23 Nov 2026 · Calculate estimate becomes a side drawer
 
 Shreya asked for the estimate as a side drawer, with the mobile design as inspiration. It replaces the v0.15.3 full page.

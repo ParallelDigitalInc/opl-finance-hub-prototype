@@ -87,7 +87,7 @@
   box-shadow: var(--shadow-s);
   overflow: hidden;
 }
-.d-main__scroll { position: absolute; inset: 0; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent; }
+.d-main__scroll { position: absolute; inset: 0; container-type: inline-size; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent; }
 .d-main__scroll::-webkit-scrollbar { display: block; width: 8px; }
 .d-main__scroll::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 8px; }
 .d-main__inner { padding: 0 32px 40px; max-width: 1208px; margin: 0 auto; }
@@ -96,7 +96,7 @@
 .d-top {
   position: sticky; top: 0; z-index: 20;
   display: flex; align-items: center; justify-content: space-between;
-  height: 72px; margin: 0 -32px; padding: 16px 32px;
+  height: 56px; margin: 0 calc((100% - 100cqw) / 2); padding: 8px 16px;   /* full panel width, even when the page column is centred */          /* trimmed from the frame's 72 / 32 (Shreya: too much padding) */
   transition: background 200ms, box-shadow 200ms, backdrop-filter 200ms;
 }
 .d-top.is-stuck { background: rgba(255, 255, 255, 0.82); backdrop-filter: blur(12px) saturate(1.4); -webkit-backdrop-filter: blur(12px) saturate(1.4); box-shadow: 0 1px 0 var(--border); }
@@ -258,7 +258,11 @@
 .d-app.is-side-collapsed .d-nav__label,
 .d-app.is-side-collapsed .d-switcher__name,
 .d-app.is-side-collapsed .d-switcher__chev { opacity: 0; flex: 0 0 0; width: 0; min-width: 0; margin: 0; overflow: hidden; }
-.d-app.is-side-collapsed .d-nav__item { justify-content: center; padding: 0; gap: 0; }
+.d-app.is-side-collapsed .d-nav__item { justify-content: center; height: 40px; padding: 0; gap: 0; }
+/* labels carry the meaning when expanded; alone, the icons step up from 16 to 20 */
+.d-nav__icon, .d-nav__icon .ico { transition: width 280ms var(--d-ease), height 280ms var(--d-ease), transform 200ms var(--d-ease); }
+.d-app.is-side-collapsed .d-nav__icon, .d-app.is-side-collapsed .d-nav__icon .ico { width: 20px; height: 20px; }
+.d-app.is-side-collapsed .d-switcher__avatar { width: 28px; height: 28px; font-size: 10px; }
 .d-app.is-side-collapsed .d-nav__group, .d-app.is-side-collapsed .d-nav__footer { width: 48px; }
 .d-app.is-side-collapsed .d-switcher { width: 48px; height: 48px; padding: 0; gap: 0; justify-content: center; }
 /* group headings become a short rule, so the sections still read as groups */
@@ -280,24 +284,15 @@
 .d-app.is-side-collapsed .d-nav__item:hover > .d-rail-tip,
 .d-app.is-side-collapsed .d-nav__item:focus-visible > .d-rail-tip,
 .d-app.is-side-collapsed .d-switcher:hover > .d-rail-tip,
-.d-app.is-side-collapsed .d-switcher:focus-visible > .d-rail-tip,
-.d-side-handle:hover > .d-rail-tip, .d-side-handle:focus-visible > .d-rail-tip { opacity: 1; visibility: visible; transform: translate(0, -50%); transition: opacity 120ms 80ms, transform 160ms var(--d-ease) 80ms, visibility 0s 80ms; }
+.d-app.is-side-collapsed .d-switcher:focus-visible > .d-rail-tip { opacity: 1; visibility: visible; transform: translate(0, -50%); transition: opacity 120ms 80ms, transform 160ms var(--d-ease) 80ms, visibility 0s 80ms; }
 .d-switcher { position: relative; }
 .d-app.is-side-collapsed .d-nav__item.is-active { box-shadow: inset 0 0 0 1px var(--border); }
 
-/* edge handle: a round button straddling the sidebar border, always there */
-.d-side-handle {
-  position: absolute; z-index: 20; top: 33px; left: 218px;
-  width: 24px; height: 24px; border-radius: 999px; display: grid; place-items: center;
-  background: #fff; color: var(--d-nav-fg);
-  box-shadow: inset 0 0 0 1px var(--border), 0 1px 2px rgba(15, 23, 42, 0.06);
-  transition: left 280ms var(--d-ease), box-shadow 140ms, transform 140ms var(--d-ease), color 140ms;
-}
-.d-side-handle svg { width: 14px; height: 14px; transition: transform 280ms var(--d-ease); }
-.d-side-handle:hover { color: var(--primary); box-shadow: inset 0 0 0 1px var(--primary), 0 0 0 4px var(--primary-tint), 0 2px 6px rgba(15, 23, 42, 0.08); }
-.d-side-handle:active { transform: scale(0.92); }
-.d-app.is-side-collapsed .d-side-handle { left: 60px; }
-.d-app.is-side-collapsed .d-side-handle svg { transform: rotate(180deg); }
+/* the top-bar toggle names itself (and its shortcut) on hover */
+.d-top__toggle { position: relative; }
+.d-rail-tip--below { left: 0; top: calc(100% + 10px); transform: translate(0, -4px); }
+.d-rail-tip--below::before { left: 16px; top: -4px; margin-top: 0; }
+.d-top__toggle:hover > .d-rail-tip--below, .d-top__toggle:focus-visible > .d-rail-tip--below { opacity: 1; visibility: visible; transform: none; transition: opacity 120ms 300ms, transform 160ms var(--d-ease) 300ms, visibility 0s 300ms; }
 .d-top__toggle .ico { transition: transform 280ms var(--d-ease); }
 .d-app.is-side-collapsed .d-top__toggle .ico { transform: scaleX(-1); }
 
@@ -959,7 +954,7 @@
    Confirming (440:135654) — layout only. Body: main column + 340 rail, gap 24. */
 .d-appd { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 24px; align-items: start; margin-top: 4px; }
 .d-appd__main { display: flex; flex-direction: column; gap: 24px; }
-.d-appd__rail { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 88px; }
+.d-appd__rail { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 72px; }
 
 /* summary card (440:136589): white, 1px slate-200, r16, p4, gap 16 */
 .d-appd__summary { display: flex; flex-direction: column; gap: 16px; padding: 4px; border-radius: 16px; background: #fff; outline: 1px solid var(--border); outline-offset: -1px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04); }
@@ -1176,7 +1171,7 @@
 .d-sd { display: flex; flex-direction: column; gap: 32px; }
 .d-sd__cols { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 24px; align-items: start; }
 .d-sd__main { display: flex; flex-direction: column; gap: 32px; }
-.d-sd__rail { position: sticky; top: 88px; display: flex; flex-direction: column; gap: 16px; }
+.d-sd__rail { position: sticky; top: 72px; display: flex; flex-direction: column; gap: 16px; }
 .d-sd__sec { display: flex; flex-direction: column; gap: 16px; }
 .d-sd__sec--tight { margin-top: -12px; gap: 12px; }
 .d-sd__h3 { display: flex; align-items: center; gap: 6px; font-size: 16px; line-height: 24px; font-weight: 500; color: var(--foreground); }

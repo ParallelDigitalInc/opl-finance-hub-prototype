@@ -2,7 +2,7 @@
    Confirming (440:135654) — layout only. Body: main column + 340 rail, gap 24. */
 .d-appd { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 24px; align-items: start; margin-top: 4px; }
 .d-appd__main { display: flex; flex-direction: column; gap: 24px; }
-.d-appd__rail { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 88px; }
+.d-appd__rail { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 72px; }
 
 /* summary card (440:136589): white, 1px slate-200, r16, p4, gap 16 */
 .d-appd__summary { display: flex; flex-direction: column; gap: 16px; padding: 4px; border-radius: 16px; background: #fff; outline: 1px solid var(--border); outline-offset: -1px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04); }
