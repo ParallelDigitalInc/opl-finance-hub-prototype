@@ -73,6 +73,7 @@
         <div style="display:grid;gap:8px">
           ${seg("hotspots", [{ value: "on", label: "Hotspot hints" }, { value: "off", label: "No hints" }], st.hotspots || "on")}
           ${seg("frame", [{ value: "on", label: "Device frame" }, { value: "off", label: "Bare screen" }], st.frame || "on")}
+          ${seg("motion", [{ value: "on", label: "Motion on" }, { value: "off", label: "Motion off" }], st.motion === "off" ? "off" : "on")}
           <button class="panel__btn" data-replay>Replay entrance <span>↻</span></button>
         </div>
       </div>

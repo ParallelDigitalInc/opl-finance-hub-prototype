@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.2.2 — 23 Nov 2026
+
+- The panel has a visible **Motion on / off** switch. Before this, `#motion=off` was a hidden URL flag that silently stopped the card cycle, the nudge and the entrance.
+
 ## v0.2.1 — 23 Nov 2026 · Trust footer
 
 - The page-end note defaults to **Trust**: "Offers from RBI-regulated banks and NBFCs" · "Your data is shared only with your consent".
