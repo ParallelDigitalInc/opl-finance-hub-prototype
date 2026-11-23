@@ -3747,11 +3747,7 @@ ${ui.StatusBar()}
 </header>
 <div class="sd-hero__body">
 <div class="sd-illus" aria-hidden="true">
-<img class="sd-illus__l sd-illus__base" src="${OPL.simg("hero-plinth-base.svg")}" alt="">
-<img class="sd-illus__l sd-illus__top" src="${OPL.simg("hero-plinth-top.svg")}" alt="">
-<img class="sd-illus__l sd-illus__notes" src="${OPL.simg("hero-notes.svg")}" alt="">
-<img class="sd-illus__l sd-illus__coins-a" src="${OPL.simg("hero-coins-a.svg")}" alt="">
-<img class="sd-illus__l sd-illus__coins-b" src="${OPL.simg("hero-coins-b.svg")}" alt="">
+<img class="sd-illus__art" src="${OPL.simg("hero-money.png")}" width="131" height="94" alt="">   <!-- Illustrations 558:102537 -->
 </div>
 <div class="sd-hero__copy">
 <p class="sd-hero__eyebrow"><span>${d.hero.eyebrow}</span>
@@ -4121,24 +4117,16 @@ OPL.fx.enter(page, [...page.querySelectorAll(".ecard"), page.querySelector(".est
 },
 };
 const money = (n) => {
-const bundle = (k) => {
-if (k === 0) return `<div class="er-money__stack" data-k="0" style="--k:0;inset:0">
-<img class="er-l" style="inset:37.74% 15.59% 28.08% 15.89%" src="${simg("estimate/m-group.svg")}" alt="">
-<img class="er-l" style="inset:40.85% 36.64% 31.69% 39.58%" src="${simg("estimate/m-v1.svg")}" alt="">
-<img class="er-l" style="inset:42.27% 44.83% 31.69% 39.58%" src="${simg("estimate/m-v2.svg")}" alt="">
-<img class="er-l" style="inset:51.9% 36.64% 31.69% 55.17%" src="${simg("estimate/m-v3.svg")}" alt="">
-<img class="er-l er-l--mul" style="inset:42.07% 43.25% 31.69% 39.58%" src="${simg("estimate/m-v4.svg")}" alt="">
-<img class="er-l er-l--mul" style="inset:40.85% 36.64% 32.76% 46.68%" src="${simg("estimate/m-v5.svg")}" alt=""></div>`;
-if (k === 1) return `<img class="er-l er-money__stack" data-k="1" style="--k:1;inset:21.94% 23.54% 43.89% 7.93%" src="${simg("estimate/m-group1.svg")}" alt="">`;
-const up = (k - 2) * 13, dx = k === 2 ? 0 : k % 2 ? -5 : 4;      // extra bundles sit on the top one
-return `<img class="er-l er-money__stack" data-k="${k}" style="--k:${k};inset:9.88% 13.87% 55.94% 17.6%;translate:${dx}px ${-up}px" src="${simg("estimate/m-group2.svg")}" alt="">`;
+const S = 0.482, BW = 201 * S, BH = 88 * S;
+const SLOT = [[50, 59], [64, 32], [42, 0]];                      // k0 (on the plinth), k1, k2
+const at = (k) => {
+if (k < 3) return SLOT[k];
+const up = (k - 2) * 27, dx = k % 2 ? 58 : 46;                  // further bundles: 27 up each
+return [dx, -up];
 };
+const bundle = (k) => { const [x, y] = at(k); return `<img class="er-l er-money__stack" data-k="${k}" style="--k:${k};left:${(x * S).toFixed(1)}px;top:${(y * S).toFixed(1)}px;width:${BW.toFixed(1)}px;height:${BH.toFixed(1)}px" src="${simg("estimate/bundle.png")}" alt="">`; };
 return OPL.raw(`<div class="er-money" aria-hidden="true">
-<div class="er-money__plinth">
-<img class="er-l" style="left:0;top:69.13px;width:145px;height:41.266px" src="${simg("estimate/m-plinth-base.svg")}" alt="">
-<img class="er-l" style="left:5.12px;top:67.65px;width:134.766px;height:28.549px" src="${simg("estimate/m-union.svg")}" alt="">
-<img class="er-l" style="left:5.12px;top:57.85px;width:134.766px;height:28.549px" src="${simg("estimate/m-ellipse.svg")}" alt="">
-</div>
+<div class="er-money__plinth"><img class="er-l" style="left:0;top:${(87 * S).toFixed(1)}px;width:${(307 * S).toFixed(1)}px;height:${(130 * S).toFixed(1)}px" src="${simg("estimate/plinth-blue.png")}" alt=""></div>
 ${Array.from({ length: Math.min(n, 8) }, (_, k) => bundle(k)).join("")}
 </div>`);
 };

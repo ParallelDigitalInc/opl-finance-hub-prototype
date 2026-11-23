@@ -135,10 +135,9 @@
 .er-col { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 46px; padding: 0 24px; }
 
 /* money illustration (416:77387) 145 × 111.36 */
-.er-money { position: relative; width: 145px; height: 111.36px; flex-shrink: 0; }
+.er-money { position: relative; width: 148px; height: 110px; flex-shrink: 0; }   /* 558:103771 */
 .er-money__plinth, div.er-money__stack { position: absolute; inset: 0; }
 .er-l { position: absolute; max-width: none; }
-img.er-l[style*="inset"] { width: auto; height: auto; }
 .er-l--mul { mix-blend-mode: multiply; }
 
 .er-text { display: flex; flex-direction: column; gap: var(--s16); align-self: stretch; }

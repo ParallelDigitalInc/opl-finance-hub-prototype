@@ -27,11 +27,7 @@
 
   const money = () => html`
     <div class="sd-illus d-sd__illus" aria-hidden="true">
-      <img class="sd-illus__l sd-illus__base" src="${OPL.simg("hero-plinth-base.svg")}" alt="">
-      <img class="sd-illus__l sd-illus__top" src="${OPL.simg("hero-plinth-top.svg")}" alt="">
-      <img class="sd-illus__l sd-illus__notes" src="${OPL.simg("hero-notes.svg")}" alt="">
-      <img class="sd-illus__l sd-illus__coins-a" src="${OPL.simg("hero-coins-a.svg")}" alt="">
-      <img class="sd-illus__l sd-illus__coins-b" src="${OPL.simg("hero-coins-b.svg")}" alt="">
+      <img class="sd-illus__art" src="${OPL.simg("hero-money.png")}" width="131" height="94" alt="">
     </div>`;
 
   const info = (text) => html`<span class="d-cmr__info" tabindex="0">${D.icon("info-circle-est", 16)}${D.tip(text)}</span>`;
