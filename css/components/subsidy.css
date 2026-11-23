@@ -1,0 +1,217 @@
+/* ==========================================================================
+   Subsidy components — PolicyPeriod, BenefitTile, ListRow, Disclosure,
+   HelpCardExpert, HowItWorks / HowStep, SubsidyFoot, CountBadge
+   Figma section 416:44852. Stroke rule per node: "inside" = outline (no layout),
+   "in layout" = border. Each is noted where it applies.
+   ========================================================================== */
+
+/* ---- shared bits ------------------------------------------------------- */
+.icon-tile { flex-shrink: 0; width: 44px; height: 44px; border-radius: var(--r-full); background: var(--muted); display: grid; place-items: center; }
+.count-badge {
+  flex-shrink: 0; width: 24px; height: 24px; border-radius: var(--r-full); background: var(--muted);
+  display: inline-grid; place-items: center;
+  font-size: 14px; line-height: 20px; font-weight: var(--fw-medium); color: var(--muted-foreground);
+  font-variant-numeric: tabular-nums;
+}
+.count-badge.is-popping { animation: badge-pop 420ms var(--ease-spring); }
+@keyframes badge-pop { 40% { transform: scale(1.18); } }
+.deadline-chip {
+  display: inline-flex; align-items: center; gap: var(--s6); align-self: flex-start;
+  padding: var(--s4) 10px var(--s4) var(--s8); border-radius: var(--r-full);
+  background: var(--warning-bg); color: var(--tag-amber);
+  font-size: 12px; line-height: 18px; font-weight: var(--fw-medium); white-space: nowrap;
+}
+/* Outlined neutral button — Figma Button "Outlined" on this frame: white, slate-300 1px
+   (Apply Now, 416:46433) / slate-200 (Talk to an Expert, 416:45929) */
+.btn--line { background: #fff; color: var(--primary); box-shadow: inset 0 0 0 1px #cbd5e1; }
+.btn--line.btn--md { box-shadow: inset 0 0 0 1px var(--border); }
+.btn--line.is-pressed { background: var(--slate-50); }
+.btn--line .ico, .btn--filled .ico { transition: transform var(--dur-fast) var(--ease-out); }
+.btn--line.is-pressed .ico:last-child { transform: translate(1.5px, -1.5px); }
+
+/* ---- PolicyPeriod (238:4515) — stroke in layout: 1+16+46+16+44+16+1 = 140 */
+.period {
+  display: flex; flex-direction: column; gap: var(--s16);
+  padding: var(--s16); border: 1px solid var(--border); border-radius: var(--r-large);
+  background: var(--surface); box-shadow: var(--shadow-s);
+}
+.period__head { display: flex; align-items: center; gap: var(--s12); }
+.period__text { display: flex; flex-direction: column; gap: var(--s2); min-width: 0; }
+.period__title { font-size: 16px; line-height: 24px; font-weight: var(--fw-semibold); color: var(--foreground); }
+.period__sub { font-size: 14px; line-height: 20px; color: var(--muted-foreground); }
+.period__meter { display: flex; flex-direction: column; gap: var(--s12); }
+.period__track { height: 6px; border-radius: var(--r-full); background: var(--muted); overflow: hidden; }
+.period__fill { display: block; height: 100%; border-radius: inherit; background: var(--success); transform-origin: 0 50%; transform: scaleX(var(--elapsed)); }
+.period.is-playing .period__fill { animation: period-fill 1100ms var(--ease-out) 260ms both; }
+@keyframes period-fill { from { transform: scaleX(0); } }
+.period__left {
+  display: inline-flex; align-items: center; gap: var(--s6); align-self: flex-start;
+  padding: var(--s4) 10px var(--s4) var(--s8); border-radius: var(--r-full); background: var(--muted);
+  font-size: 12px; line-height: 18px; font-weight: var(--fw-medium); color: var(--muted-foreground);
+}
+.period__left.is-warn { background: var(--warning-bg); color: var(--tag-amber); }
+.period.is-playing .period__left { animation: enter-up 420ms var(--ease-out) 900ms both; }
+
+/* ---- BenefitTile (416:45785) — stroke inside: 4 + 106 + 78 + 4 = 192 ---- */
+.benefit {
+  position: relative; display: flex; flex-direction: column; padding: var(--s4); text-align: left;
+  border-radius: var(--r-large); background: var(--surface);
+  outline: 1px solid var(--border); outline-offset: -1px;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.05));
+  transition: transform var(--dur-press) var(--ease-out);
+}
+.benefit__top {
+  position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: var(--s8);
+  min-height: 106px; padding: var(--s16); border-radius: var(--r-large); background: var(--muted);
+}
+.benefit__title { font-size: 16px; line-height: 21px; font-weight: var(--fw-medium); color: var(--foreground); }
+.benefit__corner {
+  position: absolute; top: 0; right: 0.5px; display: flex; padding: var(--s4) var(--s6);
+  background: var(--surface); border-radius: 0 0 0 12px;
+}
+.benefit__corner .ico { transform: scaleX(-1); transition: transform var(--dur-fast) var(--ease-out); }
+.benefit__figure { display: flex; flex-direction: column; gap: var(--s2); height: 78px; padding: var(--s16) var(--s12) var(--s16) var(--s16); }
+.benefit__value { font-size: 20px; line-height: 28px; font-weight: var(--fw-medium); color: var(--foreground); font-variant-numeric: tabular-nums; }
+.benefit__label { font-size: 12px; line-height: 16px; font-weight: var(--fw-medium); color: var(--muted-foreground); white-space: nowrap; }
+.benefit.is-pressed { transform: scale(0.97); }
+.benefit.is-pressed .benefit__corner .ico { transform: scaleX(-1) translateX(-2px); }
+
+/* ---- ListRow (416:45883 / 416:46352) ----------------------------------- */
+.lrow {
+  display: flex; align-items: center; gap: var(--s12); width: 100%; padding: var(--s16); text-align: left;
+  border-top: 1px solid var(--hairline); transition: background var(--dur-fast);
+}
+.lrow:first-child { border-top: 0; }
+.lrow__text { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: var(--s2); }
+.lrow__title { font-size: 16px; line-height: 24px; font-weight: var(--fw-medium); color: var(--foreground); }
+.lrow__sub { font-size: 14px; line-height: 20px; color: var(--muted-foreground); }
+.lrow__trail { transition: transform var(--dur-fast) var(--ease-out); }
+.lrow__chev { transform: rotate(-90deg); }
+.lrow.is-pressed { background: var(--slate-50); }
+.lrow.is-pressed .lrow__chev { transform: rotate(-90deg) translateY(2px); }
+.lrow--external.is-pressed .lrow__trail { transform: translate(2px, -2px); }
+
+/* ---- Disclosure (416:45873) — stroke in layout: 1 + 56 + 4×rows + 1 ----- */
+.disclosure {
+  border: 1px solid var(--border); border-radius: var(--r-large); background: var(--surface);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); overflow: hidden;
+}
+/* closed: the whole box is 52 with the label at y14 (416:45109, stroke inside) →
+   open: 1 + 56 header (py16, 416:45874, stroke in layout). 13 + the 1px border = 14. */
+.disclosure__head {
+  display: flex; align-items: center; gap: var(--s8); width: 100%; padding: 13px var(--s16);
+  transition: padding var(--dur-base) var(--ease-out), background var(--dur-fast);
+}
+.disclosure.is-open > .disclosure__head { padding-top: var(--s16); padding-bottom: var(--s16); }
+.disclosure__label { font-size: 16px; line-height: 24px; font-weight: var(--fw-medium); color: var(--foreground); }
+.disclosure__chev { margin-left: auto; transition: transform var(--dur-base) var(--ease-out); }
+.is-open > * > .disclosure__chev, .is-open > .disclosure__head > .disclosure__chev { transform: rotate(180deg); }
+.disclosure__head.is-pressed { background: var(--slate-50); }
+.disclosure__panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--dur-base) var(--ease-out); }
+.is-open > .disclosure__panel { grid-template-rows: 1fr; }
+.disclosure__inner { min-height: 0; overflow: hidden; }
+.disclosure .lrow { border-top: 1px solid var(--hairline); }
+.disclosure .lrow { opacity: 0; transform: translateY(-6px); transition: opacity 200ms var(--ease-out), transform 280ms var(--ease-out), background var(--dur-fast); }
+.disclosure.is-open .lrow { opacity: 1; transform: none; transition-delay: calc(var(--i, 0) * 45ms + 60ms), calc(var(--i, 0) * 45ms + 60ms), 0ms; }
+
+/* ---- HelpCardExpert (416:45923) — card stroke inside; stamp outside the clip */
+.xhelp { position: relative; }
+.xhelp__card {
+  position: relative; overflow: hidden; display: flex; align-items: center; gap: var(--s16);
+  padding: var(--s16); border-radius: var(--r-large); background: var(--primary);
+  outline: 1px solid #ecf2fa; outline-offset: -1px; isolation: isolate;
+}
+.xhelp__texture { position: absolute; left: -17px; top: -4px; width: 432px; height: 460px; max-width: none; mix-blend-mode: luminosity; pointer-events: none; }
+.xhelp__copy { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: var(--s16); flex: 236 0 0; }
+.xhelp__title { font-size: 20px; line-height: 26px; font-weight: var(--fw-semibold); color: var(--foreground); white-space: nowrap; }
+.xhelp__photo { position: absolute; left: 229px; top: -15px; width: 133px; height: 190px; max-width: none; object-fit: cover; pointer-events: none; }
+.xhelp__stamp { position: absolute; left: 199px; top: 59px; width: 70.756px; height: 70.756px; pointer-events: none; }
+/* the stamp presses on once when the card scrolls into view */
+.xhelp.is-playing .xhelp__stamp { animation: stamp-press 620ms cubic-bezier(0.2, 0.9, 0.25, 1.2) 220ms both; }
+@keyframes stamp-press {
+  0% { opacity: 0; transform: scale(1.7) rotate(-14deg); filter: blur(1.5px); }
+  55% { opacity: 1; transform: scale(0.94) rotate(2deg); filter: none; }
+  75% { transform: scale(1.03) rotate(-1deg); }
+  100% { opacity: 1; transform: none; }
+}
+.xhelp.is-playing .xhelp__card { animation: stamp-thud 260ms var(--ease-out) 560ms; }
+@keyframes stamp-thud { 50% { transform: translateY(1px) scale(0.995); } }
+
+/* ---- HowItWorks (141:21242) — stroke in layout ------------------------- */
+.how {
+  border: 1px solid var(--border); border-radius: var(--r-large); background: var(--surface);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); overflow: hidden;
+  transition: box-shadow var(--dur-base);
+}
+.how.is-open { box-shadow: var(--shadow-s); }
+/* collapsed header p16 with the deadline chip (416:45566); expanded px20 py16, rule
+   below, chip hidden (416:46371) */
+/* closed: 1 + 16 + 28 + 6 + 26 + 16 + 1 = 94 (the transparent rule takes 1 of the 16) */
+.how__head {
+  display: flex; align-items: center; gap: var(--s8); width: 100%; padding: var(--s16) var(--s16) 15px; text-align: left;
+  border-bottom: 1px solid transparent;
+  transition: padding var(--dur-base) var(--ease-out), border-color var(--dur-base), background var(--dur-fast);
+}
+.how.is-open > .how__head { padding: var(--s16) var(--s20); gap: 10px; border-bottom-color: var(--border); }
+.how__head.is-pressed { background: var(--slate-50); }
+.how__head-text { display: flex; flex-direction: column; align-items: flex-start; }
+.how__title { font-size: 20px; line-height: 28px; font-weight: var(--fw-semibold); color: var(--foreground); }
+.how__chip-slot { display: grid; grid-template-rows: 1fr; margin-top: var(--s6); transition: grid-template-rows var(--dur-base) var(--ease-out), margin var(--dur-base) var(--ease-out), opacity var(--dur-fast); }
+.how__chip-slot > * { min-height: 0; overflow: hidden; }
+.how.is-open .how__chip-slot { grid-template-rows: 0fr; margin-top: 0; opacity: 0; }
+.how__steps { padding: 0 var(--s16); }
+.how__list { list-style: none; margin: 0; padding: 20px var(--s16) 0 0; }
+.how__share {
+  display: flex; align-items: center; gap: var(--s8); width: 100%; padding: 14px var(--s16);
+  border-top: 1px solid var(--hairline); color: var(--primary);
+  font-size: 14px; line-height: 20px; font-weight: var(--fw-semibold); text-align: left;
+  transition: opacity var(--dur-fast);
+}
+.how__share .ico { transition: transform var(--dur-base) var(--ease-spring); }
+.how__share.is-pressed { opacity: 0.6; }
+.how__share.is-pressed .ico { transform: scale(0.88) rotate(-12deg); }
+.how__share.is-done { color: var(--success); }
+.how__share.is-done .ico { transform: scale(1.12); }
+
+/* HowStep (137:21194) */
+.hstep { display: flex; gap: var(--s12); }
+.hstep__rail { display: flex; flex-direction: column; align-items: center; gap: var(--s4); flex-shrink: 0; }
+.hstep__num {
+  width: 28px; height: 28px; border-radius: var(--r-full); display: grid; place-items: center;
+  background: rgba(56, 88, 229, 0.1); color: var(--primary);
+  font-size: 14px; line-height: 20px; font-weight: var(--fw-semibold);
+}
+.hstep__line { flex: 1 0 0; width: 1px; min-height: 1px; background: var(--border); transform-origin: 50% 0; }
+.hstep__content { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 10px; padding: 3px 0 24px; }
+.hstep__head { display: flex; flex-direction: column; gap: var(--s2); }
+.hstep__title { font-size: 16px; line-height: 22px; font-weight: var(--fw-medium); color: var(--foreground); }
+.hstep__body { font-size: 14px; line-height: 20px; color: var(--muted-foreground); }
+.hstep__inset { border: 1px solid var(--hairline); border-radius: 12px; background: var(--slate-50); overflow: hidden; }
+.hstep__inset-head { padding: 10px 12px 2px; font-size: 12px; line-height: 18px; font-weight: var(--fw-medium); color: var(--tertiary-foreground); }
+.hstep__inset-row { padding: var(--s8) 12px 10px; }
+.hstep__inset-row + .hstep__inset-row { border-top: 1px solid var(--hairline); }
+.hstep__inset-value { font-size: 14px; line-height: 20px; font-weight: var(--fw-medium); color: var(--foreground); }
+.hstep__inset-label { font-size: 12px; line-height: 18px; color: var(--foreground); }
+/* the rail draws itself step by step when the steps open / scroll into view */
+.how.is-playing .hstep__num { animation: hstep-pop 420ms var(--ease-spring) both; animation-delay: calc(var(--n) * 260ms + 120ms); }
+.how.is-playing .hstep__line { animation: hstep-draw 300ms var(--ease-out) both; animation-delay: calc(var(--n) * 260ms + 300ms); }
+.how.is-playing .hstep__content { animation: enter-up 420ms var(--ease-out) both; animation-delay: calc(var(--n) * 260ms + 160ms); }
+@keyframes hstep-pop { 0% { transform: scale(0.4); background: rgba(56, 88, 229, 0); } 60% { transform: scale(1.12); background: rgba(56, 88, 229, 0.22); } 100% { transform: none; } }
+@keyframes hstep-draw { from { transform: scaleY(0); } }
+
+/* ---- SubsidyFoot (416:46431) — stroke in layout: 1 + 20 + 44 + 16 + 32 + 20 = 133 */
+.sfoot {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 21;
+  display: flex; flex-direction: column; gap: var(--s16);
+  padding: var(--s20) var(--gutter) max(var(--s20), env(safe-area-inset-bottom));
+  background: var(--surface); border-top: 1px solid var(--border);
+  filter: drop-shadow(0 -2px 6px rgba(0, 0, 0, 0.04));
+}
+.sfoot__row { display: flex; gap: 10px; }
+.sfoot__row .btn { flex: 1 1 0; min-width: 0; }
+.sfoot__note { font-size: 12px; line-height: 16px; color: var(--tertiary-foreground); text-align: center; }
+
+@media (prefers-reduced-motion: reduce) {
+  .disclosure .lrow { transition: background var(--dur-fast); opacity: 1; transform: none; }
+  .disclosure__panel, .how__chip-slot { transition: none; }
+}

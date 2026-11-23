@@ -827,6 +827,176 @@
 
 ;
 
+/* ==== js/components-subsidy.js ==== */
+/* ==========================================================================
+   OPL HTML kit — subsidy components (Subsidy details, 416:44852)
+   Pure functions, same contract as components.js. Icons and images for these
+   live in assets/lazy/subsidy/ (screen-only, outside the first-load budget).
+   ========================================================================== */
+(function () {
+  const { html, cx, raw } = OPL;
+  const ui = OPL.ui;
+
+  const LAZY = "assets/lazy/subsidy/";
+  /* Screen-only icon: same markup as OPL.icon, served from the lazy folder. */
+  const sicon = (OPL.sicon = (name, size = 24, cls = "") =>
+    raw(`<img class="ico ${cls}" src="${LAZY}icons/${name}.svg" width="${size}" height="${size}" alt="" draggable="false">`));
+  OPL.simg = (name) => LAZY + name;
+  const goto = (g) => (g ? raw(`data-goto="${g}"`) : "");
+
+  /* CountBadge — 24px slate-100 circle beside a section title (416:45781) */
+  ui.CountBadge = ({ n }) => html`<span class="count-badge">${n}</span>`;
+
+  /* ------------------------------------------------------------------------
+     PolicyPeriod — "Policy period / Widget" 238:4515
+     Title leads with the end date; the bar shows how much of the period has
+     passed; the chip shows time left, computed from today. Warning style in
+     the last `warnMonths` months.
+     ------------------------------------------------------------------------ */
+  const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const fmt = (d) => `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+  const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
+  OPL.policyPeriod = ({ start, end, warnMonths = 6 }, today = new Date()) => {
+    const s = new Date(start + "T00:00:00"), e = new Date(end + "T00:00:00");
+    const t = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    let months = (e.getFullYear() - t.getFullYear()) * 12 + (e.getMonth() - t.getMonth());
+    if (e.getDate() < t.getDate()) months -= 1;
+    months = Math.max(0, months);
+    const y = Math.floor(months / 12), m = months % 12;
+    const left = t >= e ? "Closed" : months === 0 ? "Less than a month left"
+      : [y && plural(y, "year"), m && plural(m, "month")].filter(Boolean).join(" ") + " left";
+    const elapsed = Math.min(1, Math.max(0, (t - s) / (e - s)));
+    return { endLabel: fmt(e), startLabel: fmt(s), left, elapsed, warn: months < warnMonths };
+  };
+
+  ui.PolicyPeriod = ({ period }) => {
+    const p = OPL.policyPeriod(period);
+    return html`
+      <section class="period" style="--elapsed:${p.elapsed.toFixed(4)}">
+        <div class="period__head">
+          <span class="icon-tile">${sicon("calendar-widget", 24)}</span>
+          <div class="period__text">
+            <p class="period__title">Open till ${p.endLabel}</p>
+            <p class="period__sub">Operative period started ${p.startLabel}</p>
+          </div>
+        </div>
+        <div class="period__meter">
+          <div class="period__track" role="progressbar" aria-label="Policy period elapsed"
+            aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(p.elapsed * 100)}"><span class="period__fill"></span></div>
+          <span class="${cx("period__left", p.warn && "is-warn")}">${sicon(p.warn ? "clock-circle-amber" : "clock-circle-14", 14)}<span>${p.left}</span></span>
+        </div>
+      </section>`;
+  };
+
+  /* ------------------------------------------------------------------------
+     BenefitTile — policy benefit card (416:45785). Tinted top panel with the
+     benefit's two-tone icon and an arrow corner; white key-figure panel below.
+     Stroke is inside (doesn't take layout): 4 + 106 + 78 + 4 = 192.
+     ------------------------------------------------------------------------ */
+  ui.BenefitTile = ({ id, icon, title, value, label }) => html`
+    <button class="benefit" data-press data-goto="benefit-sheet" data-benefit="${id}" aria-label="${title}, ${value} ${label}">
+      <span class="benefit__top">
+        ${sicon(icon, 24)}
+        <span class="benefit__title">${title}</span>
+        <span class="benefit__corner" aria-hidden="true">${sicon("alt-arrow-corner", 19.2)}</span>
+      </span>
+      <span class="benefit__figure">
+        <span class="benefit__value">${value}</span>
+        <span class="benefit__label">${label}</span>
+      </span>
+    </button>`;
+
+  /* ListRow — icon tile + title/sub + trailing icon (416:45883, 416:46352).
+     trailing: "chevron" (benefit rows) | "external" (outbound links) */
+  ui.ListRow = ({ icon, title, sub, trailing = "chevron", goto: g, attrs = "" }) => html`
+    <button class="${cx("lrow", `lrow--${trailing}`)}" data-press ${goto(g)} ${raw(attrs)}>
+      <span class="icon-tile">${sicon(icon, 24)}</span>
+      <span class="lrow__text">
+        <span class="lrow__title">${title}</span>
+        <span class="lrow__sub">${raw(sub)}</span>
+      </span>
+      ${trailing === "external" ? sicon("arrow-right-up-20", 20, "lrow__trail") : sicon("chevron-down-20", 20, "lrow__trail lrow__chev")}
+    </button>`;
+
+  /* Disclosure — "See other benefits" (416:45873). Header button + collapsible rows.
+     Uses grid-template-rows 0fr → 1fr so height animates without measuring. */
+  ui.Disclosure = ({ id, label, count, open = false, body }) => html`
+    <section class="${cx("disclosure", open && "is-open")}" data-disclosure="${id}">
+      <button class="disclosure__head" data-press aria-expanded="${open}" aria-controls="dz-${id}">
+        <span class="disclosure__label">${label}</span>
+        ${ui.CountBadge({ n: count })}
+        ${sicon("chevron-down-20", 20, "disclosure__chev")}
+      </button>
+      <div class="disclosure__panel" id="dz-${id}" ${open ? "" : raw("inert")}><div class="disclosure__inner">${body}</div></div>
+    </section>`;
+
+  /* HelpCardExpert — "Get help from our subsidy expert" (416:45923).
+     Indigo fill under a luminosity-blended satin texture; photo bleeds off the top;
+     the OPL Verified stamp sits outside the card's clip. */
+  ui.HelpCardExpert = ({ title, cta, goto: g }) => html`
+    <div class="xhelp">
+      <section class="xhelp__card">
+        <img class="xhelp__texture" src="${OPL.simg("satin-texture.jpg")}" alt="">
+        <div class="xhelp__copy">
+          <p class="xhelp__title">${title[0]}<br>${title[1]}</p>
+          <button class="btn btn--md btn--line" data-press ${goto(g)}>${sicon("headset-primary", 16)}<span class="btn__label">${cta}</span></button>
+        </div>
+        <img class="xhelp__photo" src="${OPL.simg("expert-photo.png")}" alt="">
+      </section>
+      <img class="xhelp__stamp" src="${OPL.simg("opl-verified-stamp.png")}" alt="OPL Verified">
+    </div>`;
+
+  /* HowStep — "How it works / Step" 137:21194. Rail (number + connector) and content
+     with an optional deadline chip and a 2-row inset. */
+  ui.HowStep = ({ n, title, body, deadline, inset, last = false }) => html`
+    <li class="${cx("hstep", last && "hstep--last")}" style="--n:${n - 1}">
+      <span class="hstep__rail"><span class="hstep__num">${n}</span>${last ? "" : raw(`<span class="hstep__line"></span>`)}</span>
+      <div class="hstep__content">
+        <div class="hstep__head">
+          <p class="hstep__title">${title}</p>
+          ${body ? raw(`<p class="hstep__body">${body}</p>`) : ""}
+        </div>
+        ${deadline ? html`<span class="deadline-chip">${sicon("clock-circle-amber", 14)}<span>${deadline}</span></span>` : ""}
+        ${inset ? html`
+          <div class="hstep__inset">
+            <p class="hstep__inset-head">${inset.title}</p>
+            ${inset.rows.map((r) => html`<div class="hstep__inset-row"><p class="hstep__inset-value">${r.value}</p><p class="hstep__inset-label">${r.label}</p></div>`)}
+          </div>` : ""}
+      </div>
+    </li>`;
+
+  /* HowItWorks — "How it works / Accordion" 141:21242. Collapsed shows the deadline
+     chip in the header; expanded hides it (step 1 carries the same deadline). */
+  ui.HowItWorks = ({ title, headerDeadline, items, share, open = false }) => html`
+    <section class="${cx("how", open && "is-open")}" data-disclosure="how">
+      <button class="how__head" data-press aria-expanded="${open}" aria-controls="dz-how">
+        <span class="how__head-text">
+          <span class="how__title">${title}</span>
+          <span class="how__chip-slot"><span><span class="deadline-chip">${sicon("clock-circle-amber", 14)}<span>${headerDeadline}</span></span></span></span>
+        </span>
+        ${sicon("chevron-down-20", 20, "disclosure__chev")}
+      </button>
+      <div class="disclosure__panel" id="dz-how" ${open ? "" : raw("inert")}><div class="disclosure__inner">
+        <div class="how__steps">
+          <ol class="how__list">${items.map((s, i) => ui.HowStep({ n: i + 1, ...s, last: i === items.length - 1 }))}</ol>
+          <button class="how__share" data-press data-share-steps>${sicon("share-primary", 18)}<span class="how__share-label">${share}</span></button>
+        </div>
+      </div></div>
+    </section>`;
+
+  /* SubsidyFoot — sticky action bar (416:46431): two buttons + indicative note */
+  ui.SubsidyFoot = ({ secondary, primary, note }) => html`
+    <footer class="sfoot">
+      <div class="sfoot__row">
+        <button class="btn btn--lg btn--line btn--strong" data-press ${goto(secondary.goto)}><span class="btn__label">${secondary.label}</span>${sicon("arrow-right-up-primary", 16)}</button>
+        <button class="btn btn--lg btn--filled btn--strong" data-press ${goto(primary.goto)}>${sicon("headset-white", 16)}<span class="btn__label">${primary.label}</span></button>
+      </div>
+      <p class="sfoot__note">${note}</p>
+    </footer>`;
+})();
+
+;
+
 /* ==== js/fx.js ==== */
 /* ==========================================================================
    Shared screen behaviours (prototype layer). Screens call these from wire().
@@ -1157,6 +1327,24 @@
           { value: "on", label: "Shows once" },
           { value: "off", label: "Off" },
         ],
+      },
+    ],
+  };
+
+  /* Subsidy details (416:44852). Presets set the starting state of the two
+     disclosures; tapping them in the prototype toggles them live. */
+  OPL.variants["subsidy-detail"] = {
+    presets: [
+      { id: "collapsed", label: "Collapsed", figma: "416:44853", set: { others: "closed", steps: "closed" } },
+      { id: "expanded", label: "Expanded", figma: "416:45617", set: { others: "open", steps: "open" } },
+    ],
+    groups: [
+      { id: "others", hidden: true, default: "closed", options: [{ value: "closed" }, { value: "open" }] },
+      { id: "steps", hidden: true, default: "closed", options: [{ value: "closed" }, { value: "open" }] },
+      {
+        id: "nudge", label: "AI Mitra nudge", default: "on",
+        options: [{ value: "on", label: "Shows once" }, { value: "off", label: "Off" }],
+        note: "Proposed line: “Ask anything about this policy”. Not in Figma.",
       },
     ],
   };
@@ -1866,6 +2054,93 @@
    GENERATED from the Figma SVG — do not hand-edit shapes. */
 OPL.ui = OPL.ui || {};
 OPL.ui.SignedHeroSvg = '<svg class="mss" viewBox="0 0 390 176" width="390" height="176" fill="none" aria-hidden="true"><g><g class="ms__confetti"><g class="cf" style="--dx:-99.7px;--dy:-73.3px;--spin:-180deg;--fall:150px;--drift:-20px;--i:0"><rect x="292.162" y="157.322" width="5" height="12" rx="1.5" transform="rotate(6 292.162 157.322)" fill="#FFBB00"/></g><g class="cf" style="--dx:117.0px;--dy:-28.0px;--spin:217deg;--fall:203px;--drift:9px;--i:1"><rect x="75.4642" y="112.018" width="5" height="12" rx="1.5" transform="rotate(-1 75.4642 112.018)" fill="#A5B4FC"/></g><g class="cf" style="--dx:-94.6px;--dy:20.0px;--spin:-254deg;--fall:166px;--drift:-2px;--i:2"><rect x="287.058" y="63.9925" width="5" height="12" rx="1.5" transform="rotate(24 287.058 63.9925)" fill="#3858E5"/></g><g class="cf" style="--dx:92.1px;--dy:-27.5px;--spin:291deg;--fall:219px;--drift:-13px;--i:3"><rect x="100.386" y="111.532" width="5" height="12" rx="1.5" transform="rotate(-33 100.386 111.532)" fill="#FFBB00"/></g><g class="cf" style="--dx:-114.4px;--dy:-68.0px;--spin:-328deg;--fall:182px;--drift:16px;--i:4"><circle cx="309.41" cy="158.005" r="4" fill="#14B8A6"/></g><g class="cf" style="--dx:-93.9px;--dy:-15.7px;--spin:365deg;--fall:235px;--drift:5px;--i:5"><circle cx="288.851" cy="105.702" r="2.5" fill="#3858E5"/></g><g class="cf" style="--dx:147.8px;--dy:60.7px;--spin:-202deg;--fall:198px;--drift:-6px;--i:6"><rect x="44.7369" y="23.3174" width="5" height="12" rx="1.5" transform="rotate(-13 44.7369 23.3174)" fill="#3858E5"/></g><g class="cf" style="--dx:-162.1px;--dy:47.3px;--spin:239deg;--fall:161px;--drift:-17px;--i:7"><rect x="354.578" y="36.7218" width="5" height="12" rx="1.5" transform="rotate(-21 354.578 36.7218)" fill="#3858E5"/></g><g class="cf" style="--dx:89.4px;--dy:5.0px;--spin:-276deg;--fall:214px;--drift:12px;--i:8"><rect x="103.087" y="79.0171" width="5" height="12" rx="1.5" transform="rotate(-21 103.087 79.0171)" fill="#14B8A6"/></g><g class="cf" style="--dx:-100.7px;--dy:14.5px;--spin:313deg;--fall:177px;--drift:1px;--i:9"><rect x="293.215" y="69.5013" width="5" height="12" rx="1.5" transform="rotate(32 293.215 69.5013)" fill="#FFBB00"/></g><g class="cf" style="--dx:-110.1px;--dy:-76.8px;--spin:-350deg;--fall:230px;--drift:-10px;--i:10"><circle cx="305.134" cy="166.848" r="3.5" fill="#3858E5"/></g><g class="cf" style="--dx:101.3px;--dy:-18.4px;--spin:187deg;--fall:193px;--drift:19px;--i:11"><rect x="91.2254" y="102.419" width="5" height="12" rx="1.5" transform="rotate(27 91.2254 102.419)" fill="#14B8A6"/></g></g><circle class="mss__ripple" cx="195" cy="90" r="77.25" stroke-width="1.5" stroke="#14B8A6" stroke-opacity="0.35"/><circle class="mss__glow" cx="195" cy="90" r="66" fill="#3858E5" fill-opacity="0.06"/><circle class="mss__glow mss__glow--2" cx="195" cy="90" r="50" fill="#3858E5" fill-opacity="0.1"/><g class="mss__core" filter="url(#mss-filter0_d_0_513)"><circle cx="195" cy="90" r="37.5" fill="white" stroke="#E2E8F0"/></g><g class="mss__mark"><path opacity="0.5" d="M176.667 90C176.667 81.3576 176.667 77.0364 179.352 74.3515C182.036 71.6667 186.358 71.6667 195 71.6667C203.642 71.6667 207.964 71.6667 210.648 74.3515C213.333 77.0364 213.333 81.3576 213.333 90C213.333 98.6424 213.333 102.964 210.648 105.648C207.964 108.333 203.642 108.333 195 108.333C186.358 108.333 182.036 108.333 179.352 105.648C176.667 102.964 176.667 98.6424 176.667 90Z" fill="#3858E5"/><g><path d="M198.211 93.8364C198.619 93.5179 198.99 93.1475 199.73 92.4068L208.964 83.1729C209.187 82.9497 209.085 82.5652 208.787 82.4617C207.697 82.0835 206.279 81.3736 204.953 80.0473C203.627 78.7209 202.917 77.3031 202.538 76.2131C202.435 75.9149 202.05 75.8127 201.827 76.0359L192.593 85.2699L192.593 85.2699C191.853 86.0106 191.482 86.3809 191.164 86.7892C190.788 87.2709 190.466 87.7921 190.203 88.3436C189.98 88.8111 189.815 89.308 189.483 90.3017L189.055 91.5858L188.375 93.6275L187.737 95.542C187.574 96.031 187.701 96.5702 188.065 96.9347C188.43 97.2992 188.969 97.4265 189.458 97.2635L191.373 96.6253L193.414 95.9447L194.698 95.5167L194.698 95.5167C195.692 95.1854 196.189 95.0198 196.657 94.797C197.208 94.5342 197.729 94.2121 198.211 93.8364Z" fill="#3858E5"/><path d="M211.855 80.2818C213.826 78.3109 213.826 75.1156 211.855 73.1448C209.885 71.174 206.689 71.174 204.718 73.1448L204.422 73.4416C204.326 73.5376 204.278 73.5856 204.231 73.6497C204.112 73.814 204.037 74.0533 204.041 74.2562C204.042 74.3354 204.054 74.3993 204.077 74.527C204.122 74.7778 204.205 75.1446 204.357 75.5822C204.661 76.4573 205.234 77.6061 206.314 78.6861C207.394 79.766 208.543 80.3394 209.418 80.643C209.856 80.7948 210.222 80.8783 210.473 80.9233C210.601 80.9462 210.665 80.9577 210.744 80.9592C210.947 80.9632 211.186 80.8882 211.35 80.769C211.415 80.7225 211.463 80.6746 211.558 80.5787L211.559 80.5786L211.855 80.2818Z" fill="#3858E5"/></g></g><circle class="mss__badge" cx="219" cy="114" r="16" fill="white"/><g class="mss__badge"><path d="M229.833 114C229.833 119.983 224.983 124.833 219 124.833C213.017 124.833 208.167 119.983 208.167 114C208.167 108.017 213.017 103.167 219 103.167C224.983 103.167 229.833 108.017 229.833 114ZM223.366 110.717C223.683 111.034 223.683 111.549 223.366 111.866L217.95 117.283C217.632 117.6 217.118 117.6 216.8 117.283L214.634 115.116C214.317 114.799 214.317 114.284 214.634 113.967C214.951 113.65 215.466 113.65 215.783 113.967L217.375 115.559L219.796 113.138L222.217 110.717C222.534 110.4 223.049 110.4 223.366 110.717Z" fill-rule="evenodd" clip-rule="evenodd" fill="#16A34A"/></g></g><defs><filter id="mss-filter0_d_0_513" x="145" y="42" width="100" height="100" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset dy="2"/><feGaussianBlur stdDeviation="6"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0"/><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_0_513"/><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_0_513" result="shape"/></filter></defs></svg>\n';
+
+;
+
+/* ==== js/data/subsidy-detail.js ==== */
+/* ==========================================================================
+   Data · Subsidy details — Gujarat Textile Policy 2024
+   Figma GHuBkYGEQZvQppv3v55EaA, section "Subsidy Home - First Cut" 416:44852:
+   collapsed 416:44853 · expanded 416:45617. Copy is verbatim from the frames.
+   ========================================================================== */
+(function () {
+  OPL.data = OPL.data || {};
+
+  OPL.data.subsidyDetail = {
+    title: "Gujarat Textile Policy 2024",
+
+    hero: {
+      eyebrow: "Estimated benefits",
+      prefix: "Up to ₹", value: 1.2, suffix: "Cr",
+      cta: { label: "Calculate Estimate", goto: "subsidy-estimate" },   // flow 416:76869, not built yet
+    },
+
+    // Policy period / Widget 238:4515 — "compute it from today's date. Chip turns
+    // to the warning style in the last 6 months."
+    period: { start: "2024-10-01", end: "2029-09-30", warnMonths: 6 },
+
+    benefits: {
+      title: "Policy Benefits",
+      count: 8,
+      tiles: [
+        { id: "capital", icon: "settings-duotone-benefit", title: "Capital Subsidy", value: "10–35%", label: "on eFCI" },
+        { id: "interest", icon: "sale-duotone", title: "Interest Subsidy", value: "5–7%", label: "on term loan" },
+        { id: "power", icon: "bolt-circle-duotone", title: "Power Tariff Subsidy", value: "₹1/kWh", label: "per unit" },
+        { id: "payroll", icon: "wallet-money-duotone", title: "Payroll Assistance", value: "~₹5,000", label: "per worker a month" },
+      ],
+      others: {
+        label: "See other benefits",
+        count: 4,
+        rows: [
+          { id: "shg", icon: "case-round-duotone", title: "SHG job work assistance", sub: "₹5,000 per member a month" },
+          { id: "quality", icon: "diploma-duotone", title: "Quality Certification", sub: "50% of fee and testing<br>equipment cost" },
+          { id: "energy", icon: "waterdrops-duotone", title: "Energy and Water Saving", sub: "75% of audit cost" },
+          { id: "tech", icon: "cpu-duotone", title: "Technology Acquisition", sub: "65% of technology cost" },
+        ],
+      },
+    },
+
+    apply: {
+      title: "Apply",
+      help: { title: ["Get help from", "our subsidy expert"], cta: "Talk to an Expert", goto: "expert" },
+      links: [
+        { icon: "document-add-duotone", title: "Application portal", sub: "Apply online", goto: "application-portal" },
+        { icon: "global-duotone", title: "Official policy website", sub: "Read the full policy", goto: "policy-website" },
+      ],
+    },
+
+    // How it works / Accordion 141:21242 + How it works / Step 137:21194
+    steps: {
+      title: "How it works",
+      headerDeadline: "Apply within 1 year of production",       // collapsed header chip (416:45566)
+      items: [
+        { title: "Start commercial production", deadline: "Apply within 1yr of production" },
+        {
+          title: "Apply for an eligibility certificate",
+          body: "Your CA and a Chartered Engineer certify your investment.",
+          inset: {
+            title: "Apply at",
+            rows: [
+              { value: "District Industries Centre (DIC)", label: "If you invest up to ₹10 Cr" },
+              { value: "MSME Commissioner", label: "If you invest ₹10 Cr to ₹50 Cr" },
+            ],
+          },
+        },
+        { title: "Get your investment verified", body: "Officials check the assets you invested in." },
+        { title: "Receive your sanction", body: "You get an eligibility certificate for the approved amount." },
+      ],
+      share: "Share these steps with my CA",
+    },
+
+    foot: {
+      secondary: { label: "Apply Now", goto: "application-portal" },
+      primary: { label: "Talk to an Expert", goto: "expert" },
+      note: "Estimates are indicative. The final amount depends on policy terms and department procedures.",
+    },
+
+    aiNudge: { lead: "Ask anything about", topic: "this policy" },   // proposed, same pattern as Home
+  };
+})();
 
 ;
 
@@ -3145,6 +3420,186 @@ OPL.ui.SignedHeroSvg = '<svg class="mss" viewBox="0 0 390 176" width="390" heigh
         OPL.screens.application.celebrate = true;
         OPL.go("application", { app: this.id, st: null, ms: null, step: null }, { replace: true });
       }, OPL.fx.motionOff() ? 400 : c.wait));
+    },
+  };
+})();
+
+;
+
+/* ==== js/screens/subsidy-detail.js ==== */
+/* ==========================================================================
+   Screen · Subsidy details — Gujarat Textile Policy 2024
+   Figma: collapsed 416:44853 · expanded 416:45617 (section 416:44852)
+   Entry: Home → any "Top subsidy matches" card (data-goto="subsidy-detail").
+
+   Motion thesis (prototype layer, behaviour on drawn elements only):
+   · Focal: the benefits land. The plinth settles, the note bundle drops onto it,
+     the coin stacks clink down, and the estimate counts up as they land.
+   · Continuity: disclosures open by height (no jump); revealed rows stagger in
+     and the list scrolls itself into view if it opened below the fold.
+   · Feedback: the period bar fills to today; the How-it-works rail draws step
+     by step; the expert card's "OPL Verified" stamp presses on once.
+   Reduced motion / Motion off: everything renders at rest, nothing hidden.
+   ========================================================================== */
+(function () {
+  const { html, ui } = OPL;
+  OPL.screens = OPL.screens || {};
+
+  /* "Up to ₹1.2Cr" — one-decimal count-up (OPL.countUp is integer-only). */
+  const countUpDecimal = (el, { to, prefix, suffix, duration = 900, delay = 0, timers }) => {
+    const set = (v) => { el.textContent = prefix + v.toFixed(1) + suffix; };
+    if (OPL.fx.motionOff()) return set(to);
+    set(0);
+    OPL.afterReveal(() => timers.push(setTimeout(() => {
+      const t0 = Date.now();
+      const step = () => {
+        const k = Math.min(1, (Date.now() - t0) / duration);
+        set(to * (1 - Math.pow(1 - k, 3)));
+        if (k < 1) timers.push(setTimeout(step, 16));
+      };
+      step();
+    }, delay)));
+  };
+
+  OPL.screens["subsidy-detail"] = {
+    title: "Subsidy details",
+    figma: { collapsed: "416:44853", expanded: "416:45617" },
+    timers: [],
+
+    leave() { this.timers.forEach((t) => { clearTimeout(t); clearInterval(t); }); this.timers = []; },
+
+    render(page) {
+      this.leave();
+      const d = OPL.data.subsidyDetail;
+      const v = OPL.variantValues("subsidy-detail");
+      const b = d.benefits;
+
+      page.innerHTML = html`
+        ${ui.StatusBar()}
+        <div class="scroller">
+          <main class="sd">
+            <section class="sd-hero">
+              <div class="sd-hero__bg"><img class="sd-hero__texture" src="${OPL.simg("satin-texture.jpg")}" alt=""></div>
+              <header class="sd-head">
+                <div class="sd-head__lead">
+                  <button class="sd-head__btn sd-head__back" aria-label="Back" data-press data-back>${OPL.sicon("alt-arrow-left-19", 19.2)}</button>
+                  <h1 class="sd-head__title">${d.title}</h1>
+                </div>
+                <button class="sd-head__btn" aria-label="Support" data-press data-goto="support">${OPL.sicon("headphones-16", 16)}</button>
+              </header>
+              <div class="sd-hero__body">
+                <div class="sd-illus" aria-hidden="true">
+                  <img class="sd-illus__l sd-illus__base" src="${OPL.simg("hero-plinth-base.svg")}" alt="">
+                  <img class="sd-illus__l sd-illus__top" src="${OPL.simg("hero-plinth-top.svg")}" alt="">
+                  <img class="sd-illus__l sd-illus__notes" src="${OPL.simg("hero-notes.svg")}" alt="">
+                  <img class="sd-illus__l sd-illus__coins-a" src="${OPL.simg("hero-coins-a.svg")}" alt="">
+                  <img class="sd-illus__l sd-illus__coins-b" src="${OPL.simg("hero-coins-b.svg")}" alt="">
+                </div>
+                <div class="sd-hero__copy">
+                  <p class="sd-hero__eyebrow"><span>${d.hero.eyebrow}</span>
+                    <button class="sd-hero__info" aria-label="How we estimate this" data-press data-goto="estimate-info">${OPL.sicon("info-circle-ink", 16)}</button></p>
+                  <p class="sd-hero__amount">${d.hero.prefix}${d.hero.value}${d.hero.suffix}</p>
+                </div>
+                <div class="sd-hero__cta">${ui.Button({ label: d.hero.cta.label, trailing: "chevron-right-white", block: true, strong: true, goto: d.hero.cta.goto })}</div>
+              </div>
+            </section>
+
+            <div class="sd-body">
+              ${ui.PolicyPeriod({ period: d.period })}
+
+              <section class="sd-section sd-benefits">
+                <h2 class="sd-section__title">${b.title} ${ui.CountBadge({ n: b.count })}</h2>
+                <div class="sd-benefits__grid">${b.tiles.map((t) => ui.BenefitTile(t))}</div>
+                ${ui.Disclosure({
+                  id: "others", label: b.others.label, count: b.others.count, open: v.others === "open",
+                  body: OPL.raw(b.others.rows.map((r, i) => ui.ListRow({ ...r, goto: "benefit-sheet", attrs: `data-benefit="${r.id}" style="--i:${i}"` })).join("")),
+                })}
+              </section>
+
+              <section class="sd-section sd-apply">
+                <h2 class="sd-section__title">${d.apply.title}</h2>
+                ${ui.HelpCardExpert(d.apply.help)}
+                <div class="sd-links">${d.apply.links.map((l) => ui.ListRow({ ...l, trailing: "external" }))}</div>
+                ${ui.HowItWorks({ ...d.steps, open: v.steps === "open" })}
+              </section>
+            </div>
+          </main>
+        </div>
+        <div class="floating floating--sd">
+          ${ui.AiMitraFab({ nudge: v.nudge === "on" ? d.aiNudge : null })}
+        </div>
+        ${ui.SubsidyFoot(d.foot)}`;
+
+      this.wire(page, d);
+    },
+
+    wire(page, d) {
+      const sc = page.querySelector(".scroller");
+      const motionOff = OPL.fx.motionOff();
+      OPL.fx.statusOnScroll(page);
+      OPL.fx.nudge(page, this.timers);
+
+      /* ---- disclosures: See other benefits · How it works ---------------- */
+      const foot = page.querySelector(".sfoot");
+      const reveal = (panel) => {
+        // After the height animation, bring the newly opened content into view
+        // if it opened below the fold (keeps its header on screen).
+        this.timers.push(setTimeout(() => {
+          const view = sc.getBoundingClientRect();
+          const box = panel.getBoundingClientRect();
+          const bottomLimit = view.bottom - foot.offsetHeight - 16;
+          const head = panel.parentElement.getBoundingClientRect().top;
+          const over = Math.min(box.bottom - bottomLimit, head - view.top - 72);
+          if (over > 24) sc.scrollBy({ top: over, behavior: motionOff ? "auto" : "smooth" });
+        }, motionOff ? 0 : 380));
+      };
+      page.addEventListener("click", (e) => {
+        const head = e.target.closest(".disclosure__head, .how__head");
+        if (!head) return;
+        const sec = head.closest("[data-disclosure]");
+        const panel = sec.querySelector(".disclosure__panel");
+        const open = !sec.classList.contains("is-open");
+        sec.classList.toggle("is-open", open);
+        head.setAttribute("aria-expanded", open);
+        panel.toggleAttribute("inert", !open);
+        const badge = sec.querySelector(".count-badge");
+        if (badge && !motionOff) { badge.classList.remove("is-popping"); void badge.offsetWidth; badge.classList.add("is-popping"); }
+        if (open) {
+          if (sec.classList.contains("how")) { sec.classList.remove("is-playing"); void sec.offsetWidth; if (!motionOff) sec.classList.add("is-playing"); }
+          reveal(panel);
+        }
+      });
+
+      /* ---- Share these steps with my CA ---------------------------------- */
+      page.addEventListener("click", async (e) => {
+        const btn = e.target.closest("[data-share-steps]");
+        if (!btn) return;
+        const s = d.steps;
+        const text = `${d.title} — ${s.title}\n` + s.items.map((it, i) => `${i + 1}. ${it.title}${it.body ? ` — ${it.body}` : ""}${it.deadline ? ` (${it.deadline})` : ""}${it.inset ? "\n   " + it.inset.title + ": " + it.inset.rows.map((r) => `${r.value} (${r.label.charAt(0).toLowerCase() + r.label.slice(1)})`).join("; ") : ""}`).join("\n");
+        try {
+          if (navigator.share) { await navigator.share({ title: d.title, text }); return; }
+          await navigator.clipboard.writeText(text);
+        } catch (_) { return; }
+        const label = btn.querySelector(".how__share-label");
+        btn.classList.add("is-done");
+        label.textContent = "Steps copied";
+        this.timers.push(setTimeout(() => { btn.classList.remove("is-done"); label.textContent = s.share; }, 2200));
+      });
+
+      /* ---- entrance + in-view moments ------------------------------------ */
+      OPL.fx.enter(page, [
+        page.querySelector(".sd-hero__copy"),
+        page.querySelector(".sd-hero__cta"),
+        page.querySelector(".period"),
+        page.querySelector(".sd-benefits .sd-section__title"),
+        ...page.querySelectorAll(".benefit"),
+        page.querySelector(".disclosure"),
+      ]);
+      if (!motionOff) page.querySelector(".sd-illus").classList.add("is-landing");
+      countUpDecimal(page.querySelector(".sd-hero__amount"), {
+        to: d.hero.value, prefix: d.hero.prefix, suffix: d.hero.suffix, duration: 900, delay: 420, timers: this.timers,
+      });
+      OPL.fx.playInView(page, ".period, .xhelp, .how.is-open");
     },
   };
 })();

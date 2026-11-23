@@ -99,6 +99,24 @@
     ],
   };
 
+  /* Subsidy details (416:44852). Presets set the starting state of the two
+     disclosures; tapping them in the prototype toggles them live. */
+  OPL.variants["subsidy-detail"] = {
+    presets: [
+      { id: "collapsed", label: "Collapsed", figma: "416:44853", set: { others: "closed", steps: "closed" } },
+      { id: "expanded", label: "Expanded", figma: "416:45617", set: { others: "open", steps: "open" } },
+    ],
+    groups: [
+      { id: "others", hidden: true, default: "closed", options: [{ value: "closed" }, { value: "open" }] },
+      { id: "steps", hidden: true, default: "closed", options: [{ value: "closed" }, { value: "open" }] },
+      {
+        id: "nudge", label: "AI Mitra nudge", default: "on",
+        options: [{ value: "on", label: "Shows once" }, { value: "off", label: "Off" }],
+        note: "Proposed line: “Ask anything about this policy”. Not in Figma.",
+      },
+    ],
+  };
+
   OPL.variants["loan-offers"] = {
     presets: [
       { id: "list", label: "Offers list", figma: "382:35324", set: { compare: "none", sheet: "none" } },

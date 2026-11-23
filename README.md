@@ -27,6 +27,11 @@ starts the HTML component kit that later mobile flows reuse.
     - The NeSL portal follows (six screenshots, `433:8115` … `416:83101`), then Confirming (`416:82947`), then Application · Signed with its milestone sheet (`431:8486`).
     - "I'll come back later" or Cancel on NeSL leads to Application · Sign letter (`431:7803`).
   - Group F (disbursal: `435:8001`, `435:8572`) comes next.
+- **Subsidy details** (branch `flow/subsidies`; section "Subsidy Home - First Cut" `416:44852`):
+  - Gujarat Textile Policy 2024, collapsed `416:44853` and expanded `416:45617` (panel presets).
+  - Reached from any Home "Top subsidy matches" card.
+  - "See other benefits" and "How it works" open and close in place.
+  - Hotspots for later: benefit sheets (`416:47994`), Calculate Estimate (`416:76869`), Talk to an Expert, Apply Now and the two links.
 
 ## Run it
 
@@ -238,6 +243,34 @@ All of this is behaviour on existing elements. None of it adds UI:
 6. **Back after signing** returns to the KFS reader. The NeSL steps and loader don't stay in history (they use `replace`), but the KFS page does.
 7. **Timing is a prototype choice:** redirect 1.8 s, confirming 2.4 s.
 8. **Prototype behaviour:** about 5 s after Submit, the first lender "approves" and the milestone sheet plays. This simulates the async lender response so the full flow can be demoed.
+
+## Figma flags · Subsidy details (`416:44852`)
+
+1. **Every Home subsidy card opens the Textile Policy page.** The three Home cards are other schemes (MSME Competitive, Gujarat Electronics, Aatmanirbhar Gujarat), and only Textile Policy has a details design.
+2. **Strokes differ between the two frames.**
+   - "See other benefits" is 52 tall with the stroke inside when closed. It is 1 + 56 + rows + 1, with the stroke in layout, when open.
+   - The closed label sits 14 from the top with no gap before the count badge. The open one sits 16 down with an 8 gap.
+   - The closed header is 13 + the 1px border, so the label still lands at 14. The 8 gap is used in both states.
+3. **The How it works chevron points down in both frames.** "See other benefits" flips to up when open. Both use the flip here, for consistency.
+4. **The deadline chip copy differs:** "Apply within 1 year of production" (accordion header) vs "Apply within 1yr of production" (step 1). Both are used as drawn.
+5. **"See other benefits" is 351 wide**, 1px wider than the 350 column. 350 is used.
+6. **The Steps frame has a 1px drop shadow on a frame with no fill**, so it would shadow the text. Not used.
+7. **Step 2's inset labels are ink (`#0F172A`)**, while the component default is `#64748B`. Used as drawn.
+8. **Buttons are drawn in Instrument Sans** (Calculate Estimate, Apply Now, Talk to an Expert). Geist SemiBold is used, per the Geist-only rule.
+9. **Policy period is computed from today,** per the widget's description. Today, 23 Nov 2026, gives "2 years 10 months left" and a 43% bar, the same as the frame (137 of 316). It moves with the date, and the chip turns amber in the last 6 months.
+10. **Proposed, not in Figma:**
+    - the AI Mitra nudge line "Ask anything about this policy" (panel toggle)
+    - the "Steps copied" confirmation when sharing steps without a native share sheet
+11. **Illustration:** the five vector layers (plinth ×2, notes, two coin stacks) are composed from Figma's own SVGs at their offsets, so the entrance can land them. The two clip-path groups inside the coins came through empty from Figma, so check the coin rims against the frame.
+
+**Motion (prototype layer):**
+- **The benefits land:** the plinth settles, the notes drop onto it, the coins clink down, and "Up to ₹1.2Cr" counts up as they land.
+- The period bar fills to today, then the time-left chip appears.
+- Disclosures open by height. Their rows stagger in, and the list scrolls into view if it opened below the fold.
+- The How it works rail draws step by step.
+- The OPL Verified stamp presses onto the expert card once.
+- Tiles, rows and buttons have press states, with their arrows nudging in the direction they lead.
+- Reduced motion and "Motion off" render everything at rest.
 
 ## Versioning
 

@@ -1,5 +1,26 @@
 # Changelog
 
+## Unreleased · `flow/subsidies` · Subsidy details
+
+Synced from Figma: section "Subsidy Home - First Cut" `416:44852`, frames `416:44853` (collapsed) and `416:45617` (expanded).
+
+**Added**
+
+- **Subsidy details screen** (`subsidy-detail`), for Gujarat Textile Policy 2024. Home's "Top subsidy matches" cards now open it.
+  - The hero has a five-layer illustration and the estimate.
+  - Policy period widget, computed from today.
+  - Policy Benefits 2×2 tiles and "See other benefits" (4 rows).
+  - Apply: the expert help card, portal and website links, and How it works (4 steps, "Share these steps with my CA").
+  - A sticky Apply Now / Talk to an Expert bar.
+- **Presets:** Collapsed, Expanded. AI Mitra nudge toggle.
+- **Components** (`js/components-subsidy.js`, `css/components/subsidy.css`; also on `library.html`): `PolicyPeriod`, `BenefitTile`, `ListRow`, `Disclosure`, `HelpCardExpert`, `HowItWorks` / `HowStep`, `SubsidyFoot`, `CountBadge`, `.deadline-chip`, `.btn--line`.
+- **Motion:** the benefits landing, period fill, disclosure height and stagger with self-scroll, rail draw, stamp press, and directional press nudges. See README.
+- **Assets** in `assets/lazy/subsidy/` (screen-only): the illustration SVGs, the satin texture, the expert photo, the stamp (rasterised from a 139 KB vector to 6 KB), and 23 icons.
+
+**Changed**
+
+- `tools/build.sh` strips comments from the CSS bundle. Sources keep them. This saves about 17 KB of first load, which keeps the total under 700 KB.
+
 ## v0.8.0 — 23 Nov 2026 · NeSL signing (group E)
 
 Synced from Figma: `433:7980`, the six NeSL-Redirection frames, `416:82947`, `431:8486` and `431:7803`.
