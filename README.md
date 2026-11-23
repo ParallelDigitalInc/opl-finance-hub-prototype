@@ -71,6 +71,11 @@ Switch with **View → Desktop** in the panel, press **D**, or link `#device=des
    - the filter empty state copy (after the old "No matches" frame `357:100347`)
    - the Sort options (taken from mobile)
    - the compare toast
+   - **rotating AI questions** (`D.mountAi`): each AI row cycles through four questions from its own context every ~4.6s, the drawn one first. The question lifts away as the next rises in, and it holds on hover, off-screen or with reduced motion.
+     - Loans hero: limit, payout speed, rate.
+     - CIBIL card: rank 1, applying again, low risk.
+     - Subsidies hero: it was drawn with the Loans question, so it now asks subsidy questions instead.
+     - The question sets live in `js/desktop/data/loans-overview.js` and `subsidies.js`.
 6. **Loan Offers (`507:84666`):** every row shows ₹50 L · 9.45% · Yearly · 0.75% (placeholder figures as drawn). The "Processing fee" stat is Figtree in Figma and is shown in Geist.
 7. **Compare (`507:87387`):** Figma draws Citi, SIDBI and Axis with identical terms. The prototype uses distinct sample terms per lender (v0.13.4, `js/desktop/data/loan-offers.js`) so the comparison means something. They need OPL's real figures.
 8. **Mixed controls:** the Compare checkbox is a 16px DS checkbox on the horizontal rows (`507:84775`) but a 20px Solar icon on the vertical cards. Both use the Solar icon here, for consistency.
@@ -78,7 +83,7 @@ Switch with **View → Desktop** in the panel, press **D**, or link `#device=des
 11. **NeSL (`524:105163`):** the frames are laid out as `476:231121` · `476:231334` · `476:231547` · `476:231761`. The prototype plays the unscrolled agreement (`476:231547`) first, then the scrolled one with I AGREE, then e-stamp, then OTP.
 12. **Compare tray (`524:106147`):** only the 1-picked state is drawn. "Add one more, or compare now" (2 picked) and "Ready to compare" (3 picked) are proposed copy. The texture is the hero texture (same 626×827 image).
 13. **Subsidies (Final Desktop):**
-   - Copy kept as drawn but questionable: "Capital subsides"; the subsidies hero's AI row reads "Which working capital loan should I apply for?"; the Electronics card repeats the MSME card's "90% of lean consultant fees".
+   - Copy kept as drawn but questionable: "Capital subsides"; the Electronics card repeats the MSME card's "90% of lean consultant fees".
    - The results page lists the three schemes twice.
    - The Explore options, the Sort options and the tooltip copy are proposed.
    - Choosing a state other than Gujarat filters to central schemes; that rule is assumed.

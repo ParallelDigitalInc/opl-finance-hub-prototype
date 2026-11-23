@@ -163,10 +163,14 @@
       <span class="d-check__label">${label}</span>
     </button>`;
   D.mitraMark = () => html`<span class="d-mitra-mark">${D.icon("mitra-logo-white", 12)}</span>`;
-  D.aiRow = (text, { goto = "ai-mitra", cls = "" } = {}) => html`
-    <button class="d-ai ${cls}" data-goto="${goto}">
-      ${D.mitraMark()}<span class="d-ai__text">${text}</span>${D.icon("alt-arrow-right", 14, "d-ai__arrow")}
+  // q: one question, or a list asked in turn (the first is the one drawn). D.mountAi rotates them.
+  D.aiRow = (q, { goto = "ai-mitra", cls = "" } = {}) => {
+    const list = Array.isArray(q) ? q : [q];
+    return html`
+    <button class="d-ai ${cls}" data-goto="${goto}" ${list.length > 1 ? raw(`data-ai-qs="${encodeURIComponent(JSON.stringify(list))}"`) : ""}>
+      ${D.mitraMark()}<span class="d-ai__text"><span class="d-ai__q">${list[0]}</span></span>${D.icon("alt-arrow-right", 14, "d-ai__arrow")}
     </button>`;
+  };
   // src: an image path, or { src, crop, bg } where crop positions an oversized source
   // inside the circle exactly as the Figma image fill does (e.g. Citi, 476:200444)
   D.logo = (src, { size = 40, cls = "" } = {}) => {
@@ -398,6 +402,41 @@
     D.mountTabs(page);
     D.mountTopbar(page);
     D.mountFab(page);
+    D.mountAi(page);
+  };
+
+  /* AI rows with several questions: every ~4.5s the question lifts away and the next one
+     rises in (slight blur, no layout shift). Rows on one page start out of step so they
+     never change together. Holds while hovered/focused, off-screen or the tab is hidden;
+     still under reduced motion. Leaving the page stops it (row.isConnected). */
+  D.mountAi = (root) => {
+    if (motionOff()) return;
+    root.querySelectorAll("[data-ai-qs]").forEach((row, k) => {
+      const qs = JSON.parse(decodeURIComponent(row.dataset.aiQs));
+      const box = row.querySelector(".d-ai__text");
+      let i = 0, hold = false, seen = true;
+      const set = (v) => () => { hold = v; };
+      row.addEventListener("mouseenter", set(true)); row.addEventListener("mouseleave", set(false));
+      row.addEventListener("focus", set(true)); row.addEventListener("blur", set(false));
+      if ("IntersectionObserver" in window) new IntersectionObserver((es) => { seen = es[0].isIntersecting; }, { threshold: 0.6 }).observe(row);
+      const swap = () => {
+        i = (i + 1) % qs.length;
+        const old = box.querySelector(".d-ai__q:not(.is-out)");
+        const next = document.createElement("span");
+        next.className = "d-ai__q is-in";
+        next.textContent = qs[i];
+        box.appendChild(next);
+        old?.classList.add("is-out");
+        setTimeout(() => { old?.remove(); next.classList.remove("is-in"); }, 520);
+        row.setAttribute("aria-label", `Ask AI Mitra: ${qs[i]}`);
+      };
+      const tick = () => {
+        if (!row.isConnected) return;
+        if (!hold && seen && !document.hidden) swap();
+        setTimeout(tick, 4600);
+      };
+      OPL.afterReveal(() => setTimeout(tick, 3400 + k * 1700));
+    });
   };
 
   /* Compare selection shared across desktop tabs (seeded from the mobile Loan offers

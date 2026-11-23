@@ -17,7 +17,9 @@
         { icon: "hero-sale-square", label: "Lowest interest", value: "From 9.45%" },
         { icon: "hero-stopwatch", label: "Fastest money", value: "In ~2 days" },
       ],
-      ai: "Which working capital loan should I apply for?",
+      // First as drawn; the rest rotate in (proposed, from the hero's own figures)
+      ai: ["Which working capital loan should I apply for?", "How much of my ₹50 L limit should I borrow?",
+        "Which lender can pay out in about 2 days?", "Can I get a rate below 9.45%?"],
     },
     cmr: {                                    // 476:200254
       title: "CIBIL MSME Rank",
@@ -27,7 +29,8 @@
       risk: "Low Risk",
       // Info tooltip (proposed copy — the frame has the icon, no tooltip drawn)
       info: "CIBIL MSME Rank runs from 1 (lowest risk) to 10 (highest risk). Lenders use it to price your loan.",
-      ai: "How do I maintain this rank",
+      ai: ["How do I maintain this rank", "What would move me to rank 1?",
+        "Will applying again lower my rank?", "Why do lenders see me as low risk?"],
     },
     matches: {                                // 476:200396
       title: "Top loan matches",
