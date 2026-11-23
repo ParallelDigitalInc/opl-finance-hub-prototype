@@ -25,7 +25,10 @@
         { icon: "hero-sale-square", label: "Interest subsidies", value: "Up to ₹20 L" },
         { icon: "sub-gift", label: "Other benefits", value: "Up to ₹2 L" },
       ],
-      ai: "Which working capital loan should I apply for?",   // as drawn on the subsidies hero — flagged
+      // Drawn with the Loans question ("Which working capital loan should I apply for?"). Swapped
+      // for subsidy questions from this hero's figures, rotating (proposed, flagged in README)
+      ai: ["Which subsidy should I apply for first?", "How do I claim the ₹50 L capital subsidy?",
+        "Can I combine central and state schemes?", "What documents do I need to apply?"],
     },
     refine: {                                                  // 524:98833
       title: "Refine your matches",

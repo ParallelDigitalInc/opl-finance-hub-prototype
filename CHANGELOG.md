@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.16.11 — 23 Nov 2026 · Desktop AI questions change with context
+
+Shreya: on desktop, wherever there's AI, the questions should change subtly in context.
+
+- **Each AI row cycles through four questions** taken from what sits around it, starting with the one drawn in Figma:
+  - Loans hero: borrowing limit, payout speed, rate.
+  - CIBIL MSME Rank card: rank 1, applying again, low risk.
+  - Subsidies hero: which subsidy first, the ₹50 L capital subsidy, combining schemes, documents. It was drawn with the Loans question, so it now asks subsidy questions instead.
+- **The swap:** every ~4.6s the question lifts away with a slight blur as the next rises into the same spot, with no layout shift. Rows on one page are out of step, so they never change together.
+- **When it holds:** on hover or focus, while the row is off-screen or the tab is hidden, and under reduced motion.
+- **Code:** `D.aiRow` takes one question or a list; `D.mountAi` runs from `D.mountShell`, so any future AI row with a list rotates too.
+
 ## v0.16.10 — 23 Nov 2026 · Estimate card stacks like the mobile hero
 
 Shreya asked for the illustration on top, with "Up to" given the same treatment as the amount.

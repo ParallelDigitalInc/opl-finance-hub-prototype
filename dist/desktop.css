@@ -399,7 +399,13 @@
 /* ---- AI Mitra row (476:200247 · 476:200355) ---------------------------------------------- */
 .d-mitra-mark { width: 24px; height: 24px; flex-shrink: 0; border-radius: 999px; background: var(--primary); display: grid; place-items: center; transition: transform 500ms var(--d-ease); }
 .d-ai { width: 100%; display: flex; align-items: center; gap: 10px; padding: 12px; text-align: left; transition: background 160ms; }
-.d-ai__text { flex: 1; font-size: 14px; line-height: 20px; font-weight: 500; color: var(--foreground); }
+.d-ai__text { flex: 1; min-width: 0; display: grid; overflow: hidden; font-size: 14px; line-height: 20px; font-weight: 500; color: var(--foreground); }
+/* rotating questions share one cell: the old one lifts away as the next rises in */
+.d-ai__q { grid-area: 1 / 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.d-ai__q.is-in { animation: d-ai-in 520ms var(--d-ease) both; }
+.d-ai__q.is-out { animation: d-ai-out 360ms ease-in both; }
+@keyframes d-ai-in { from { opacity: 0; transform: translateY(9px); filter: blur(3px); } }
+@keyframes d-ai-out { to { opacity: 0; transform: translateY(-9px); filter: blur(3px); } }
 .d-ai__arrow { transition: transform 200ms var(--d-ease); }
 .d-ai:hover { background: rgba(56, 88, 229, 0.04); }
 .d-ai:hover .d-ai__arrow { transform: translateX(3px); }
