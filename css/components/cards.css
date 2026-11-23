@@ -118,6 +118,7 @@
 .match--loan .match__text { gap: 3px; }
 .match--loan .match__title { line-height: 21px; }
 .match--loan .match__sub { line-height: 18px; white-space: nowrap; }
+.match--lg .match__title { font-size: 18px; } /* Loans overview 382:36202 — 18/21 */
 .match--subsidy .match__text { gap: var(--s4); }
 .match--subsidy .match__title { line-height: 21px; }
 .match--subsidy .match__sub { line-height: 16px; }

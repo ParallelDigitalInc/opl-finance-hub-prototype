@@ -146,10 +146,10 @@
 
   /* ------------------------------------------------------------------------
      MatchCard — "Top loan/subsidy matches" card (loan 382:34123, subsidy 382:34197)
-     figures: [{label, value, unit?}]
+     figures: [{label, value, unit?}]   size: "md" (Home, 16px title) | "lg" (Loans overview, 18px)
      ------------------------------------------------------------------------ */
-  ui.MatchCard = ({ kind, tag, tint, logo, title, subtitle, figures, goto }) => html`
-    <article class="${cx("match", `match--${kind}`)}" style="--tint:${tint}" data-press ${goto ? OPL.raw(`data-goto="${goto}"`) : ""}>
+  ui.MatchCard = ({ kind, tag, tint, logo, title, subtitle, figures, goto, size = "md" }) => html`
+    <article class="${cx("match", `match--${kind}`, size === "lg" && "match--lg")}" style="--tint:${tint}" data-press ${goto ? OPL.raw(`data-goto="${goto}"`) : ""}>
       <div class="match__head">
         <span class="match__tag">${tag}</span>
         <div class="match__id">

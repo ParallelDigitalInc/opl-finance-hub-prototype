@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.3.1 — 23 Nov 2026 · Loans overview tweaks
+
+- The offer cards in the Loans overview's first fold use **18px titles**, as drawn in `382:36202` (`MatchCard size: "lg"`). Home stays at 16px.
+- The first fold has **3 offer cards**; Axis Bank is added, the same offer as on Home.
+
 ## v0.3.0 — 23 Nov 2026 · Loans overview
 
 Synced from Figma `382:36150` (Loans overview). Home hero re-synced: "₹50 Lakhs", "Explore Loans" and "Explore Subsidies".

@@ -34,7 +34,7 @@
                 <p class="lo-hero__amount" data-amount="${d.limit.value}">${d.limit.prefix}${d.limit.value}${d.limit.suffix}</p>
               </div>
               ${ui.CmrPill(d.cmr)}
-              <div class="rail lo-hero__rail">${d.offers.map((c) => ui.MatchCard(c))}</div>
+              <div class="rail lo-hero__rail">${d.offers.map((c) => ui.MatchCard({ ...c, size: "lg" }))}</div>
               <div class="lo-hero__cta">${ui.Button({ label: d.offersCta.label, trailing: "chevron-right-white", block: true, goto: d.offersCta.goto })}</div>
             </section>
 
