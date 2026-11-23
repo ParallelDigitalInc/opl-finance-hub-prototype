@@ -138,10 +138,12 @@
       { id: "kfs", label: "KFS ready (Citi)", figma: "382:42689", set: { app: "pick-citi", apps: "figma", st: "", ms: "off" } },
       { id: "sign", label: "Sign letter (resume)", figma: "431:7803", set: { app: "pick-citi", apps: "figma", st: "sign", ms: "off" } },
       { id: "signed", label: "Letter signed + sheet", figma: "431:8486", set: { app: "pick-citi", apps: "figma", st: "signed", ms: "on" } },
+      { id: "disbursing", label: "Money on its way", figma: "435:8001", set: { app: "pick-citi", apps: "figma", st: "disbursing", ms: "off" } },
+      { id: "disbursed", label: "Money received + sheet", figma: "435:8572", set: { app: "pick-citi", apps: "figma", st: "disbursed", ms: "on" } },
     ],
     groups: [
       { id: "app", hidden: true, default: "", options: [{ value: "" }, { value: "offer-sidbi" }, { value: "pick-citi" }] },
-      { id: "st", hidden: true, default: "", options: [{ value: "" }, { value: "sign" }, { value: "signed" }] },
+      { id: "st", hidden: true, default: "", options: ["", "sign", "signed", "disbursing", "disbursed"].map((value) => ({ value })) },
       { id: "ms", hidden: true, default: "off", options: [{ value: "off" }, { value: "on" }] },
       { id: "apps", hidden: true, default: "live", options: [{ value: "live" }, { value: "figma" }] },
     ],

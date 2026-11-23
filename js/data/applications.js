@@ -197,4 +197,35 @@
       },
     },
   });
+
+  // Group F · disbursal (Figma 435:8001 waiting, 435:8572 received + "Disbursed" milestone sheet)
+  Object.assign(OPL.data.applications, {
+    disbursing: {
+      title: "Money on Its Way",
+      sub: "Expected by 30 Nov",
+      step4: "Money Disbursal",
+      step4Sub: (name) => `${name} is processing the disbursal`,
+      note: (name) => `${name} may call you to confirm details before disbursal of final loan amount.`,
+      // cell borders exactly as drawn: b = bottom, r = right (435:8181)
+      card: { label: "Final Loan Amount", value: "₹44,32,500", tex: 0.2,
+        rows: [[{ l: "Expected by", v: "30 Nov", b: 1 }], [{ l: "Monthly EMI", v: "₹1,44,043" }, { l: "First EMI", v: "5 Jan 2027", r: 1 }]] },
+    },
+    disbursed: {
+      title: "Money Received",
+      step4: "Money in Account",
+      step4Sub: "Received on 27 Nov",
+      note: (name) => `${name} may call you to confirm details before sending the money.`,
+      card: { label: "Final Loan Amount", value: "₹44,32,500", tex: 0.3,
+        rows: [[{ l: "Into account", v: "•••• 4521", b: 1, r: 1 }, { l: "Received on", v: "27 Nov", b: 1 }], [{ l: "First EMI", v: "5 Jan 2027", r: 1 }, { l: "Monthly EMI", v: "₹1,44,043" }]] },
+      sheet: {
+        eyebrow: "Money disbursed to your account", amount: "₹44,32,500",
+        rows: [["Monthly EMI", "₹1,44,043"], ["First EMI", "5 Jan 2027"], ["Number of EMIs", "36"]],
+        cta: "View my loan", done: "Done",
+      },
+    },
+    disbursalTitle: "Disbursal Details",
+    docs: [{ label: "Signed sanction letter", goto: "sanction-letter" }, { label: "Key Fact Statement", goto: "kfs-document" }],
+    // live demo after the signed sheet closes (prototype timing): → Money on its way → Money received
+    demo: { toDisbursing: 3500, toDisbursed: 6000 },
+  });
 })();

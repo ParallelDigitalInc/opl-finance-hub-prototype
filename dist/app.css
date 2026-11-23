@@ -1202,7 +1202,7 @@ html[data-frame="off"] .screen { border-radius: 16px; }
 /* ---- KFS summary (416:43894) ------------------------------------------- */
 .kfs-sum { display: flex; flex-direction: column; gap: var(--s16); }
 .kfs-sum__title { font-size: 16px; line-height: 20px; font-weight: var(--fw-medium); color: var(--foreground); }
-.kfs-apr { display: flex; flex-direction: column; gap: var(--s4); padding: var(--s4); border-radius: var(--r-large); outline: 1px solid var(--border); outline-offset: -1px; background: var(--surface); box-shadow: var(--shadow-s); overflow: hidden; }
+.kfs-apr { display: flex; flex-direction: column; gap: var(--s4); padding: var(--s4); border-radius: var(--r-large); border: 1px solid var(--border); /* stroke in layout: header at 5,5 (416:43779) */ background: var(--surface); box-shadow: var(--shadow-s); overflow: hidden; }
 .kfs-apr__head { position: relative; display: flex; flex-direction: column; gap: var(--s2); padding: var(--s16); border-radius: var(--r-inner); background: var(--tint-blue); overflow: hidden; font-size: 14px; line-height: 20px; font-weight: var(--fw-medium); color: var(--foreground); }
 .kfs-apr__head > p { position: relative; }
 .kfs-apr__tex { position: absolute; left: 0; top: -199.1%; width: 100%; height: 499.08%; max-width: none; opacity: 0.3; }
@@ -1347,6 +1347,40 @@ html[data-frame="off"] .screen { border-radius: 16px; }
 /* Application detail · signed: AI Mitra only (no nav, no footer) */
 .appd--signed { padding-bottom: 100px; }
 .ms--signed { padding-bottom: 0; margin-bottom: -4px; }   /* 431:8687 is py 8: 12 bare − 4 = 8 under Done */
+
+/* ---- Group F · disbursal (435:8001, 435:8572) ------------------------------ */
+.tl__node--progress { background: #f0f6fe; box-shadow: inset 0 0 0 1.5px var(--primary); }   /* "Node · in progress" */
+.tl__item--progress .tl__title { font-weight: var(--fw-semibold); }
+.tl__line--fade-blue { background: linear-gradient(180deg, #0d9488, var(--primary)); }
+.tl.is-playing .tl__item--progress .tl__node { animation: step-pop 420ms var(--ease-spring) both, node-ping 1.8s var(--ease-out) 900ms 2; }
+.appd-status__sub { margin-top: 0; font-size: 12px; line-height: 16px; color: var(--muted-foreground); }
+
+.kfs-apr__tex { opacity: var(--tex, 0.3); }
+.fig-card__cells { display: flex; flex-direction: column; border-radius: var(--r-tag); background: var(--surface); overflow: hidden; }
+.fig-card__row { display: flex; }
+.fig-card__row > div { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: var(--s2); padding: 14px var(--s16); white-space: nowrap; }
+.fig-card__row > .is-b { border-bottom: 1px solid var(--hairline); }
+.fig-card__row > .is-r { border-right: 1px solid var(--hairline); }
+.fig-card__row span { font-size: 12px; line-height: 16px; color: var(--muted-foreground); }
+.fig-card__row b { font-size: 20px; line-height: 28px; font-weight: var(--fw-medium); color: var(--foreground); }
+
+.link-row { width: 100%; display: flex; align-items: center; gap: var(--s12); padding: var(--s4) 0; text-align: left; transition: opacity var(--dur-fast); }
+.link-row__label { flex: 1 1 0; min-width: 0; font-size: 14px; line-height: 20px; font-weight: var(--fw-medium); color: var(--foreground); }
+.link-row > .ico:last-child { margin-left: -2px; transition: transform var(--dur-fast) var(--ease-out); }   /* label↔chevron gap 10 */
+.link-row.is-pressed { opacity: 0.6; }
+.link-row.is-pressed > .ico:last-child { transform: translateX(2px); }
+
+.ms--disbursed .ms__hero { height: 196px; }
+.ms__msg--amount p { font-size: 14px; line-height: 20px; font-weight: var(--fw-medium); color: var(--muted-foreground); }
+.ms__msg--amount h2 { font-size: 30px; line-height: 36px; font-weight: var(--fw-semibold); color: var(--foreground); font-variant-numeric: tabular-nums; }
+/* "Node · current"-named steps in 431/435 frames: text flush with the node, connector tucks 1px (rail 73) */
+.tl__item--flush .tl__text { padding-top: 0; }
+.tl__item--flush .tl__line { margin-top: -1px; }
+/* stroke in layout on these cards (431:8556, 435:8177): header lands at 5,5 */
+.kfs-apr--bordered { outline: none; border: 1px solid var(--border); }
+/* Content 16/20/24 in the 431/435 frames */
+.appd--signed .appd-body, .appd--money .appd-body { padding-top: var(--s16); padding-bottom: 24px; }
+.tl__item:last-child { margin-bottom: 0; }   /* only steps above another step tuck 1px (Figma mb -1 on all but the last) */
 
 /* ==== css/screens/home.css ==== */
 /* ==========================================================================

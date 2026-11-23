@@ -1,5 +1,32 @@
 # Changelog
 
+## v0.9.0 — 23 Nov 2026 · Disbursal (group F), loan journey complete
+
+Synced from Figma `435:8001` (Money on its way) and `435:8572` (Money received + Disbursed milestone sheet).
+
+**Added**
+
+- **Application · Money on Its Way** (`435:8001`):
+  - "Expected by 30 Nov" under the title.
+  - A fourth timeline step, "Money Disbursal", in progress: blue ring node that pings, teal→blue connector.
+  - **Disbursal Details**: amount card with Expected by, Monthly EMI and First EMI, plus an info note.
+  - Branch Details, a new **Documents** card (Signed sanction letter, Key Fact Statement), WhatsApp, and the nav.
+- **Application · Money Received** (`435:8572`):
+  - Every step done ("Money in Account · Received on 27 Nov").
+  - The card shows Into account, Received on, First EMI and Monthly EMI.
+  - Documents comes before Branch Details, as drawn.
+- **"Disbursed" milestone sheet**: the hero is inlined (a full burst of 26 confetti pieces, ripple, and the wallet mark popping), and the amount counts up from ₹0 to ₹44,32,500. "View my loan" leads to My Loans (a hotspot for now), and "Done" closes the sheet.
+- **The whole loan journey now plays end to end.** When you close the "Sanction letter signed" sheet, Money on its way follows after 3.5 s, then Money received and the Disbursed sheet after 6 s more. This is prototype timing; the presets jump straight to each state.
+- **Components:** `FigureCard` (amount head plus cells, with borders exactly where Figma draws them) and `LinkList` (document rows). The Timeline gets a `progress` state, `line: "fade-blue"` and a `pad` option.
+
+**Fixed (precision)**
+
+- **Timelines:** steps whose node Figma names "current" sit flush with their text and tuck their connector 1px (a 73px rail), and the last step no longer tucks.
+  - KFS ready went from 249 to **252** (as drawn).
+  - Signed and Money on its way are exact too (266 and 374).
+- **APR and amount cards** draw their stroke inside the layout (header at 5,5), so the KFS Summary card is now 253 tall, as drawn.
+- **Body padding** is 16/24 in the signed and disbursal states, as drawn.
+
 ## v0.8.0 — 23 Nov 2026 · NeSL signing (group E)
 
 Synced from Figma: `433:7980`, the six NeSL-Redirection frames, `416:82947`, `431:8486` and `431:7803`.

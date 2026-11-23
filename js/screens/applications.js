@@ -71,7 +71,7 @@
 
       const cards = apps.map((a) => {
         const l = lender(a.id);
-        return a.status === "kfs" || a.status === "sign" || a.status === "signed"   // later states reuse the KFS card (no list design yet)
+        return ["kfs", "sign", "signed", "disbursing", "disbursed"].includes(a.status)   // later states reuse the KFS card (no list design yet)
           ? ui.ApplicationCard({
               id: a.id, logo: l.logo, name: l.name, product: l.type, tint: l.tint, tag: d.kfs.daysLeft,
               figures: [{ label: "Final offer", value: d.kfs.finalOffer }, rate], steps: kfsSteps,
@@ -161,22 +161,33 @@
       const status = v.st || OPL.apps.statusOf(id);
       const l = lender(id);
       const kfs = status === "kfs", sign = status === "sign", signed = status === "signed";
+      const disbursing = status === "disbursing", disbursed = status === "disbursed", money = disbursing || disbursed;
       const footCta = kfs ? d.kfs.cta : sign ? d.sign.cta : "";
       const branch = d.branch(l.slug);
 
-      const timeline = sign || signed
+      // pads as drawn: step 1 text 5, middle steps flush with their node, last step 6 (431/435 frames)
+      const timeline = money
         ? [
             { icon: "plain-2", state: "done", title: `Sent to ${l.name}`, sub: d.sentAt },
-            { icon: "buildings", state: "done", title: "Lender Verification", sub: d.verifiedOn, line: sign ? "fade" : "" },
+            { icon: "buildings", state: "done", title: "Lender Verification", sub: d.verifiedOn, pad: 0 },
+            { icon: "document-text-done", state: "done", title: d.signed.step3, sub: d.signed.step3Sub, pad: 0, line: disbursing ? "fade-blue" : "" },
+            disbursing
+              ? { icon: "wallet-money", state: "progress", title: d.disbursing.step4, sub: d.disbursing.step4Sub(l.name), pad: 6 }
+              : { icon: "wallet-money", state: "done", strong: true, title: d.disbursed.step4, sub: d.disbursed.step4Sub, pad: 6 },
+          ]
+        : sign || signed
+        ? [
+            { icon: "plain-2", state: "done", title: `Sent to ${l.name}`, sub: d.sentAt },
+            { icon: "buildings", state: "done", title: "Lender Verification", sub: d.verifiedOn, line: sign ? "fade" : "", pad: 0 },
             signed
-              ? { icon: "document-text-done", state: "done", strong: true, title: d.signed.step3, sub: d.signed.step3Sub }
-              : { icon: "document-text", state: "action", title: d.sign.step3, sub: d.sign.step3Sub },
+              ? { icon: "document-text-done", state: "done", strong: true, title: d.signed.step3, sub: d.signed.step3Sub, pad: 6 }
+              : { icon: "document-text", state: "action", title: d.sign.step3, sub: d.sign.step3Sub, pad: 6 },
           ]
         : kfs
         ? [
             { icon: "plain-2", state: "done", title: `Sent to ${l.name}`, sub: d.sentAt },
-            { icon: "buildings", state: "done", title: "Lender Verification", sub: d.verifiedOn },
-            { icon: "document-text", state: "action", title: d.kfs.title },
+            { icon: "buildings", state: "done", title: "Lender Verification", sub: d.verifiedOn, pad: 0 },   // 382:42737 flush, rail 73
+            { icon: "document-text", state: "action", title: d.kfs.title, pad: 6 },
           ]
         : [
             { icon: "plain-2", state: "done", title: `Sent to ${l.name}`, sub: d.sentAt },
@@ -184,11 +195,23 @@
             { icon: "document-text-muted", state: "todo", title: d.verifying.todo },
           ];
 
-      const body = signed
+      const disbursal = money && (disbursing ? d.disbursing : d.disbursed);
+      const branchCard = ui.InfoCard({ title: "Branch Details", body: ui.ContactList(branch) });
+      const docsCard = ui.InfoCard({ title: "Documents", body: ui.LinkList({ items: d.docs }) });
+      const body = money
+        ? html`
+            <section class="appd-group">
+              <h3 class="appd-group__title">${d.disbursalTitle}</h3>
+              ${ui.FigureCard(disbursal.card)}
+              ${ui.NoteRow({ text: disbursal.note(l.name), tone: "info" })}
+            </section>
+            ${disbursing ? html`${branchCard}${docsCard}` : html`${docsCard}${branchCard}`}
+            ${ui.WhatsAppRow({ label: d.whatsapp })}`
+        : signed
         ? html`
             <section class="appd-group">
               <h3 class="appd-group__title">${d.signed.summaryTitle}</h3>
-              ${ui.AprCard({ s: d.kfs.summary, chip: d.signed.aprChip })}
+              ${ui.AprCard({ s: d.kfs.summary, chip: d.signed.aprChip, bordered: true })}
               ${ui.KeyValueCard({ rows: d.signed.rows })}
             </section>
             ${ui.InfoCard({ title: "Branch Details", body: ui.ContactList(branch) })}
@@ -217,7 +240,7 @@
       page.innerHTML = html`
         ${ui.StatusBar()}
         <div class="scroller">
-          <main class="${OPL.cx("appd", footCta && "appd--kfs", signed && "appd--signed")}" style="--app-tint:${l.tint}">
+          <main class="${OPL.cx("appd", footCta && "appd--kfs", signed && "appd--signed", money && "appd--money")}" style="--app-tint:${l.tint}">
             <section class="appd-top">
               <header class="appd-header">
                 <button class="app-header__back" aria-label="Back" data-press data-back>${OPL.icon("arrow-left-b", 24)}</button>
@@ -225,7 +248,8 @@
                 ${ui.IconButton({ icon: "headphones-round-sound-linear", label: "Support", goto: "support" })}
               </header>
               <div class="appd-status">
-                <h2 class="appd-status__title">${signed ? d.signed.title : sign ? d.sign.title : kfs ? d.kfs.title : d.verifying.title(l.name)}</h2>
+                <h2 class="appd-status__title">${disbursed ? d.disbursed.title : disbursing ? d.disbursing.title : signed ? d.signed.title : sign ? d.sign.title : kfs ? d.kfs.title : d.verifying.title(l.name)}</h2>
+                ${disbursing ? OPL.raw(`<p class="appd-status__sub">${d.disbursing.sub}</p>`) : ""}
                 ${ui.Timeline({ items: timeline })}
               </div>
             </section>
@@ -235,25 +259,57 @@
         </div>
         <div class="${OPL.cx("floating", footCta && "floating--above-foot", signed && "floating--fab-only")}">
           ${ui.AiMitraFab({ nudge: d.aiNudge })}
-          ${kfs || sign || signed ? "" : ui.BottomNav({ items: OPL.data.loansOverview.nav, active: "applications", variant: "section" })}
+          ${kfs || sign || signed ? "" : ui.BottomNav({
+            // the disbursal frames (435:*) label this tab "Applications", like Loans overview
+            items: money ? OPL.data.loansOverview.nav.map((it) => ({ ...it, label: it.overviewLabel || it.label })) : OPL.data.loansOverview.nav,
+            active: "applications", variant: "section" })}
         </div>
         ${kfs ? OPL.raw(`<div class="appd-foot">${ui.Button({ label: d.kfs.cta, block: true, goto: "kfs" })}</div>`) : ""}
         ${sign ? OPL.raw(`<div class="appd-foot">${ui.Button({ label: d.sign.cta, trailing: "arrow-square-out-white", block: true, attrs: 'data-sign-nesl' })}</div>`) : ""}`;
 
-      this.wire(page, { id, l, signed, v });
+      this.wire(page, { id, l, signed, disbursing, disbursed, v });
     },
 
     /* "Sanction letter signed" milestone (431:8687) over the signed detail */
-    openSigned(page, l) {
+    openSigned(page, l, { live, id } = {}) {
       const d = A().signed.sheet;
-      const sheets = OPL.fx.sheets(page);
+      let advanced = false;
+      // live flow: once the sheet is dismissed, time "passes" → Money on its way (prototype timing)
+      const sheets = OPL.fx.sheets(page, { onClose: () => {
+        if (!live || advanced) return; advanced = true;
+        this.timers.push(setTimeout(() => {
+          if (!page.isConnected) return;
+          OPL.apps.setStatus(id, "disbursing"); this.progressNext = true; OPL.rerender();
+        }, OPL.fx.motionOff() ? 300 : A().demo.toDisbursing));
+      } });
       const body = OPL.fx.bareSheet(page, "signed");
       body.innerHTML = ui.MilestoneSigned({ ...d, body: d.body(l.name) }).toString();
       page.addEventListener("click", (e) => { if (e.target.closest("[data-ms-view], [data-ms-done]")) sheets.close(); });
       sheets.open("signed");
     },
 
-    wire(page, { id, l, signed, v }) {
+    /* "Disbursed" milestone (435:8799): full burst, amount counts up as the hero */
+    openDisbursed(page) {
+      const d = A().disbursed.sheet;
+      const sheets = OPL.fx.sheets(page);
+      const body = OPL.fx.bareSheet(page, "disbursed");
+      body.innerHTML = ui.MilestoneDisbursed(d).toString();
+      page.addEventListener("click", (e) => { if (e.target.closest("[data-ms-done]")) sheets.close(); });
+      sheets.open("disbursed");
+      const el = body.querySelector("[data-ms-amount]");
+      const to = Number(d.amount.replace(/[^\d]/g, ""));
+      if (!OPL.fx.motionOff() && !OPL.reducedMotion()) {
+        const t0 = Date.now() + 260, dur = 1100;
+        const tick = () => {
+          const k = Math.max(0, Math.min(1, (Date.now() - t0) / dur)), e = 1 - Math.pow(1 - k, 3);
+          el.textContent = "₹" + Math.round(to * e).toLocaleString("en-IN");
+          if (k < 1 && el.isConnected) this.timers.push(setTimeout(tick, 16));
+        };
+        el.textContent = "₹0"; tick();
+      }
+    },
+
+    wire(page, { id, l, signed, disbursing, disbursed, v }) {
       OPL.fx.statusOnScroll(page);
       OPL.fx.playInView(page, ".tl, .kfs-repay");
       OPL.fx.nudge(page, this.timers);
@@ -276,7 +332,19 @@
       // Arriving from NeSL (celebrate) or the Figma preset: the signed milestone sheet
       if (signed && (this.celebrate || v.ms === "on")) {
         const fresh = this.celebrate; this.celebrate = false;
-        OPL.afterReveal(() => this.timers.push(setTimeout(() => page.isConnected && this.openSigned(page, l), fresh && !OPL.fx.motionOff() ? 460 : 0)));
+        OPL.afterReveal(() => this.timers.push(setTimeout(() => page.isConnected && this.openSigned(page, l, { live: fresh, id }), fresh && !OPL.fx.motionOff() ? 460 : 0)));
+      }
+      // Live demo continues: Money on its way → (a few seconds) → Money received + Disbursed sheet
+      if (disbursing && this.progressNext) {
+        this.progressNext = false;
+        this.timers.push(setTimeout(() => {
+          if (!page.isConnected) return;
+          OPL.apps.setStatus(id, "disbursed"); this.celebrateMoney = true; OPL.rerender();
+        }, OPL.fx.motionOff() ? 300 : A().demo.toDisbursed));
+      }
+      if (disbursed && (this.celebrateMoney || v.ms === "on")) {
+        const fresh = this.celebrateMoney; this.celebrateMoney = false;
+        OPL.afterReveal(() => this.timers.push(setTimeout(() => page.isConnected && this.openDisbursed(page), fresh && !OPL.fx.motionOff() ? 700 : 0)));
       }
     },
   };

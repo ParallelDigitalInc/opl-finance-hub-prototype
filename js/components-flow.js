@@ -42,14 +42,15 @@
   };
 
   /* Timeline — vertical status timeline (382:42462).
-     items: [{ icon, state: done|current|action|todo, title, sub, subTone, line, strong }]
-     line: "fade" = teal → warning gradient into an action step (431:7855). strong: SemiBold title. */
+     items: [{ icon, state: done|current|action|progress|todo, title, sub, subTone, line, strong, pad }]
+     line: "fade" = teal → warning (431:7855), "fade-blue" = teal → primary (435:8157).
+     strong: SemiBold title. pad: text top padding as drawn (default 5; 0 = flush with the node). */
   ui.Timeline = ({ items }) => html`
     <div class="tl">${items.map((it, i) => OPL.raw(`
-      <div class="tl__item tl__item--${it.state}">
+      <div class="tl__item tl__item--${it.state}${it.pad === 0 ? " tl__item--flush" : ""}">
         <div class="tl__rail"><span class="tl__node tl__node--${it.state}" style="--i:${i}">${icon(it.icon, 16)}</span>
-          ${i < items.length - 1 ? `<span class="tl__line ${it.line === "fade" ? "tl__line--fade" : it.state === "done" ? "tl__line--done" : ""}"></span>` : ""}</div>
-        <div class="tl__text"><p class="tl__title${it.strong ? " tl__title--strong" : ""}">${it.title}</p>${it.sub ? `<p class="tl__sub ${it.subTone ? `tl__sub--${it.subTone}` : ""}">${it.sub}</p>` : ""}</div>
+          ${i < items.length - 1 ? `<span class="tl__line ${it.line ? `tl__line--${it.line}` : it.state === "done" ? "tl__line--done" : ""}"></span>` : ""}</div>
+        <div class="tl__text"${it.pad != null ? ` style="padding-top:${it.pad}px"` : ""}><p class="tl__title${it.strong ? " tl__title--strong" : ""}">${it.title}</p>${it.sub ? `<p class="tl__sub ${it.subTone ? `tl__sub--${it.subTone}` : ""}">${it.sub}</p>` : ""}</div>
       </div>`))}</div>`;
 
   /* InfoCard — collapsible card (382:42487 family). body: HTML */
@@ -74,8 +75,8 @@
 
   /* AprCard — "APR summary" (416:43894 / 431:8556): tinted APR head + 2×2 figures.
      chip: optional success chip on the head ("Same as KFS", 431:8560). */
-  ui.AprCard = ({ s, chip }) => html`
-    <div class="kfs-apr">
+  ui.AprCard = ({ s, chip, bordered }) => html`
+    <div class="${cx("kfs-apr", bordered && "kfs-apr--bordered")}">
       <div class="kfs-apr__head"><img class="kfs-apr__tex" src="${img("hero-texture.jpg")}" alt=""><p>APR</p><p class="kfs-apr__v">${s.apr}</p>
         ${chip ? OPL.raw(`<span class="ok-chip kfs-apr__chip">${icon("check-circle-chip", 14)}<span>${chip}</span></span>`) : ""}</div>
       <div class="kfs-apr__grid">
@@ -191,6 +192,35 @@
         <div class="ms__card ms__card--rows">${rows.map(([k, v]) => OPL.raw(`<div class="ms__row"><span>${k}</span><b>${v}</b></div>`))}</div>
         <div class="ms__actions">
           ${ui.Button({ label: cta, block: true, attrs: "data-ms-view" })}
+          <button class="ms__later" data-ms-done>${done}</button>
+        </div>
+      </div>
+    </div>`;
+
+  /* FigureCard — "Disbursal card" (435:8177): tinted amount head + figure cells.
+     rows: [[{ l, v, b, r }]] — b/r draw the bottom/right hairline exactly where Figma does. */
+  ui.FigureCard = ({ label, value, tex = 0.3, rows }) => html`
+    <div class="kfs-apr kfs-apr--bordered fig-card">
+      <div class="kfs-apr__head" style="--tex:${tex}"><img class="kfs-apr__tex" src="${img("hero-texture.jpg")}" alt=""><p>${label}</p><p class="kfs-apr__v">${value}</p></div>
+      <div class="fig-card__cells">${rows.map((r) => OPL.raw(`<div class="fig-card__row">${r.map((c) =>
+        `<div class="${cx(c.b && "is-b", c.r && "is-r")}"><span>${c.l}</span><b>${c.v}</b></div>`).join("")}</div>`))}</div>
+    </div>`;
+
+  /* LinkList — "Documents" rows (435:8251): tile + label + chevron */
+  ui.LinkList = ({ items }) => OPL.raw(items.map((it) => `
+    <button class="link-row" data-press data-goto="${it.goto}"><span class="contact-row__tile">${icon("document-text-20-primary", 20)}</span>
+      <span class="link-row__label">${it.label}</span>${icon("alt-arrow-right-muted", 16)}</button>`).join(""));
+
+  /* MilestoneDisbursed — "Loan / Milestone sheet", State=Disbursed (435:8799): full burst, amount as hero */
+  ui.MilestoneDisbursed = ({ eyebrow, amount, rows, cta, done }) => html`
+    <div class="ms ms--signed ms--disbursed">
+      <span class="sheet__grabber" data-sheet-drag></span>
+      <div class="ms__hero">${OPL.raw(ui.DisbursedHeroSvg)}</div>
+      <div class="ms__content">
+        <div class="ms__msg ms__msg--amount"><p>${eyebrow}</p><h2 data-ms-amount="${amount}">${amount}</h2></div>
+        <div class="ms__card ms__card--rows">${rows.map(([k, v]) => OPL.raw(`<div class="ms__row"><span>${k}</span><b>${v}</b></div>`))}</div>
+        <div class="ms__actions">
+          ${ui.Button({ label: cta, block: true, goto: "my-loans" })}
           <button class="ms__later" data-ms-done>${done}</button>
         </div>
       </div>
