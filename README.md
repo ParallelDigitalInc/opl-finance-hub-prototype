@@ -366,7 +366,7 @@ Opens from Home → "CMR score" and Loans overview → "CMR - 2" (both point at 
 
 **Motion:**
 - The bars sweep in, then the needle swings down from 10 to the rank while the number counts down with it. "Low risk" pops in, and the rank's bars pulse once.
-- Factor rows rise in one by one, and their status chips pop. A row opens to say why the factor matters; Credit line usage also shows a meter against the 30% mark.
+- Factors are CRED-style tiles, one figure each (100% on-time, 45% usage, 3 enquiries, 6 yrs, 2 types), with a status dot, the impact level and status along the bottom. They are paired by impact: high, medium, then low at full width. Figures count up as the tiles rise in, and the usage tile shows a bar against the 30% mark. Tap a tile and it flips to say why the factor matters.
 - The lead card's usage bar slides from amber 45% to green 30% when it scrolls into view, and its "Biggest lift" tag shines once.
 - The footer lifts with a hairline while content scrolls beneath it.
 

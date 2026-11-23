@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.16.7 — 23 Nov 2026 · CMR sheet: CRED-style factor tiles
+
+Shreya: the factor cards are hard to scan and don't look great; she likes what CRED does. Remove the subtitle and the two quieter steps.
+
+- **Factors are now tiles, one figure each**, in a two-column grid paired by impact:
+  - High impact: 100% EMIs paid on time, and 45% of the credit line in use (with a bar against the 30% mark).
+  - Medium impact: 3 enquiries in 90 days, and 6 yrs for the oldest loan.
+  - Low impact, full width: 2 types of credit.
+- **Each tile:** a status dot beside the figure, with the impact and the coloured status along a dashed footer. Figures count up as the tiles rise in.
+- **Tap a tile and it flips** to say why the factor matters, in the business's numbers. "Tap a card to see why" sits beside the heading.
+- **Removed:** the subtitle "From your CIBIL report, biggest effect first", and the two steps under "Your path to CMR-1" (wait for Citi, autopay).
+
 ## v0.16.5 — 23 Nov 2026 · Back goes up, not to the last page seen
 
 Shreya: back on mobile isn't logical; it takes me to random screens.
