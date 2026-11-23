@@ -221,7 +221,8 @@
 .tracker__step--done { background: var(--success-bg); }
 .tracker__step--action { background: var(--warning-bg); }
 .tracker__step--upcoming { background: var(--muted); }
-.tracker__line { flex: 1 1 0; height: 2px; transform-origin: 0 50%; }
+.tracker__line { position: relative; flex: 1 1 0; height: 2px; transform-origin: 0 50%; overflow: hidden; }
+.tracker__line i { display: none; }
 .tracker__line--done { background: var(--success); }
 .tracker__line--todo { background: var(--border); }
 .tracker__labels { display: flex; justify-content: space-between; }
@@ -248,7 +249,7 @@
   box-shadow: var(--shadow-s);
   overflow: hidden;
 }
-.app-card__lender { position: relative; display: flex; align-items: center; gap: var(--s12); min-height: 72px; padding: 14px var(--s4) 14px var(--s16); border-radius: 13px; background: var(--tint-blue); }
+.app-card__lender { position: relative; display: flex; align-items: center; gap: var(--s12); min-height: 72px; padding: 14px var(--s4) 14px var(--s16); border-radius: 13px; background: var(--app-tint, var(--tint-blue)); }
 .app-card__name { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: var(--s2); white-space: nowrap; }
 .app-card__title { font-size: 16px; line-height: 22px; font-weight: var(--fw-medium); color: var(--foreground); }
 .app-card__sub { font-size: 12px; line-height: 16px; color: var(--muted-foreground); }

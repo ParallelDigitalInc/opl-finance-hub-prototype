@@ -147,6 +147,63 @@
     return { open, paintFoot };
   };
 
+  /* Bare sheet shell (custom layout, e.g. Apply / Milestone). Returns the body element. */
+  fx.bareSheet = (page, id) => {
+    page.insertAdjacentHTML("beforeend", `<div class="sheet-layer" data-sheet="${id}" hidden>
+      <div class="sheet-scrim" data-sheet-close></div>
+      <section class="sheet sheet--bare" role="dialog"><div class="sheet__bare-body" data-${id}-body></div></section></div>`);
+    return page.querySelector(`[data-${id}-body]`);
+  };
+
+  /* Short "Up to ₹50 L" → long "Up to ₹50 Lakhs" (as written on the apply sheet / details) */
+  fx.longAmount = (v) => String(v || "").replace(/₹([\d.]+)\s*L$/, "₹$1 Lakhs");
+
+  /* Apply sheet ("Proceed applying", 382:41022). open(ids) for one or many offers.
+     Submit → applications are created as "verifying" and the Applications list opens. */
+  fx.applySheet = (page, sheets) => {
+    const { ui } = OPL;
+    const body = fx.bareSheet(page, "apply");
+    let ids = [];
+    const lenderOf = (id) => {
+      const cl = OPL.data.compareLoans;
+      const rec = cl.records[cl.aliases[id] || id];
+      const card = OPL.data.loanCatalog[id];
+      return { id, name: rec ? rec.name : card.title, logo: rec ? rec.logo : card.logo,
+        type: rec ? rec.values.type : card.subtitle, amount: fx.longAmount(rec ? rec.values.amount : `Up to ${card.figures[0].value}`) };
+    };
+    const open = (list) => {
+      ids = list.filter(Boolean);
+      if (!ids.length) return;
+      body.innerHTML = ui.ApplySheetBody({ lenders: ids.map(lenderOf) }).toString();
+      sheets.open("apply");
+    };
+    page.addEventListener("click", (e) => {
+      const one = e.target.closest("[data-apply]");
+      if (one) { e.stopPropagation(); return open([one.dataset.apply]); }
+      const c = e.target.closest("[data-consent]");
+      if (c) {
+        const on = c.getAttribute("aria-pressed") !== "true";
+        c.setAttribute("aria-pressed", on);
+        c.querySelector("img").src = `assets/icons/${on ? "check-square-22" : "check-square"}.svg`;
+        c.classList.remove("is-popping"); void c.offsetWidth; c.classList.add("is-popping");
+        body.querySelector("[data-apply-submit]").disabled = !on;
+        return;
+      }
+      const sub = e.target.closest("[data-apply-submit]");
+      if (sub) {
+        sub.classList.add("is-loading");
+        setTimeout(() => {
+          const apps = OPL.screens.applications;
+          apps.apps = ids.map((id) => ({ id, status: "verifying" }));
+          apps.fresh = true;                       // lets the list play the approval moment
+          sheets.close();
+          setTimeout(() => OPL.go("applications"), motionOff() ? 0 : 260);
+        }, motionOff() ? 0 : 900);
+      }
+    });
+    return { open };
+  };
+
   /* Drag-to-scroll with a mouse (presenting on a laptop). */
   fx.mouseDrag = (el) => {
     let down = false, sx = 0, sl = 0, moved = false;

@@ -40,7 +40,7 @@
         </div>
         <div class="cl-foot">
           ${ui.ComparePick({ label: d.pickLabel, lenders: this.cols, addSlot: this.cols.length < d.max })}
-          <div class="cl-cta">${ui.Button({ label: d.cta(this.selectedCount()), block: true, strong: true, goto: "apply-lenders", attrs: "data-cta" })}</div>
+          <div class="cl-cta">${ui.Button({ label: d.cta(this.selectedCount()), block: true, strong: true, attrs: "data-cta" })}</div>
         </div>`;
 
       this.wire(page, d);
@@ -68,8 +68,10 @@
       scroll.addEventListener("scroll", () => { pick.scrollLeft = scroll.scrollLeft; }, { passive: true });
       OPL.fx.mouseDrag(scroll);
 
+      const apply = OPL.fx.applySheet(page, OPL.fx.sheets(page));
       page.addEventListener("click", (e) => {
         const t = e.target;
+        if (t.closest("[data-cta]")) return apply.open(this.cols.filter((c) => c.selected).map((c) => c.id));
         if (t.closest("[data-compare-more]")) return OPL.back();   // back to the list to tick another
         if (t.closest("[data-diff]")) {
           this.diff = !this.diff;

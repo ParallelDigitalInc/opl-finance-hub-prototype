@@ -121,6 +121,28 @@
     groups: [],
   };
 
+  OPL.variants.applications = {
+    presets: [
+      { id: "figma", label: "Figma state", figma: "382:41059", set: { apps: "figma", ms: "off" } },
+      { id: "approved", label: "Approved sheet", figma: "416:43921", set: { apps: "figma", ms: "on" } },
+      { id: "live", label: "My submitted applications", figma: "382:41059", set: { apps: "live", ms: "off" } },
+    ],
+    groups: [
+      { id: "apps", hidden: true, default: "live", options: [{ value: "live" }, { value: "figma" }] },
+      { id: "ms", hidden: true, default: "off", options: [{ value: "off" }, { value: "on" }] },
+    ],
+  };
+  OPL.variants.application = {
+    presets: [
+      { id: "verifying", label: "Verifying (SIDBI)", figma: "382:42423", set: { app: "offer-sidbi", apps: "figma" } },
+      { id: "kfs", label: "KFS ready (Citi)", figma: "382:42689", set: { app: "pick-citi", apps: "figma" } },
+    ],
+    groups: [
+      { id: "app", hidden: true, default: "", options: [{ value: "" }, { value: "offer-sidbi" }, { value: "pick-citi" }] },
+      { id: "apps", hidden: true, default: "live", options: [{ value: "live" }, { value: "figma" }] },
+    ],
+  };
+
   /** Resolve the current value of every group for a screen (URL → default). */
   OPL.variantValues = (screen) => {
     const reg = OPL.variants[screen];

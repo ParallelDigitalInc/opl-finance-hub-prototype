@@ -90,6 +90,7 @@
       OPL.fx.nudge(page, this.timers);
 
       const sheets = OPL.fx.sheets(page, { onClose: () => OPL.state.set({ sheet: null }, { silent: true }) });
+      OPL.fx.applySheet(page, sheets);   // card / sheet "Apply now"
       OPL.fx.loanDetail(page, sheets, {
         onCompare: (id, btn) => { const was = this.sel.includes(id); this.toggleCompare(page, id, btn); return this.sel.includes(id) !== was; },
       });

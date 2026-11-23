@@ -14,6 +14,12 @@ starts the HTML component kit that later mobile flows reuse.
   - Loans overview → "See all loans (7)" or the Offers tab
   - Home → "View all" on Top loan matches
 - **Compare loans:** `382:37839`. Loan offers → tray "Compare" (2+ loans selected).
+- **Loan applications** (section `416:122660`), v0.6.0 builds groups A–C:
+  - **Apply sheet** ("Proceed applying", `382:40870` / `382:41357`): from "Apply to N lenders" on Compare loans, or "Apply now" on any offer card or Loan details sheet.
+  - **Track Loan Applications** (`382:41059`): reached from Submit or the Loans "Track Loans" tab.
+  - **Application detail:** verifying (`382:42423`) or KFS ready (`382:42689`).
+  - **"{Lender} approved your loan"** milestone sheet (`416:43921`).
+  - Groups D–F (KFS PDF, NeSL signing, disbursal) come next.
 
 ## Run it
 
@@ -183,6 +189,20 @@ All of this is behaviour on existing elements. None of it adds UI:
    - **v0.5.2:** the same sheet (`OPL.fx.loanDetail`) opens from Home's "Top loan matches" and the Loans overview offer cards.
    - Compare is one shared selection: ticking on Home shows up on Loan offers.
    - Bank of Baroda isn't in the Loan offers list, so its sheet has no Compare, and its APR, EMI, fee, collateral and Money in are **assumed placeholders** (`match-bob`).
+
+## Figma flags · Loan applications (`416:122660`)
+
+1. **Copy is driven by the selection.** The single-lender sheet (`382:41357`) reuses the 2-lender copy ("Submit 2 applications", consent naming Citi Bank and SIDBI). I used "Submit application" and the actual lender names. Its note "A separate application goes to each lender…" is kept as drawn; consider dropping it for a single lender.
+2. **Lender rows don't match Compare.** The sheet shows SIDBI as "Term loan · Up to ₹48 Lakhs"; Compare says "Working capital term loan · Up to ₹50 L". Rows follow the shared loan data.
+3. **Two tracker styles on one screen.** The verifying card uses solid green, a blue in-progress step and 3px lines; the KFS card uses light tints and 2px lines. Reproduced as drawn.
+4. **The Loans tab was renamed "Track Loans"** while I was building (nav `440:132239`). Applied to the Loans tab bar everywhere; the Loans overview frame may still say "Applications".
+5. **The DS Toggle "On" is indigo `#4338CA`** (old primary), not `#3858E5`. Used as drawn.
+6. **Lender-specific content exists only for SIDBI (verifying) and Citi (KFS ready).** Other lenders reuse those templates with their own name; this is **assumed**:
+   - phone, address, documents and application number
+   - KFS figures (₹45 L etc.)
+   - `ringroad.surat@<lender>.example`
+7. **Strokes are in layout** on this section's info cards, status card, WhatsApp row and apply lenders card (unlike earlier match and offer cards).
+8. **Prototype behaviour:** about 5 s after Submit, the first lender "approves" and the milestone sheet plays. This simulates the async lender response so the full flow can be demoed.
 
 ## Versioning
 

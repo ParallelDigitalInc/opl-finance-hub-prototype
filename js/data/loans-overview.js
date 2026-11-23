@@ -71,9 +71,10 @@
     aiNudge: { lead: "Ask anything about", topic: "your loans" },
 
     nav: [
-      { id: "overview", label: "Overview", icon: "widget-active", iconActive: "widget-active" },
+      { id: "overview", label: "Overview", icon: "widget", iconActive: "widget-active", goto: "loans-overview" },
       { id: "loan-offers", label: "Offers", icon: "banknote-2" },
-      { id: "applications", label: "Applications", icon: "clipboard-list" },
+      // Figma renamed this tab "Track Loans" on 23 Nov (nav 440:132239); active icon from there
+      { id: "applications", label: "Track Loans", icon: "clipboard-list", iconActive: "clipboard-list-active" },
       { id: "my-loans", label: "My Loans", icon: "wallet-2" },
     ],
   };

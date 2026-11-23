@@ -61,7 +61,7 @@
 
     wire(page, d) {
       OPL.fx.statusOnScroll(page);
-      OPL.fx.loanDetail(page, OPL.fx.sheets(page));   // offer cards open Loan details
+      { const sh = OPL.fx.sheets(page); OPL.fx.applySheet(page, sh); OPL.fx.loanDetail(page, sh); }   // offer cards → details → apply
       page.querySelectorAll(".rail").forEach(OPL.fx.mouseDrag);
       OPL.fx.playInView(page, ".tracker, .borrow");
       OPL.fx.nudge(page, this.timers);

@@ -22,9 +22,11 @@
     return "#" + new URLSearchParams(next).toString();
   };
 
-  OPL.go = (name) => {
-    if (!OPL.screens[name] || name === screenName()) return;
-    history.pushState({ depth: depth + 1 }, "", hashFor({ screen: name }));
+  OPL.go = (name, params = {}) => {
+    if (!OPL.screens[name]) return;
+    const next = hashFor({ screen: name, ...params });
+    if (next === location.hash || (name === screenName() && !Object.keys(params).length)) return;
+    history.pushState({ depth: depth + 1 }, "", next);
     depth++;
     render({ dir: "forward" });
   };
@@ -40,9 +42,19 @@
     document.documentElement.dataset.hotspots = st.hotspots || "on";
     document.documentElement.dataset.frame = st.frame || "on";
 
-    // Same screen (variant / panel change): re-render in place.
+    // Same screen (variant / panel change): re-render on a fresh element so listeners
+    // bound by the previous render are dropped (no double handlers).
     if (currentPage && currentPage.dataset.screen === name && !dir) {
-      OPL.screens[name].render(currentPage);
+      const fresh = document.createElement("div");
+      fresh.className = currentPage.className.replace(/\b(is-push-in|is-pop-in|is-entering)\b/g, "").trim();
+      fresh.dataset.screen = name;
+      const scroll = currentPage.querySelector(".scroller")?.scrollTop || 0;
+      currentPage.replaceWith(fresh);
+      currentPage = fresh;
+      const s = OPL.screens[name];
+      if (s.leave) s.leave();
+      s.render(fresh);
+      const sc = fresh.querySelector(".scroller"); if (sc) sc.scrollTop = scroll;
       return renderPanel(name);
     }
 
@@ -167,6 +179,9 @@
   });
 
   OPL.current = () => screenName();
+  /* A screen that needs to re-render itself (e.g. a status change) asks the router,
+     so the page element is swapped cleanly and stays tracked. */
+  OPL.rerender = () => { render(); return currentPage; };
 
   window.addEventListener("opl:state", () => render());
   window.addEventListener("popstate", (e) => {

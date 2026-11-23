@@ -215,19 +215,24 @@
 
   /* Tracker — "Flow / Application tracker v2", Style=Icon (416:121737).
      steps: [{ icon, label, state: "done" | "action" | "upcoming" }] */
-  ui.Tracker = ({ steps }) => html`
-    <div class="tracker">
+  /* style: "tint" (default; light green done, 2px lines — 382:41115) | "solid" (verifying card:
+     solid green done, blue in-progress step, 3px lines with partial progress — 382:41153) */
+  ui.Tracker = ({ steps, style = "tint" }) => html`
+    <div class="tracker tracker--${style}">
       <div class="tracker__track">${steps.map((s, i) => OPL.raw(
-        (i ? `<span class="tracker__line tracker__line--${steps[i - 1].state === "done" ? "done" : "todo"}" style="--i:${i}"></span>` : "") +
+        (i ? `<span class="tracker__line tracker__line--${steps[i - 1].state === "done" ? "done" : steps[i - 1].state === "progress" ? "progress" : "todo"}" style="--i:${i}"><i></i></span>` : "") +
         `<span class="tracker__step tracker__step--${s.state}" style="--i:${i}">${icon(s.icon, 16)}</span>`
       ))}</div>
       <div class="tracker__labels">${steps.map((s) => OPL.raw(`<p class="tracker__label tracker__label--${s.state}">${s.label}</p>`))}</div>
     </div>`;
 
   /* ApplicationCard — "Your loan applications" card (416:121715) */
-  ui.ApplicationCard = ({ logo, name, product, tag, figures, steps, cta, goto }) => html`
-    <article class="app-card">
-      <div class="app-card__lender">
+  /* Variants for the applications list (382:41135 verifying · 382:41093 KFS ready):
+     tint, trackerStyle, ctaVariant ("filled" | "outlined"), note (centred under CTA),
+     footnote (amber strip at the bottom), attrs for the CTA. */
+  ui.ApplicationCard = ({ logo, name, product, tag, figures, steps, cta, goto, tint, trackerStyle, ctaVariant = "filled", ctaAttrs = "", note, footnote, id }) => html`
+    <article class="app-card" ${tint ? OPL.raw(`style="--app-tint:${tint}"`) : ""} ${id ? OPL.raw(`data-app="${id}"`) : ""}>
+      <div class="app-card__lender" ${id ? OPL.raw(`data-app-open="${id}" data-press`) : ""}>
         ${ui.Logo({ id: logo, size: 40 })}
         <div class="app-card__name"><p class="app-card__title">${name}</p><p class="app-card__sub">${product}</p></div>
         ${tag ? OPL.raw(`<span class="app-card__tag">${tag}</span>`) : ""}
@@ -237,10 +242,14 @@
           <div class="app-card__figures">${figures.map((f) => OPL.raw(`
             <div class="figure figure--app"><span class="figure__label">${f.label}</span>
               <span class="figure__value">${f.value}${f.unit ? `<span class="figure__unit">${f.unit}</span>` : ""}</span></div>`))}</div>
-          ${ui.Tracker({ steps })}
+          ${ui.Tracker({ steps, style: trackerStyle })}
         </div>
-        ${ui.Button({ label: cta, size: "md", block: true, goto })}
+        <div class="app-card__actions">
+          ${ui.Button({ label: cta, size: "md", block: true, goto, variant: ctaVariant, attrs: ctaAttrs })}
+          ${note ? OPL.raw(`<p class="app-card__note">${note}</p>`) : ""}
+        </div>
       </div>
+      ${footnote ? OPL.raw(`<div class="app-card__foot">${icon("info-circle-amber", 16)}<span>${footnote}</span></div>`) : ""}
     </article>`;
 
   /* BorrowingCard — "Your Borrowing" summary (382:36253) */
@@ -283,7 +292,7 @@
           <img class="ico offer__check" src="assets/icons/${selected ? "check-square-checked" : "check-square"}.svg" width="24" height="24" alt="">
           <span>Compare</span>
         </button>
-        ${ui.Button({ label: "Apply now", variant: "tonal", size: "md", trailing: "arrow-right-primary", goto: "apply-loan" })}
+        ${ui.Button({ label: "Apply now", variant: "tonal", size: "md", trailing: "arrow-right-primary", attrs: `data-apply="${id}"` })}
       </div>
     </article>`;
 
@@ -330,7 +339,7 @@
         <img class="ico offer__check" src="assets/icons/${selected ? "check-square-checked" : "check-square"}.svg" width="24" height="24" alt="">
         <span>Compare</span>
       </button>`) : ""}
-      ${ui.Button({ label: "Apply now", trailing: "chevron-right-white", goto: "apply-loan", attrs: 'style="flex:1"' })}
+      ${ui.Button({ label: "Apply now", trailing: "chevron-right-white", attrs: `style="flex:1" data-apply="${id}"` })}
     </div>`;
 
   /* SortOption — "Loan offers / Sort option" 393:504 */
@@ -472,7 +481,7 @@
   ui.BottomNav = ({ items, active, variant = "main" }) => html`
     <nav class="nav nav--${variant}">
       ${items.map((it) => OPL.raw(`
-        <button class="nav__item ${it.id === active ? "is-active" : ""}" data-press ${it.id === active ? "" : `data-goto="${it.id}"`}>
+        <button class="nav__item ${it.id === active ? "is-active" : ""}" data-press ${it.id === active ? "" : `data-goto="${it.goto || it.id}"`}>
           <span class="nav__pill">${icon(it.id === active ? it.iconActive : it.icon, 24)}</span>
           <span class="nav__label">${it.label}</span>
         </button>`))}

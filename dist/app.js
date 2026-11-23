@@ -9,7 +9,7 @@
 (function () {
   const OPL = (window.OPL = window.OPL || {});
 
-  OPL.VERSION = "0.5.2";
+  OPL.VERSION = "0.6.0";
   OPL.FIGMA_FILE = "https://www.figma.com/design/GHuBkYGEQZvQppv3v55EaA/OPL----Internal-Playground--5-";
   OPL.figmaLink = (nodeId) => `${OPL.FIGMA_FILE}?node-id=${nodeId.replace(":", "-")}`;
 
@@ -350,19 +350,24 @@
 
   /* Tracker — "Flow / Application tracker v2", Style=Icon (416:121737).
      steps: [{ icon, label, state: "done" | "action" | "upcoming" }] */
-  ui.Tracker = ({ steps }) => html`
-    <div class="tracker">
+  /* style: "tint" (default; light green done, 2px lines — 382:41115) | "solid" (verifying card:
+     solid green done, blue in-progress step, 3px lines with partial progress — 382:41153) */
+  ui.Tracker = ({ steps, style = "tint" }) => html`
+    <div class="tracker tracker--${style}">
       <div class="tracker__track">${steps.map((s, i) => OPL.raw(
-        (i ? `<span class="tracker__line tracker__line--${steps[i - 1].state === "done" ? "done" : "todo"}" style="--i:${i}"></span>` : "") +
+        (i ? `<span class="tracker__line tracker__line--${steps[i - 1].state === "done" ? "done" : steps[i - 1].state === "progress" ? "progress" : "todo"}" style="--i:${i}"><i></i></span>` : "") +
         `<span class="tracker__step tracker__step--${s.state}" style="--i:${i}">${icon(s.icon, 16)}</span>`
       ))}</div>
       <div class="tracker__labels">${steps.map((s) => OPL.raw(`<p class="tracker__label tracker__label--${s.state}">${s.label}</p>`))}</div>
     </div>`;
 
   /* ApplicationCard — "Your loan applications" card (416:121715) */
-  ui.ApplicationCard = ({ logo, name, product, tag, figures, steps, cta, goto }) => html`
-    <article class="app-card">
-      <div class="app-card__lender">
+  /* Variants for the applications list (382:41135 verifying · 382:41093 KFS ready):
+     tint, trackerStyle, ctaVariant ("filled" | "outlined"), note (centred under CTA),
+     footnote (amber strip at the bottom), attrs for the CTA. */
+  ui.ApplicationCard = ({ logo, name, product, tag, figures, steps, cta, goto, tint, trackerStyle, ctaVariant = "filled", ctaAttrs = "", note, footnote, id }) => html`
+    <article class="app-card" ${tint ? OPL.raw(`style="--app-tint:${tint}"`) : ""} ${id ? OPL.raw(`data-app="${id}"`) : ""}>
+      <div class="app-card__lender" ${id ? OPL.raw(`data-app-open="${id}" data-press`) : ""}>
         ${ui.Logo({ id: logo, size: 40 })}
         <div class="app-card__name"><p class="app-card__title">${name}</p><p class="app-card__sub">${product}</p></div>
         ${tag ? OPL.raw(`<span class="app-card__tag">${tag}</span>`) : ""}
@@ -372,10 +377,14 @@
           <div class="app-card__figures">${figures.map((f) => OPL.raw(`
             <div class="figure figure--app"><span class="figure__label">${f.label}</span>
               <span class="figure__value">${f.value}${f.unit ? `<span class="figure__unit">${f.unit}</span>` : ""}</span></div>`))}</div>
-          ${ui.Tracker({ steps })}
+          ${ui.Tracker({ steps, style: trackerStyle })}
         </div>
-        ${ui.Button({ label: cta, size: "md", block: true, goto })}
+        <div class="app-card__actions">
+          ${ui.Button({ label: cta, size: "md", block: true, goto, variant: ctaVariant, attrs: ctaAttrs })}
+          ${note ? OPL.raw(`<p class="app-card__note">${note}</p>`) : ""}
+        </div>
       </div>
+      ${footnote ? OPL.raw(`<div class="app-card__foot">${icon("info-circle-amber", 16)}<span>${footnote}</span></div>`) : ""}
     </article>`;
 
   /* BorrowingCard — "Your Borrowing" summary (382:36253) */
@@ -418,7 +427,7 @@
           <img class="ico offer__check" src="assets/icons/${selected ? "check-square-checked" : "check-square"}.svg" width="24" height="24" alt="">
           <span>Compare</span>
         </button>
-        ${ui.Button({ label: "Apply now", variant: "tonal", size: "md", trailing: "arrow-right-primary", goto: "apply-loan" })}
+        ${ui.Button({ label: "Apply now", variant: "tonal", size: "md", trailing: "arrow-right-primary", attrs: `data-apply="${id}"` })}
       </div>
     </article>`;
 
@@ -465,7 +474,7 @@
         <img class="ico offer__check" src="assets/icons/${selected ? "check-square-checked" : "check-square"}.svg" width="24" height="24" alt="">
         <span>Compare</span>
       </button>`) : ""}
-      ${ui.Button({ label: "Apply now", trailing: "chevron-right-white", goto: "apply-loan", attrs: 'style="flex:1"' })}
+      ${ui.Button({ label: "Apply now", trailing: "chevron-right-white", attrs: `style="flex:1" data-apply="${id}"` })}
     </div>`;
 
   /* SortOption — "Loan offers / Sort option" 393:504 */
@@ -607,11 +616,138 @@
   ui.BottomNav = ({ items, active, variant = "main" }) => html`
     <nav class="nav nav--${variant}">
       ${items.map((it) => OPL.raw(`
-        <button class="nav__item ${it.id === active ? "is-active" : ""}" data-press ${it.id === active ? "" : `data-goto="${it.id}"`}>
+        <button class="nav__item ${it.id === active ? "is-active" : ""}" data-press ${it.id === active ? "" : `data-goto="${it.goto || it.id}"`}>
           <span class="nav__pill">${icon(it.id === active ? it.iconActive : it.icon, 24)}</span>
           <span class="nav__label">${it.label}</span>
         </button>`))}
     </nav>`;
+})();
+
+;
+
+/* ==== js/components-flow.js ==== */
+/* ==========================================================================
+   OPL HTML kit — loan application flow components (Figma 416:122660)
+   ========================================================================== */
+(function () {
+  const { html, icon, img, cx, ui } = OPL;
+
+  /* NoteRow — "Flow / Note row" 319:802. tone: neutral | info | warning */
+  const NOTE_ICON = { neutral: "info-circle-neutral", info: "info-circle-primary", warning: "danger-circle" };
+  ui.NoteRow = ({ text, tone = "neutral" }) => html`
+    <div class="note-row note-row--${tone}">
+      <span class="note-row__tile">${icon(NOTE_ICON[tone], 18)}</span>
+      <p class="note-row__text">${OPL.raw(text)}</p>
+    </div>`;
+
+  /* ApplySheet body — "Proceed applying" sheet (382:41022). lenders: [{ id, name, logo, type, amount }] */
+  ui.ApplySheetBody = ({ lenders }) => {
+    const a = OPL.data.apply;
+    const names = lenders.map((l) => l.name).join(" and ");
+    return html`
+      <div class="apply">
+        <div class="apply__top">
+          <img class="apply__texture" src="${img("hero-texture.jpg")}" alt="">
+          <span class="sheet__grabber apply__grabber" data-sheet-drag></span>
+          <h2 class="apply__title">${lenders.length === 1 ? a.titleOne(lenders[0].name) : a.titleMany(lenders.length)}</h2>
+          <div class="apply__lenders">${lenders.map((l) => OPL.raw(`
+            <div class="apply__lender">${ui.Logo({ id: l.logo, size: 32 })}
+              <div class="apply__lender-text"><p>${l.name}</p><span>${l.type}</span></div>
+              <p class="apply__amount">${l.amount}</p></div>`))}</div>
+        </div>
+        <div class="apply__notes">${a.notes.map((n) => ui.NoteRow({ text: n }))}</div>
+        <div class="apply__consent-wrap">
+          <button class="apply__consent" data-consent aria-pressed="true">
+            <img class="ico" src="assets/icons/check-square-22.svg" width="22" height="22" alt="">
+            <span>${a.consent(names)}</span>
+          </button>
+        </div>
+        <div class="apply__actions">
+          ${ui.Button({ label: a.submit(lenders.length), block: true, strong: true, attrs: "data-apply-submit" })}
+          <button class="apply__cancel" data-sheet-close>${a.cancel}</button>
+        </div>
+      </div>`;
+  };
+
+  /* Timeline — vertical status timeline (382:42462).
+     items: [{ icon, state: done|current|action|todo, title, sub, subTone }] */
+  ui.Timeline = ({ items }) => html`
+    <div class="tl">${items.map((it, i) => OPL.raw(`
+      <div class="tl__item tl__item--${it.state}">
+        <div class="tl__rail"><span class="tl__node tl__node--${it.state}" style="--i:${i}">${icon(it.icon, 16)}</span>
+          ${i < items.length - 1 ? `<span class="tl__line ${it.state === "done" ? "tl__line--done" : ""}"></span>` : ""}</div>
+        <div class="tl__text"><p class="tl__title">${it.title}</p>${it.sub ? `<p class="tl__sub ${it.subTone ? `tl__sub--${it.subTone}` : ""}">${it.sub}</p>` : ""}</div>
+      </div>`))}</div>`;
+
+  /* InfoCard — collapsible card (382:42487 family). body: HTML */
+  ui.InfoCard = ({ title, body }) => html`
+    <section class="info-card is-open">
+      <button class="info-card__head" data-accordion><span>${title}</span>${icon("alt-arrow-right", 16, "info-card__chev")}</button>
+      <div class="info-card__body"><div class="info-card__inner">${OPL.raw(String(body))}</div></div>
+    </section>`;
+  ui.DocList = ({ items }) => OPL.raw(items.map((t) => `<div class="doc-row">${icon("document-text-20", 20)}<span>${t}</span></div>`).join(""));
+  ui.ContactList = ({ phone, email }) => OPL.raw(`
+    <div class="contact-row"><span class="contact-row__tile">${icon("phone-rounded", 20)}</span><span class="contact-row__value">${phone}</span>
+      <button class="copy-btn" data-copy="${phone}" aria-label="Copy">${icon("copy", 16)}</button></div>
+    <div class="contact-row"><span class="contact-row__tile">${icon("letter", 20)}</span><span class="contact-row__value">${email}</span>
+      <button class="copy-btn" data-copy="${email}" aria-label="Copy">${icon("copy", 16)}</button></div>`);
+  ui.DetailRows = ({ rows }) => OPL.raw(rows.map(([l, v, copy]) => `
+    <div class="detail-row"><span>${l}</span><span class="detail-row__v">${v}${copy ? `<button class="copy-btn" data-copy="${v}" aria-label="Copy">${icon("copy", 16)}</button>` : ""}</span></div>`).join(""));
+
+  /* WhatsAppRow — "WhatsApp updates" (382:42556) with DS Toggle */
+  ui.WhatsAppRow = ({ label, on = true }) => html`
+    <div class="wa-row"><img class="wa-row__logo" src="${img("whatsapp.png")}" width="24" height="24" alt=""><span>${label}</span>
+      ${ui.Toggle({ on, attrs: "data-wa" })}</div>`;
+
+  /* KfsSummary — "KFS Summary" (416:43894): APR card, You repay split bar, fact chips */
+  ui.KfsSummary = ({ s }) => html`
+    <div class="kfs-sum">
+      <h3 class="kfs-sum__title">KFS Summary</h3>
+      <div class="kfs-apr">
+        <div class="kfs-apr__head"><img class="kfs-apr__tex" src="${img("hero-texture.jpg")}" alt=""><p>APR</p><p class="kfs-apr__v">${s.apr}</p></div>
+        <div class="kfs-apr__grid">
+          <div><span>Loan amount</span><b>${s.loanAmount}</b></div>
+          <div><span>Tenure</span><b>${s.tenure}<i> months</i></b></div>
+          <div><span>Interest rate</span><b>${s.rate}<i> p.a.</i></b></div>
+          <div><span>Monthly EMI</span><b>${s.emi}</b></div>
+        </div>
+      </div>
+      <div class="kfs-repay">
+        <div class="kfs-repay__head"><span>You repay</span><b>${s.repay}</b></div>
+        <div class="kfs-repay__bar">${s.split.map((p) => OPL.raw(`<span style="flex:${p.w} 0 0;background:${p.color}"></span>`))}</div>
+        <div class="kfs-repay__legend">${s.split.map((p) => OPL.raw(`<div>${icon(p.dot, 8)}<span>${p.label}</span><b>${p.value}</b></div>`))}</div>
+      </div>
+      <div class="kfs-facts">${s.facts.map((f) => OPL.raw(`<span>${f}</span>`))}</div>
+    </div>`;
+
+  /* MilestoneSheet body — "Loan / Milestone sheet", State=Approved (400:1873 / 416:44065) */
+  ui.MilestoneApproved = ({ lender, logo, type, figures, title, body, note }) => html`
+    <div class="ms">
+      <span class="sheet__grabber" data-sheet-drag></span>
+      <div class="ms__hero">
+        <img class="ms__confetti" src="${img("milestone-confetti.svg")}" alt="">
+        <img class="ms__ripple" src="${img("milestone-ripple.svg")}" alt="">
+        <img class="ms__glow1" src="${img("milestone-glow-1.svg")}" alt="">
+        <img class="ms__glow2" src="${img("milestone-glow-2.svg")}" alt="">
+        <span class="ms__core"><img src="${img("milestone-core.svg")}" alt=""></span>
+        <span class="ms__mark">${ui.Logo({ id: logo, size: 52 })}</span>
+        <img class="ms__badge-bg" src="${img("milestone-badge-bg.svg")}" alt="">
+        <img class="ms__badge" src="${img("milestone-badge.svg")}" alt="">
+      </div>
+      <div class="ms__content">
+        <div class="ms__msg"><h2>${title}</h2><p>${body}</p></div>
+        <div class="ms__card">
+          <div class="ms__lender">${ui.Logo({ id: logo, size: 36 })}<div><p>${lender}</p><span>${type}</span></div></div>
+          <span class="ms__divider"></span>
+          <div class="ms__figs">${figures.map((f) => OPL.raw(`<div><span>${f.label}</span><b>${f.value}${f.unit ? `<i> ${f.unit}</i>` : ""}</b></div>`))}</div>
+        </div>
+        ${ui.NoteRow({ text: note, tone: "warning" })}
+        <div class="ms__actions">
+          ${ui.Button({ label: "Review KFS", block: true, attrs: "data-ms-review" })}
+          <button class="ms__later" data-sheet-close>Later</button>
+        </div>
+      </div>
+    </div>`;
 })();
 
 ;
@@ -766,6 +902,63 @@
     return { open, paintFoot };
   };
 
+  /* Bare sheet shell (custom layout, e.g. Apply / Milestone). Returns the body element. */
+  fx.bareSheet = (page, id) => {
+    page.insertAdjacentHTML("beforeend", `<div class="sheet-layer" data-sheet="${id}" hidden>
+      <div class="sheet-scrim" data-sheet-close></div>
+      <section class="sheet sheet--bare" role="dialog"><div class="sheet__bare-body" data-${id}-body></div></section></div>`);
+    return page.querySelector(`[data-${id}-body]`);
+  };
+
+  /* Short "Up to ₹50 L" → long "Up to ₹50 Lakhs" (as written on the apply sheet / details) */
+  fx.longAmount = (v) => String(v || "").replace(/₹([\d.]+)\s*L$/, "₹$1 Lakhs");
+
+  /* Apply sheet ("Proceed applying", 382:41022). open(ids) for one or many offers.
+     Submit → applications are created as "verifying" and the Applications list opens. */
+  fx.applySheet = (page, sheets) => {
+    const { ui } = OPL;
+    const body = fx.bareSheet(page, "apply");
+    let ids = [];
+    const lenderOf = (id) => {
+      const cl = OPL.data.compareLoans;
+      const rec = cl.records[cl.aliases[id] || id];
+      const card = OPL.data.loanCatalog[id];
+      return { id, name: rec ? rec.name : card.title, logo: rec ? rec.logo : card.logo,
+        type: rec ? rec.values.type : card.subtitle, amount: fx.longAmount(rec ? rec.values.amount : `Up to ${card.figures[0].value}`) };
+    };
+    const open = (list) => {
+      ids = list.filter(Boolean);
+      if (!ids.length) return;
+      body.innerHTML = ui.ApplySheetBody({ lenders: ids.map(lenderOf) }).toString();
+      sheets.open("apply");
+    };
+    page.addEventListener("click", (e) => {
+      const one = e.target.closest("[data-apply]");
+      if (one) { e.stopPropagation(); return open([one.dataset.apply]); }
+      const c = e.target.closest("[data-consent]");
+      if (c) {
+        const on = c.getAttribute("aria-pressed") !== "true";
+        c.setAttribute("aria-pressed", on);
+        c.querySelector("img").src = `assets/icons/${on ? "check-square-22" : "check-square"}.svg`;
+        c.classList.remove("is-popping"); void c.offsetWidth; c.classList.add("is-popping");
+        body.querySelector("[data-apply-submit]").disabled = !on;
+        return;
+      }
+      const sub = e.target.closest("[data-apply-submit]");
+      if (sub) {
+        sub.classList.add("is-loading");
+        setTimeout(() => {
+          const apps = OPL.screens.applications;
+          apps.apps = ids.map((id) => ({ id, status: "verifying" }));
+          apps.fresh = true;                       // lets the list play the approval moment
+          sheets.close();
+          setTimeout(() => OPL.go("applications"), motionOff() ? 0 : 260);
+        }, motionOff() ? 0 : 900);
+      }
+    });
+    return { open };
+  };
+
   /* Drag-to-scroll with a mouse (presenting on a laptop). */
   fx.mouseDrag = (el) => {
     let down = false, sx = 0, sl = 0, moved = false;
@@ -913,6 +1106,28 @@
   OPL.variants["compare-loans"] = {
     presets: [{ id: "default", label: "Compare loans", figma: "382:37839", set: {} }],
     groups: [],
+  };
+
+  OPL.variants.applications = {
+    presets: [
+      { id: "figma", label: "Figma state", figma: "382:41059", set: { apps: "figma", ms: "off" } },
+      { id: "approved", label: "Approved sheet", figma: "416:43921", set: { apps: "figma", ms: "on" } },
+      { id: "live", label: "My submitted applications", figma: "382:41059", set: { apps: "live", ms: "off" } },
+    ],
+    groups: [
+      { id: "apps", hidden: true, default: "live", options: [{ value: "live" }, { value: "figma" }] },
+      { id: "ms", hidden: true, default: "off", options: [{ value: "off" }, { value: "on" }] },
+    ],
+  };
+  OPL.variants.application = {
+    presets: [
+      { id: "verifying", label: "Verifying (SIDBI)", figma: "382:42423", set: { app: "offer-sidbi", apps: "figma" } },
+      { id: "kfs", label: "KFS ready (Citi)", figma: "382:42689", set: { app: "pick-citi", apps: "figma" } },
+    ],
+    groups: [
+      { id: "app", hidden: true, default: "", options: [{ value: "" }, { value: "offer-sidbi" }, { value: "pick-citi" }] },
+      { id: "apps", hidden: true, default: "live", options: [{ value: "live" }, { value: "figma" }] },
+    ],
   };
 
   /** Resolve the current value of every group for a screen (URL → default). */
@@ -1145,9 +1360,10 @@
     aiNudge: { lead: "Ask anything about", topic: "your loans" },
 
     nav: [
-      { id: "overview", label: "Overview", icon: "widget-active", iconActive: "widget-active" },
+      { id: "overview", label: "Overview", icon: "widget", iconActive: "widget-active", goto: "loans-overview" },
       { id: "loan-offers", label: "Offers", icon: "banknote-2" },
-      { id: "applications", label: "Applications", icon: "clipboard-list" },
+      // Figma renamed this tab "Track Loans" on 23 Nov (nav 440:132239); active icon from there
+      { id: "applications", label: "Track Loans", icon: "clipboard-list", iconActive: "clipboard-list-active" },
       { id: "my-loans", label: "My Loans", icon: "wallet-2" },
     ],
   };
@@ -1334,6 +1550,82 @@
 
 ;
 
+/* ==== js/data/applications.js ==== */
+/* Content for the Loan Applications flow — Figma section "Loan Applications" 416:122660.
+   A Apply to 2–3: 382:40705 (compare) + 382:40870 (sheet) · B Apply to one: 382:41357
+   C Track: list 382:41059/382:41602 · verifying detail 382:42423 · approved sheet 416:43921
+   · KFS-ready detail 382:42689.
+   Copy is verbatim. Lender-specific details exist in Figma for SIDBI (verifying) and Citi
+   (KFS ready); other lenders reuse those templates with their name — ASSUMED, flagged. */
+(function () {
+  OPL.data = OPL.data || {};
+
+  OPL.data.apply = {
+    titleMany: (n) => `Proceed applying to ${n} lenders?`,
+    titleOne: (name) => `Proceed applying to ${name} loan?`,
+    notes: [
+      "Each lender runs a full credit check and verification",
+      "A separate application goes to each lender at the same time. You can accept the KFS of only one of them this month.",
+    ],
+    consent: (names) => `I agree to share my business, GST, bank and bureau details with ${names} for this application.`,
+    submit: (n) => (n === 1 ? "Submit application" : `Submit ${n} applications`),   // Figma's single sheet says "Submit 2 applications" — adapted
+    cancel: "Cancel",
+  };
+
+  OPL.data.applications = {
+    title: (n) => `Track Loan Applications (${n})`,
+    note: "You can accept one KFS this month.<br>The other application closes when you do.",
+    // Figma state of the list (382:41059): SIDBI verifying, Citi KFS ready
+    figmaPreset: [{ id: "offer-sidbi", status: "verifying" }, { id: "pick-citi", status: "kfs" }],
+    sentAt: "22 Nov, 11:40 am",
+    verifiedOn: "Verified on 24 Nov",
+
+    // Tints of the lender band on these screens (SIDBI #F4F7E4 is new here)
+    tints: { "offer-sidbi": "#f4f7e4", "pick-sidbi": "#f4f7e4", "pick-citi": "var(--tint-blue)" },
+
+    // Verifying template (SIDBI, 382:42423)
+    verifying: {
+      title: (name) => `${name} is verifying your application`,
+      cardNote: (name) => `${name} may call you and visit your unit. This usually takes 5 to 7 working days. We will notify you.`,
+      progress: "In progress · Takes ~5 to 7 working days",
+      todo: "Final offer & KFS Signing",
+      expect: (name) => [`${name} will call you on ••••6789.`, "They may visit your unit on Ring Road, Surat."],
+      docs: ["Latest stock statement", "Partner KYC (Aadhaar, PAN)", "Factory rent agreement"],
+      appNo: "LA-2026-11-2232",
+    },
+
+    // KFS-ready template (Citi, 382:42689 + list card 382:41093 + sheet 416:44065)
+    kfs: {
+      title: "Review KFS and Sanction Letter",
+      daysLeft: "2 days left",
+      cardNote: "Sign the KFS and sanction letter before 25 Nov ‘26",
+      approvedTitle: (name) => `${name} approved your loan`,
+      approvedBody: "Your final offer is ready. Read the Key Fact Statement, then accept the offer to sign.",
+      approvedNote: "Accept and sign before 25 Nov 2026.",
+      finalOffer: "₹45 L",
+      summary: {
+        apr: "10.54%",
+        loanAmount: "₹45,00,000", tenure: "36", rate: "9.45%", emi: "₹1,44,043",
+        repay: "₹51,85,548",
+        split: [
+          { label: "Final Loan Amount", value: "₹44,32,500", w: 268.401, color: "#3858e5", dot: "dot-primary" },
+          { label: "Interest", value: "₹6,85,548", w: 41.512, color: "#14b8a6", dot: "dot-teal" },
+          { label: "Processing fee", value: "₹67,500", w: 4.087, color: "#ffbb00", dot: "dot-yellow" },
+        ],
+        facts: ["Floating rate", "No collateral", "3-day cooling-off"],
+      },
+      cta: "Review Full KFS & Accept",
+    },
+
+    branch: (lenderSlug) => ({ phone: "0261 2345 678", email: `ringroad.surat@${lenderSlug}.example` }),
+    whatsapp: "Get WhatsApp updates",
+    withdraw: "Withdraw application",
+    aiNudge: { lead: "Ask anything about", topic: "your application" },
+  };
+})();
+
+;
+
 /* ==== js/screens/home.js ==== */
 /* ==========================================================================
    Screen · Finance Hub Home
@@ -1446,7 +1738,7 @@
       const counted = new Set();
 
       /* Loan details sheet from "Top loan matches" cards (shared with Loan offers) */
-      OPL.fx.loanDetail(screen, OPL.fx.sheets(screen));
+      { const sh = OPL.fx.sheets(screen); OPL.fx.applySheet(screen, sh); OPL.fx.loanDetail(screen, sh); }
 
       /* status bar surface on scroll */
       scroller.addEventListener("scroll", () => screen.classList.toggle("is-scrolled", scroller.scrollTop > 8), { passive: true });
@@ -1687,7 +1979,7 @@
 
     wire(page, d) {
       OPL.fx.statusOnScroll(page);
-      OPL.fx.loanDetail(page, OPL.fx.sheets(page));   // offer cards open Loan details
+      { const sh = OPL.fx.sheets(page); OPL.fx.applySheet(page, sh); OPL.fx.loanDetail(page, sh); }   // offer cards → details → apply
       page.querySelectorAll(".rail").forEach(OPL.fx.mouseDrag);
       OPL.fx.playInView(page, ".tracker, .borrow");
       OPL.fx.nudge(page, this.timers);
@@ -1801,6 +2093,7 @@
       OPL.fx.nudge(page, this.timers);
 
       const sheets = OPL.fx.sheets(page, { onClose: () => OPL.state.set({ sheet: null }, { silent: true }) });
+      OPL.fx.applySheet(page, sheets);   // card / sheet "Apply now"
       OPL.fx.loanDetail(page, sheets, {
         onCompare: (id, btn) => { const was = this.sel.includes(id); this.toggleCompare(page, id, btn); return this.sel.includes(id) !== was; },
       });
@@ -1944,7 +2237,7 @@
         </div>
         <div class="cl-foot">
           ${ui.ComparePick({ label: d.pickLabel, lenders: this.cols, addSlot: this.cols.length < d.max })}
-          <div class="cl-cta">${ui.Button({ label: d.cta(this.selectedCount()), block: true, strong: true, goto: "apply-lenders", attrs: "data-cta" })}</div>
+          <div class="cl-cta">${ui.Button({ label: d.cta(this.selectedCount()), block: true, strong: true, attrs: "data-cta" })}</div>
         </div>`;
 
       this.wire(page, d);
@@ -1972,8 +2265,10 @@
       scroll.addEventListener("scroll", () => { pick.scrollLeft = scroll.scrollLeft; }, { passive: true });
       OPL.fx.mouseDrag(scroll);
 
+      const apply = OPL.fx.applySheet(page, OPL.fx.sheets(page));
       page.addEventListener("click", (e) => {
         const t = e.target;
+        if (t.closest("[data-cta]")) return apply.open(this.cols.filter((c) => c.selected).map((c) => c.id));
         if (t.closest("[data-compare-more]")) return OPL.back();   // back to the list to tick another
         if (t.closest("[data-diff]")) {
           this.diff = !this.diff;
@@ -2042,6 +2337,238 @@
 
 ;
 
+/* ==== js/screens/applications.js ==== */
+/* ==========================================================================
+   Screens · Loan applications — Figma 416:122660
+   "applications"  Track Loan Applications list (382:41059 / 382:41602)
+                   + approved milestone sheet (416:43921)
+   "application"   one application: verifying (382:42423) or KFS ready (382:42689)
+   Entry: Apply sheet → Submit; Loans tabs → Applications.
+   ========================================================================== */
+(function () {
+  const { html, ui } = OPL;
+  OPL.screens = OPL.screens || {};
+  const A = () => OPL.data.applications;
+  const cl = () => OPL.data.compareLoans;
+  const titleCase = (s) => String(s).replace(/\b\w/g, (c) => c.toUpperCase());
+  const record = (id) => cl().records[cl().aliases[id] || id];
+  const card = (id) => OPL.data.loanCatalog[id];
+  const lender = (id) => {
+    const r = record(id), c = card(id);
+    return {
+      id, name: r ? r.name : c.title, logo: r ? r.logo : c.logo,
+      type: r ? r.values.type : c.subtitle,
+      amountShort: r ? r.values.amount : `Up to ${c.figures[0].value}`,
+      apr: r ? r.values.apr : "",
+      tint: A().tints[id] || (c && c.tint) || "var(--tint-blue)",
+      slug: (r ? r.name : c.title).split(" ")[0].toLowerCase(),
+    };
+  };
+  const rate = { label: "Interest", value: "9.45%", unit: "p.a." };
+
+  /* Current application list: what was submitted, or the Figma state. */
+  const currentApps = () => {
+    const s = OPL.screens.applications;
+    const v = OPL.variantValues("applications");
+    return v.apps === "figma" || !s.apps ? A().figmaPreset.map((a) => ({ ...a })) : s.apps;
+  };
+
+  const verifyingSteps = [
+    { icon: "plain-2-white", label: "Application<br>Sent", state: "done" },
+    { icon: "buildings-primary", label: "Lender Verification", state: "progress" },
+    { icon: "document-text-muted", label: "Sign KFS<br>and Sanction", state: "todo" },
+  ];
+  const kfsSteps = OPL.data.loansOverview.applications.card.steps;
+
+  /* ---- List --------------------------------------------------------------- */
+  OPL.screens.applications = {
+    title: "Applications",
+    figma: { list: "382:41059" },
+    apps: null,
+    fresh: false,
+    timers: [],
+    leave() { this.timers.forEach((t) => clearTimeout(t)); this.timers = []; },
+
+    render(page) {
+      this.leave();
+      const d = A();
+      const apps = currentApps();
+      const v = OPL.variantValues("applications");
+
+      const cards = apps.map((a) => {
+        const l = lender(a.id);
+        return a.status === "kfs"
+          ? ui.ApplicationCard({
+              id: a.id, logo: l.logo, name: l.name, product: l.type, tint: l.tint, tag: d.kfs.daysLeft,
+              figures: [{ label: "Final offer", value: d.kfs.finalOffer }, rate], steps: kfsSteps,
+              cta: "Review KFS", ctaAttrs: `data-app-open="${a.id}"`, footnote: d.kfs.cardNote,
+            })
+          : ui.ApplicationCard({
+              id: a.id, logo: l.logo, name: l.name, product: l.type, tint: l.tint,
+              figures: [{ label: "Loan offer", value: l.amountShort }, rate], steps: verifyingSteps, trackerStyle: "solid",
+              cta: "View details", ctaVariant: "outlined", ctaAttrs: `data-app-open="${a.id}"`, note: d.verifying.cardNote(l.name),
+            });
+      });
+
+      page.innerHTML = html`
+        ${ui.StatusBar()}
+        <div class="scroller">
+          <main class="apps">
+            <div class="apps-bg"><img class="apps-bg__ellipse" src="${OPL.img("hero-ellipse.svg")}" alt=""><img class="apps-bg__texture" src="${OPL.img("hero-texture.jpg")}" alt=""></div>
+            <div class="apps-header">${ui.AppHeader({ title: d.title(apps.length), back: true, backIcon: "arrow-left-b", actions: [{ icon: "headphones-round-sound-linear", label: "Support", goto: "support" }] })}</div>
+            <div class="apps-list">${cards}</div>
+            <div class="apps-note">${ui.NoteRow({ text: d.note })}</div>
+          </main>
+        </div>
+        <div class="floating">
+          ${ui.AiMitraFab({ nudge: d.aiNudge })}
+          ${ui.BottomNav({ items: OPL.data.loansOverview.nav, active: "applications", variant: "section" })}
+        </div>`;
+
+      const sheets = OPL.fx.sheets(page);
+      const msBody = OPL.fx.bareSheet(page, "ms");
+      this._sheets = sheets; this._ms = msBody;
+      this.wire(page, sheets, msBody, v);
+    },
+
+    openMilestone(page, sheets, msBody, id) {
+      const d = A(), l = lender(id);
+      msBody.innerHTML = ui.MilestoneApproved({
+        lender: l.name, logo: l.logo, type: l.type, title: d.kfs.approvedTitle(l.name), body: d.kfs.approvedBody, note: d.kfs.approvedNote,
+        figures: [{ label: "Final offer", value: d.kfs.finalOffer }, rate, { label: "APR", value: id === "pick-citi" ? d.kfs.summary.apr : l.apr }],
+      }).toString();
+      msBody.dataset.app = id;
+      sheets.open("ms");
+    },
+
+    wire(page, sheets, msBody, v) {
+      OPL.fx.statusOnScroll(page);
+      OPL.fx.playInView(page, ".tracker");
+      OPL.fx.nudge(page, this.timers);
+      OPL.fx.enter(page, [...page.querySelectorAll(".app-card"), page.querySelector(".apps-note")]);
+
+      page.addEventListener("click", (e) => {
+        const o = e.target.closest("[data-app-open]");
+        if (o) return OPL.go("application", { app: o.dataset.appOpen });
+        if (e.target.closest("[data-ms-review]")) { const id = msBody.dataset.app; sheets.close(); return this.timers.push(setTimeout(() => OPL.go("application", { app: id }), 280)); }
+      });
+
+      // Figma preset: the approved sheet open over the list
+      if (v.ms === "on") this.openMilestone(page, sheets, msBody, "pick-citi");
+
+      // Live demo: a few seconds after submitting, the first lender approves
+      if (this.fresh && this.apps && this.apps.length) {
+        this.fresh = false;
+        OPL.afterReveal(() => this.timers.push(setTimeout(() => {
+          if (!page.isConnected) return;
+          const first = this.apps[0];
+          first.status = "kfs";
+          const fresh = OPL.rerender();
+          this.openMilestone(fresh, this._sheets, this._ms, first.id);
+        }, OPL.fx.motionOff() ? 0 : 5000)));
+      }
+    },
+  };
+
+  /* ---- Detail ------------------------------------------------------------- */
+  OPL.screens.application = {
+    title: "Application",
+    figma: { verifying: "382:42423", kfs: "382:42689" },
+    timers: [],
+    leave() { this.timers.forEach((t) => clearTimeout(t)); this.timers = []; },
+
+    render(page) {
+      this.leave();
+      const d = A();
+      const apps = currentApps();
+      const id = OPL.state.get().app || apps[0].id;
+      const app = apps.find((a) => a.id === id) || { id, status: "verifying" };
+      const l = lender(id);
+      const kfs = app.status === "kfs";
+      const branch = d.branch(l.slug);
+
+      const timeline = kfs
+        ? [
+            { icon: "plain-2", state: "done", title: `Sent to ${l.name}`, sub: d.sentAt },
+            { icon: "buildings", state: "done", title: "Lender Verification", sub: d.verifiedOn },
+            { icon: "document-text", state: "action", title: d.kfs.title },
+          ]
+        : [
+            { icon: "plain-2", state: "done", title: `Sent to ${l.name}`, sub: d.sentAt },
+            { icon: "buildings-primary", state: "current", title: "Lender Verification", sub: d.verifying.progress, subTone: "primary" },
+            { icon: "document-text-muted", state: "todo", title: d.verifying.todo },
+          ];
+
+      const body = kfs
+        ? html`
+            ${ui.KfsSummary({ s: d.kfs.summary })}
+            ${ui.InfoCard({ title: "Branch Details", body: ui.ContactList(branch) })}
+            ${ui.WhatsAppRow({ label: d.whatsapp })}`
+        : html`
+            ${ui.InfoCard({ title: "What to expect", body: d.verifying.expect(l.name).map((t) => ui.NoteRow({ text: t, tone: "info" })).join("") })}
+            ${ui.InfoCard({ title: "Keep these documents ready", body: ui.DocList({ items: d.verifying.docs }) })}
+            ${ui.InfoCard({ title: "Branch Details", body: ui.ContactList(branch) })}
+            <div class="appd-group"><h3 class="appd-group__title">Loan Application Details</h3>
+              ${ui.InfoCard({ title: "Loan Application Details", body: ui.DetailRows({ rows: [
+                ["Application No.", d.verifying.appNo, true],
+                ["Loan Amount", OPL.fx.longAmount(l.amountShort)],
+                ["Interest Rate", "Floating • 9.45%"],
+                ["Loan Type", titleCase(l.type)],
+              ] }) })}</div>
+            ${ui.WhatsAppRow({ label: d.whatsapp })}`;
+
+      page.innerHTML = html`
+        ${ui.StatusBar()}
+        <div class="scroller">
+          <main class="${OPL.cx("appd", kfs && "appd--kfs")}" style="--app-tint:${l.tint}">
+            <section class="appd-top">
+              <header class="appd-header">
+                <button class="app-header__back" aria-label="Back" data-press data-back>${OPL.icon("arrow-left-b", 24)}</button>
+                <div class="appd-header__id">${ui.Logo({ id: l.logo, size: 40 })}<div><p>${l.name}</p><span>${l.type}</span></div></div>
+                ${ui.IconButton({ icon: "headphones-round-sound-linear", label: "Support", goto: "support" })}
+              </header>
+              <div class="appd-status">
+                <h2 class="appd-status__title">${kfs ? d.kfs.title : d.verifying.title(l.name)}</h2>
+                ${ui.Timeline({ items: timeline })}
+              </div>
+            </section>
+            <div class="appd-body">${body}</div>
+            <div class="appd-withdraw"><button class="appd-withdraw__btn" data-goto="withdraw-application" data-press>${d.withdraw}</button></div>
+          </main>
+        </div>
+        <div class="${OPL.cx("floating", kfs && "floating--above-foot")}">
+          ${ui.AiMitraFab({ nudge: d.aiNudge })}
+          ${kfs ? "" : ui.BottomNav({ items: OPL.data.loansOverview.nav, active: "applications", variant: "section" })}
+        </div>
+        ${kfs ? OPL.raw(`<div class="appd-foot">${ui.Button({ label: d.kfs.cta, block: true, goto: "kfs" })}</div>`) : ""}`;
+
+      this.wire(page);
+    },
+
+    wire(page) {
+      OPL.fx.statusOnScroll(page);
+      OPL.fx.playInView(page, ".tl, .kfs-repay");
+      OPL.fx.nudge(page, this.timers);
+      OPL.fx.enter(page, [page.querySelector(".appd-status"), ...page.querySelectorAll(".appd-body > *")]);
+      page.addEventListener("click", (e) => {
+        const acc = e.target.closest("[data-accordion]");
+        if (acc) return acc.closest(".info-card").classList.toggle("is-open");
+        const cp = e.target.closest("[data-copy]");
+        if (cp) {
+          navigator.clipboard?.writeText(cp.dataset.copy).catch(() => {});
+          cp.classList.remove("is-copied"); void cp.offsetWidth; cp.classList.add("is-copied");
+          if (navigator.vibrate) navigator.vibrate(6);
+          return;
+        }
+        const wa = e.target.closest("[data-wa]");
+        if (wa) { wa.classList.toggle("is-on"); wa.setAttribute("aria-checked", wa.classList.contains("is-on")); }
+      });
+    },
+  };
+})();
+
+;
+
 /* ==== js/app.js ==== */
 /* ==========================================================================
    Prototype shell — router (push/pop pages), device scaling, variant panel.
@@ -2067,9 +2594,11 @@
     return "#" + new URLSearchParams(next).toString();
   };
 
-  OPL.go = (name) => {
-    if (!OPL.screens[name] || name === screenName()) return;
-    history.pushState({ depth: depth + 1 }, "", hashFor({ screen: name }));
+  OPL.go = (name, params = {}) => {
+    if (!OPL.screens[name]) return;
+    const next = hashFor({ screen: name, ...params });
+    if (next === location.hash || (name === screenName() && !Object.keys(params).length)) return;
+    history.pushState({ depth: depth + 1 }, "", next);
     depth++;
     render({ dir: "forward" });
   };
@@ -2085,9 +2614,19 @@
     document.documentElement.dataset.hotspots = st.hotspots || "on";
     document.documentElement.dataset.frame = st.frame || "on";
 
-    // Same screen (variant / panel change): re-render in place.
+    // Same screen (variant / panel change): re-render on a fresh element so listeners
+    // bound by the previous render are dropped (no double handlers).
     if (currentPage && currentPage.dataset.screen === name && !dir) {
-      OPL.screens[name].render(currentPage);
+      const fresh = document.createElement("div");
+      fresh.className = currentPage.className.replace(/\b(is-push-in|is-pop-in|is-entering)\b/g, "").trim();
+      fresh.dataset.screen = name;
+      const scroll = currentPage.querySelector(".scroller")?.scrollTop || 0;
+      currentPage.replaceWith(fresh);
+      currentPage = fresh;
+      const s = OPL.screens[name];
+      if (s.leave) s.leave();
+      s.render(fresh);
+      const sc = fresh.querySelector(".scroller"); if (sc) sc.scrollTop = scroll;
       return renderPanel(name);
     }
 
@@ -2212,6 +2751,9 @@
   });
 
   OPL.current = () => screenName();
+  /* A screen that needs to re-render itself (e.g. a status change) asks the router,
+     so the page element is swapped cleanly and stays tracked. */
+  OPL.rerender = () => { render(); return currentPage; };
 
   window.addEventListener("opl:state", () => render());
   window.addEventListener("popstate", (e) => {

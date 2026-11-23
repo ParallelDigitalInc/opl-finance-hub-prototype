@@ -1,0 +1,33 @@
+/* ==========================================================================
+   Screens · Loan applications (416:122660)
+   List 382:41059: hero 305 · header to 121 · cards from 129, 16 apart · note +32.
+   Detail 382:42423 / 382:42689: tinted top (header 72 + status card) · body 20/16 · 24 gaps.
+   ========================================================================== */
+.apps { position: relative; padding: calc(121px + var(--dy)) var(--gutter) 170px; --dy: calc(var(--status-h) - 47px); }
+.apps-bg { position: absolute; left: 0; right: 0; top: 0; height: calc(305px + var(--dy)); overflow: hidden; background: var(--hero-bg); }
+.apps-bg__ellipse { position: absolute; left: calc(50% - 209px); top: calc(82px + var(--dy)); width: 418px; height: 418px; max-width: none; }
+.apps-bg__texture { position: absolute; left: calc(50% - 258.45px); top: calc(-250px + var(--dy)); width: 516.9px; height: 683px; max-width: none; opacity: 0.3; }
+.apps-header { position: absolute; top: var(--status-h); left: 0; right: 0; z-index: 2; }
+.apps-header .icon-btn { box-shadow: inset 0 0 0 1px var(--border); }
+.apps-list { position: relative; display: flex; flex-direction: column; gap: var(--s16); padding-top: var(--s8); }
+.apps-note { padding-top: 48px; }   /* 16 list gap + 32 top padding (382:41157) */
+
+.appd { --dy: calc(var(--status-h) - 47px); padding-bottom: 178px; }
+.appd--kfs { padding-bottom: 161px; }
+.appd-top { padding: var(--status-h) 0 var(--s20); background: var(--app-tint); }
+.appd-header { display: flex; align-items: center; gap: var(--s12); padding: var(--s16); }
+.appd-header__id { flex: 1 1 0; min-width: 0; display: flex; align-items: center; gap: var(--s12); }
+.appd-header__id > div { display: flex; flex-direction: column; gap: var(--s2); min-width: 0; }
+.appd-header__id p { font-size: 16px; line-height: 22px; font-weight: var(--fw-medium); color: var(--foreground); }
+.appd-header__id span { font-size: 12px; line-height: 16px; color: var(--muted-foreground); }
+.appd-status { margin: 10px var(--gutter) 0; display: flex; flex-direction: column; gap: var(--s20); padding: var(--s16); border-radius: var(--r-large); border: 1px solid var(--border); /* stroke in layout here (252) */ background: var(--surface); box-shadow: var(--shadow-s); }
+.appd-status__title { font-size: 18px; line-height: 26px; font-weight: var(--fw-semibold); color: var(--foreground); }
+.appd-body { display: flex; flex-direction: column; gap: 24px; padding: var(--s20) var(--gutter); }
+.appd--kfs .appd-body { padding-top: var(--s16); padding-bottom: 24px; }
+.appd-group { display: flex; flex-direction: column; gap: var(--s16); }
+.appd-group__title { font-size: 16px; line-height: 20px; font-weight: var(--fw-medium); color: var(--foreground); }
+.appd-withdraw { display: flex; justify-content: center; }
+.appd-withdraw__btn { height: 38px; padding: 0 14px; font-size: 13px; line-height: 18px; font-weight: var(--fw-semibold); color: #b91c1c; }
+.floating--above-foot { bottom: 93px; padding-bottom: 24px; }
+.floating--above-foot::before { display: none; }
+.appd-foot { position: absolute; left: 0; right: 0; bottom: 0; z-index: 21; padding: var(--s16) var(--gutter) max(32px, env(safe-area-inset-bottom)); background: #fff; border-top: 1px solid var(--border); }

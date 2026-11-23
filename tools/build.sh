@@ -12,22 +12,27 @@ CSS=(
   css/components/primitives.css
   css/components/cards.css
   css/components/chrome.css
+  css/components/flow.css
   css/screens/home.css
   css/screens/loans-overview.css
   css/screens/loan-offers.css
+  css/screens/applications.css
 )
 JS=(
   js/core.js
   js/components.js
+  js/components-flow.js
   js/fx.js
   js/variants.js
   js/data/home.js
   js/data/loans-overview.js
   js/data/loan-offers.js
+  js/data/applications.js
   js/screens/home.js
   js/screens/loans-overview.js
   js/screens/loan-offers.js
   js/screens/compare-loans.js
+  js/screens/applications.js
   js/app.js
 )
 

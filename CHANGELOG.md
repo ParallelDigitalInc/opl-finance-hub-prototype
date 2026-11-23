@@ -1,5 +1,31 @@
 # Changelog
 
+## v0.6.0 — 23 Nov 2026 · Loan applications (A–C)
+
+Synced from Figma section "Loan Applications" `416:122660`: groups A (apply to 2–3), B (apply to one) and C (track applications).
+
+**Added**
+
+- **Apply sheet:**
+  - opens from "Apply now" on offer cards and the Loan details sheet, and from "Apply to N lenders" on Compare loans
+  - lender rows, notes, consent (unticking disables Submit), and Submit with a loading state
+- **Track Loan Applications list:**
+  - a verifying card (solid tracker, partial progress line, outlined "View details", note)
+  - a KFS-ready card ("2 days left", "Review KFS", amber note strip)
+  - the bottom note and the Loans tab bar with "Track Loans" active
+- **Application detail:**
+  - lender-tinted header and status card with a vertical timeline that plays in
+  - collapsible cards (What to expect, Documents, Branch with copy, Application details)
+  - WhatsApp toggle and Withdraw
+  - in the KFS-ready variant: KFS summary (APR card, repay split bar that plays in, fact chips), sticky "Review Full KFS & Accept" and the AI Mitra button above it
+- **Milestone sheet "{Lender} approved your loan":** confetti, ripple ring, mark and badge pop. It auto-plays about 5 s after Submit for the first lender and opens from the panel preset.
+- **New components:** NoteRow, ApplySheetBody, Timeline, InfoCard, DocList, ContactList, DetailRows, WhatsAppRow, KfsSummary, MilestoneApproved. ApplicationCard gains tint, solid tracker, outlined CTA, note and footnote; Tracker gains the `solid` style and `progress` state. New helpers: `fx.applySheet`, `fx.bareSheet`.
+- **Router:** `OPL.go(name, params)` for screen params (`#app=…`); `OPL.rerender()` for self re-renders.
+
+**Fixed**
+
+- **Duplicate click handlers:** re-rendering a screen in place (any panel variant change) piled up click handlers. Pages are now swapped for a fresh element.
+
 ## v0.5.2 — 23 Nov 2026 · Loan cards clickable everywhere
 
 - **"Top loan matches" cards on Home and the Loans overview offer cards** now open the Loan details sheet instead of a hotspot hint.
