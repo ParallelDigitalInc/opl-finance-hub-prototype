@@ -48,6 +48,7 @@
           </div>`,
       });
       D.mountShell(page);
+      D.mountCompareBar(page);
       D.enter(page);
       D.bindListControls(page, st, () => D.flip(page.querySelector("[data-list]"), allFor(st), page));
       page.addEventListener("click", (e) => {

@@ -367,3 +367,49 @@
 .d-modal-layer.is-open .d-applym > * > * { animation: enter-up 380ms var(--ease-out) both; }
 .d-applym .btn { transition: transform 120ms var(--d-ease), background 160ms, box-shadow 160ms, opacity 160ms; }
 .d-applym .btn--filled:not([disabled]):hover { background: #2f4ed6; box-shadow: 0 6px 16px -6px rgba(56, 88, 229, 0.55); }
+
+/* ---- Compare tray (524:106147): #F1F6FE + hero texture 45%, 2px white stroke, r16 -------- */
+.d-cbar {
+  position: absolute; left: 28px; right: 28px; bottom: 16px; z-index: 26;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  min-height: 76px; padding: 16px 20px; border-radius: 16px; overflow: hidden; isolation: isolate;
+  background: #f1f6fe; box-shadow: inset 0 0 0 2px #fff, 0 2px 12px rgba(0, 0, 0, 0.04), 0 16px 40px -16px rgba(15, 23, 42, 0.22);
+  transform: translateY(calc(100% + 24px)); opacity: 0; pointer-events: none;
+  transition: transform 420ms var(--ease-spring), opacity 200ms;
+}
+.d-cbar::before { content: ""; position: absolute; inset: 0; z-index: -1; background: url("../assets/lazy/dsk/hero-texture.png") center / cover no-repeat; opacity: 0.45; }
+.d-cbar.is-up { transform: none; opacity: 1; pointer-events: auto; }
+.d-cbar.is-instant { transition: none; }
+.d-main.has-cbar .d-main__inner { padding-bottom: 116px; }
+.d-main.has-cbar .d-fab-wrap { bottom: 108px; }
+.d-cbar__picked { display: flex; align-items: center; gap: 24px; min-width: 0; }
+.d-cbar__status { width: 188px; display: flex; flex-direction: column; gap: 2px; white-space: nowrap; }
+.d-cbar__status p { font-size: 16px; line-height: 24px; font-weight: 600; color: var(--foreground); }
+.d-cbar__status small { font-size: 14px; line-height: 20px; color: var(--muted-foreground); }
+.d-cbar__slots { display: flex; align-items: center; gap: 10px; }
+.d-cbar__chip { display: inline-flex; align-items: center; gap: 10px; height: 44px; padding: 0 12px 0 4px; border-radius: 999px; background: #fff; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06); white-space: nowrap; }
+.d-cbar__chip .d-logo { box-shadow: inset 0 0 0 1px #e5e7eb; }
+.d-cbar__chip b { font-size: 16px; line-height: 24px; font-weight: 600; color: var(--foreground); }
+.d-cbar__chip.is-new { animation: d-chip-in 420ms var(--ease-spring) both; }
+@keyframes d-chip-in { from { transform: scale(0.7); opacity: 0; } to { transform: none; opacity: 1; } }
+.d-cbar__x { width: 20px; height: 20px; border-radius: 50%; transition: transform 200ms var(--d-ease), filter 160ms; }
+.d-cbar__x:hover { transform: rotate(90deg); filter: brightness(0.8); }
+.d-cbar__slot { display: inline-flex; align-items: center; height: 44px; padding: 0 18px; border-radius: 999px; background: #fff; border: 1px dashed var(--primary); font-size: 15px; line-height: 20px; font-weight: 500; color: var(--primary); white-space: nowrap; }
+.d-cbar__actions { display: flex; align-items: center; gap: 20px; flex-shrink: 0; }
+.d-cbar__clear { height: 24px; font-size: 12px; line-height: 16px; font-weight: 500; color: var(--tertiary-foreground); border-radius: 999px; transition: color 140ms; }
+.d-cbar__clear:hover { color: var(--foreground); }
+.d-cbar__go { display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 10px 14px; border-radius: 999px; background: #fff; font-size: 14px; line-height: 18px; font-weight: 500; color: var(--primary); transition: background 160ms, color 160ms, box-shadow 160ms, transform 120ms var(--d-ease); }
+.d-cbar__go .ico { transition: transform 200ms var(--d-ease); }
+.d-cbar__go:not([disabled]):hover { background: var(--primary); color: #fff; box-shadow: 0 6px 16px -6px rgba(56, 88, 229, 0.55); }
+.d-cbar__go:not([disabled]):hover .ico { transform: translateX(3px); filter: brightness(0) invert(1); }
+.d-cbar__go:not([disabled]):active { transform: scale(0.97); }
+.d-cbar__go[disabled] { cursor: not-allowed; }
+.d-cbar__go[disabled] { color: rgba(56, 88, 229, 0.5); }
+.d-cbar__go[disabled] .ico { opacity: 0.5; }
+
+/* Selected states keep their identity on hover (hover only deepens them) */
+.d-row-card--pick.is-picked:hover { box-shadow: inset 0 0 0 2px var(--primary), 0 8px 20px -10px rgba(56, 88, 229, 0.35); }
+.d-row-card--pick:not(.is-picked):hover { box-shadow: inset 0 0 0 2px #cbd5e1; }
+.d-row-card--pick:hover .d-check__off { transform: scale(1.06); }
+.d-chip.is-selected:hover { background: #e6effd; }
+.d-check.is-checked:hover .d-check__on { transform: scale(1.06); }

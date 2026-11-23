@@ -61,6 +61,7 @@ Switch with **View → Desktop** in the panel, press **D**, or link `#device=des
 8. **Mixed controls:** the Compare checkbox is a 16px DS checkbox on the horizontal rows (`507:84775`) but a 20px Solar icon on the vertical cards. Both use the Solar icon here, for consistency.
 10. **Applications (`440:134641`):** the "View details" button label is indigo `#3730A3` and the WhatsApp toggle is `#4338CA` in Figma. The label is shown as `#3858E5`; the toggle is kept as drawn. The list card has no design for the signed or disbursal states, so it reuses the KFS-ready card, as mobile does.
 11. **NeSL (`524:105163`):** the frames are laid out as `476:231121` · `476:231334` · `476:231547` · `476:231761`. The prototype plays the unscrolled agreement (`476:231547`) first, then the scrolled one with I AGREE, then e-stamp, then OTP.
+12. **Compare tray (`524:106147`):** only the 1-picked state is drawn. "Add one more, or compare now" (2 picked) and "Ready to compare" (3 picked) are proposed copy. The texture is the hero texture (same 626×827 image).
 9. **Add offers drawer:** the Select button is indigo `#4338CA` in Figma and shown as `#3858E5` here. The "n of 3 selected" counter is proposed.
 
 ## Run it

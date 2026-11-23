@@ -663,3 +663,80 @@
     });
   };
 })();
+
+/* Compare tray (524:106147) — sticks to the bottom of the main panel once an offer is
+   ticked for comparison (Overview, Loan Offers). Picked lenders as chips, dashed empty
+   slots, Clear all, and Compare (enabled from 2 picks). Replaces the "added" toast. */
+(function () {
+  const { html } = OPL;
+  const D = OPL.d;
+  const info = (id) => {
+    const c = OPL.ddata.compare;
+    const r = c.records[c.aliases[id] || id];
+    return r ? { name: r.name, logo: r.logo } : null;
+  };
+  const inner = () => {
+    const ids = D.compare.get().filter((id) => info(id)).slice(0, 3);
+    const n = ids.length;
+    const sub = n < 2 ? "Pick at least one more" : n < 3 ? "Add one more, or compare now" : "Ready to compare";
+    return String(html`
+      <div class="d-cbar__picked">
+        <div class="d-cbar__status"><p>${n} of 3 picked</p><small>${sub}</small></div>
+        <div class="d-cbar__slots">
+          ${ids.map((id) => { const l = info(id); return html`<span class="d-cbar__chip" data-chip-id="${id}">${D.logo(l.logo, { size: 36 })}<b>${l.name}</b><button class="d-cbar__x" data-cbar-remove="${id}" aria-label="Remove ${l.name}">${D.icon("bar-close", 20)}</button></span>`; })}
+          ${[...Array(3 - n)].map((_, i) => html`<span class="d-cbar__slot">Slot ${n + i + 1}</span>`)}
+        </div>
+      </div>
+      <div class="d-cbar__actions">
+        <button class="d-cbar__clear" data-cbar-clear>Clear all</button>
+        <button class="d-cbar__go" data-cbar-go ${n < 2 ? "disabled" : ""}>Compare${D.icon("bar-arrow", 16)}</button>
+      </div>`);
+  };
+  D.mountCompareBar = (page) => {
+    const main = page.querySelector(".d-main");
+    if (!main) return;
+    const bar = document.createElement("div");
+    bar.className = "d-cbar";
+    bar.setAttribute("role", "region");
+    bar.setAttribute("aria-label", "Compare loans");
+    main.appendChild(bar);
+    const paint = (bump) => {
+      const n = D.compare.get().filter((id) => info(id)).length;
+      bar.innerHTML = inner();
+      bar.classList.toggle("is-up", n > 0);
+      main.classList.toggle("has-cbar", n > 0);
+      if (bump) { const chip = bar.querySelector(`[data-chip-id="${bump}"]`); chip && chip.classList.add("is-new"); }
+    };
+    paint();
+    if (D.compare.get().length) bar.classList.add("is-instant");
+    bar.addEventListener("click", (e) => {
+      const rm = e.target.closest("[data-cbar-remove]");
+      if (rm) {
+        D.compare.set(D.compare.get().filter((x) => x !== rm.dataset.cbarRemove));
+        page.querySelectorAll(`[data-compare="${rm.dataset.cbarRemove}"]`).forEach((c) => { c.classList.remove("is-checked"); c.setAttribute("aria-checked", "false"); });
+        D.updateCompareCount(page);
+        return paint();
+      }
+      if (e.target.closest("[data-cbar-clear]")) {
+        D.compare.get().forEach((id) => page.querySelectorAll(`[data-compare="${id}"]`).forEach((c) => { c.classList.remove("is-checked"); c.setAttribute("aria-checked", "false"); }));
+        D.compare.set([]);
+        D.updateCompareCount(page);
+        return paint();
+      }
+      if (e.target.closest("[data-cbar-go]")) return OPL.go("compare-loans");
+    });
+    D._cbar = { paint, bar };
+    return paint;
+  };
+  // the compare checkbox now updates the tray instead of raising a toast
+  D.toggleCompare = (page, id) => {
+    const ok = D.compare.toggle(id);
+    const bar = page.querySelector(".d-cbar");
+    if (!ok) { bar && bar.animate([{ transform: "translateX(0)" }, { transform: "translateX(-6px)" }, { transform: "translateX(6px)" }, { transform: "none" }], { duration: 260 }); return null; }
+    const on = D.compare.get().includes(id);
+    page.querySelectorAll(`[data-compare="${id}"]`).forEach((c) => { c.classList.toggle("is-checked", on); c.setAttribute("aria-checked", on); });
+    D.updateCompareCount(page);
+    if (bar && D._cbar && D._cbar.bar === bar) D._cbar.paint(on ? id : null);
+    return on;
+  };
+})();

@@ -138,6 +138,7 @@
           </div>`,
       });
       D.mountShell(page);
+      D.mountCompareBar(page);
       D.mountGauge(page);
       D.enter(page);
       const amt = page.querySelector("[data-countup]");

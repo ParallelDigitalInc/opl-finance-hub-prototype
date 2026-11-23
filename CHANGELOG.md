@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.13.2 — 23 Nov 2026 · Compare tray + selection hovers
+
+**Added**
+
+- **Compare tray** (`524:106147`). Once you tick Compare on any card (Overview or Loan Offers), a tray sticks to the bottom of the main panel:
+  - "n of 3 picked" with a hint
+  - picked lenders as logo chips (each removable)
+  - dashed "Slot 2 / Slot 3" placeholders
+  - Clear all
+  - **Compare**, disabled until two are picked, which opens the Compare tab
+
+  It springs up on the first pick, each new chip pops in, and a fourth pick shakes the tray. The AI Mitra button and the page padding make room for it. It replaces the "added to compare" toast.
+
+**Fixed**
+
+- Hovering a **selected** Compare column or a **picked** offer in the Add-offers drawer swapped the blue selected outline for the grey hover one. Selected states now keep their outline, and hover only deepens it. Selected chips and checked checkboxes get their own hover too.
+
 ## v0.13.1 — 23 Nov 2026 · Desktop NeSL as drawn
 
 Synced from Figma section "nesl" `524:105163`. Shreya: the desktop NeSL screens were wrong; they reused the mobile portal.
