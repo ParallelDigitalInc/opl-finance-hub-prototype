@@ -12,6 +12,16 @@ Shreya: improve the Debt Profile (was "Your Borrowing", Figma `570:105880`); the
 - **The donut** now has four slices in the legend colours: the three owed parts, then the free limit in pale blue. Figma still had the old two-part donut. Geometry is as drawn, with rounded corners and even ~3px gaps. Slices pop in clockwise; with a mouse, pointing at a row or slice highlights it.
 - **Rotating AI question** (`fx.aiRotate`): after the drawn "Can I take another term loan?", it cycles to "Which loan should I repay first?", "Should I draw my free ₹18.30 L?" and "Is ₹64.92 L too much to owe?". It holds while pressed, off-screen or under reduced motion.
 - `ui.BorrowingCard` is replaced by `ui.DebtProfile` (library updated). README → Loans overview flags lists what changed from Figma.
+## v0.16.12 — 23 Nov 2026 · Calculate estimate is a modal, and the page remembers the result
+
+Shreya asked for a modal for more delight when the estimate is calculated, and for the result to show outside once closed.
+
+- **Calculate estimate opens as a 560 modal** over Subsidy details, replacing the side drawer. The box keeps one height for form and result, so the calculated moment swaps in place with no jump:
+  - Form: the mobile cards scroll between a fixed header and a footer with the live "Your estimate", Build-up bar, Get Estimate and Talk to an Expert.
+  - Result: satin and rays bloom, a bundle lands per benefit while the total climbs, confetti bursts from the stack, and the whole modal gives a small bounce at the end.
+- **Closing the modal updates the page.** The estimate card (both details versions) counts from its old figure to yours, **"Up to ₹1.01Cr"**, glows once, and adds **"Based on your 3 benefits"**. Its button becomes **Recalculate**. Re-renders keep it.
+- **Mobile too.** The result is saved to the shared estimate state from either view, so the mobile Subsidy details hero shows your number, the note and Recalculate as well. Mobile's own result screen now saves it too.
+- The URL still follows the modal (`subsidy-estimate` / `subsidy-estimate-result`).
 
 ## v0.16.11 — 23 Nov 2026 · Desktop AI questions change with context
 

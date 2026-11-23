@@ -203,3 +203,11 @@
 /* benefit sheet in a drawer (mobile body) */
 .d-bsheet { flex: 1; min-height: 0; overflow-y: auto; margin: 0 -24px; padding: 0 24px 24px; }
 .d-bsheet .bsheet__grip { display: none; }
+
+/* the card after an estimate: the figure counts to the user's number and glows once; a note says why */
+.d-sd__est-note { margin-top: 2px; font-size: 13px; line-height: 18px; color: #64748b; }
+.d-sd__blue .d-sd__est-note { color: rgba(255, 255, 255, 0.8); }
+[data-est-amt].is-updated { animation: d-est-glow 1400ms var(--ease-out); }
+@keyframes d-est-glow { 0% { text-shadow: 0 0 0 transparent; } 30% { color: var(--primary); text-shadow: 0 0 24px rgba(56, 88, 229, 0.35); } 100% { text-shadow: 0 0 0 transparent; } }
+.d-sd__blue [data-est-amt].is-updated { animation-name: d-est-glow-light; }
+@keyframes d-est-glow-light { 30% { text-shadow: 0 0 24px rgba(255, 255, 255, 0.6); } }

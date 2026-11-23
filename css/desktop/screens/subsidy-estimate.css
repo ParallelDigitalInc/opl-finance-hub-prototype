@@ -1,11 +1,16 @@
-/* Desktop · Calculate estimate as a side drawer (520) over Subsidy details. Modelled on the mobile
-   sheet 416:76869 → 416:77363 (no desktop frame). Cards, chips and result art are the mobile kit's. */
-.d-estd-layer .d-drawer { overflow: hidden; }
-.d-estd-layer .d-drawer__head, .d-estd-layer .d-drawer__body, .d-estd-layer .d-drawer__foot { position: relative; z-index: 1; }
-.d-estd { flex: 1; min-height: 0; display: flex; flex-direction: column; transition: opacity 200ms, transform 240ms var(--ease-out); }
+/* Desktop · Calculate estimate as a modal (560) over Subsidy details. Modelled on the mobile sheet
+   416:76869 → 416:77363 (no desktop frame). Cards, chips and result art are the mobile kit's.
+   One fixed-height box for form and result, so the calculated moment swaps in place, no jump. */
+.d-estm-layer .d-modal { display: flex; flex-direction: column; overflow: hidden; height: min(780px, calc(100% - 64px)); }
+.d-estm__head, .d-estd, .d-estm__foot { position: relative; z-index: 1; }
+.d-estm__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 24px 24px 16px; }
+.d-estm__title { font-size: 20px; line-height: 28px; font-weight: 600; color: var(--foreground); }
+.d-estm__x { width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0; transition: transform 220ms var(--d-ease); }
+.d-estm__x:hover { transform: rotate(90deg); }
+.d-estd { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 0 24px; transition: opacity 200ms, transform 240ms var(--ease-out); }
 .d-estd.is-swapping, .d-estd__foot.is-swapping { opacity: 0; transform: translateY(6px); transition: opacity 150ms, transform 160ms; }
 .d-estd__scroll { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; margin: -6px -24px 0; padding: 6px 24px 24px; scrollbar-width: thin; }
-.d-estd__lead { margin-top: -4px; font-size: 14px; line-height: 20px; color: var(--muted-foreground); }
+.d-estd__lead { margin-top: -10px; font-size: 14px; line-height: 20px; color: var(--muted-foreground); }
 
 /* cards: the mobile cards, with desktop hover */
 .d-estd .ecard { filter: none; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04); transition: padding var(--dur-base) var(--ease-out), box-shadow 160ms; }
@@ -18,7 +23,7 @@
 .d-estd .est-chip:hover { background: var(--soft-primary, #e0e7ff); }
 
 /* footer: live estimate + the mobile action bar */
-.d-estd-layer .d-drawer__foot { display: block; padding: 16px 24px 20px; border-top-color: var(--border); }
+.d-estm__foot { padding: 16px 24px 20px; border-top: 1px solid var(--border); background: #fff; transition: background 300ms, border-color 300ms; }
 .d-estd__foot { display: flex; flex-direction: column; gap: 14px; transition: opacity 200ms, transform 240ms var(--ease-out); }
 .d-estd__live { display: flex; flex-direction: column; gap: 8px; }
 .d-estd__live-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
@@ -42,13 +47,13 @@
 .d-estd__bg img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .d-estd__bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255, 255, 255, 0) 45.913%, #fff 92%); }
 .d-estd__rays { position: absolute; left: calc(50% - 177px); top: -24px; width: 354px; height: 354px; max-width: none; opacity: 0; pointer-events: none; }
-.d-estd-layer.is-result .d-estd__bg { opacity: 0.78; }
-.d-estd-layer.is-result .d-estd__rays { opacity: 0.5; animation: rays-bloom 900ms var(--ease-out) both, rays-spin 60s linear 900ms infinite; }
-.d-estd-layer.is-result .d-drawer__foot { border-top-color: transparent; background: transparent; }
+.d-estm-layer.is-result .d-estd__bg { opacity: 0.78; }
+.d-estm-layer.is-result .d-estd__rays { opacity: 0.5; animation: rays-bloom 900ms var(--ease-out) both, rays-spin 60s linear 900ms infinite; }
+.d-estm-layer.is-result .d-estm__foot { border-top-color: transparent; background: transparent; }
 .d-estd .d-er { position: relative; inset: auto; flex: 1 0 auto; display: flex; flex-direction: column; --status-h: 0px; }
 .d-estd .d-er .er-col { gap: 46px; padding: 28px 0 0; }            /* mobile spacing (416:77363) */
 .d-estd .d-er .er-copy { padding: 0 8px; }
 .d-estd .d-er .er-note { padding: 24px 16px 0; }                    /* as mobile: pinned to the bottom, above the actions */
 .d-estd .d-er .er-caption__more:hover { text-decoration: underline; text-underline-offset: 3px; }
 .d-estd .d-er .er-confetti { left: calc(50% - 195px); top: 20px; }
-@media (prefers-reduced-motion: reduce) { .d-estd-layer.is-result .d-estd__rays { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .d-estm-layer.is-result .d-estd__rays { animation: none; } }

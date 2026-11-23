@@ -73,3 +73,5 @@
 .floating--sd { bottom: var(--sd-foot); padding-bottom: 24px; }
 /* this frame's Floating bottom is the gradient alone (0 → 0.24), no backdrop blur */
 .floating--sd::before { background: linear-gradient(180deg, rgba(241, 245, 248, 0) 35.235%, rgba(241, 245, 248, 0.24) 80.201%); backdrop-filter: none; -webkit-backdrop-filter: none; }
+/* after an estimate: the hero shows the user's number and says why */
+.sd-hero__note { margin-top: -4px; font-size: 13px; line-height: 18px; color: #64748b; }

@@ -42,9 +42,30 @@
     },
 
     // Calculate estimate (mobile 416:76869) as a side drawer — js/desktop/screens/subsidy-estimate.js
-    openEstimate(page, opts) {
+    openEstimate(page, opts = {}) {
       if (this.estimate && this.estimate.el.classList.contains("is-open")) return;
-      this.estimate = D.openEstimate(page, opts);
+      this.estimate = D.openEstimate(page, { ...opts, onClose: (res) => this.reflect(page, res) });
+    },
+
+    // the card's figure: what the user calculated (shared estimate state), else the policy's "Up to"
+    mine() {
+      const est = OPL.ddata.subsidies.detail.estimate, r = OPL.estimate && OPL.estimate.result, E = OPL.data.subsidyEstimate;
+      if (!r || !(r.total > 0)) return { text: est.prefix + est.amount, note: "", cta: est.cta, value: E.parseMoney(est.amount) };
+      return { text: est.prefix + E.fmt(r.total, { tight: true }), note: `Based on your ${r.count} benefit${r.count === 1 ? "" : "s"}`, cta: "Recalculate", value: r.total };
+    },
+
+    // after the modal closes: count the card from its old figure to the calculated one, glow once
+    reflect(page, res) {
+      if (!res || !(res.total > 0) || !page.isConnected) return;
+      const now = this.mine(), E = OPL.data.subsidyEstimate, kit = OPL.estimateKit;
+      page.querySelectorAll("[data-est-amt]").forEach((el) => {
+        const from = this.shownValue || E.parseMoney(el.textContent.replace(/^Up to\s*/i, "")) || 0;
+        el.classList.remove("is-updated"); void el.offsetWidth; el.classList.add("is-updated");
+        kit.countMoney(el, from, now.value, { dur: D.motionOff() ? 0 : 900, tight: true, prefix: "Up to ", timers: this.timers });
+      });
+      this.shownValue = now.value;
+      page.querySelectorAll("[data-est-note]").forEach((el) => { el.textContent = now.note; el.hidden = false; });
+      page.querySelectorAll("[data-estimate] span").forEach((el) => { el.textContent = now.cta; });
     },
 
     render(page) {
@@ -55,6 +76,8 @@
       const v = OPL.dvariantValues("subsidy-detail");
       const cover = v.dhero !== "blue";
       const est = s.estimate;
+      const mine = this.mine();                           // { text, note, cta } — calculated, or the policy's "Up to"
+      this.shownValue = mine.value;
 
       const tiles = html`
         <section class="d-sd__sec">
@@ -105,8 +128,8 @@
                   : html`
                     <section class="d-sd__blue" data-enter>
                       <div class="d-sd__blue-top">
-                        <div><p class="d-sd__eyebrow">${est.eyebrow}${info(s.info)}</p><p class="d-sd__amount">${est.prefix}${est.amount}</p></div>
-                        ${D.btn({ label: est.cta, style: "outlined", size: "md", cls: "d-sd__calc", iconRight: OPL.icon("chevron-right-primary", 16), attrs: "data-estimate aria-haspopup=\"dialog\"" })}
+                        <div><p class="d-sd__eyebrow">${est.eyebrow}${info(s.info)}</p><p class="d-sd__amount" data-est-amt>${mine.text}</p><p class="d-sd__est-note" data-est-note ${mine.note ? "" : raw("hidden")}>${mine.note}</p></div>
+                        ${D.btn({ label: mine.cta, style: "outlined", size: "md", cls: "d-sd__calc", iconRight: OPL.icon("chevron-right-primary", 16), attrs: "data-estimate aria-haspopup=\"dialog\"" })}
                       </div>
                       <div class="d-sd__blue-panel">${ui.PolicyPeriod({ period: d.period })}</div>
                     </section>`}
@@ -120,9 +143,10 @@
                     <div class="d-sd__est-in">
                       ${money()}
                       <p class="d-sd__eyebrow">${est.eyebrow}${info(s.info)}</p>
-                      <p class="d-sd__est-amt">${est.prefix}${est.amount}</p>
+                      <p class="d-sd__est-amt" data-est-amt>${mine.text}</p>
+                      <p class="d-sd__est-note" data-est-note ${mine.note ? "" : raw("hidden")}>${mine.note}</p>
                       <div class="d-sd__est-actions">
-                        ${D.btn({ label: est.cta, style: "filled", size: "lg", cls: "d-btn--block", iconRight: D.icon("btn-arrow-white", 16), attrs: "data-estimate aria-haspopup=\"dialog\"" })}
+                        ${D.btn({ label: mine.cta, style: "filled", size: "lg", cls: "d-btn--block", iconRight: D.icon("btn-arrow-white", 16), attrs: "data-estimate aria-haspopup=\"dialog\"" })}
                         ${D.btn({ label: est.apply, style: "outlined", size: "lg", cls: "d-btn--block d-btn--neutral", iconRight: D.icon("arrow-up-right-primary", 16), goto: "application-portal" })}
                       </div>
                     </div>

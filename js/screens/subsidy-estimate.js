@@ -300,6 +300,7 @@
       const total = rows.reduce((s, b) => s + amt[b.id], 0);
       this.rows = rows.map((b) => ({ id: b.id, amount: amt[b.id] }));
       this.total = total;
+      S.result = { total, count: rows.length };           // the policy page (mobile hero, desktop card) shows it
 
       page.innerHTML = html`
         ${ui.StatusBar()}

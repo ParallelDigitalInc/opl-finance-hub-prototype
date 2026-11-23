@@ -2823,9 +2823,30 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
     },
 
     // Calculate estimate (mobile 416:76869) as a side drawer — js/desktop/screens/subsidy-estimate.js
-    openEstimate(page, opts) {
+    openEstimate(page, opts = {}) {
       if (this.estimate && this.estimate.el.classList.contains("is-open")) return;
-      this.estimate = D.openEstimate(page, opts);
+      this.estimate = D.openEstimate(page, { ...opts, onClose: (res) => this.reflect(page, res) });
+    },
+
+    // the card's figure: what the user calculated (shared estimate state), else the policy's "Up to"
+    mine() {
+      const est = OPL.ddata.subsidies.detail.estimate, r = OPL.estimate && OPL.estimate.result, E = OPL.data.subsidyEstimate;
+      if (!r || !(r.total > 0)) return { text: est.prefix + est.amount, note: "", cta: est.cta, value: E.parseMoney(est.amount) };
+      return { text: est.prefix + E.fmt(r.total, { tight: true }), note: `Based on your ${r.count} benefit${r.count === 1 ? "" : "s"}`, cta: "Recalculate", value: r.total };
+    },
+
+    // after the modal closes: count the card from its old figure to the calculated one, glow once
+    reflect(page, res) {
+      if (!res || !(res.total > 0) || !page.isConnected) return;
+      const now = this.mine(), E = OPL.data.subsidyEstimate, kit = OPL.estimateKit;
+      page.querySelectorAll("[data-est-amt]").forEach((el) => {
+        const from = this.shownValue || E.parseMoney(el.textContent.replace(/^Up to\s*/i, "")) || 0;
+        el.classList.remove("is-updated"); void el.offsetWidth; el.classList.add("is-updated");
+        kit.countMoney(el, from, now.value, { dur: D.motionOff() ? 0 : 900, tight: true, prefix: "Up to ", timers: this.timers });
+      });
+      this.shownValue = now.value;
+      page.querySelectorAll("[data-est-note]").forEach((el) => { el.textContent = now.note; el.hidden = false; });
+      page.querySelectorAll("[data-estimate] span").forEach((el) => { el.textContent = now.cta; });
     },
 
     render(page) {
@@ -2836,6 +2857,8 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
       const v = OPL.dvariantValues("subsidy-detail");
       const cover = v.dhero !== "blue";
       const est = s.estimate;
+      const mine = this.mine();                           // { text, note, cta } — calculated, or the policy's "Up to"
+      this.shownValue = mine.value;
 
       const tiles = html`
         <section class="d-sd__sec">
@@ -2886,8 +2909,8 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
                   : html`
                     <section class="d-sd__blue" data-enter>
                       <div class="d-sd__blue-top">
-                        <div><p class="d-sd__eyebrow">${est.eyebrow}${info(s.info)}</p><p class="d-sd__amount">${est.prefix}${est.amount}</p></div>
-                        ${D.btn({ label: est.cta, style: "outlined", size: "md", cls: "d-sd__calc", iconRight: OPL.icon("chevron-right-primary", 16), attrs: "data-estimate aria-haspopup=\"dialog\"" })}
+                        <div><p class="d-sd__eyebrow">${est.eyebrow}${info(s.info)}</p><p class="d-sd__amount" data-est-amt>${mine.text}</p><p class="d-sd__est-note" data-est-note ${mine.note ? "" : raw("hidden")}>${mine.note}</p></div>
+                        ${D.btn({ label: mine.cta, style: "outlined", size: "md", cls: "d-sd__calc", iconRight: OPL.icon("chevron-right-primary", 16), attrs: "data-estimate aria-haspopup=\"dialog\"" })}
                       </div>
                       <div class="d-sd__blue-panel">${ui.PolicyPeriod({ period: d.period })}</div>
                     </section>`}
@@ -2901,9 +2924,10 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
                     <div class="d-sd__est-in">
                       ${money()}
                       <p class="d-sd__eyebrow">${est.eyebrow}${info(s.info)}</p>
-                      <p class="d-sd__est-amt">${est.prefix}${est.amount}</p>
+                      <p class="d-sd__est-amt" data-est-amt>${mine.text}</p>
+                      <p class="d-sd__est-note" data-est-note ${mine.note ? "" : raw("hidden")}>${mine.note}</p>
                       <div class="d-sd__est-actions">
-                        ${D.btn({ label: est.cta, style: "filled", size: "lg", cls: "d-btn--block", iconRight: D.icon("btn-arrow-white", 16), attrs: "data-estimate aria-haspopup=\"dialog\"" })}
+                        ${D.btn({ label: mine.cta, style: "filled", size: "lg", cls: "d-btn--block", iconRight: D.icon("btn-arrow-white", 16), attrs: "data-estimate aria-haspopup=\"dialog\"" })}
                         ${D.btn({ label: est.apply, style: "outlined", size: "lg", cls: "d-btn--block d-btn--neutral", iconRight: D.icon("arrow-up-right-primary", 16), goto: "application-portal" })}
                       </div>
                     </div>
@@ -2953,19 +2977,21 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
 ;
 
 /* ==== js/desktop/screens/subsidy-estimate.js ==== */
-/* Desktop · Govt. subsidies › Calculate estimate, as a side drawer over Subsidy details.
+/* Desktop · Govt. subsidies › Calculate estimate, as a modal over Subsidy details (v0.16.12;
+   it was a side drawer — a centred stage makes the calculated moment land harder).
    No desktop frame on "-> Final Desktop"; the mobile sheet is the model (section 416:76869:
    form 416:77107 / 416:76872 → result 416:77363), flagged in the README as designed in code.
 
    Form   the mobile benefit cards and "Add more benefits" chips scroll; the footer is the mobile
           action bar (Get Estimate + Talk to an Expert) with one desktop addition: a live
           "Your estimate" line and Build-up bar that re-count as you type.
-   Result Get Estimate turns the drawer into the mobile result in place: satin + rays behind the
+   Result Get Estimate turns the modal into the mobile result in place: satin + rays behind the
           header, a bundle lands per benefit while the total climbs, confetti from the stack.
           "Add more" turns it back into the form.
    State is the mobile kit's (OPL.estimateKit), so numbers carry across views and reopenings.
    Routes: #screen=subsidy-estimate / subsidy-estimate-result open Subsidy details with the
-   drawer up; the URL follows the drawer (silently) so a reload restores it. */
+   modal up; the URL follows the modal (silently) so a reload restores it. Closing hands the result
+   (S.result) back, and the page counts its estimate card to it. */
 (function () {
   const { html, raw } = OPL;
   const D = OPL.d;
@@ -3060,27 +3086,28 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
   };
 
   /* ==========================================================================================
-     D.openEstimate(page, { result }) — the drawer
+     D.openEstimate(page, { result, onClose }) — the modal
      ========================================================================================== */
-  D.openEstimate = (page, { result = false } = {}) => {
+  D.openEstimate = (page, { result = false, onClose } = {}) => {
     const kit = K(), d = E(), S = kit.S, motionOff = D.motionOff();
     kit.ensure();
     if (result) fillDemo();
     const timers = [];
     let shown = {}, shownTotal = 0, mode = "form", closed = false;
 
-    const dr = D.openDrawer(page, {
-      title: d.title, width: 520,
-      body: `<div class="d-estd" data-estd></div>`,
-      footer: `<div class="d-estd__foot" data-estd-foot></div>`,
+    const dr = D.openModal(page, `
+      <div class="d-estm__head"><h2 class="d-estm__title">${d.title}</h2><button class="d-estm__x" data-modal-close aria-label="Close">${D.icon("close-circle-drawer", 24)}</button></div>
+      <div class="d-estd" data-estd></div>
+      <div class="d-estm__foot"><div class="d-estd__foot" data-estd-foot></div></div>`, {
+      width: 560, cls: "d-estm-layer",
       onClose: () => {
         closed = true;
         timers.forEach(clearTimeout);
         if (/^subsidy-estimate/.test(OPL.state.get().screen || "")) OPL.state.set({ screen: "subsidy-detail" }, { silent: true });
+        onClose && onClose(S.result || null);           // the page reflects what was calculated
       },
     });
-    const layer = dr.el, drawer = layer.querySelector(".d-drawer");
-    layer.classList.add("d-estd-layer");
+    const layer = dr.el, drawer = layer.querySelector(".d-modal");
     // satin + rays sit behind the header in the result state
     drawer.insertAdjacentHTML("afterbegin", `<div class="d-estd__bg" aria-hidden="true"><img src="${OPL.simg("estimate/satin-blue.jpg")}" alt=""></div><img class="d-estd__rays" src="${OPL.simg("estimate/rays.png")}" alt="" aria-hidden="true">`);
     const body = drawer.querySelector("[data-estd]"), foot = drawer.querySelector("[data-estd-foot]");
@@ -3148,12 +3175,13 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
       timers.forEach(clearTimeout); timers.length = 0;
       const amt = kit.amounts();
       const list = d.benefits.filter((b) => S.list.includes(b.id) && amt[b.id] > 0);
+      S.result = { total: list.reduce((t, b) => t + amt[b.id], 0), count: list.length };   // shared: the page (and mobile) show it
       body.innerHTML = String(resultBody(list, amt));
       foot.innerHTML = String(resultFoot());
       layer.classList.remove("is-built");
       void layer.offsetWidth; layer.classList.add("is-result");
       route("subsidy-estimate-result");
-      // the drawer's opening focus would ring "Add more"; the result has nothing to type into
+      // keep focus off "Add more" when the result opens; there's nothing to type into
       timers.push(setTimeout(() => { if (document.activeElement && document.activeElement.matches("[data-add-more]")) document.activeElement.blur(); }, 360));
       if (motionOff) return;
       kit.loadCelebrate();
@@ -3174,12 +3202,13 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
           kit.countMoney(body.querySelector(`[data-row-amt="${b.id}"]`), 0, amt[b.id], { dur: 520, timers });
           kit.countMoney(totalEl, from, running, { dur: 520, timers, onDone: k === list.length - 1 ? () => {
             er.classList.add("is-built"); layer.classList.add("is-built");
+            drawer.animate([{ transform: "scale(1)" }, { transform: "scale(1.015)" }, { transform: "scale(1)" }], { duration: 520, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)" });
             if (party) party.finale();
           } : null });
         }, START + k * STEP)));
       }, 120));
     };
-    // form ⇄ result crossfade inside the drawer
+    // form ⇄ result crossfade inside the modal
     const swap = (fn) => {
       if (motionOff) return fn();
       body.classList.add("is-swapping"); foot.classList.add("is-swapping");
@@ -3188,7 +3217,7 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
 
     /* ---- events ---- */
     drawer.addEventListener("click", (e) => {
-      if (e.target.closest("[data-goto]")) return dr.close();       // Apply Online / Talk to an Expert leave the drawer
+      if (e.target.closest("[data-goto]")) return dr.close();       // Apply Online / Talk to an Expert leave the modal
       if (e.target.closest("[data-add-more]")) return swap(() => showForm({ fromResult: true }));
       if (mode !== "form") return;
 
@@ -3257,7 +3286,7 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
     return dr;
   };
 
-  /* routes: Subsidy details with the drawer already up */
+  /* routes: Subsidy details with the modal already up */
   const withDrawer = (result) => ({
     title: `Govt. subsidies · ${result ? "Estimate result" : "Calculate estimate"}`,
     figma: { mobile: result ? "416:77363" : "416:77107" },
