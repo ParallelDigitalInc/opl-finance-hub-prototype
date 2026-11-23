@@ -126,6 +126,12 @@
         sheetEl.dataset.benefit = id;
         const body = sheetEl.querySelector(".bsheet__body");
         body.scrollTop = 0;
+        // pinned actions lift off the content while there's more to scroll
+        const foot = sheetEl.querySelector("[data-sheet-foot]");
+        const lift = () => foot && foot.classList.toggle("is-raised", body.scrollTop + body.clientHeight < body.scrollHeight - 2);
+        body.addEventListener("scroll", lift, { passive: true });
+        sheetEl._lift = lift;
+        this.timers.push(setTimeout(lift, 60), setTimeout(lift, 480));
         sheetEl.classList.remove("is-presenting"); void sheetEl.offsetWidth;
         if (!motionOff && !instant) sheetEl.classList.add("is-presenting");
         sheets.open("benefit", { instant });
@@ -148,6 +154,7 @@
           const note = sheetEl.querySelector("[data-act-note]");
           const swap = () => {
             list.innerHTML = ui.RateRows({ rows: act.rows }).toString();
+            if (sheetEl._lift) requestAnimationFrame(sheetEl._lift);
             note.textContent = act.note;
             list.dataset.dir = i > 0 ? "next" : "prev";
             list.classList.remove("is-swapping"); note.classList.remove("is-swapping");

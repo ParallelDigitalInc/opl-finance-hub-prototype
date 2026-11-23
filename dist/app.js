@@ -4,7 +4,7 @@
 
 (function () {
 const OPL = (window.OPL = window.OPL || {});
-OPL.VERSION = "0.15.0";
+OPL.VERSION = "0.15.1";
 OPL.FIGMA_FILE = "https://www.figma.com/design/GHuBkYGEQZvQppv3v55EaA/OPL----Internal-Playground--5-";
 OPL.figmaLink = (nodeId) => `${OPL.FIGMA_FILE}?node-id=${nodeId.replace(":", "-")}`;
 const esc = (v) =>
@@ -855,10 +855,10 @@ ${r.groups.map((g) => html`<div class="rlist"><p class="rlist__group">${g.title}
 <p class="bsheet__h">Conditions</p>
 <div class="clist">${s.conditions.map((c, i) => ui.SheetCondition(c, i))}</div>
 </div>
-<div class="bsheet__sec bsheet__actions" style="--s:${r ? 4 : 3}">
+</div>
+<div class="bsheet__foot" data-sheet-foot>
 <button class="btn btn--lg btn--filled btn--strong btn--block" data-press ${goto(actions.expert.goto)}>${sicon("sheet-headset-white", 16)}<span class="btn__label">${actions.expert.label}</span></button>
 ${s.apply ? html`<button class="btn btn--md btn--ghost btn--block" data-press ${goto(actions.apply.goto)}><span class="btn__label">${actions.apply.label}</span>${sicon("arrow-right-up-primary", 16)}</button>` : ""}
-</div>
 </div>`;
 };
 ui.BenefitSheetLayer = () => html`
@@ -3529,6 +3529,11 @@ sheetEl.setAttribute("aria-label", s.title);
 sheetEl.dataset.benefit = id;
 const body = sheetEl.querySelector(".bsheet__body");
 body.scrollTop = 0;
+const foot = sheetEl.querySelector("[data-sheet-foot]");
+const lift = () => foot && foot.classList.toggle("is-raised", body.scrollTop + body.clientHeight < body.scrollHeight - 2);
+body.addEventListener("scroll", lift, { passive: true });
+sheetEl._lift = lift;
+this.timers.push(setTimeout(lift, 60), setTimeout(lift, 480));
 sheetEl.classList.remove("is-presenting"); void sheetEl.offsetWidth;
 if (!motionOff && !instant) sheetEl.classList.add("is-presenting");
 sheets.open("benefit", { instant });
@@ -3550,6 +3555,7 @@ const list = sheetEl.querySelector("[data-rate-list]");
 const note = sheetEl.querySelector("[data-act-note]");
 const swap = () => {
 list.innerHTML = ui.RateRows({ rows: act.rows }).toString();
+if (sheetEl._lift) requestAnimationFrame(sheetEl._lift);
 note.textContent = act.note;
 list.dataset.dir = i > 0 ? "next" : "prev";
 list.classList.remove("is-swapping"); note.classList.remove("is-swapping");
