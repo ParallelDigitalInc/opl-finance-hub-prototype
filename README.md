@@ -3,6 +3,8 @@
 The source of truth for the Finance Hub flows as a clickable HTML prototype. It also
 starts the HTML component kit that later mobile flows reuse.
 
+- **Live (team link):** https://paralleldigitalinc.github.io/opl-finance-hub-prototype/ · library: https://paralleldigitalinc.github.io/opl-finance-hub-prototype/library.html
+- **Repo:** https://github.com/ParallelDigitalInc/opl-finance-hub-prototype. GitHub Pages redeploys from `main` on every push, usually within a minute or two.
 - **Prototype:** `index.html` (a device frame plus a variant panel; full-screen on a phone)
 - **Component library:** `library.html` (tokens, icons and every component, rendered by the same functions)
 - **Figma:** `GHuBkYGEQZvQppv3v55EaA`, section *Finance Home* `416:82748`
@@ -23,10 +25,12 @@ starts the HTML component kit that later mobile flows reuse.
 
 ## Run it
 
+The working copy lives in `~/Code/opl-finance-hub-prototype`, outside iCloud. iCloud's "Optimize Mac Storage" offloads files under ~/Documents and stalls git, so don't keep a repo there.
+
 Open `index.html` directly, or serve the folder. After editing anything in `css/` or `js/`, run `tools/build.sh`: pages load the `dist/` bundles. The pre-commit hook also runs it.
 
 ```bash
-cd ~/Documents/OPL/finance-hub-html && npx serve .
+cd ~/Code/opl-finance-hub-prototype && npx serve .
 ```
 
 On a phone (≤ 500px wide) the prototype goes full-bleed with no shell and no panel, and
