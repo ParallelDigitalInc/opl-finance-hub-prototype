@@ -235,8 +235,8 @@
         }
         const apply = e.target.closest("[data-apply]");
         if (apply) {
-          if (OPL.hasScreen("d-apply")) { e.stopPropagation(); return OPL.go("d-apply", { lender: apply.dataset.apply }); }
-          return;                                   // not built yet: core flashes the hotspot
+          e.stopPropagation();
+          return D.apply(page, [apply.dataset.apply]);
         }
       });
       page.addEventListener("keydown", (e) => { if (e.key === "Escape") closeMenus(); });

@@ -92,7 +92,7 @@
     { id: "overview", label: "Overview", icon: "tab-widget-outline", iconOn: "tab-widget-active", goto: "loans-overview" },
     { id: "offers", label: "Loan Offers", icon: "tab-banknote-2", iconOn: "nav-banknote-active", goto: "loan-offers" },
     { id: "compare", label: "Compare", icon: "tab-mirror-left", iconOn: "tab-mirror-bold", goto: "compare-loans" },
-    { id: "applications", label: "Applications", icon: "tab-document-text", goto: "applications" },
+    { id: "applications", label: "Applications", icon: "tab-document-text", iconOn: "tab-doc-bold", goto: "applications" },
     { id: "myloans", label: "My Loans", icon: "tab-notes", goto: "my-loans" },
   ];
   D.tabs = (active = "overview", counts = {}) => html`
@@ -241,10 +241,10 @@
           p.style.setProperty("--i", i);
         });
         if (motionOff()) { g.classList.add("is-in", "is-settled"); return; }
-        OPL.afterReveal(() => requestAnimationFrame(() => {
+        OPL.afterReveal(() => setTimeout(() => {
           g.classList.add("is-in");
           setTimeout(() => g.classList.add("is-settled"), 20 * 34 + 600);
-        }));
+        }, 16));
       });
     });
   };
@@ -263,13 +263,15 @@
     const active = tabs.querySelector(".d-tab.is-active");
     if (!active) { ink.style.opacity = 0; return; }
     const prev = lastTab && tabs.querySelector(`.d-tab[data-tab="${lastTab}"]`);
-    requestAnimationFrame(() => {
+    {
       if (prev && prev !== active && !motionOff()) {
         place(prev, false);
         void ink.offsetWidth;
         place(active, true);
       } else place(active, false);
-    });
+    }
+    // first paint can happen before Geist loads: re-measure once fonts are in
+    if (document.fonts && document.fonts.status !== "loaded") document.fonts.ready.then(() => active.isConnected && place(active, false));
     lastTab = active.dataset.tab;
     // hover preview: the ink leans toward the hovered tab
     tabs.addEventListener("pointerover", (e) => {
@@ -315,7 +317,7 @@
     const els = [...root.querySelectorAll("[data-enter]")];
     if (motionOff()) return;
     els.forEach((el, i) => { el.classList.add("d-enter"); el.style.setProperty("--d", `${i * 60}ms`); });
-    OPL.afterReveal(() => requestAnimationFrame(() => els.forEach((el) => el.classList.add("is-in"))));
+    OPL.afterReveal(() => setTimeout(() => els.forEach((el) => el.classList.add("is-in")), 16));
   };
 
   // Count-up for figures like "₹50 Lakhs" (keeps prefix/suffix)
@@ -361,7 +363,7 @@
     t.className = "d-toast";
     t.innerHTML = `<span>${text}</span>${action ? `<button class="d-toast__act" data-goto="${goto}">${action}</button>` : ""}`;
     host.appendChild(t);
-    requestAnimationFrame(() => t.classList.add("is-in"));
+    void t.offsetWidth; t.classList.add("is-in");
     clearTimeout(D._toastT);
     D._toastT = setTimeout(() => { t.classList.remove("is-in"); setTimeout(() => t.remove(), 300); }, 3200);
   };
@@ -463,7 +465,7 @@
     const onKey = (e) => { if (e.key === "Escape") { e.stopPropagation(); close(); } };
     document.addEventListener("keydown", onKey, true);
     el.addEventListener("click", (e) => { if (e.target.closest("[data-drawer-close]")) close(); });
-    requestAnimationFrame(() => el.classList.add("is-open"));
+    void el.offsetWidth; el.classList.add("is-open");
     setTimeout(() => el.querySelector("input, button:not([data-drawer-close])")?.focus({ preventScroll: true }), 340);
     return { el, close };
   };
@@ -557,5 +559,107 @@
     if (!badge) { badge = document.createElement("span"); badge.className = "d-tab__count"; tab.appendChild(badge); }
     badge.textContent = n;
     badge.classList.remove("is-bump"); void badge.offsetWidth; badge.classList.add("is-bump");
+  };
+})();
+
+/* ==========================================================================
+   Applications — list (440:134641), horizontal step tracker, centred modal for
+   milestone moments (440:137299). The milestone content is the mobile kit's
+   "Loan / Milestone sheet" (ui.Milestone*), so the delight is identical in both views.
+   ========================================================================== */
+(function () {
+  const { html, raw } = OPL;
+  const D = OPL.d;
+
+  // Horizontal steps (440:134792): 30px indicator, 3px connector, label 14 + sub 12
+  // state: done (green) | progress (blue ring, part-filled connector) | action (amber ring) | todo (grey)
+  const IND = {
+    done: (i) => (i === 0 ? "step-plain-white" : i === 1 ? "step-buildings-white" : "step-doc-amber"),
+    progress: () => "step-buildings-blue",
+    action: () => "step-doc-amber",
+    todo: () => "step-doc-grey",
+  };
+  D.hSteps = (steps) => html`
+    <div class="d-steps">${steps.map((s, i) => html`
+      <div class="d-step d-step--${s.state}" style="--i:${i}">
+        <div class="d-step__rail">
+          <span class="d-step__ind">${D.icon(s.icon || IND[s.state](i), 16)}</span>
+          ${i < steps.length - 1 ? html`<span class="d-step__line"><i></i></span>` : ""}
+          <span class="d-step__gap"></span>
+        </div>
+        <div class="d-step__text"><p>${s.label}</p><small>${s.sub}</small></div>
+      </div>`)}
+    </div>`;
+
+  // Centred modal (desktop counterpart of the bottom sheet): scrim, spring pop, Esc / scrim to close
+  D.openModal = (page, body, { width = 480, cls = "", onClose } = {}) => {
+    const host = page.querySelector(".d-app");
+    const el = document.createElement("div");
+    el.className = `d-modal-layer ${cls}`;
+    el.innerHTML = `<div class="d-scrim" data-modal-close></div><section class="d-modal" role="dialog" aria-modal="true" style="width:${width}px">${body}</section>`;
+    host.appendChild(el);
+    let closed = false;
+    const close = () => {
+      if (closed) return; closed = true;
+      el.classList.remove("is-open");
+      document.removeEventListener("keydown", onKey, true);
+      setTimeout(() => el.remove(), 320);
+      onClose && onClose();
+    };
+    const onKey = (e) => { if (e.key === "Escape") { e.stopPropagation(); close(); } };
+    document.addEventListener("keydown", onKey, true);
+    el.addEventListener("click", (e) => { if (e.target.closest("[data-modal-close], [data-sheet-close]")) close(); });
+    void el.offsetWidth; el.classList.add("is-open");     // reflow, not rAF: also opens in a background tab
+    return { el, close };
+  };
+
+  // WhatsApp updates pill (440:134742)
+  D.whatsappPill = (on = true) => html`
+    <button class="d-wa ${on ? "is-on" : ""}" role="switch" aria-checked="${on}" data-wa>
+      ${D.icon("whatsapp", 20)}<span>WhatsApp updates</span><span class="d-toggle__track"><span class="d-toggle__knob"></span></span>
+    </button>`;
+
+  D.noteRow = (text) => html`<div class="d-note">${D.icon("info-circle-note", 24)}<span>${text}</span></div>`;
+})();
+
+/* Apply ("Proceed applying", mobile 382:41022) as a desktop modal — the mobile sheet body
+   (ui.ApplySheetBody) and the same submit: applications start as "verifying", the list
+   opens and plays the approval moment. */
+(function () {
+  const D = OPL.d;
+  D.apply = (page, ids) => {
+    ids = (ids || []).filter(Boolean);
+    if (!ids.length) return;
+    const cl = OPL.data.compareLoans;
+    const lenderOf = (id) => {
+      const rec = cl.records[cl.aliases[id] || id];
+      const card = OPL.data.loanCatalog[id];
+      return { id, name: rec ? rec.name : card.title, logo: rec ? rec.logo : card.logo,
+        type: rec ? rec.values.type : card.subtitle, amount: OPL.fx.longAmount(rec ? rec.values.amount : `Up to ${card.figures[0].value}`) };
+    };
+    const body = OPL.ui.ApplySheetBody({ lenders: ids.map(lenderOf) }).toString();
+    const m = D.openModal(page, `<div class="d-applym">${body}</div>`, { width: 520, cls: "d-modal--apply" });
+    m.el.addEventListener("click", (e) => {
+      const c = e.target.closest("[data-consent]");
+      if (c) {
+        const on = c.getAttribute("aria-pressed") !== "true";
+        c.setAttribute("aria-pressed", on);
+        c.querySelector("img").src = `assets/icons/${on ? "check-square-22" : "check-square"}.svg`;
+        c.classList.remove("is-popping"); void c.offsetWidth; c.classList.add("is-popping");
+        m.el.querySelector("[data-apply-submit]").disabled = !on;
+        return;
+      }
+      const sub = e.target.closest("[data-apply-submit]");
+      if (sub) {
+        sub.classList.add("is-loading");
+        setTimeout(() => {
+          const apps = OPL.screens.applications;
+          apps.apps = ids.map((id) => ({ id, status: "verifying" }));
+          apps.fresh = true;
+          m.close();
+          setTimeout(() => OPL.go("applications"), D.motionOff() ? 0 : 260);
+        }, D.motionOff() ? 0 : 900);
+      }
+    });
   };
 })();

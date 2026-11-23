@@ -277,3 +277,93 @@
 .d-main.has-bar .d-fab-wrap { bottom: 98px; }
 .d-btn--block { width: 100%; }
 .d-btn.is-popping { animation: d-bump 360ms var(--ease-spring); }
+
+/* ---- Horizontal steps (440:134792) ------------------------------------------------------- */
+.d-steps { display: flex; align-items: flex-start; }
+.d-step { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.d-step__rail { display: flex; align-items: center; gap: 8px; }
+.d-step__ind { width: 30px; height: 30px; flex-shrink: 0; border-radius: 999px; display: grid; place-items: center; background: #f1f5f9; transform: scale(0.6); opacity: 0; transition: transform 420ms var(--ease-spring) calc(var(--i) * 220ms), opacity 200ms calc(var(--i) * 220ms); }
+.d-step--done .d-step__ind { background: #2c8a47; }
+.d-step--progress .d-step__ind { background: #e8eefd; box-shadow: inset 0 0 0 1.5px var(--primary); }
+.d-step--action .d-step__ind { background: #fef3c7; box-shadow: inset 0 0 0 1.5px #b45309; }
+.d-step__line { position: relative; flex: 1; height: 3px; border-radius: 2px; background: #e2e8f0; overflow: hidden; }
+.d-step__line i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 2px; transition: width 520ms var(--d-ease) calc(var(--i) * 220ms + 160ms); }
+.d-step--done .d-step__line i { background: #2c8a47; }
+.d-step--progress .d-step__line i { background: var(--primary); }
+.d-step__gap { width: 4px; height: 2px; flex-shrink: 0; }
+.d-step__text { display: flex; flex-direction: column; gap: 2px; padding-right: 12px; }
+.d-step__text p { font-size: 14px; line-height: normal; font-weight: 500; color: var(--foreground); }
+.d-step__text small { font-size: 12px; line-height: normal; color: var(--tertiary-foreground); }
+.d-step--progress .d-step__text small { color: var(--primary); }
+.d-step--action .d-step__text small { color: #b45309; }
+.d-steps.is-in .d-step__ind { transform: none; opacity: 1; }
+.d-steps.is-in .d-step--done .d-step__line i { width: 100%; }
+.d-steps.is-in .d-step--progress .d-step__line i { width: 61px; animation: d-progress 2.4s ease-in-out 1.2s infinite; }
+@keyframes d-progress { 0%, 100% { width: 61px; } 50% { width: 84px; } }
+/* in-progress ring breathes; the action step pings once */
+.d-steps.is-in .d-step--progress .d-step__ind { animation: d-ring-pulse 2.4s ease-out 1s infinite; }
+@keyframes d-ring-pulse { 0% { box-shadow: inset 0 0 0 1.5px var(--primary), 0 0 0 0 rgba(56, 88, 229, 0.28); } 70%, 100% { box-shadow: inset 0 0 0 1.5px var(--primary), 0 0 0 8px rgba(56, 88, 229, 0); } }
+.d-steps.is-in .d-step--action .d-step__ind { animation: d-ring-amber 2.4s ease-out 1s 2; }
+@keyframes d-ring-amber { 0% { box-shadow: inset 0 0 0 1.5px #b45309, 0 0 0 0 rgba(180, 83, 9, 0.28); } 70%, 100% { box-shadow: inset 0 0 0 1.5px #b45309, 0 0 0 8px rgba(180, 83, 9, 0); } }
+
+/* ---- Application card (440:134748): 2px #F1F5F9 stroke inside, tinted head, white body ----- */
+.d-appcard { display: flex; flex-direction: column; padding: 4px 4px 0; border-radius: 16px; background: #fff; box-shadow: inset 0 0 0 2px #f1f5f9; cursor: pointer; transition: transform 260ms var(--d-ease), box-shadow 260ms var(--d-ease); }
+.d-appcard:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 2px #e2e8f0, var(--d-shadow-hover); }
+.d-appcard:hover .d-logo { transform: scale(1.06); }
+.d-appcard:focus-visible { box-shadow: inset 0 0 0 2px var(--primary), var(--d-focus); }
+.d-appcard__head { position: relative; display: flex; align-items: flex-start; justify-content: space-between; padding: 0 0 16px 20px; border-radius: 16px; background: var(--tint); overflow: hidden; }
+.d-appcard__id { display: flex; align-items: flex-start; gap: 12px; padding-top: 16px; }
+.d-appcard__tag { display: inline-flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 0 0 0 12px; background: #fff; font-size: 12px; line-height: normal; font-weight: 500; color: #92400e; white-space: nowrap; }
+.d-appcard__body { display: flex; flex-direction: column; gap: 24px; padding: 20px 16px 24px 20px; border-radius: 14px; background: #fff; }
+.d-appcard__row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.d-appcard__figs { display: flex; align-items: flex-end; gap: 48px; }
+.d-appcard__figs .d-fig__value small { font-weight: 500; }
+.d-btn--neutral { box-shadow: inset 0 0 0 1px var(--border); }
+.d-btn--neutral:hover { box-shadow: inset 0 0 0 1px var(--primary); background: var(--primary-tint); }
+
+/* ---- WhatsApp pill (440:134742) + note row ---------------------------------------------- */
+.d-wa { display: inline-flex; align-items: center; gap: 8px; padding: 12px; border-radius: 999px; background: var(--muted); font-size: 14px; line-height: 20px; font-weight: 500; color: var(--foreground); transition: background 160ms; }
+.d-wa:hover { background: #e8edf3; }
+.d-wa.is-on .d-toggle__track { background: #4338ca; }
+.d-wa.is-on .d-toggle__knob { transform: translateX(16px); }
+.d-note { display: flex; align-items: center; gap: 12px; font-size: 14px; line-height: 20px; color: var(--muted-foreground); }
+
+/* ---- Modal (desktop counterpart of the bottom sheet) ------------------------------------ */
+.d-modal-layer { position: absolute; inset: 0; z-index: 70; display: grid; place-items: center; pointer-events: none; }
+.d-modal-layer.is-open { pointer-events: auto; }
+.d-modal-layer .d-scrim { position: absolute; inset: 0; }
+.d-modal-layer.is-open .d-scrim { opacity: 1; }
+.d-modal {
+  position: relative; max-height: calc(100% - 64px); overflow: auto;
+  border-radius: 24px; background: #fff; box-shadow: 0 24px 64px -16px rgba(15, 23, 42, 0.35);
+  opacity: 0; transform: translateY(16px) scale(0.96);
+  transition: opacity 240ms, transform 460ms var(--ease-spring);
+}
+.d-modal-layer.is-open .d-modal { opacity: 1; transform: none; }
+/* Milestone content (mobile "Loan / Milestone sheet" 400:1873) inside the 480 modal (R2/R9) */
+.d-ms { padding: 20px 24px 12px; }
+.d-ms .sheet__grabber { display: none; }
+.d-ms .ms { padding-top: 0; }
+.d-ms .ms__hero { margin: 0 auto; }
+.d-modal-layer.is-open .ms__ripple { animation: ms-ripple 1.8s var(--ease-out) 200ms infinite; }
+.d-modal-layer.is-open .ms__glow1, .d-modal-layer.is-open .ms__glow2 { animation: ms-breathe 2.4s ease-in-out infinite; }
+.d-modal-layer.is-open .ms__mark { animation: ms-pop 520ms var(--ease-spring) 120ms both; }
+.d-modal-layer.is-open .ms__badge, .d-modal-layer.is-open .ms__badge-bg { animation: ms-pop 420ms var(--ease-spring) 420ms both; }
+.d-modal-layer.is-open .ms__confetti .cf {
+  animation: cf-burst 1150ms cubic-bezier(0.18, 0.89, 0.32, 1.12) both, cf-fall 1500ms cubic-bezier(0.55, 0, 0.85, 0.4) forwards;
+  animation-delay: calc(var(--i) * 22ms + 180ms), calc(1250ms + var(--i) * 45ms);
+}
+.d-modal-layer.is-open .ms__content > * { animation: enter-up 420ms var(--ease-out) both; }
+.d-modal-layer.is-open .ms__content > :nth-child(2) { animation-delay: 80ms; }
+.d-modal-layer.is-open .ms__content > :nth-child(3) { animation-delay: 140ms; }
+.d-modal-layer.is-open .ms__content > :nth-child(4) { animation-delay: 200ms; }
+.d-ms .btn { transition: transform 120ms var(--d-ease), background 160ms, box-shadow 160ms; }
+.d-ms .btn--filled:hover { background: #2f4ed6; box-shadow: 0 6px 16px -6px rgba(56, 88, 229, 0.55); }
+.d-ms .ms__later:hover { opacity: 0.75; }
+
+/* Apply modal: the mobile "Proceed applying" body (382:41022) inside a 520 modal */
+.d-applym { padding: 8px 8px 4px; }
+.d-applym .sheet__grabber { display: none; }
+.d-modal-layer.is-open .d-applym > * > * { animation: enter-up 380ms var(--ease-out) both; }
+.d-applym .btn { transition: transform 120ms var(--d-ease), background 160ms, box-shadow 160ms, opacity 160ms; }
+.d-applym .btn--filled:not([disabled]):hover { background: #2f4ed6; box-shadow: 0 6px 16px -6px rgba(56, 88, 229, 0.55); }

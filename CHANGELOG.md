@@ -1,5 +1,29 @@
 # Changelog
 
+## v0.12.0 — 23 Nov 2026 · Desktop Applications + Apply, with the approval moment
+
+Branch `flow/desktop`. Synced from Figma `440:134641` (Your Applications) and `440:137299` ("Citi Bank approved your loan" over the list), in section *final-loan applications* `440:134259`.
+
+**Added**
+
+- **Loans › Applications** (`440:134641`):
+  - "Your Applications" header with its count and the **WhatsApp updates** pill (toggle).
+  - One card per application: tinted head, "2 days left" tag on KFS-ready cards, and figures with the CTA on one row. Verifying shows Loan offer and Interest with View details; KFS ready shows Final offer, Interest, APR and Monthly EMI with Review KFS.
+  - **Horizontal steps**: done (green), in progress (blue ring, part-filled connector), action (amber ring), to do (grey).
+  - The one-KFS-a-month note.
+- **Apply modal**: the mobile "Proceed applying" body in a 520 modal, opened by every Apply Now (Overview, Loan Offers) and by "Apply to selected lenders" on Compare. Submit creates the applications exactly as mobile does.
+- **Delight, as on mobile.** A few seconds after you submit, the first lender approves. Its card flips to KFS ready and the **approval milestone** opens in a 480 modal. It's the mobile `Loan / Milestone sheet` (confetti burst that falls away, ripple, breathing glow, logo and tick popping), so the moment is identical in both views. `#ms=on` opens it directly, as on mobile. "Review KFS" leads to the application page.
+- **Shared state.** Applications come from the mobile kit (`OPL.apps`), so an application submitted or advanced in one view shows the same status in the other.
+
+**Interaction layer**
+
+- Steps grow in one after another. The in-progress ring breathes and its connector inches forward; the action ring pings twice.
+- Cards lift on hover. View details and Review KFS nudge their chevron or arrow.
+- Modals spring in over a scrim and close on Esc or a scrim click.
+- Overlays now open with a reflow instead of `requestAnimationFrame`, so they also open in a background tab or a hidden preview pane.
+
+**Not on desktop yet** (opens the "isn't designed for desktop yet" page, with a one-click switch to mobile): Application page (`440:136328`, `440:136512`, `440:136901`, `440:137099`), KFS reader (`440:134934`), NeSL signing (`471:24999`…), and the Signed / Disbursed milestones (`440:136706`, `440:137099`).
+
 ## v0.11.0 — 23 Nov 2026 · Desktop Loan Offers + Compare
 
 Branch `flow/desktop`. Synced from Figma `357:102436` (Loan Offers tab), `507:84666` (tagged offer rows), `507:85604` (Compare, empty), `507:86537` / `507:87387` (three added, Selected and the Apply bar) and `507:86111` / `507:85929` (Add offers drawer).

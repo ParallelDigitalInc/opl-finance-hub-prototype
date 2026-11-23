@@ -58,10 +58,7 @@
           return D.toggleCompare(page, id, o.name);
         }
         const apply = e.target.closest("[data-apply]");
-        if (apply && OPL.hasScreen("d-apply")) {
-          e.stopPropagation();
-          return OPL.go("d-apply", { lender: apply.dataset.apply });
-        }
+        if (apply) { e.stopPropagation(); return D.apply(page, [apply.dataset.apply]); }
       });
     },
   };

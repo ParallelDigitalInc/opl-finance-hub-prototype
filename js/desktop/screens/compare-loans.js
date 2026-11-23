@@ -145,10 +145,7 @@
         }
         if (e.target.closest("[data-browse]")) return this.openDrawer(page);
         const apply = e.target.closest("[data-apply-selected]");
-        if (apply && OPL.hasScreen("d-apply")) {
-          e.stopPropagation();
-          return OPL.go("d-apply", { lenders: this.sel.join(",") });
-        }
+        if (apply) { e.stopPropagation(); return D.apply(page, this.sel.slice()); }
       });
     },
 
