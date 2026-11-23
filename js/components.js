@@ -337,8 +337,8 @@
       ${r.sub ? `<span class="ct-sub">${r.sub}</span>` : ""}</div>`;
     const value = (l, r) => {
       const v = l.values[r.id];
-      const best = l.best.includes(r.id);
-      return `<div class="${cx("ct-cell ct-value", r.small && "ct-value--small", best && "is-best")}" data-row="${r.id}" style="--h:${r.h}px">
+      const best = (l.best || []).includes(r.id);
+      return `<div class="${cx("ct-cell ct-value", r.small && "ct-value--small", best && "is-best", v === "—" && "is-na")}" data-row="${r.id}" style="--h:${r.h}px">
         ${Array.isArray(v) ? `<span>${v[0]}</span><span class="ct-sub">${v[1]}</span>` : `<span>${v}</span>`}</div>`;
     };
     return html`

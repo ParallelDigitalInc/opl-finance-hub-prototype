@@ -414,6 +414,7 @@
 .ct-value { padding-left: var(--s12); font-size: 14px; line-height: 20px; font-weight: var(--fw-medium); color: var(--foreground); width: 115px; }
 .ct-value--small { justify-content: center; font-size: 12px; line-height: 16px; }
 .ct-value.is-best > span:first-child { color: var(--best); }
+.ct-value.is-na { color: var(--icon-subtle); }
 .ct-head { height: 102px; padding: var(--s16) var(--s4) var(--s8); width: 115px; }
 .ct-card { border: 1.5px solid var(--primary); border-radius: 14px; background: #fff; overflow: hidden; }
 .ct-card__inner { display: flex; flex-direction: column; gap: var(--s8); padding: var(--s8) var(--s6) var(--s8) var(--s8); border-radius: 11px; }

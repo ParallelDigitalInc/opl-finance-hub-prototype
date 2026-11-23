@@ -15,8 +15,15 @@
     render(page) {
       this.leave();
       const d = OPL.data.compareLoans;
-      // working copy so removing columns / picking doesn't mutate the data
-      this.cols = d.lenders.map((l) => ({ ...l }));
+      // Columns follow the Loan offers selection (in the order picked). Opened without
+      // one (panel / direct link), it shows the Figma frame as drawn.
+      const sel = (OPL.screens["loan-offers"] && OPL.screens["loan-offers"].sel) || [];
+      const picks = sel.length ? sel.map((id) => ({ id, selected: true })) : d.figmaDefault;
+      this.cols = picks.map(({ id, selected }) => {
+        const key = d.aliases[id] || id;
+        return { id, ...d.records[key], selected };
+      });
+      this.computeBest(d);
       this.diff = false;
 
       page.innerHTML = html`
@@ -40,6 +47,19 @@
     },
 
     selectedCount() { return this.cols.filter((c) => c.selected).length; },
+
+    /* Green = best in the row among the lenders on screen (needs 2+ known values that differ). */
+    computeBest(d) {
+      const num = (v) => { const m = String(Array.isArray(v) ? v[0] : v).match(/[\d.]+/); return m ? parseFloat(m[0]) : null; };
+      this.cols.forEach((c) => (c.best = []));
+      Object.entries(d.bestRules).forEach(([row, dir]) => {
+        const vals = this.cols.map((c) => num(c.values[row]));
+        const known = vals.filter((x) => x != null);
+        if (known.length < 2 || known.every((x) => x === known[0])) return;
+        const target = dir === "max" ? Math.max(...known) : Math.min(...known);
+        this.cols.forEach((c, i) => { if (vals[i] === target) c.best.push(row); });
+      });
+    },
 
     wire(page, d) {
       OPL.fx.statusOnScroll(page);
@@ -69,8 +89,12 @@
           const id = x.dataset.colRemove;
           page.querySelectorAll(`[data-col="${id}"]`).forEach((el) => el.classList.add("is-removing"));
           this.cols = this.cols.filter((c) => c.id !== id);
+          // keep the list in step: removing here un-ticks it there
+          const lo = OPL.screens["loan-offers"];
+          if (lo && lo.sel) lo.sel = lo.sel.filter((x) => x !== id);
           this.timers.push(setTimeout(() => {
             page.querySelectorAll(`[data-col="${id}"]`).forEach((el) => el.remove());
+            this.computeBest(d); this.paintBest(page);
             this.paintCta(page, d); this.paintDiff(page, d);
             if (this.cols.length <= 1) page.querySelectorAll(".ct-card__x").forEach((b) => (b.style.visibility = "hidden"));
           }, OPL.fx.motionOff() ? 0 : 320));
@@ -78,6 +102,11 @@
       });
 
       OPL.fx.enter(page, [...page.querySelectorAll(".ct-col")], { holdMs: 2000 });
+    },
+
+    paintBest(page) {
+      this.cols.forEach((c) => page.querySelectorAll(`.ct-col[data-col="${c.id}"] .ct-value`).forEach((cell) =>
+        cell.classList.toggle("is-best", c.best.includes(cell.dataset.row))));
     },
 
     paintCta(page, d) {

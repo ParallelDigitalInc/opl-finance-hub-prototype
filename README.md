@@ -130,9 +130,13 @@ All of this is behaviour on existing elements. None of it adds UI:
 
 ## Figma flags · Loan offers flow (`416:121835`)
 
-1. **Compare loans doesn't match the selection.**
-   - The compare state selects SIDBI + Axis, but Compare loans shows Citi, SIDBI and a third lender.
-   - Figma has no compare data for Axis or HDFC, so the screen shows its three drawn columns whatever you pick. I need either data for every offer or a fixed demo set.
+1. **Compare loans follows the selection** (decided 23 Nov). Columns are the ticked offers, in the order they were ticked; opened directly, it shows the Figma set (Citi, SIDBI, SBI). Removing a column un-ticks it on the list.
+   - Green means the best value in the row among the lenders on screen: max loan amount, min interest, APR, fee and Money in. It needs 2+ known values that differ. EMI isn't coloured, as in Figma. This rule reproduces Figma's greens for the drawn set.
+   - **Data OPL needs to supply:** Axis and HDFC have no Compare data in Figma. Their APR, Money in, and (for the All-offers cards) the processing fee show "—", and CGTMSE cover is unknown.
+   - Derived values:
+     - "Needed" collateral, from the "Needs collateral" tag
+     - EMI ₹1,50,690 → "₹1.51 L/mo"
+   - **Figma conflict:** Citi's card says Tenure "Renews yearly", Fee 0.75%, while its Compare column says 3 years, 1.5%. Compare uses the Compare column.
 2. **The third Compare column** is labelled "SIDBI" but carries the SBI logo and different figures. It's shown as **SBI**.
 3. **"Top 3 picks" draws only 2 cards.** I added SIDBI as the third, using only Figma values: its All-offers card, plus the 0.5% processing fee from Compare loans.
 4. **Nav doesn't match.** Loan offers uses the Finance hub tabs (Home · Business · Finance · Grow), while Loans overview uses the Loans tabs, whose Offers tab leads here. Kept as drawn.

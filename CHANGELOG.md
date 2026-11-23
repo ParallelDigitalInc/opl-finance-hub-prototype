@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.4.1 — 23 Nov 2026 · Compare follows selection
+
+- **Compare loans columns now follow the Loan offers selection,** in tick order. Without a selection it falls back to the Figma frame (Citi, SIDBI, SBI; 2 of 3 picked).
+- **Per-offer compare records** are built from Figma sources only, with "—" where Figma has no figure (Axis and HDFC APR, fee, Money in). Unknown values are muted.
+- **Green "best" values are computed per row** on screen and recomputed when a column is removed. The Figma set renders exactly as drawn.
+- **Removing a column un-ticks that offer on the list.** The tray and outlines update when you go back.
+
 ## v0.4.0 — 23 Nov 2026 · Loan offers + Compare loans
 
 Synced from Figma section "Loans" `416:121835`:

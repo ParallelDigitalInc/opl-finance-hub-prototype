@@ -8,6 +8,7 @@
   const lo = OPL.data.loansOverview;
   const of = OPL.data.loanOffers;
   const cl = OPL.data.compareLoans;
+  const clCols = cl.figmaDefault.map(({ id, selected }) => ({ id, ...cl.records[id], selected, best: { "pick-citi": ["amount", "interest", "money"], "offer-sidbi": ["amount", "interest", "apr"], sbi: ["fee"] }[id] }));
   const root = document.getElementById("lib");
 
   const TOKENS = {
@@ -141,7 +142,7 @@
     },
     {
       name: "CompareTable", node: "382:37840 · pick row 382:37990", use: "Sticky label column, horizontally scrolling lender columns, best values in green.",
-      demos: [["", OPL.raw(`<div style="width:390px;overflow:hidden;border-radius:12px;box-shadow:inset 0 0 0 1px var(--border)">${ui.CompareTable({ rows: cl.rows.slice(0, 4), lenders: cl.lenders })}${ui.ComparePick({ label: cl.pickLabel, lenders: cl.lenders })}</div>`), `ui.CompareTable({ rows, lenders }) · ui.ComparePick({ label, lenders })`]],
+      demos: [["", OPL.raw(`<div style="width:390px;overflow:hidden;border-radius:12px;box-shadow:inset 0 0 0 1px var(--border)">${ui.CompareTable({ rows: cl.rows.slice(0, 4), lenders: clCols })}${ui.ComparePick({ label: cl.pickLabel, lenders: clCols })}</div>`), `ui.CompareTable({ rows, lenders }) · ui.ComparePick({ label, lenders })`]],
     },
     {
       name: "PageNote", node: "proposed", use: "Quiet sign-off at the end of a scrolling page. Proposed — not in Figma yet.",

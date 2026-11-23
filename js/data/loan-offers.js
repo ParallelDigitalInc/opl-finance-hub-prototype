@@ -100,27 +100,49 @@
       { id: "collateral", label: "Collateral", h: 68 },
       { id: "money", label: "Money in", sub: "estimate, after signing", h: 68 },
     ],
-    // best: values drawn in green (#15803D) in Figma
-    lenders: [
-      {
-        id: "citi", name: "Citi Bank", logo: "citiApp", tint: "var(--tint-blue)", selected: true,
+    /* One record per comparable offer, keyed by the Loan offers card id.
+       Sources: Citi, SIDBI and SBI columns of 382:37839 (complete). Axis and HDFC have
+       no Compare data in Figma, so their rows use only what their cards show, and "—"
+       where Figma has nothing. "Best" (green) is computed per row on screen. */
+    records: {
+      "pick-citi": {
+        name: "Citi Bank", logo: "citiApp", tint: "var(--tint-blue)",
         values: { type: "Working capital loan", amount: "Up to ₹50 L", interest: "9.45% p.a.", apr: "10.54%", tenure: "3 years",
           emi: "₹1.60 L/mo", fee: "1.5%", collateral: ["Not needed", "CGTMSE"], money: "~3-4 days" },
-        best: ["amount", "interest", "money"],
       },
-      {
-        id: "sidbi", name: "SIDBI", logo: "sidbi", tint: "#f6f8e2", selected: true,
+      "offer-sidbi": {
+        name: "SIDBI", logo: "sidbi", tint: "#f6f8e2",
         values: { type: "Working capital term loan", amount: "Up to ₹50 L", interest: "9.45% p.a.", apr: "9.81%", tenure: "3 years",
           emi: "₹1.60 L/mo", fee: "0.5%", collateral: ["Not needed", "CGTMSE"], money: "~5-7 days" },
-        best: ["amount", "interest", "apr"],
       },
-      {
-        id: "sbi", name: "SBI", logo: "sbi", tint: "#eceefc", selected: false,
+      sbi: {
+        name: "SBI", logo: "sbi", tint: "#eceefc",
         values: { type: "Term loan · CGTMSE", amount: "Up to ₹45 L", interest: "9.75% p.a.", apr: "10.07%", tenure: "3 years",
           emi: "₹1.45 L/mo", fee: "0.44%", collateral: ["Not needed", "CGTMSE"], money: "~7-10 days" },
-        best: ["fee"],
       },
-    ],
+      // From the Axis "Top 3 picks" card (382:35360)
+      "pick-axis": {
+        name: "Axis Bank", logo: "axis", tint: "var(--tint-pink)",
+        values: { type: "Working capital loan", amount: "Up to ₹50 L", interest: "9.45% p.a.", apr: "—", tenure: "Renews yearly",
+          emi: "—", fee: "0.75%", collateral: ["Not needed"], money: "—" },
+      },
+      // From the Axis / HDFC All-offers cards (382:35525, 382:35571). EMI ₹1,50,690 → ₹1.51 L/mo.
+      "offer-axis": {
+        name: "Axis Bank", logo: "axis", tint: "var(--tint-pink)",
+        values: { type: "Cash credit limit", amount: "Up to ₹50 L", interest: "9.45% p.a.", apr: "—", tenure: "Renews yearly",
+          emi: "₹1.51 L/mo", fee: "—", collateral: ["Needed"], money: "—" },
+      },
+      "offer-hdfc": {
+        name: "HDFC Bank", logo: "hdfcMark", tint: "var(--tint-blue)",
+        values: { type: "Cash credit limit", amount: "Up to ₹50 L", interest: "9.45% p.a.", apr: "—", tenure: "Renews yearly",
+          emi: "₹1.51 L/mo", fee: "—", collateral: ["Needed"], money: "—" },
+      },
+    },
+    aliases: { "pick-sidbi": "offer-sidbi" },  // same SIDBI product
+    // Rows that get a green "best" value, and which direction wins (as Figma colours them; EMI isn't coloured)
+    bestRules: { amount: "max", interest: "min", apr: "min", fee: "min", money: "min" },
+    // Shown when the screen is opened without a selection (panel / direct link): the Figma frame as drawn
+    figmaDefault: [{ id: "pick-citi", selected: true }, { id: "offer-sidbi", selected: true }, { id: "sbi", selected: false }],
     pickLabel: "Pick your loan",
     cta: (n) => `Apply to ${n} lender${n === 1 ? "" : "s"}`,
   };
