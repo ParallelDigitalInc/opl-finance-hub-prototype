@@ -68,7 +68,8 @@
         <div class="floating">
           ${ui.AiMitraFab({ nudge: v.nudge === "on" ? d.aiNudge : null })}
           <div class="floating__tray" data-tray></div>
-          ${ui.BottomNav({ items: OPL.data.home.nav, active: "finance" })}
+          ${/* Loans section footer, Offers active — same tabs and labels as Loans overview (Shreya, 23 Nov) */ ""}
+          ${ui.BottomNav({ items: OPL.data.loansOverview.nav.map((it) => ({ ...it, label: it.overviewLabel || it.label })), active: "loan-offers", variant: "section" })}
         </div>
 
         ${ui.Sheet({ id: "sort", title: "Sort by", body: html`<div class="sheet-sort" data-sort-list>${d.sortOptions.map((o) => ui.SortOption({ label: o, selected: o === this.sort }))}</div>` })}

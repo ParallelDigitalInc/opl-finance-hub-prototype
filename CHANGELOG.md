@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.16.9 — 23 Nov 2026 · Loan offers gets the Loans footer
+
+Shreya: the footer on "See all loan offers" / "View all" should match the Loans page, with Offers selected.
+
+- **Loan offers footer:** it used the Finance hub tabs (Home · Business · Finance · Grow). It now uses the Loans tabs (Overview · Offers · Applications · My Loans), with Offers active and the same labels as Loans overview.
+- **Moving between Overview and Offers:** the footer holds still and only the active pill moves.
+- **New active icon:** Solar Banknote 2 Bold in `#3858E5` (`assets/icons/banknote-2-active.svg`), the same family as the other active tabs.
+- **Figma flag:** Loan offers is still drawn with the Finance hub tabs (README → Loan offers flow, flag 4).
+
 ## v0.16.8 — 23 Nov 2026 · Desktop frame fits short windows · no repeated "Open till"
 
 - **The desktop frame now fits the window's height as well as its width.** In a short window the frame (760px minimum) used to run past the bottom and get cropped. That cut off the Calculate estimate drawer's footer (live estimate, Get Estimate) and anything else at the bottom: apply bars, modal actions. It now scales down to fit instead. Shreya: "getting cut".
