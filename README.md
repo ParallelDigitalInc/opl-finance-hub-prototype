@@ -11,7 +11,7 @@ starts the HTML component kit that later mobile flows reuse.
 
 **Screens (v0.10.0):**
 - **Home:** frames `382:34093`, `382:33823`, `382:36681`
-- **Loans overview:** `382:36150`. Home → "Explore Loans" pushes it; the back arrow or browser back pops it.
+- **Loans overview:** `382:36150`. Home → "Explore Loans" pushes it; Back returns to Home.
 - **Loan offers:** list `382:35324`, comparing `382:35666`, Sort sheet `393:505`, Filters sheet `393:869`. Reached from:
   - Loans overview → "See all loans (7)" or the Offers tab
   - Home → "View all" on Top loan matches
@@ -139,7 +139,9 @@ tools/hooks/pre-commit     runs both before every commit
 5. If a pattern is new, add it to `components.js`, the matching CSS file and `library.js`, with its Figma node ID.
 
 Screens expose `render(page)` and `leave()`; `leave()` clears timers when the page is popped or replaced.
-`data-goto="<screen>"` on any element links it, and `data-back` pops the current page. Until that screen exists, tapping it flashes a hotspot hint.
+`data-goto="<screen>"` on any element links it. Until that screen exists, tapping it flashes a hotspot hint.
+
+`data-back` (every in-app Back and ✕) goes **up**, not to the last page seen. `OPL.parents` in `js/app.js` lists the screens each one sits under, most usual first. Back returns to the nearest of those on the path taken, skipping bottom-nav tab switches, panel jumps and hand-offs. With none on the path (opened from the panel or a link), it lands on the first one and keeps only `app` plus the prototype params. Bottom-nav tabs sit under their section's Overview. On desktop "home" means Loans overview. The browser's own back button still pops real history.
 
 ## Loading (guardrail)
 

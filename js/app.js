@@ -1,7 +1,8 @@
 /* ==========================================================================
    Prototype shell — router (push/pop pages), device scaling, variant panel.
    Navigation: OPL.go(name) pushes a page (slides in from the right) and a
-   browser history entry; OPL.back() / the browser back button pops it.
+   browser history entry. OPL.back() (every in-app Back / Close) goes UP, not to
+   the last page seen: see OPL.parents. The browser's own back button still pops history.
    Variant changes re-render the current page in place.
    Device: #device=desktop swaps the phone for a 1440-wide browser window and renders
    OPL.dscreens (js/desktop/*, a separate bundle fetched on first switch). The screen
@@ -68,13 +69,45 @@
     if (!OPL.hasScreen(name)) return;
     const next = hashFor({ screen: name, ...params });
     if (next === location.hash || (name === screenName() && !Object.keys(params).length)) return;
-    if (replace) history.replaceState({ depth }, "", next);
-    else { history.pushState({ depth: depth + 1 }, "", next); depth++; }
+    const trail = trailNow().slice(0, depth);
+    if (replace) history.replaceState({ depth, trail: [...trail, name] }, "", next);
+    else { history.pushState({ depth: depth + 1, trail: [...trail, screenName(), name] }, "", next); depth++; }
     render({ dir: "forward" });
   };
+  /* Back = up. Each screen lists the screens it sits under, most usual first. Back returns
+     to the nearest of those on the path you took (so Subsidy details goes back to Explore
+     if you came from Explore, to Home if you came from Home), skipping tab switches, panel
+     jumps and one-off hand-offs in between. If none is on the path (opened from the panel
+     or a link), it lands on the first one. Bottom-nav tabs sit under the section's Overview. */
+  OPL.parents = {
+    "loans-overview": ["home"],
+    "loan-offers": ["loans-overview", "home"],
+    applications: ["loans-overview", "home"],
+    "compare-loans": ["loan-offers"],
+    application: ["applications", "loans-overview", "home"],
+    kfs: ["application"],
+    nesl: ["kfs", "application"],
+    "subsidies-overview": ["home"],
+    "subsidies-explore": ["subsidies-overview"],
+    "subsidy-detail": ["subsidies-explore", "subsidies-overview", "home"],
+    "subsidy-estimate": ["subsidy-detail"],
+    "subsidy-estimate-result": ["subsidy-detail"],
+  };
+  // Prototype-wide params that survive a jump up; screen state (sheets, steps, presets) doesn't
+  const KEEP = ["app", "device", "panel", "motion", "hotspots", "frame"];
+  const trailNow = () => (history.state && history.state.trail) || [];
   OPL.back = () => {
-    if (depth > 0) return history.back();
-    history.replaceState({ depth: 0 }, "", hashFor({ screen: null }));
+    const cur = screenName();
+    // Desktop has no Finance Home: its root is Loans overview
+    const ups = (OPL.parents[cur] || ["home"]).map((n) => (isDesktop() && n === "home" ? "loans-overview" : n));
+    if (cur === "home" || (isDesktop() && cur === "loans-overview")) return;
+    const trail = trailNow();
+    for (let i = depth - 1; i >= 0; i--) if (ups.includes(trail[i])) return history.go(i - depth);
+    const parent = ups[0];
+    const st = OPL.state.get(), next = { screen: parent === "home" ? null : parent };
+    KEEP.forEach((k) => st[k] != null && (next[k] = st[k]));
+    const hash = "#" + new URLSearchParams(Object.entries(next).filter(([, v]) => v != null)).toString();
+    history.replaceState({ depth, trail: [...trail.slice(0, depth), parent] }, "", hash);
     render({ dir: "back" });
   };
 
@@ -329,7 +362,7 @@
       const target = scr.dataset.screen;
       if (target === screenName() || (isDesktop() && target === dName(screenName()))) return;
       // Going "up" to home reads as a back; anything else pushes.
-      if (target === "home" || (isDesktop() && target === "loans-overview" && depth === 0)) { history.replaceState({ depth: 0 }, "", hashFor({ screen: null })); depth = 0; return render({ dir: "back" }); }
+      if (target === "home" || (isDesktop() && target === "loans-overview" && depth === 0)) { history.replaceState({ depth: 0, trail: ["home"] }, "", hashFor({ screen: null })); depth = 0; return render({ dir: "back" }); }
       return OPL.go(target);
     }
     const preset = e.target.closest("[data-preset]");
@@ -380,7 +413,7 @@
   });
 
   OPL.initInteractions(screenEl);
-  history.replaceState({ depth: 0 }, "", location.hash || "#");
+  history.replaceState({ depth: 0, trail: [screenName()] }, "", location.hash || "#");
 
   /* ---- boot: render hidden, reveal when fonts + first-screen images are ready ---- */
   const timeout = (ms) => new Promise((r) => setTimeout(r, ms));

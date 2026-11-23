@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.16.5 — 23 Nov 2026 · Back goes up, not to the last page seen
+
+Shreya: back on mobile isn't logical; it takes me to random screens.
+
+Every Back and ✕ used to replay browser history, including bottom-nav tab switches and panel jumps. Now each screen has a parent (`OPL.parents`, README → Structure), and Back returns to the nearest parent on the path you took, or to the usual one if you jumped in.
+
+- **Offers / Applications tabs** → Loans overview → Home, whichever tabs you went through.
+- **Subsidy details** → Explore, Subsidies home or Home, whichever you came from.
+- **Estimate result ✕** → Subsidy details.
+- **KFS deep link** → Application (same loan) → Applications → Loans overview.
+- Desktop follows the same map, with Loans overview as its top level.
+
 ## v0.16.4 — 23 Nov 2026 · 3D factory and pins for the new-unit art
 
 The illustration I missed in v0.16.2 (Illustrations `558:103493`).
