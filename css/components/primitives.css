@@ -1,0 +1,141 @@
+/* ==========================================================================
+   Primitives — Button, IconButton, Avatar, Logo, FactPill, Dots, Chip, Badge
+   ========================================================================== */
+
+/* ---- Button (Figma Button 2:118) --------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s8);
+  border-radius: var(--r-full);
+  font-weight: var(--fw-medium);
+  font-size: 14px;
+  line-height: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  transition: transform var(--dur-press) var(--ease-out), opacity var(--dur-fast);
+}
+.btn--lg { height: var(--btn-lg); padding: var(--s12) var(--s20); }
+.btn--sm { height: var(--btn-sm); padding: var(--s8) var(--s16); gap: var(--s4); line-height: 16px; }
+.btn--filled { background: var(--primary); color: var(--primary-foreground); }
+.btn--text { height: auto; padding: var(--s4) 0; gap: var(--s4); color: var(--primary); overflow: visible; }
+.btn--block { width: 100%; }
+.btn .ico { transition: transform var(--dur-fast) var(--ease-out); }
+.btn.is-pressed { transform: scale(0.97); }
+.btn--text.is-pressed { transform: none; opacity: 0.6; }
+.btn--text.is-pressed .ico, .btn--filled.is-pressed .ico:last-child { transform: translateX(2px); }
+
+/* ---- IconButton (header, 382:34257) ------------------------------------ */
+.icon-btn {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-full);
+  background: rgba(255, 255, 255, 0.5);
+  display: grid;
+  place-items: center;
+  transition: transform var(--dur-press) var(--ease-out), background var(--dur-fast);
+}
+.icon-btn.is-pressed { transform: scale(0.92); background: rgba(255, 255, 255, 0.8); }
+
+/* ---- Avatar (382:34261) ------------------------------------------------ */
+.avatar {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-full);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  background: #1e1e1e;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: transform var(--dur-press) var(--ease-out);
+}
+.avatar__bg { position: absolute; left: -5px; top: 0; width: 60px; height: 40px; object-fit: cover; max-width: none; }
+.avatar__fg { position: absolute; left: -1px; top: -22px; width: 47px; height: 59px; max-width: none; }
+.avatar.is-pressed { transform: scale(0.92); }
+
+/* ---- Logo -------------------------------------------------------------- */
+.logo {
+  position: relative;
+  flex-shrink: 0;
+  width: var(--logo);
+  height: var(--logo);
+  border-radius: var(--r-full);
+  border: var(--ring, 0px) solid var(--neutral-border);
+}
+.logo__fill { position: absolute; inset: 0; border-radius: var(--r-full); overflow: hidden; background: var(--muted); }
+.logo__cover { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.logo__crop { position: absolute; max-width: none; }
+
+/* ---- FactPill (382:34270) ---------------------------------------------- */
+.fact {
+  display: inline-flex;
+  white-space: pre;
+  padding: var(--s4) var(--s12);
+  border-radius: var(--r-full);
+  background: var(--hero-fact-bg);
+  mix-blend-mode: multiply;
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: var(--fw-medium);
+  color: var(--foreground);
+}
+.fact__strong { font-weight: var(--fw-semibold); }
+.fact__accent { color: var(--primary); }
+
+/* ---- Carousel dots (382:34097) ----------------------------------------- */
+.dots { display: flex; justify-content: center; align-items: center; gap: var(--s4); height: 8px; }
+.dot {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 30px;
+  background: var(--border);
+  overflow: hidden;
+  transition: width var(--dur-base) var(--ease-out);
+}
+.dot::before { content: ""; position: absolute; inset: -8px; } /* larger tap target */
+.dot__fill { position: absolute; left: 0; top: 0; height: 8px; width: 0; border-radius: 30px; background: var(--primary); }
+.dot.is-active { width: 24px; }
+.dot.is-active .dot__fill { width: 14px; transition: width var(--dur-base) var(--ease-out); }
+/* auto-advance: fill becomes a progress bar */
+.dots.is-auto .dot.is-active .dot__fill { width: 24px; transition: none; animation: dot-progress var(--autoplay, 5s) linear both; }
+.dots.is-auto.is-paused .dot.is-active .dot__fill { animation-play-state: paused; }
+@keyframes dot-progress { from { width: 0; } to { width: 24px; } }
+
+/* ---- Chip (382:34182) + Badge (382:34194) ------------------------------ */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s6);
+  flex-shrink: 0;
+  padding: var(--s8) var(--s12);
+  border-radius: var(--r-full);
+  background: var(--tile);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: var(--fw-medium);
+  color: var(--foreground);
+  white-space: nowrap;
+  transition: transform var(--dur-press) var(--ease-out), background var(--dur-fast), box-shadow var(--dur-fast);
+}
+.chip.is-pressed { transform: scale(0.96); }
+/* Selected state — from Loan offers chip component 392:490 (same file) */
+.chip.is-selected { background: var(--primary-tint); box-shadow: inset 0 0 0 1px var(--primary); }
+.badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 9px; /* Figma: text trimmed to cap height → 16×9 */
+  padding: 0 var(--s4);
+  border-radius: var(--r-full);
+  background: var(--badge-bg);
+  font-size: 12px;
+  line-height: 9px;
+  font-weight: var(--fw-medium);
+  text-align: center;
+  color: var(--foreground);
+  text-box: trim-both cap alphabetic;
+}

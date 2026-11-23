@@ -1,0 +1,162 @@
+/* ==========================================================================
+   Cards — HeroCard, MatchCard, QuickAction, SectionHeader, HelpCard, NoticeBanner
+   ========================================================================== */
+
+/* ---- HeroCard (front 382:34286 · back 382:34276) -----------------------
+   One component, scaled by --s. Back card = 194/289 = 0.6713.            */
+.hero-card {
+  --s: 1;
+  width: calc(289px * var(--s));
+  padding: calc(3px * var(--s));
+  outline: 1px solid var(--border); outline-offset: -1px; /* Figma stroke: inside, not in layout */
+  border-radius: calc(16px * var(--s));
+  background: var(--surface);
+  box-shadow: var(--shadow-s);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.hero-card__inner {
+  flex: 1 1 auto;
+  border-radius: calc(14px * var(--s));
+  background: var(--tint);
+}
+.hero-card__row { display: flex; }
+.hero-card__text { display: flex; flex-direction: column; flex: 1 1 0; min-width: 0; }
+.hero-card__title { font-weight: var(--fw-medium); font-size: calc(16px * var(--s)); color: var(--foreground); }
+.hero-card__sub { font-size: calc(12px * var(--s)); color: var(--muted-foreground); white-space: nowrap; }
+
+/* loan */
+.hero-card--loan { padding-bottom: calc(16px * var(--s)); }
+.hero-card--loan .hero-card__inner { padding: calc(16px * var(--s)) 0 calc(16px * var(--s)) calc(14px * var(--s)); }
+.hero-card--loan .hero-card__row { align-items: center; gap: calc(8px * var(--s)); }
+.hero-card--loan .hero-card__text { gap: calc(1px * var(--s)); }
+.hero-card--loan .hero-card__title { line-height: calc(21px * var(--s)); }
+.hero-card--loan .hero-card__sub { line-height: calc(18px * var(--s)); }
+.hero-card--back.hero-card--loan .hero-card__inner { opacity: 0.8; border-radius: 9px; }
+
+/* subsidy */
+.hero-card--subsidy { height: calc(110px * var(--s)); }
+.hero-card--subsidy .hero-card__inner { display: flex; padding: calc(16px * var(--s)) calc(14px * var(--s)); }
+.hero-card--subsidy .hero-card__row { flex: 1; align-items: flex-start; gap: calc(12px * var(--s)); }
+.hero-card--subsidy .hero-card__text { gap: calc(4px * var(--s)); }
+.hero-card--subsidy .hero-card__title { line-height: calc(21px * var(--s)); } /* Figma "normal" for Geist 16 = 21 */
+.hero-card--subsidy .hero-card__sub { line-height: calc(16px * var(--s)); }
+.hero-card--back.hero-card--subsidy { opacity: 0.8; }
+
+/* ---- MatchCard (loan 382:34123 · subsidy 382:34197) -------------------- */
+.match {
+  flex: 0 0 289px;
+  width: 289px;
+  display: flex;
+  flex-direction: column;
+  padding: var(--s4);
+  outline: 1px solid var(--border); outline-offset: -1px;
+  border-radius: var(--r-large);
+  background: var(--surface);
+  scroll-snap-align: start;
+  transition: transform var(--dur-press) var(--ease-out);
+  cursor: pointer;
+}
+.match--loan { box-shadow: var(--shadow-s); overflow: hidden; }
+.match--subsidy { filter: var(--shadow-drop-s); }
+.match.is-pressed { transform: scale(0.98); }
+
+.match__head {
+  display: flex;
+  flex-direction: column;
+  padding: 0 0 var(--s16) var(--s20);
+  border-radius: var(--r-large);
+  background: var(--tint);
+}
+.match__tag {
+  align-self: flex-end;
+  padding: var(--s6) var(--s8);
+  border-bottom-left-radius: var(--r-tag);
+  background: var(--surface);
+  font-size: 12px;
+  line-height: 16px; /* Figma "normal" → 28px tag */
+  font-weight: var(--fw-medium);
+  color: var(--primary);
+  white-space: nowrap;
+}
+.match__id { display: flex; flex-direction: column; gap: var(--s12); }
+.match__text { display: flex; flex-direction: column; }
+.match__title { font-size: 16px; font-weight: var(--fw-medium); color: var(--foreground); }
+.match__sub { font-size: 12px; color: var(--muted-foreground); }
+.match--loan .match__text { gap: 3px; }
+.match--loan .match__title { line-height: 21px; }
+.match--loan .match__sub { line-height: 18px; white-space: nowrap; }
+.match--subsidy .match__text { gap: var(--s4); }
+.match--subsidy .match__title { line-height: 21px; }
+.match--subsidy .match__sub { line-height: 16px; }
+
+.match__body {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--s32);
+  padding: var(--s20);
+  border-radius: var(--r-inner);
+  background: var(--surface);
+}
+.figure { display: flex; flex-direction: column; gap: var(--s2); white-space: nowrap; }
+.figure__label { font-size: 12px; line-height: 16px; color: var(--muted-foreground); }
+.figure__value { display: flex; align-items: baseline; gap: var(--s4); font-size: 20px; line-height: 28px; font-weight: var(--fw-medium); color: var(--foreground); }
+.figure__unit { font-size: 12px; line-height: 16px; }
+
+/* ---- QuickAction (382:34102) ------------------------------------------- */
+.qa { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 7px; }
+.qa__tile {
+  height: 74px;
+  border-radius: var(--r-large);
+  background: var(--tile);
+  display: grid;
+  place-items: center;
+  transition: transform var(--dur-press) var(--ease-out), background var(--dur-fast);
+}
+.qa__tile .ico { transition: transform var(--dur-base) var(--ease-spring); }
+.qa__label { font-size: 14px; line-height: 18px; font-weight: var(--fw-medium); text-align: center; color: var(--foreground); }
+.qa.is-pressed .qa__tile { transform: scale(0.94); background: #edf1f6; }
+.qa.is-pressed .qa__tile .ico { transform: scale(1.08); }
+
+/* ---- SectionHeader (382:34119) ----------------------------------------- */
+.section-head { display: flex; align-items: center; justify-content: space-between; padding: 0 var(--gutter); }
+.section-head__title { font-size: 20px; line-height: 28px; font-weight: var(--fw-medium); color: var(--foreground); white-space: nowrap; }
+
+/* ---- HelpCard (382:34297) ---------------------------------------------- */
+.help {
+  position: relative;
+  overflow: hidden;
+  padding: var(--s16);
+  outline: 1px solid var(--border); outline-offset: -1px;
+  border-radius: var(--r-large);
+  background: var(--help-bg);
+  box-shadow: var(--shadow-s);
+}
+.help__text { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; gap: var(--s16); }
+.help__copy { display: flex; flex-direction: column; gap: var(--s2); }
+.help__title { width: 231px; font-size: 14px; line-height: 20px; font-weight: var(--fw-medium); color: var(--foreground); }
+.help__sub { font-size: 12px; line-height: 16px; color: var(--tertiary-foreground); }
+.help__art { position: absolute; left: 178px; top: 3px; width: 181px; height: 120px; object-fit: cover; z-index: 2; pointer-events: none; }
+
+/* ---- NoticeBanner (382:36897) ------------------------------------------ */
+.notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--s16);
+  border: 1px solid var(--border);
+  border-radius: var(--r-large);
+  background: var(--surface);
+  box-shadow: var(--shadow-s);
+  transition: transform var(--dur-press) var(--ease-out);
+  cursor: pointer;
+}
+.notice.is-pressed { transform: scale(0.98); }
+.notice__lead { display: flex; align-items: center; gap: var(--s8); flex: 1 1 0; min-width: 0; }
+.notice__icon { display: flex; padding: var(--s8); border-radius: var(--r-full); background: var(--warning-bg); }
+.notice__text { font-size: 14px; line-height: 20px; color: var(--muted-foreground); white-space: nowrap; }
+.notice__text strong { font-weight: var(--fw-semibold); color: var(--foreground); }
+.notice__close { position: relative; display: flex; }
+.notice__close::before { content: ""; position: absolute; inset: -12px; }

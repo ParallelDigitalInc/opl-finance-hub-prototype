@@ -1,0 +1,103 @@
+/* ==========================================================================
+   Screen · Finance Hub Home (Figma 382:34093 / 382:33823 / 382:36681)
+   Vertical rhythm from the frames: hero 418 → dots +8 → quick actions +24
+   → sections +40 → help card +40 → 225 bottom space (frame height 1662).
+   ========================================================================== */
+
+.home { position: relative; padding-bottom: 225px; --dy: calc(var(--status-h) - 47px); }
+
+/* ---- Hero -------------------------------------------------------------- */
+.hero { position: relative; height: calc(418px + var(--dy)); }
+.hero__bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 0 0 var(--r-xl) var(--r-xl);
+  background: var(--hero-bg);
+  transition: background var(--dur-base);
+}
+.hero__ellipse { position: absolute; left: calc(50% - 209px); top: calc(81px + var(--dy)); width: 418px; height: 418px; max-width: none; }
+.hero__texture { position: absolute; left: -1px; top: calc(-50px + var(--dy)); width: 100%; height: 515px; max-width: none; opacity: 0.2; }
+.hero__blur {
+  position: absolute;
+  inset: 0;
+  border-radius: 0 0 var(--r-xl) var(--r-xl);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+.hero .app-header { position: absolute; top: var(--status-h); left: 0; right: 0; z-index: 2; }
+
+.hero__track {
+  position: absolute;
+  left: 0; right: 0;
+  top: calc(var(--status-h) + 72px);
+  bottom: 0;
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  z-index: 1;
+}
+.hero__track::-webkit-scrollbar { display: none; }
+.hero__slide { --p: 0; flex: 0 0 100%; display: flex; justify-content: center; padding-top: 12px; scroll-snap-align: center; scroll-snap-stop: always; }
+.hero__content { width: 334px; display: flex; flex-direction: column; align-items: center; gap: 29px; }
+.hero__slide--subsidies .hero__content { gap: 44px; }
+
+.hero__titleblock { display: flex; flex-direction: column; align-items: center; gap: var(--s12); translate: calc(var(--p) * 24px) 0; opacity: calc(1 - min(1, abs(var(--p)) * 1.4)); }
+.hero__eyebrow { font-size: 16px; line-height: 28px; font-weight: var(--fw-medium); text-align: center; }
+.hero__amount { font-size: 30px; line-height: 36px; letter-spacing: -0.4px; font-weight: var(--fw-semibold); text-align: center; font-variant-numeric: tabular-nums; }
+.hero__facts { display: flex; gap: var(--s8); align-self: stretch; }
+
+.hero__stack { display: flex; flex-direction: column; align-items: center; width: 100%; }
+.hero__cards { display: inline-grid; grid-template: max-content / max-content; place-items: start; margin-bottom: -20px; }
+.hero__cards > * { grid-area: 1 / 1; }
+.hero__cards .hero-card--back { margin-left: 47.5px; translate: calc(var(--p) * 56px) 0; }
+.hero__cards .hero-card:not(.hero-card--back) { margin-top: 17px; translate: calc(var(--p) * 16px) 0; }
+.hero__slide--subsidies .hero__cards { margin-bottom: -12px; }
+.hero__slide--subsidies .hero__cards .hero-card:not(.hero-card--back) { margin-top: 16px; }
+.hero__stack .btn { position: relative; }
+
+.home .dots { margin-top: 8px; }
+
+/* ---- Quick actions ----------------------------------------------------- */
+.quick { display: flex; gap: var(--s16); padding: 0 var(--gutter); margin-top: 24px; }
+
+/* ---- Sections ---------------------------------------------------------- */
+.home-section { margin-top: var(--section-gap); display: flex; flex-direction: column; gap: var(--s16); }
+.home-section__body { display: flex; flex-direction: column; gap: var(--s16); }
+.rail {
+  display: flex;
+  gap: var(--s16);
+  padding: 12px var(--gutter);
+  margin: -12px 0;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding: 0 var(--gutter);
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+.rail::-webkit-scrollbar { display: none; }
+.rail--chips { gap: var(--s8); scroll-snap-type: none; }
+
+.home .help { margin: var(--section-gap) var(--gutter) 0; }
+
+/* ---- Entrance choreography -------------------------------------------- */
+.enter { --i: 0; }
+.is-entering .enter { animation: enter-up var(--dur-slow) var(--ease-out) both; animation-delay: calc(var(--i) * 55ms + 80ms); }
+.is-entering .hero-card--back.enter { animation-name: enter-back; }
+.is-entering .hero-card:not(.hero-card--back).enter { animation-name: enter-front; }
+.is-entering .rail .match.enter { animation-name: enter-left; }
+@keyframes enter-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes enter-back { from { opacity: 0; transform: translateY(22px) scale(0.94); } to { opacity: var(--o, 1); transform: none; } }
+@keyframes enter-front { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
+@keyframes enter-left { from { opacity: 0; transform: translateX(28px); } to { opacity: 1; transform: none; } }
+.hero-card--back.hero-card--subsidy { --o: 0.8; }
+
+@media (prefers-reduced-motion: reduce) {
+  .is-entering .enter { animation: none !important; }
+  .hero__titleblock, .hero__cards > * { translate: none !important; }
+}

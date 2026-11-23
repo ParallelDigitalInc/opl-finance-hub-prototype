@@ -1,0 +1,114 @@
+# OPL Finance Hub · HTML prototype
+
+The source of truth for the Finance Hub flows as a clickable HTML prototype. It also
+starts the HTML component kit that later mobile flows reuse.
+
+- **Prototype:** `index.html` (a device frame plus a variant panel; full-screen on a phone)
+- **Component library:** `library.html` (tokens, icons and every component, rendered by the same functions)
+- **Figma:** `GHuBkYGEQZvQppv3v55EaA`, section *Finance Home* `416:82748`
+
+## Run it
+
+There is no build step. Open `index.html` directly, or serve the folder:
+
+```bash
+cd ~/Documents/OPL/finance-hub-html && npx serve .
+```
+
+On a phone (≤ 500px wide) the prototype goes full-bleed with no shell and no panel, and
+uses the real status bar and safe areas. Any state can be linked through the URL hash, for example:
+
+`index.html#order=subsidies&emi=on` · `#autoplay=on` · `#frame=off` · `#hotspots=off` · `#motion=off`
+
+## Structure
+
+```
+css/
+  tokens.css               design tokens; names mirror the Figma variables
+  base.css                 reset, stage, device shell, prototype panel (chrome, not product UI)
+  components/
+    primitives.css         Button, IconButton, Avatar, Logo, FactPill, Dots, Chip, Badge
+    cards.css              HeroCard, MatchCard, QuickAction, SectionHeader, HelpCard, NoticeBanner
+    chrome.css             StatusBar, AppHeader, FloatingBottom, AiMitraFab, BottomNav
+  screens/home.css         layout only: rhythm and positions for this screen
+js/
+  core.js                  OPL namespace, templating, URL state, press feedback, hotspots, count-up
+  components.js            OPL.ui.* (pure functions: props in, HTML out)
+  variants.js              toggle registry per screen (presets = Figma frames)
+  data/home.js             screen content, verbatim from Figma
+  screens/home.js          screen render and behaviour
+  app.js                   router, device scaling, panel
+  library.js               component library page
+assets/icons               Solar icons exported from Figma (colours baked in, as drawn)
+assets/img                 logos, avatar, hero texture, illustration
+```
+
+**Adding a screen:**
+1. Put its content in `js/data/<screen>.js`.
+2. Compose it from `OPL.ui` in `js/screens/<screen>.js` and register it in `OPL.screens`.
+3. Put layout-only CSS in `css/screens/<screen>.css`.
+4. Add its presets and toggles to `js/variants.js`.
+5. If a pattern is new, add it to `components.js`, the matching CSS file and `library.js`, with its Figma node ID.
+
+`data-goto="<screen>"` on any element links it. Until that screen exists, tapping it flashes a hotspot hint.
+
+## Fidelity rules
+
+- Figma is the source of truth. Nothing visual is added that isn't in the frames.
+- Strokes are drawn **inside** (`outline-offset: -1px`), because Figma strokes on these frames don't take layout space. A CSS `border` makes every card 2px too tall.
+- Figma "normal" line-height for Geist 16 is **21px**. It is set explicitly.
+- CTA colour is `#3858E5` as drawn on screen; the DS CTA token isn't updated yet. Text colours follow the updated DS.
+- Geist only. Icons are Solar, exported from Figma.
+
+Geometry was checked against Figma on 23 Nov 2026:
+- frame height 1662
+- hero card 95 / back 63.77
+- match cards 232 / 252
+- sections at y 615 and 931
+- help card 1319 / 118
+- floating bottom 172, or 246 with the EMI banner
+- nav items 56 / 57
+
+## Motion and behaviour (prototype layer)
+
+All of this is behaviour on existing elements. None of it adds UI:
+
+- **Entrance:** hero copy → back card → front card → CTA → dots → quick actions → sections, staggered 55ms apart. The ₹ amount counts up once.
+- **Hero carousel:** native swipe with snap. The back card has parallax (it moves more than the front card) and the copy fades as it slides. The dots stay in sync, and tapping a dot changes slide. Optional auto-advance turns the active dot's fill into a 5s progress bar; touching pauses it.
+- **Press states:**
+  - cards scale to 0.98
+  - tiles scale to 0.94, with a small icon pop
+  - buttons and chips scale to 0.96–0.97
+  - text links fade, and the chevron nudges
+  - Android adds a haptic tick
+- **Rails:** horizontal scroll-snap; mouse drag works on a laptop.
+- **Status bar:** gains a frosted surface once content scrolls under it.
+- **EMI banner:** dismissing slides it off. The slot then collapses and the AI Mitra button settles into the loans-frame position.
+- **AI Mitra:** a one-time attention ripple after the entrance. On press, the mark rotates.
+- Reduced-motion users get no entrance or parallax.
+
+## Figma flags (kept as drawn; to confirm)
+
+1. The "View all" chevron differs: the loans frame uses a heavier CaretRight than the subsidies frame. One is used everywhere (the loans frame's).
+2. The hero back card on the subsidy slide shows the Gujarat mark with the *MSME Competitive Lean Scheme* copy, the same as the front card.
+3. *Gujarat Electronics Policy* is tagged "Central Government", but it is a state policy (Science and Technology Department).
+4. The second loan card's tag "Working Capital Loan" repeats its subtitle.
+5. The help card in `382:36681` has 17px padding and is 120 tall; the other frames use 16 / 118. 16 is used.
+6. The tile and chip fill `#F5F7FA` is off-palette.
+7. The fact pill's text style is "label/medium" (Figtree) but renders in Geist. Geist is used.
+8. The EMI banner reads "due on 12 Nov", which is in the past relative to today's demo date.
+9. Inactive nav items are 57 tall while the active one is 56, so labels sit 1.5px higher. This is reproduced.
+
+## Versioning
+
+| | |
+|---|---|
+| Scheme | `0.MINOR.PATCH` until hand-off, then `1.0.0` |
+| MINOR | a new screen or flow is added (0.2 = next flow, …) |
+| PATCH | fidelity fixes or a Figma re-sync of existing screens |
+| Tag | every version is a git tag `vX.Y.Z`; the CHANGELOG lists the Figma nodes synced and the date |
+| Single source | `OPL.VERSION` in `js/core.js` (shown in the panel) |
+| Branches | `main` is always presentable. Work happens on `flow/<name>` and is merged when reviewed |
+| Deploys | each tag gets an immutable deploy URL, used in decks so the audience link never changes. A stable alias points to the latest |
+
+Release: bump `OPL.VERSION`, add a CHANGELOG entry, commit, `git tag vX.Y.Z`.
