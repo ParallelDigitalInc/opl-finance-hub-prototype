@@ -102,7 +102,7 @@
 
       page.innerHTML = D.shell({
         nav: "loans", title: "", tab: null,
-        crumbs: [{ label: "Loans", goto: "loans-overview" }, { label: "Applications", goto: "applications" }, { label: `Loan details - ${l.name}` }],
+        crumbs: [{ label: "Loans", goto: "loans-overview" }, { label: "Track Loans", goto: "applications" }, { label: `Loan details - ${l.name}` }],
         body: html`
           <div class="d-appd" style="--tint:${l.tint}">
             <div class="d-appd__main">

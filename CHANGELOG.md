@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.16.15 — 23 Nov 2026 · "Track Loans" everywhere
+
+Shreya: some places say "Track Loans", others "Applications"; stick to Track Loans.
+
+- **Mobile Loans footer:** the third tab now reads **Track Loans** on Loans overview, Offers and the money-received states too. The `overviewLabel` override is gone.
+- **Desktop:** the Loans tab and the breadcrumbs on loan details and KFS read **Track Loans**; the panel title is "Loans · Track Loans".
+- **Unchanged:** the page headings "Track Loan Applications (n)" (mobile) and "Your Applications" (desktop).
+- **README flag:** Figma still draws "Applications" on Loans overview (`382:36150`) and the disbursal frames (`435:*`).
+
 ## v0.16.14 — 23 Nov 2026 · Thinner phone frame, no blurry edges
 
 Shreya: why are there dark, blurry edges round the phone? Make the frame slightly thinner.

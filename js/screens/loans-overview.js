@@ -50,7 +50,7 @@
         </div>
         <div class="floating">
           ${ui.AiMitraFab({ nudge: v.nudge === "on" ? d.aiNudge : null })}
-          ${ui.BottomNav({ items: d.nav.map((it) => ({ ...it, label: it.overviewLabel || it.label })), active: "overview", variant: "section" })}
+          ${ui.BottomNav({ items: d.nav, active: "overview", variant: "section" })}
         </div>`;
 
       this.wire(page, d);

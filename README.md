@@ -290,7 +290,7 @@ All of this is behaviour on existing elements. None of it adds UI:
 1. **Copy is driven by the selection.** The single-lender sheet (`382:41357`) reuses the 2-lender copy ("Submit 2 applications", consent naming Citi Bank and SIDBI). I used "Submit application" and the actual lender names. Its note "A separate application goes to each lender…" is kept as drawn; consider dropping it for a single lender.
 2. **Lender rows don't match Compare.** The sheet shows SIDBI as "Term loan · Up to ₹48 Lakhs"; Compare says "Working capital term loan · Up to ₹50 L". Rows follow the shared loan data.
 3. **Two tracker styles on one screen.** The verifying card uses solid green, a blue in-progress step and 3px lines; the KFS card uses light tints and 2px lines. Reproduced as drawn.
-4. **The third Loans tab has two labels.** It reads "Track Loans" on the application screens (nav `440:132239`) and "Applications" on Loans overview (`382:36150`), each as drawn (Shreya, 23 Nov). Pick one name for both.
+4. **The third Loans tab is "Track Loans" everywhere** (Shreya, 23 Nov). It was drawn "Track Loans" on the application screens (nav `440:132239`) but "Applications" on Loans overview (`382:36150`) and the disbursal frames (`435:*`). The desktop tab and breadcrumbs follow suit. Page headings keep their own copy: "Track Loan Applications (n)" on mobile and "Your Applications" on desktop.
 5. **The DS Toggle "On" is indigo `#4338CA`** (old primary), not `#3858E5`. Used as drawn.
 6. **Lender-specific content exists only for SIDBI (verifying) and Citi (KFS ready).** Other lenders reuse those templates with their own name; this is **assumed**:
    - phone, address, documents and application number

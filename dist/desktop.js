@@ -99,7 +99,7 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
     { id: "overview", label: "Overview", icon: "tab-widget-outline", iconOn: "tab-widget-active", goto: "loans-overview" },
     { id: "offers", label: "Loan Offers", icon: "tab-banknote-2", iconOn: "nav-banknote-active", goto: "loan-offers" },
     { id: "compare", label: "Compare", icon: "tab-mirror-left", iconOn: "tab-mirror-bold", goto: "compare-loans" },
-    { id: "applications", label: "Applications", icon: "tab-document-text", iconOn: "tab-doc-bold", goto: "applications" },
+    { id: "applications", label: "Track Loans", icon: "tab-document-text", iconOn: "tab-doc-bold", goto: "applications" },
     { id: "myloans", label: "My Loans", icon: "tab-notes", goto: "my-loans" },
   ];
   D.tabs = (active = "overview", counts = {}) => html`
@@ -1864,7 +1864,7 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
   };
 
   OPL.dscreens.applications = {
-    title: "Loans · Applications",
+    title: "Loans · Track Loans",
     figma: { list: "440:134641", approved: "440:137299" },
     timers: [],
     leave() { this.timers.forEach(clearTimeout); this.timers = []; },
@@ -2038,7 +2038,7 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
 
       page.innerHTML = D.shell({
         nav: "loans", title: "", tab: null,
-        crumbs: [{ label: "Loans", goto: "loans-overview" }, { label: "Applications", goto: "applications" }, { label: `Loan details - ${l.name}` }],
+        crumbs: [{ label: "Loans", goto: "loans-overview" }, { label: "Track Loans", goto: "applications" }, { label: `Loan details - ${l.name}` }],
         body: html`
           <div class="d-appd" style="--tint:${l.tint}">
             <div class="d-appd__main">
@@ -2195,7 +2195,7 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
 
       page.innerHTML = D.shell({
         nav: "loans", title: "", tab: null,
-        crumbs: [{ label: "Loans", goto: "loans-overview" }, { label: "Applications", goto: "applications" }, { label: `Loan detail - ${l.name}`, goto: "application" }, { label: "Sign KFS and Sanction Letter" }],
+        crumbs: [{ label: "Loans", goto: "loans-overview" }, { label: "Track Loans", goto: "applications" }, { label: `Loan detail - ${l.name}`, goto: "application" }, { label: "Sign KFS and Sanction Letter" }],
         body: html`
           <div class="d-kfs">
             <div class="d-kfs__bar">

@@ -58,7 +58,7 @@
   };
 
   OPL.dscreens.applications = {
-    title: "Loans · Applications",
+    title: "Loans · Track Loans",
     figma: { list: "440:134641", approved: "440:137299" },
     timers: [],
     leave() { this.timers.forEach(clearTimeout); this.timers = []; },

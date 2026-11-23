@@ -95,7 +95,7 @@
     { id: "overview", label: "Overview", icon: "tab-widget-outline", iconOn: "tab-widget-active", goto: "loans-overview" },
     { id: "offers", label: "Loan Offers", icon: "tab-banknote-2", iconOn: "nav-banknote-active", goto: "loan-offers" },
     { id: "compare", label: "Compare", icon: "tab-mirror-left", iconOn: "tab-mirror-bold", goto: "compare-loans" },
-    { id: "applications", label: "Applications", icon: "tab-document-text", iconOn: "tab-doc-bold", goto: "applications" },
+    { id: "applications", label: "Track Loans", icon: "tab-document-text", iconOn: "tab-doc-bold", goto: "applications" },
     { id: "myloans", label: "My Loans", icon: "tab-notes", goto: "my-loans" },
   ];
   D.tabs = (active = "overview", counts = {}) => html`

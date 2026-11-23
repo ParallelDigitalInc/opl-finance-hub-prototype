@@ -44,7 +44,7 @@
 
       page.innerHTML = D.shell({
         nav: "loans", title: "", tab: null,
-        crumbs: [{ label: "Loans", goto: "loans-overview" }, { label: "Applications", goto: "applications" }, { label: `Loan detail - ${l.name}`, goto: "application" }, { label: "Sign KFS and Sanction Letter" }],
+        crumbs: [{ label: "Loans", goto: "loans-overview" }, { label: "Track Loans", goto: "applications" }, { label: `Loan detail - ${l.name}`, goto: "application" }, { label: "Sign KFS and Sanction Letter" }],
         body: html`
           <div class="d-kfs">
             <div class="d-kfs__bar">

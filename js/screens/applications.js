@@ -56,7 +56,7 @@
 
   /* ---- List --------------------------------------------------------------- */
   OPL.screens.applications = {
-    title: "Applications",
+    title: "Track Loans",
     figma: { list: "382:41059" },
     apps: null,
     fresh: false,
@@ -260,8 +260,8 @@
         <div class="${OPL.cx("floating", footCta && "floating--above-foot", signed && "floating--fab-only")}">
           ${ui.AiMitraFab({ nudge: d.aiNudge })}
           ${kfs || sign || signed ? "" : ui.BottomNav({
-            // the disbursal frames (435:*) label this tab "Applications", like Loans overview
-            items: money ? OPL.data.loansOverview.nav.map((it) => ({ ...it, label: it.overviewLabel || it.label })) : OPL.data.loansOverview.nav,
+            // "Track Loans" everywhere (Shreya, 23 Nov); the disbursal frames (435:*) draw "Applications" — flagged
+            items: OPL.data.loansOverview.nav,
             active: "applications", variant: "section" })}
         </div>
         ${kfs ? OPL.raw(`<div class="appd-foot">${ui.Button({ label: d.kfs.cta, block: true, goto: "kfs" })}</div>`) : ""}
