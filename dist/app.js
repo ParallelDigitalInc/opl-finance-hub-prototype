@@ -4,7 +4,7 @@
 
 (function () {
 const OPL = (window.OPL = window.OPL || {});
-OPL.VERSION = "0.15.7";
+OPL.VERSION = "0.15.8";
 OPL.FIGMA_FILE = "https://www.figma.com/design/GHuBkYGEQZvQppv3v55EaA/OPL----Internal-Playground--5-";
 OPL.figmaLink = (nodeId) => `${OPL.FIGMA_FILE}?node-id=${nodeId.replace(":", "-")}`;
 const esc = (v) =>
@@ -2265,16 +2265,7 @@ states: {
 title: "Schemes in",
 search: "Search a state",
 caption: "States fetched from your GST registration",
-all: { value: "All", label: "All states", sub: "Central schemes, and each state's own" },
-options: [
-{ value: "Gujarat", sub: "Principal place of business" },
-{ value: "Andhra Pradesh", sub: "Additional place of business" },
-{ value: "Karnataka", sub: "Additional place of business" },
-{ value: "Madhya Pradesh", sub: "Additional place of business" },
-{ value: "Maharashtra", sub: "Additional place of business" },
-{ value: "Rajasthan", sub: "Additional place of business" },
-{ value: "Tamil Nadu", sub: "Additional place of business" },
-],
+options: ["Gujarat", "Andhra Pradesh", "Karnataka", "Madhya Pradesh", "Maharashtra", "Rajasthan", "Tamil Nadu"],
 home: "Gujarat",                                      // the state whose schemes the cards are
 empty: (q) => `No state on your GST registration matches “${q}”.`,
 none: (state, filter) => `No ${filter ? filter.toLowerCase() + " " : ""}schemes to show for ${state} yet. Central schemes apply in every state.`,
@@ -4008,19 +3999,17 @@ ${sicon(c.icon, 24)}
 <span class="sh-chip__count" data-count="${c.count}">${c.count}</span>
 ${OPL.icon("alt-arrow-left", 16, "sh-chip__chev")}
 </button>`;
-const placeLabel = (p) => (p === "All" ? OPL.data.subsidiesHome.states.all.label : p);
-const stateRow = (o, label, on) => html`
-<button class="${cx("sh-state", on && "is-selected")}" role="radio" aria-checked="${on}" data-place="${o.value}" data-press>
-<span class="sh-state__text"><span class="sh-state__name">${label}</span><span class="sh-state__sub">${o.sub}</span></span>
+const stateRow = (value, on) => html`
+<button class="${cx("sh-state", on && "is-selected")}" role="radio" aria-checked="${on}" data-place="${value}" data-press>
+<span class="sh-state__name">${value}</span>
 ${on ? OPL.raw(`<img class="ico sh-state__radio" src="assets/icons/radio-selected.svg" width="20" height="20" alt="">`) : OPL.raw(`<span class="sort-opt__radio sh-state__radio"></span>`)}
 </button>`;
 const statesBody = (s, place) => html`
 <div class="sh-states">
 <label class="sh-search">${sicon("search-16", 16)}<input type="search" placeholder="${s.search}" aria-label="${s.search}" data-place-search autocomplete="off" spellcheck="false"></label>
-<p class="sh-states__caption">${sicon("gst-14", 14)}<span>${s.caption}</span></p>
+<p class="sh-states__caption">${s.caption}</p>
 <div class="sh-states__list" role="radiogroup" aria-label="${s.title}" data-place-list>
-${stateRow(s.all, s.all.label, place === "All")}
-${s.options.map((o) => stateRow(o, o.value, o.value === place))}
+${s.options.map((o) => stateRow(o, o === place))}
 </div>
 <p class="sh-states__empty" data-place-empty hidden></p>
 </div>`;
@@ -4057,7 +4046,7 @@ ${ui.StatusBar()}
 ${ui.SectionHeader({ title: t.title, action: t.action, goto: t.goto })}
 <div class="rail rail--chips sh-filters">
 <button class="sh-where" data-press data-open-sheet="states" aria-haspopup="dialog">
-${sicon("map-point-16", 16)}<span class="sh-where__label">${t.location.label}</span><span class="sh-where__value" data-place-label>${placeLabel(this.place)}</span>${sicon("alt-arrow-right-14", 14, "sh-where__chev")}
+${sicon("map-point-16", 16)}<span class="sh-where__label">${t.location.label}</span><span class="sh-where__value" data-place-label>${this.place}</span>${sicon("alt-arrow-right-14", 14, "sh-where__chev")}
 </button>
 <span class="chip-divider"></span>
 ${t.filters.map((f) => ui.Chip({ label: f.label, selected: this.filter === f.match && !!f.match, goto: f.goto, attrs: f.match ? `data-filter="${f.match}"` : "" }))}
@@ -4097,7 +4086,7 @@ const rail = page.querySelector("[data-rail]");
 const none = page.querySelector("[data-none]");
 const apply = (match) => {
 this.filter = match;
-const away = this.place !== "All" && this.place !== d.states.home;
+const away = this.place !== d.states.home;
 page.querySelectorAll("[data-filter]").forEach((c) => c.classList.toggle("is-selected", c.dataset.filter === match));
 let shown = 0;
 rail.querySelectorAll(".match").forEach((card) => {
@@ -4108,7 +4097,7 @@ if (!out) shown++;
 });
 none.hidden = shown > 0;
 rail.classList.toggle("is-empty", !shown);          // nothing to show: the rail folds away too
-if (!shown) none.textContent = d.states.none(placeLabel(this.place), match && (d.top.filters.find((f) => f.match === match) || {}).label);
+if (!shown) none.textContent = d.states.none(this.place, match && (d.top.filters.find((f) => f.match === match) || {}).label);
 rail.scrollTo({ left: 0, behavior: motionOff ? "auto" : "smooth" });
 };
 const sheets = OPL.fx.sheets(page, { onClose: () => {
@@ -4129,13 +4118,9 @@ if (!n) empty.textContent = d.states.empty(q.trim());
 };
 const pick = (value) => {
 this.place = value;
-page.querySelectorAll("[data-place]").forEach((b) => {
-const o = value === b.dataset.place;
-const opt = b.dataset.place === "All" ? d.states.all : d.states.options.find((x) => x.value === b.dataset.place);
-b.outerHTML = stateRow(opt, b.dataset.place === "All" ? d.states.all.label : opt.value, o).toString();
-});
+page.querySelectorAll("[data-place]").forEach((b) => { b.outerHTML = stateRow(b.dataset.place, b.dataset.place === value).toString(); });
 const label = page.querySelector("[data-place-label]");
-label.textContent = placeLabel(value);
+label.textContent = value;
 label.classList.remove("is-changed"); void label.offsetWidth; label.classList.add("is-changed");
 this.timers.push(setTimeout(() => { sheets.close(); apply(this.filter); }, motionOff ? 0 : 220));   // radio rows apply on tap, no CTA
 };

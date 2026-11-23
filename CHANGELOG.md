@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.15.8 — 23 Nov 2026 · Simpler "Schemes in" sheet
+
+Shreya's edits to the state sheet:
+
+- **No "All states" row.** The list is only the states on the GST registration.
+- **No row subcopy.** "Principal / Additional place of business" is gone. Rows are just the state name at the Sort sheet's 52px height.
+- **No GST icon** beside "States fetched from your GST registration".
+- All seven states now fit without scrolling. Picking still applies on tap, and outside Gujarat only central schemes show.
+
 ## v0.15.7 — 23 Nov 2026 · "Schemes in" state sheet (mobile) + subsidy card fixes
 
 **Added**
