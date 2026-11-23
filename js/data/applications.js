@@ -69,4 +69,75 @@
     withdraw: "Withdraw application",
     aiNudge: { lead: "Ask anything about", topic: "your application" },
   };
+
+  /* KFS reader — Figma 416:43474 (page 1, locked) + 416:43604 (page 4, read to end).
+     Pages 1, 2 and 4 are verbatim. Page 3 (Annex A) is NOT drawn in Figma: rows 13–17 on
+     page 2 point to it, so it is ASSUMED here (flagged in README). Lender text other than
+     Citi reuses the Citi template with the lender's name — ASSUMED. */
+  OPL.data.kfsDoc = {
+    step: "Step 1 of 2 · Accept KFS",
+    end: "End of Key Fact Statement",
+    consent: "I have read and understood the<br>Key Fact Statement",
+    hint: "Read to the last page to accept",
+    cta: "Accept KFS",
+    letterhead: { "pick-citi": "Citi Bank N.A. · Commercial Bank" },
+    pages: (l) => [
+      {
+        title: "Key Fact Statement",
+        meta: "Loan no. LA-2026-11-2231 · Issued 22 Nov 2026 · Valid till 25 Nov 2026",
+        part: "Part 1 · Interest rate and fees/charges",
+        rows: [
+          [1, "Loan proposal / account no.", "LA-2026-11-2231"],
+          [2, "Type of loan", "Working capital term loan"],
+          [3, "Sanctioned loan amount", "₹45,00,000"],
+          [4, "Disbursal schedule", "100% upfront"],
+          [5, "Loan term", "36 months"],
+          [6, "Instalments", "36 EMIs of ₹1,44,043"],
+          [7, "First instalment due", "5 Jan 2027"],
+          [8, "Interest rate (floating)", "9.45% p.a."],
+          [9, "Reference benchmark", "RBLR"],
+          [10, "Processing fee", "₹67,500 (incl. GST)"],
+          [11, "Annual Percentage Rate (APR)", "10.54%"],
+          [12, "Total interest payable", "₹6,85,548"],
+        ],
+        note: "APR is the yearly cost of credit to the borrower, including the interest rate and all fees and charges. Figures are computed on the sanctioned amount.",
+      },
+      {
+        part: "Part 1 (continued) · Contingent charges",
+        rows: [
+          [13, "Penal charges, if any", "See Annex A"],
+          [14, "Cheque / NACH bounce", "See Annex A"],
+          [15, "Foreclosure / prepayment", "See Annex A"],
+          [16, "Switch from floating to fixed rate", "See Annex A"],
+          [17, "Other charges", "See Annex A"],
+        ],
+      },
+      {
+        assumed: true,   // not in Figma
+        part: "Annex A · Contingent charges",
+        rows: [
+          [13, "Penal charges, if any", "2% p.a. on the overdue instalment"],
+          [14, "Cheque / NACH bounce", "₹500 per instance + GST"],
+          [15, "Foreclosure / prepayment", "Nil (floating rate)"],
+          [16, "Switch from floating to fixed rate", "0.5% of principal outstanding"],
+          [17, "Other charges", "Stamp duty as per state law"],
+        ],
+      },
+      {
+        part: "Part 2 · Other qualitative information",
+        rows: [
+          [1, "Recovery agents", "Engaged only as per RBI guidelines. List on the lender’s website."],
+          [2, "Grievance redressal officer", `Nodal Officer, ${l.name}, Mumbai · nodal.officer@${l.slug}.example`],
+          [3, "Cooling-off / look-up period", "3 days from disbursal, no penalty"],
+          [4, "Loan servicing agent", `${l.name} (no LSP)`],
+        ],
+        ack: {
+          title: "Borrower acknowledgement",
+          text: "I confirm that I have read and understood this Key Fact Statement, and that its contents were explained to me in a language I understand.",
+          lines: ["Borrower signature", "Date"],
+          foot: "To be signed electronically through OPL.",
+        },
+      },
+    ],
+  };
 })();

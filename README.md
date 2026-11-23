@@ -9,7 +9,7 @@ starts the HTML component kit that later mobile flows reuse.
 - **Component library:** `library.html` (tokens, icons and every component, rendered by the same functions)
 - **Figma:** `GHuBkYGEQZvQppv3v55EaA`, section *Finance Home* `416:82748`
 
-**Screens (v0.4.0):**
+**Screens (v0.7.0):**
 - **Home:** frames `382:34093`, `382:33823`, `382:36681`
 - **Loans overview:** `382:36150`. Home → "Explore Loans" pushes it; the back arrow or browser back pops it.
 - **Loan offers:** list `382:35324`, comparing `382:35666`, Sort sheet `393:505`, Filters sheet `393:869`. Reached from:
@@ -21,7 +21,8 @@ starts the HTML component kit that later mobile flows reuse.
   - **Track Loan Applications** (`382:41059`): reached from Submit or the Loans "Track Loans" tab.
   - **Application detail:** verifying (`382:42423`) or KFS ready (`382:42689`).
   - **"{Lender} approved your loan"** milestone sheet (`416:43921`).
-  - Groups D–F (KFS PDF, NeSL signing, disbursal) come next.
+  - **KFS reader** (group D, v0.7.0; `416:43474` → `416:43604`): from "Review Full KFS & Accept". Read to the last page, tick consent, then Accept KFS.
+  - Groups E–F (NeSL signing, disbursal) come next. Accept KFS shows a hotspot hint until then.
 
 ## Run it
 
@@ -208,6 +209,17 @@ All of this is behaviour on existing elements. None of it adds UI:
 7. **Strokes are in layout** on this section's info cards, status card, WhatsApp row and apply lenders card (unlike earlier match and offer cards).
 9. **Duplicate heading.** "Loan Application Details" appears twice in `382:42526` (section heading and card title). On Shreya's call (23 Nov) only the card title is kept.
 10. **Confetti exits.** Figma shows it resting around the mark. In the prototype it bursts to those spots, then falls away and fades (Shreya, 23 Nov).
+11. **KFS page 3 isn't drawn.** The KFS reads "Page n of 4", and rows 13–17 on page 2 say "See Annex A". Only pages 1, 2 (`416:43474`) and 4 (`416:43604`) exist. Page 3 is **assumed** as "Annex A · Contingent charges" (data `kfsDoc.pages[2]`, `assumed: true`) with placeholder values:
+    - 2% p.a. penal interest
+    - ₹500 per bounce
+    - Nil foreclosure on floating rate
+    - 0.5% to switch to fixed
+    - stamp duty
+    These need real copy from the lender or legal.
+12. **KFS consent states.** Figma draws *locked* (grey text, 50% checkbox, hint shown, disabled button) and *read to end* (ticked, enabled). Between them, the prototype adds *unlocked, not ticked*: ink text, full checkbox, button still disabled. You tick it yourself, as a consent should work.
+13. **Consent line break.** Page 4 breaks "…understood the / Key Fact Statement"; page 1 wraps after "Key Fact". Page 4's break is used in both states.
+14. **The KFS disabled button** is drawn as slate-200 fill with a #94A3B8 label at 50%. The DS's generic disabled state (45% opacity) isn't used here.
+15. **KFS for other lenders** reuses Citi's template with the lender's name: the letterhead name, grievance officer and LSP rows. Loan numbers and figures stay Citi's. This is **assumed**.
 8. **Prototype behaviour:** about 5 s after Submit, the first lender "approves" and the milestone sheet plays. This simulates the async lender response so the full flow can be demoed.
 
 ## Versioning

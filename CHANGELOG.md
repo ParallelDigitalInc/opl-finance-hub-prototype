@@ -1,5 +1,26 @@
 # Changelog
 
+## v0.7.0 — 23 Nov 2026 · KFS reader (group D)
+
+Synced from Figma `416:43474` (KFS, page 1) and `416:43604` (KFS Page 4).
+
+**Added**
+
+- **Key Fact Statement reader** (`kfs`). Reached from "Review Full KFS & Accept" on the KFS-ready application detail.
+  - The header has the lender's title, "Step 1 of 2 · Accept KFS" and a Download icon (hotspot, since there's no PDF yet).
+  - Four PDF pages (342×484) sit on the slate canvas, with letterhead, rule, numbered tables and the borrower acknowledgement, at Figma's exact type sizes (6.5–13px).
+  - The page counter pill and the 3px read-progress bar follow the scroll. Progress only moves forward.
+  - Reaching the last page unlocks consent: the row turns ink, "Read to the last page to accept" collapses, and the footer shrinks from 172 to 144.
+  - Ticking consent pops the checkbox and turns the disabled slate "Accept KFS" button primary. Accept goes to Step 2 (NeSL), which is a hotspot until group E is built.
+- **Presets:** "Reading (page 1)" for `416:43474`, and "Read to the end" for `416:43604` (scrolled to the end, ticked, enabled).
+- **Mobile:** on phones narrower than 390, pages scale to fit (fit-to-width); there's no sideways scroll.
+- Icon `download.svg` (Figma `416:43504`).
+
+**Assumed (flagged in README)**
+
+- Page 3 (Annex A) isn't drawn, so its charges are placeholders.
+- The unlocked-but-unticked consent state isn't drawn.
+
 ## v0.6.2 — 23 Nov 2026 · Confetti exit + heading fix
 
 - **Confetti** now leaves after the burst: each piece hangs a beat, then falls 150–240 px with a little drift and spin and fades out, staggered 45 ms apart. The sheet ends clean.

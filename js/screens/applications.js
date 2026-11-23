@@ -39,6 +39,7 @@
     { icon: "document-text-muted", label: "Sign KFS<br>and Sanction", state: "todo" },
   ];
   const kfsSteps = OPL.data.loansOverview.applications.card.steps;
+  OPL.apps = { lender, currentApps };   // shared with the KFS reader (screens/kfs.js)
 
   /* ---- List --------------------------------------------------------------- */
   OPL.screens.applications = {

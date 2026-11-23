@@ -1,0 +1,101 @@
+/* ==========================================================================
+   Screens · KFS reader — 416:43474 (locked) / 416:43604 (read to end)
+   Top: status 47 + header 76 (white). Canvas #F1F5F9, pages 342×484 Shadow/s,
+   16 apart, padding 16/24. Footer sticky: 172 locked → 144 unlocked; progress
+   3px on its top edge; page counter 12 above it. PDF type is drawn at 6.5–13px.
+   ========================================================================== */
+.kfs { position: absolute; inset: 0; --kfs-foot: 172px; --kfs-top: calc(var(--status-h) + 76px); background: #f1f5f9; }
+
+.kfs-top { position: absolute; top: 0; left: 0; right: 0; z-index: 3; padding-top: var(--status-h); background: var(--surface); }
+.kfs-top .status-bar { background: var(--surface); }
+.kfs-head { display: flex; align-items: center; gap: var(--s8); padding: var(--s16) var(--gutter); }
+.kfs-head__title { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; }
+.kfs-head__title h1 { font-size: 18px; line-height: 28px; font-weight: var(--fw-semibold); color: var(--foreground); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kfs-head__title p { font-size: 12px; line-height: 16px; color: var(--muted-foreground); white-space: nowrap; }
+.kfs-head__dl { position: relative; display: flex; margin-left: auto; transition: transform var(--dur-press) var(--ease-out), opacity var(--dur-fast); }
+.kfs-head__dl::before { content: ""; position: absolute; inset: -8px; }
+.kfs-head__dl.is-pressed { transform: translateY(2px); opacity: 0.6; }
+
+/* ---- PDF canvas -------------------------------------------------------- */
+.kfs-canvas {
+  top: var(--kfs-top);
+  padding: var(--s16) 24px calc(var(--kfs-foot) + 45px);   /* end text sits 9 above the counter (416:43604) */
+  display: flex; flex-direction: column; align-items: center; gap: var(--s16);
+  background: #f1f5f9;
+}
+.kfs-pages { display: flex; flex-direction: column; align-items: center; gap: var(--s16); }
+.kfs-end { font-size: 12px; line-height: 16px; color: #64748b; text-align: center; white-space: nowrap; }
+
+.kfs-page {
+  flex: 0 0 auto; width: 342px; height: 484px; overflow: hidden;
+  display: flex; flex-direction: column; align-items: flex-start; gap: var(--s8);
+  padding: 20px; background: #fff; box-shadow: var(--shadow-s);
+  color: #0f172a;
+  zoom: var(--kfs-zoom, 1);
+}
+.kfs-page h3, .kfs-page h4, .kfs-page p { margin: 0; }
+.kfs-page__lh { width: 100%; display: flex; align-items: center; gap: 6px; }
+.kfs-page__lh .logo { --logo-bg: var(--muted); }
+.kfs-page__org { flex: 1 1 0; min-width: 0; font-size: 8px; line-height: 10px; font-weight: var(--fw-medium); }
+.kfs-page__no { font-size: 6.5px; line-height: 8px; color: #64748b; white-space: nowrap; }
+.kfs-page__rule { display: block; width: 100%; height: 0.5px; flex: 0 0 0.5px; background: #cbd5e1; }
+.kfs-page__title { width: 100%; font-size: 13px; line-height: 16px; font-weight: var(--fw-semibold); }
+.kfs-page__meta { width: 100%; font-size: 7px; line-height: 10px; color: #64748b; }
+.kfs-page__part { font-size: 8px; line-height: 12px; font-weight: var(--fw-semibold); white-space: nowrap; }
+.kfs-page__note { width: 100%; font-size: 6.5px; line-height: 9px; color: #64748b; }
+
+.kfs-table { width: 100%; display: flex; flex-direction: column; border: 0.5px solid #cbd5e1; border-radius: 2px; overflow: hidden; font-size: 7px; line-height: 10px; }
+.kfs-row { display: flex; align-items: flex-start; gap: var(--s8); padding: 4px 6px; }
+.kfs-row--alt { background: var(--slate-50); }
+.kfs-row__n { flex: 0 0 10px; color: #64748b; }
+.kfs-row__l { flex: 1 1 0; min-width: 0; }
+.kfs-row__v { flex: 0 0 120px; font-weight: var(--fw-medium); }
+
+.kfs-ack { width: 100%; display: flex; flex-direction: column; gap: 6px; padding: 10px; border: 0.5px solid #cbd5e1; border-radius: 4px; }
+.kfs-ack__title { font-size: 8px; line-height: 12px; font-weight: var(--fw-semibold); }
+.kfs-ack__text { font-size: 7px; line-height: 10px; }
+.kfs-ack__sign { display: flex; gap: var(--s16); padding-top: 14px; }
+.kfs-ack__sign > div { flex: 1 1 0; display: flex; flex-direction: column; gap: 3px; }
+.kfs-ack__sign span { display: block; height: 0.5px; background: #94a3b8; }
+.kfs-ack__sign p, .kfs-ack__foot { font-size: 6.5px; line-height: 8px; color: #64748b; }
+
+/* ---- Page counter (416:43593) ----------------------------------------- */
+.kfs-counter {
+  position: absolute; z-index: 4; left: 50%; bottom: calc(var(--kfs-foot) + 12px); transform: translateX(-50%);
+  padding: 4px 10px; border-radius: 999px; background: rgba(15, 23, 42, 0.72);
+  font-size: 12px; line-height: 16px; font-weight: var(--fw-medium); color: #fff; white-space: nowrap;
+  transition: bottom 320ms var(--ease-out);
+}
+.kfs-counter b { font-weight: inherit; }
+.kfs-counter.is-popping b { display: inline-block; animation: kfs-tick 280ms var(--ease-out); }
+@keyframes kfs-tick { from { transform: translateY(5px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* ---- Sticky footer (416:43595 → 416:43674) ---------------------------- */
+.kfs-foot {
+  position: absolute; z-index: 5; left: 0; right: 0; bottom: 0;
+  display: flex; flex-direction: column; gap: var(--s12);
+  padding: var(--s16) var(--gutter) max(32px, env(safe-area-inset-bottom));
+  background: var(--surface);
+}
+.kfs-progress { position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--border); overflow: hidden; }
+.kfs-progress i { display: block; height: 100%; background: var(--primary); transition: width 480ms var(--ease-out); }
+
+.kfs-consent { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; }
+.kfs-consent .ico { flex: 0 0 24px; opacity: 0.5; transition: opacity var(--dur-fast); }
+.kfs-consent span { flex: 1 1 0; min-width: 0; font-size: 14px; line-height: 20px; color: #94a3b8; transition: color 320ms var(--ease-out); }
+.kfs-consent[disabled] { cursor: default; }
+.kfs-consent.is-popping .ico { animation: check-pop 360ms var(--ease-spring); }
+.is-unlocked .kfs-consent .ico { opacity: 1; }
+.is-unlocked .kfs-consent span { color: var(--foreground); }
+
+/* hint collapses on unlock: 172 → 144 (the -12 cancels its flex gap) */
+.kfs-hint { display: grid; grid-template-rows: 1fr; transition: grid-template-rows 320ms var(--ease-out), opacity 200ms, margin 320ms var(--ease-out); }
+.kfs-hint > p { overflow: hidden; min-height: 0; font-size: 12px; line-height: 16px; color: var(--muted-foreground); text-align: center; }
+.is-unlocked .kfs-hint { grid-template-rows: 0fr; opacity: 0; margin-top: -12px; }
+
+/* Disabled Button as drawn (416:43601): slate-200 fill, #94A3B8 label at 50% */
+.kfs-foot .btn { transition: transform var(--dur-press) var(--ease-out), background 280ms var(--ease-out), color 280ms var(--ease-out); }
+.kfs-foot .btn[disabled] { opacity: 1; background: var(--border); color: #94a3b8; }
+.kfs-foot .btn[disabled] .btn__label { opacity: 0.5; }
+
+.is-instant, .is-instant * { transition: none !important; }

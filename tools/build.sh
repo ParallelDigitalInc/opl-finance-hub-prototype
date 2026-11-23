@@ -17,6 +17,7 @@ CSS=(
   css/screens/loans-overview.css
   css/screens/loan-offers.css
   css/screens/applications.css
+  css/screens/kfs.css
 )
 JS=(
   js/core.js
@@ -33,6 +34,7 @@ JS=(
   js/screens/loan-offers.js
   js/screens/compare-loans.js
   js/screens/applications.js
+  js/screens/kfs.js
   js/app.js
 )
 

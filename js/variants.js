@@ -143,6 +143,16 @@
     ],
   };
 
+  OPL.variants.kfs = {
+    presets: [
+      { id: "start", label: "Reading (page 1)", figma: "416:43474", set: { read: "start" } },
+      { id: "end", label: "Read to the end", figma: "416:43604", set: { read: "end" } },
+    ],
+    groups: [
+      { id: "read", hidden: true, default: "start", options: [{ value: "start" }, { value: "end" }] },
+    ],
+  };
+
   /** Resolve the current value of every group for a screen (URL → default). */
   OPL.variantValues = (screen) => {
     const reg = OPL.variants[screen];
