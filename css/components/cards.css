@@ -97,7 +97,7 @@
   display: flex;
   flex-direction: column;
   padding: 0 0 var(--s16) var(--s20);
-  border-radius: var(--r-large);
+  border-radius: var(--r-inner);          /* 4 inside a 16 card → 14 */
   background: var(--tint);
 }
 .match__tag {

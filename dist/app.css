@@ -541,7 +541,7 @@ cursor: pointer;
 display: flex;
 flex-direction: column;
 padding: 0 0 var(--s16) var(--s20);
-border-radius: var(--r-large);
+border-radius: var(--r-inner);
 background: var(--tint);
 }
 .match__tag {
@@ -1333,7 +1333,7 @@ transition: transform var(--dur-press) var(--ease-out);
 }
 .benefit__top {
 position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: var(--s8);
-min-height: 106px; padding: var(--s16); border-radius: var(--r-large); background: var(--muted);
+min-height: 106px; padding: var(--s16); border-radius: var(--r-inner); background: var(--muted);
 }
 .benefit__title { font-size: 16px; line-height: 21px; font-weight: var(--fw-medium); color: var(--foreground); }
 .benefit__corner {
@@ -1932,9 +1932,9 @@ padding: 0; transition: padding var(--dur-base) var(--ease-out);
 .ecard__head {
 display: flex; align-items: center; justify-content: space-between; gap: var(--s8); width: 100%;
 padding: var(--s16); border-radius: var(--r-large); background: var(--surface); text-align: left;
-transition: background var(--dur-base) var(--ease-out);
+transition: background var(--dur-base) var(--ease-out), border-radius var(--dur-base) var(--ease-out);
 }
-.ecard.is-open > .ecard__head { background: var(--muted); }
+.ecard.is-open > .ecard__head { background: var(--muted); border-radius: var(--r-inner); }
 .ecard__name { display: flex; align-items: center; gap: var(--s8); min-width: 0; font-size: 16px; line-height: 21px; font-weight: var(--fw-medium); color: var(--foreground); white-space: nowrap; }
 .ecard__right { display: flex; align-items: center; gap: var(--s8); flex-shrink: 0; }
 .ecard__amt { font-size: 16px; line-height: 21px; font-weight: var(--fw-semibold); color: var(--foreground); white-space: nowrap; font-variant-numeric: tabular-nums; display: inline-block; }

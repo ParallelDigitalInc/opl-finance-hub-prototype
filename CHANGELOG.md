@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.16.1 — 23 Nov 2026 · 14px inner radius everywhere
+
+Shreya: a tinted card inside a 16px white card should be 14px.
+
+I audited every mobile and desktop screen in the browser, flagging any filled element sat inset inside a 16px parent. Four were still 16px; all are now 14px:
+
+- **Match card heads** (the tinted top of loan and subsidy cards): Home, Loans overview, Subsidies home, Explore subsidies, and the loan details sheet.
+- **Benefit tiles** on Subsidy details (mobile, and the desktop page behind the estimate drawer).
+- **The open benefit card** in Calculate estimate. A closed card keeps 16 because its head fills the card. The radius now animates with the padding.
+- **The expert help card** inside the desktop Subsidy details rail.
+
+Desktop offer cards, compare columns, subsidy cards and the cream estimate card were already 14. Re-running the audit finds nothing on either view.
+
 ## v0.16.0 — 23 Nov 2026 · Explore subsidies, desktop + mobile
 
 Synced from Shreya's revised frames.

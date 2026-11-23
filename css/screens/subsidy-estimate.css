@@ -39,9 +39,9 @@
 .ecard__head {
   display: flex; align-items: center; justify-content: space-between; gap: var(--s8); width: 100%;
   padding: var(--s16); border-radius: var(--r-large); background: var(--surface); text-align: left;
-  transition: background var(--dur-base) var(--ease-out);
+  transition: background var(--dur-base) var(--ease-out), border-radius var(--dur-base) var(--ease-out);
 }
-.ecard.is-open > .ecard__head { background: var(--muted); }
+.ecard.is-open > .ecard__head { background: var(--muted); border-radius: var(--r-inner); }   /* open: 4 inside a 16 card → 14 */
 .ecard__name { display: flex; align-items: center; gap: var(--s8); min-width: 0; font-size: 16px; line-height: 21px; font-weight: var(--fw-medium); color: var(--foreground); white-space: nowrap; }
 .ecard__right { display: flex; align-items: center; gap: var(--s8); flex-shrink: 0; }
 .ecard__amt { font-size: 16px; line-height: 21px; font-weight: var(--fw-semibold); color: var(--foreground); white-space: nowrap; font-variant-numeric: tabular-nums; display: inline-block; }
