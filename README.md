@@ -117,7 +117,7 @@ All of this is behaviour on existing elements. None of it adds UI:
 
 ## Figma flags · Loans overview (`382:36150`)
 
-1. **The offer cards drift from Home.** Titles are 18px, subtitles Figtree Medium, and the BoB labels use "Prodigy Sans". I used the Home MatchCard (title Medium 16, meta Geist Regular 12) to follow the card rules from the consistency pass. Say if 18px is intended.
+1. **The offer cards drift from Home.** Titles are 18px, subtitles Figtree Medium, and the BoB labels use "Prodigy Sans". I used the Home MatchCard (title Medium 16, meta Geist Regular 12). **Decided 23 Nov: keep 16px.** The Figma frame still needs updating to match.
 2. Fonts mapped to Geist: the status-bar time (Figtree) and the "See all loans (7)" label (Instrument Sans SemiBold → DS Button Medium 14).
 3. The visible hero layer (`416:121651`) rounds only the **bottom-left** corner, so the bottom-right is square. This is reproduced; confirm it's intended.
 4. The content column is 354 wide (application and borrowing cards), while the help card is 350 and the screen gutter is 20/16. Reproduced as drawn.
