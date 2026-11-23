@@ -1076,10 +1076,10 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
       sort: { label: "Sort by", value: "Alphabetical", options: ["Alphabetical", "Highest benefit"] },  // options proposed
       cards: [CARDS.msme, CARDS.electronics, CARDS.textile],
     },
-    states: {                                                  // 524:99394
+    states: {                                                  // 524:99394, minus its "All" row (Shreya: GST states only)
       search: "Search a state",
       caption: "States fetched from your GST registration",
-      options: ["All", "Gujarat", "Andhra Pradesh", "Karnataka", "Madhya Pradesh", "Maharashtra", "Rajasthan", "Tamil Nadu"],
+      options: ["Gujarat", "Andhra Pradesh", "Karnataka", "Madhya Pradesh", "Maharashtra", "Rajasthan", "Tamil Nadu"],
     },
     promo: {                                                   // 524:98971
       title: ["Planning a new unit in another state,", "or a new product line?"],
@@ -2449,7 +2449,7 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
     cards() {
       const st = this.st, t = S().top;
       let list = t.cards.filter((c) => !st.chips.length || st.chips.some((ch) => ch === c.kind || ch === "Sector" || ch === "Import & Export"));
-      if (st.state !== "All" && st.state !== "Gujarat") list = list.filter((c) => c.kind === "Central");   // other states: only central schemes apply
+      if (st.state !== "Gujarat") list = list.filter((c) => c.kind === "Central");   // other states: only central schemes apply
       if (st.sort === "Highest benefit") list = list.slice().sort((a, b) => (b.value.includes("%") ? 1 : 0) - (a.value.includes("%") ? 1 : 0));
       if (!list.length) return `<div class="d-empty"><p class="d-empty__title">No subsidies match these filters</p><p class="d-empty__body">Try another state or remove a filter.</p></div>`;
       return list.map((c) => String(D.subsidyCard(c))).join("");

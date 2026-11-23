@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.15.9 — 23 Nov 2026 · Desktop state picker matches mobile
+
+- **The desktop "Schemes in" picker has no "All" row**, like the mobile sheet: only the states on the GST registration. Figma `524:99394` draws "All". It's dropped at Shreya's request.
+- The picker already had no row subcopy and no caption icon, so the two views now match.
+
 ## v0.15.8 — 23 Nov 2026 · Simpler "Schemes in" sheet
 
 Shreya's edits to the state sheet:

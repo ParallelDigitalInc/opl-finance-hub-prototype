@@ -100,7 +100,7 @@
     cards() {
       const st = this.st, t = S().top;
       let list = t.cards.filter((c) => !st.chips.length || st.chips.some((ch) => ch === c.kind || ch === "Sector" || ch === "Import & Export"));
-      if (st.state !== "All" && st.state !== "Gujarat") list = list.filter((c) => c.kind === "Central");   // other states: only central schemes apply
+      if (st.state !== "Gujarat") list = list.filter((c) => c.kind === "Central");   // other states: only central schemes apply
       if (st.sort === "Highest benefit") list = list.slice().sort((a, b) => (b.value.includes("%") ? 1 : 0) - (a.value.includes("%") ? 1 : 0));
       if (!list.length) return `<div class="d-empty"><p class="d-empty__title">No subsidies match these filters</p><p class="d-empty__body">Try another state or remove a filter.</p></div>`;
       return list.map((c) => String(D.subsidyCard(c))).join("");

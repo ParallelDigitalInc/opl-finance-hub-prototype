@@ -39,10 +39,10 @@
       sort: { label: "Sort by", value: "Alphabetical", options: ["Alphabetical", "Highest benefit"] },  // options proposed
       cards: [CARDS.msme, CARDS.electronics, CARDS.textile],
     },
-    states: {                                                  // 524:99394
+    states: {                                                  // 524:99394, minus its "All" row (Shreya: GST states only)
       search: "Search a state",
       caption: "States fetched from your GST registration",
-      options: ["All", "Gujarat", "Andhra Pradesh", "Karnataka", "Madhya Pradesh", "Maharashtra", "Rajasthan", "Tamil Nadu"],
+      options: ["Gujarat", "Andhra Pradesh", "Karnataka", "Madhya Pradesh", "Maharashtra", "Rajasthan", "Tamil Nadu"],
     },
     promo: {                                                   // 524:98971
       title: ["Planning a new unit in another state,", "or a new product line?"],
