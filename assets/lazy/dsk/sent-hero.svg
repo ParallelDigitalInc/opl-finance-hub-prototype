@@ -1,0 +1,29 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="390" height="168" viewBox="0 0 390 168" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Hero">
+<circle id="Glow 1" cx="195" cy="86" r="66" fill="#2C8A47" fill-opacity="0.12"/>
+<circle id="Glow 2" cx="195" cy="86" r="50" fill="#16A34A" fill-opacity="0.12"/>
+<g id="Core" filter="url(#filter0_d_0_90)">
+<circle cx="195" cy="86" r="38" fill="white"/>
+</g>
+<g id="Mark">
+<path id="Vector" d="M184.66 96.3396L210.854 70.1464C209.206 68.499 206.085 69.5393 199.843 71.6198L184.291 76.8036C180.822 77.9602 179.087 78.5384 178.56 79.8106C178.436 80.1096 178.362 80.4266 178.339 80.7494C178.241 82.1228 179.534 83.4158 182.12 86.0019L182.591 86.4729C183.015 86.8974 183.228 87.1096 183.388 87.3459C183.704 87.8118 183.884 88.3571 183.907 88.9199C183.918 89.2053 183.873 89.5021 183.784 90.0957C183.458 92.2687 183.295 93.3551 183.487 94.1912C183.677 95.0175 184.09 95.7557 184.66 96.3396Z" fill-rule="evenodd" clip-rule="evenodd" fill="#3858E5"/>
+<path id="Vector_2" opacity="0.5" d="M204.163 96.8092L209.38 81.157C211.461 74.9153 212.501 71.7945 210.854 70.1471L184.661 96.3403C185.241 96.934 185.984 97.3681 186.821 97.5729C187.654 97.7768 188.743 97.629 190.921 97.3335L191.04 97.3174C191.653 97.2341 191.96 97.1924 192.255 97.2102C192.79 97.2425 193.307 97.4167 193.752 97.715C193.997 97.8793 194.216 98.0983 194.654 98.5362L195.073 98.955C197.59 101.472 198.849 102.731 200.184 102.665C200.552 102.647 200.913 102.562 201.251 102.413C202.474 101.875 203.037 100.186 204.163 96.8092Z" fill="#3858E5"/>
+</g>
+<circle id="Badge bg" cx="219" cy="110" r="16" fill="white"/>
+<g id="Badge">
+<path id="Vector_3" d="M229.833 110C229.833 115.983 224.983 120.833 219 120.833C213.017 120.833 208.167 115.983 208.167 110C208.167 104.017 213.017 99.1667 219 99.1667C224.983 99.1667 229.833 104.017 229.833 110ZM223.366 106.717C223.683 107.034 223.683 107.549 223.366 107.866L217.95 113.283C217.632 113.6 217.118 113.6 216.8 113.283L214.634 111.116C214.317 110.799 214.317 110.284 214.634 109.967C214.951 109.65 215.466 109.65 215.783 109.967L217.375 111.559L219.796 109.138L222.217 106.717C222.534 106.4 223.049 106.4 223.366 106.717Z" fill-rule="evenodd" clip-rule="evenodd" fill="#16A34A"/>
+</g>
+</g>
+<defs>
+<filter id="filter0_d_0_90" x="145" y="38" width="100" height="100" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="2"/>
+<feGaussianBlur stdDeviation="6"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_0_90"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_0_90" result="shape"/>
+</filter>
+</defs>
+</svg>

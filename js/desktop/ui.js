@@ -47,6 +47,7 @@
     <button class="d-nav__item ${it.id === active ? "is-active" : ""}" data-goto="${it.goto || "d-" + it.id}" data-label="${it.label}" ${it.id === active ? raw('aria-current="page"') : ""}>
       <span class="d-nav__icon">${D.icon(it.icon, it.size || 16)}</span>
       <span class="d-nav__label">${it.label}</span>
+      <span class="d-rail-tip" aria-hidden="true">${it.label}</span>
     </button>`;
   D.sidebar = (active = "loans") => html`
     <aside class="d-side" aria-label="Main navigation">
@@ -54,6 +55,7 @@
         <span class="d-switcher__avatar">RF</span>
         <span class="d-switcher__name">Ratan Fabrics Pvt. Ltd.</span>
         ${D.icon("switcher-chevron", 16, "d-switcher__chev")}
+        <span class="d-rail-tip" aria-hidden="true">Ratan Fabrics Pvt. Ltd.</span>
       </button>
       ${NAV.map((g) => html`
         <nav class="d-nav__group">
@@ -66,7 +68,11 @@
         ${navItem({ id: "help", label: "Help & Support", icon: "nav-headphones" }, active)}
         ${navItem({ id: "settings", label: "Settings", icon: "nav-settings" }, active)}
       </div>
-    </aside>`;
+    </aside>
+    <button class="d-side-handle" data-side-toggle aria-label="${D.sideCollapsed ? "Expand" : "Collapse"} sidebar" aria-expanded="${!D.sideCollapsed}">
+      <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 3.5 5.5 8l4.5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="d-rail-tip" aria-hidden="true"><span data-side-tip>${D.sideCollapsed ? "Expand" : "Collapse"} sidebar</span><kbd>[</kbd></span>
+    </button>`;
 
   /* ---- Top bar (476:200177) ----------------------------------------------- */
   D.topbar = () => html`
@@ -361,8 +367,9 @@
     D.sideCollapsed = !app.classList.contains("is-side-collapsed");
     try { localStorage.setItem("opl.dside", D.sideCollapsed ? "1" : "0"); } catch (_) {}
     app.classList.toggle("is-side-collapsed", D.sideCollapsed);
-    t.setAttribute("aria-expanded", !D.sideCollapsed);
-    t.setAttribute("aria-label", `${D.sideCollapsed ? "Expand" : "Collapse"} sidebar`);
+    const label = `${D.sideCollapsed ? "Expand" : "Collapse"} sidebar`;
+    app.querySelectorAll("[data-side-toggle]").forEach((b) => { b.setAttribute("aria-expanded", !D.sideCollapsed); b.setAttribute("aria-label", label); });
+    app.querySelectorAll("[data-side-tip]").forEach((x) => { x.textContent = label; });
   });
   // "[" toggles the sidebar too (desktop apps' convention), ignored while typing
   window.addEventListener("keydown", (e) => {
@@ -671,6 +678,39 @@
    opens and plays the approval moment. */
 (function () {
   const D = OPL.d;
+  // "Applications sent to N lenders" (Final Desktop 507:131481): the apply modal turns into the
+  // success moment in place. Hero inlined from Figma so its parts can move: glows breathe, the
+  // core pops, the plane flies in, the tick lands.
+  D.applySent = (m, lenders) => {
+    const box = m.el.querySelector(".d-applym");
+    const names = lenders.map((l) => l.name);
+    const who = names.length > 1 ? names.slice(0, -1).join(", ") + " and " + names[names.length - 1] : names[0];
+    const n = lenders.length;
+    box.classList.add("is-leaving");
+    setTimeout(() => {
+      box.className = "d-sent";
+      box.innerHTML = String(OPL.html`
+        <div class="d-sent__hero" data-sent-hero aria-hidden="true"></div>
+        <div class="d-sent__msg">
+          <h2>Applications sent to ${n} lender${n === 1 ? "" : "s"}</h2>
+          <p>${who} ${n === 1 ? "is" : "are"} now checking your details. <b>Lenders usually reply in 5 to 7 working days.</b></p>
+        </div>
+        <div class="d-sent__card">${lenders.map((l, i) => OPL.html`${i ? OPL.raw('<span class="d-sent__div"></span>') : ""}
+          <div class="d-sent__row" style="--i:${i}">${OPL.ui.Logo({ id: l.logo, size: 36 })}<div><p>${l.name}</p><small>${l.type}</small></div><span class="d-sent__chip">Sent</span></div>`)}
+        </div>
+        <div class="d-sent__actions">
+          ${D.btn({ label: "Track applications", style: "filled", size: "lg", cls: "d-btn--block", attrs: "data-sent-track" })}
+          <button class="d-sent__done" data-sent-done>Done</button>
+        </div>`);
+      D.inlineSvg("sent-hero").then((svg) => {
+        const host = box.querySelector("[data-sent-hero]");
+        host.innerHTML = svg;
+        void host.offsetWidth;
+        if (!D.motionOff()) host.classList.add("is-in"); else host.classList.add("is-static");
+      });
+    }, D.motionOff() ? 0 : 180);
+  };
+
   D.apply = (page, ids) => {
     ids = (ids || []).filter(Boolean);
     if (!ids.length) return;
@@ -682,7 +722,7 @@
         type: rec ? rec.values.type : card.subtitle, amount: OPL.fx.longAmount(rec ? rec.values.amount : `Up to ${card.figures[0].value}`) };
     };
     const body = OPL.ui.ApplySheetBody({ lenders: ids.map(lenderOf) }).toString();
-    const m = D.openModal(page, `<div class="d-applym">${body}</div>`, { width: 520, cls: "d-modal--apply" });
+    const m = D.openModal(page, `<div class="d-applym">${body}</div>`, { width: 480, cls: "d-modal--apply" });
     m.el.addEventListener("click", (e) => {
       const c = e.target.closest("[data-consent]");
       if (c) {
@@ -694,14 +734,15 @@
         return;
       }
       const sub = e.target.closest("[data-apply-submit]");
+      if (e.target.closest("[data-sent-track]")) { m.close(); return setTimeout(() => OPL.go("applications"), D.motionOff() ? 0 : 220); }
+      if (e.target.closest("[data-sent-done]")) return m.close();
       if (sub) {
         sub.classList.add("is-loading");
         setTimeout(() => {
           const apps = OPL.screens.applications;
           apps.apps = ids.map((id) => ({ id, status: "verifying" }));
-          apps.fresh = true;
-          m.close();
-          setTimeout(() => OPL.go("applications"), D.motionOff() ? 0 : 260);
+          apps.fresh = true;                       // the list still plays the approval moment
+          D.applySent(m, ids.map(lenderOf));
         }, D.motionOff() ? 0 : 900);
       }
     });
