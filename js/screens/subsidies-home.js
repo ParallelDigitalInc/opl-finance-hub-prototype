@@ -26,16 +26,36 @@
       ${OPL.icon("alt-arrow-left", 16, "sh-chip__chev")}
     </button>`;
 
+  /* "Schemes in" sheet: states from the GST registration, radio rows that apply on tap */
+  const placeLabel = (p) => (p === "All" ? OPL.data.subsidiesHome.states.all.label : p);
+  const stateRow = (o, label, on) => html`
+    <button class="${cx("sh-state", on && "is-selected")}" role="radio" aria-checked="${on}" data-place="${o.value}" data-press>
+      <span class="sh-state__text"><span class="sh-state__name">${label}</span><span class="sh-state__sub">${o.sub}</span></span>
+      ${on ? OPL.raw(`<img class="ico sh-state__radio" src="assets/icons/radio-selected.svg" width="20" height="20" alt="">`) : OPL.raw(`<span class="sort-opt__radio sh-state__radio"></span>`)}
+    </button>`;
+  const statesBody = (s, place) => html`
+    <div class="sh-states">
+      <label class="sh-search">${sicon("search-16", 16)}<input type="search" placeholder="${s.search}" aria-label="${s.search}" data-place-search autocomplete="off" spellcheck="false"></label>
+      <p class="sh-states__caption">${sicon("gst-14", 14)}<span>${s.caption}</span></p>
+      <div class="sh-states__list" role="radiogroup" aria-label="${s.title}" data-place-list>
+        ${stateRow(s.all, s.all.label, place === "All")}
+        ${s.options.map((o) => stateRow(o, o.value, o.value === place))}
+      </div>
+      <p class="sh-states__empty" data-place-empty hidden></p>
+    </div>`;
+
   OPL.screens["subsidies-overview"] = {
     title: "Subsidies home",
     figma: { default: "524:103425" },
     timers: [],
     filter: null,
+    place: null,                                   // "Schemes in" pick; defaults to the GST principal state
     leave() { this.timers.forEach((t) => { clearTimeout(t); clearInterval(t); }); this.timers = []; },
 
     render(page) {
       this.leave();
       const d = OPL.data.subsidiesHome, t = d.top;
+      if (!this.place) this.place = d.states.home;
       const v = OPL.variantValues("subsidies-overview");
       const cards = OPL.data.home.subsidies.cards;
 
@@ -59,12 +79,13 @@
             <section class="sh-top">
               ${ui.SectionHeader({ title: t.title, action: t.action, goto: t.goto })}
               <div class="rail rail--chips sh-filters">
-                <button class="sh-where" data-press data-goto="${t.location.goto}">
-                  ${sicon("map-point-16", 16)}<span class="sh-where__label">${t.location.label}</span><span class="sh-where__value">${t.location.value}</span>${sicon("alt-arrow-right-14", 14, "sh-where__chev")}
+                <button class="sh-where" data-press data-open-sheet="states" aria-haspopup="dialog">
+                  ${sicon("map-point-16", 16)}<span class="sh-where__label">${t.location.label}</span><span class="sh-where__value" data-place-label>${placeLabel(this.place)}</span>${sicon("alt-arrow-right-14", 14, "sh-where__chev")}
                 </button>
                 <span class="chip-divider"></span>
                 ${t.filters.map((f) => ui.Chip({ label: f.label, selected: this.filter === f.match && !!f.match, goto: f.goto, attrs: f.match ? `data-filter="${f.match}"` : "" }))}
               </div>
+              <p class="sh-none" data-none hidden></p>
               <div class="rail sh-rail" data-rail>${cards.map((c) => OPL.raw(ui.MatchCard(c).toString().replace("<article ", `<article data-tag="${c.tag}" `)))}</div>
             </section>
 
@@ -87,7 +108,8 @@
         </div>
         <div class="floating">
           ${ui.AiMitraFab({ nudge: v.nudge === "on" ? d.aiNudge : null })}
-        </div>`;
+        </div>
+        ${ui.Sheet({ id: "states", title: d.states.title, body: statesBody(d.states, this.place) })}`;
 
       this.wire(page, d);
     },
@@ -98,23 +120,67 @@
       OPL.fx.nudge(page, this.timers);
       page.querySelectorAll(".rail").forEach(OPL.fx.mouseDrag);
 
-      /* Central / State: filter the rail in place */
+      /* Central / State and "Schemes in" filter the rail in place. Outside the home (GST principal)
+         state only central schemes apply, so state-tagged cards step aside. */
       const rail = page.querySelector("[data-rail]");
+      const none = page.querySelector("[data-none]");
       const apply = (match) => {
         this.filter = match;
+        const away = this.place !== "All" && this.place !== d.states.home;
         page.querySelectorAll("[data-filter]").forEach((c) => c.classList.toggle("is-selected", c.dataset.filter === match));
+        let shown = 0;
         rail.querySelectorAll(".match").forEach((card) => {
-          const out = match && card.dataset.tag !== match;
+          const out = (match && card.dataset.tag !== match) || (away && card.dataset.tag === "State Government");
           card.classList.toggle("is-filtered-out", !!out);
           card.toggleAttribute("inert", !!out);
+          if (!out) shown++;
         });
+        none.hidden = shown > 0;
+        rail.classList.toggle("is-empty", !shown);          // nothing to show: the rail folds away too
+        if (!shown) none.textContent = d.states.none(placeLabel(this.place), match && (d.top.filters.find((f) => f.match === match) || {}).label);
         rail.scrollTo({ left: 0, behavior: motionOff ? "auto" : "smooth" });
       };
+
+      const sheets = OPL.fx.sheets(page, { onClose: () => {
+        OPL.state.set({ sheet: null }, { silent: true });
+        const q = page.querySelector("[data-place-search]");
+        if (q && q.value) { q.value = ""; search(""); }
+      } });
+      const search = (q) => {
+        const k = q.trim().toLowerCase();
+        let n = 0;
+        page.querySelectorAll("[data-place]").forEach((b) => {
+          const hit = !k || b.querySelector(".sh-state__name").textContent.toLowerCase().includes(k);
+          b.hidden = !hit; if (hit) n++;
+        });
+        const empty = page.querySelector("[data-place-empty]");
+        empty.hidden = n > 0;
+        if (!n) empty.textContent = d.states.empty(q.trim());
+      };
+      const pick = (value) => {
+        this.place = value;
+        page.querySelectorAll("[data-place]").forEach((b) => {
+          const o = value === b.dataset.place;
+          const opt = b.dataset.place === "All" ? d.states.all : d.states.options.find((x) => x.value === b.dataset.place);
+          b.outerHTML = stateRow(opt, b.dataset.place === "All" ? d.states.all.label : opt.value, o).toString();
+        });
+        const label = page.querySelector("[data-place-label]");
+        label.textContent = placeLabel(value);
+        label.classList.remove("is-changed"); void label.offsetWidth; label.classList.add("is-changed");
+        this.timers.push(setTimeout(() => { sheets.close(); apply(this.filter); }, motionOff ? 0 : 220));   // radio rows apply on tap, no CTA
+      };
+
       page.addEventListener("click", (e) => {
         const f = e.target.closest("[data-filter]");
-        if (f) apply(this.filter === f.dataset.filter ? null : f.dataset.filter);
+        if (f) return apply(this.filter === f.dataset.filter ? null : f.dataset.filter);
+        const open = e.target.closest("[data-open-sheet]");
+        if (open) { OPL.state.set({ sheet: open.dataset.openSheet }, { silent: true }); return sheets.open(open.dataset.openSheet); }
+        const p = e.target.closest("[data-place]");
+        if (p) return pick(p.dataset.place);
       });
-      if (this.filter) apply(this.filter);
+      page.addEventListener("input", (e) => { if (e.target.matches("[data-place-search]")) search(e.target.value); });
+      apply(this.filter);
+      if (OPL.variantValues("subsidies-overview").sheet === "states") sheets.open("states", { instant: true });
 
       /* entrance: amount counts up, chips settle and their counts tick */
       OPL.fx.enter(page, [

@@ -86,20 +86,20 @@
         {
           kind: "subsidy", tag: "State Government", tint: "var(--tint-peach)", logo: "msme",
           title: "MSME Competitive<br>Lean Scheme", subtitle: "MSME Champions Scheme",
-          figures: [{ label: "Assistance up to", value: "Up to ₹2.4L" }],
+          figures: [{ label: "Assistance up to", value: "₹2.4L" }],
           goto: "subsidy-detail",
         },
         {
           kind: "subsidy", tag: "Central Government", tint: "var(--tint-blue)", logo: "gujarat",
           title: "Gujarat Electronics Policy<br>(2022 - 28)", subtitle: "Science and Technology Department",
-          figures: [{ label: "Assistance up to", value: "Up to ₹2.4L" }],
+          figures: [{ label: "Assistance up to", value: "₹2.4L" }],
           goto: "subsidy-detail",
         },
         {
           // Aatmanirbhar Gujarat 2022 — subsidy screens 164:1434 ("Up to ₹1.2Cr")
           kind: "subsidy", tag: "State Government", tint: "var(--tint-peach)", logo: "gujaratGovt",
           title: "Aatmanirbhar<br>Gujarat 2022", subtitle: "Industries and Mines Department",
-          figures: [{ label: "Assistance up to", value: "Up to ₹1.2Cr" }],
+          figures: [{ label: "Assistance up to", value: "₹1.2Cr" }],
           goto: "subsidy-detail",
         },
       ],

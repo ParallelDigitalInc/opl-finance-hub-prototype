@@ -128,8 +128,11 @@
 
   /* Subsidies home (524:103425) */
   OPL.variants["subsidies-overview"] = {
-    presets: [{ id: "default", label: "Subsidies home", figma: "524:103425", set: {} }],
-    groups: [{
+    presets: [
+      { id: "default", label: "Subsidies home", figma: "524:103425", set: { sheet: "none" } },
+      { id: "states", label: "Schemes in · state sheet", figma: "524:99394", set: { sheet: "states" } },   // desktop picker; no mobile frame
+    ],
+    groups: [{ id: "sheet", hidden: true, default: "none", options: [{ value: "none" }, { value: "states" }] }, {
       id: "nudge", label: "AI Mitra nudge", default: "on",
       options: [{ value: "on", label: "Shows once" }, { value: "off", label: "Off" }],
       note: "Proposed line: “Ask anything about subsidies”. Not in Figma.",

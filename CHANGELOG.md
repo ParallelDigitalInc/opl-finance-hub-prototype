@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.15.7 — 23 Nov 2026 · "Schemes in" state sheet (mobile) + subsidy card fixes
+
+**Added**
+
+- **"Schemes in" bottom sheet** on the mobile Subsidies home. Shreya asked for it. The pill used to lead to an unbuilt `subsidy-location` screen.
+  - The list is the states on the business's **GST registration**: "States fetched from your GST registration". Each row says why it's there: Gujarat is the *Principal place of business*, the others are *Additional place of business*. All states sits first.
+  - "Search a state" filters the list. No match reads "No state on your GST registration matches …".
+  - Rows apply on tap (radio pops, sheet closes), like the Sort sheet. Drag, scrim or Escape dismisses it.
+  - The pill updates with a tick. Outside Gujarat only central schemes apply, so state-tagged cards step aside, as on desktop. If nothing is left, a note says so ("Central schemes apply in every state") and the rail folds away.
+  - States and copy come from the desktop picker `524:99394`. There is no mobile frame, so it's designed in code and flagged. Panel preset: *Schemes in · state sheet*.
+
+**Fixed**
+
+- **Subsidy cards stretched tall when Central or State was on.** The folding card squeezed to 0 wide, its text reflowed into a 376px column, and the rail stretched every card to match. Cards now keep their own height, and a folding card keeps its content width while it collapses.
+- **"Assistance up to · Up to ₹2.4L" said "up to" twice.** The value now reads ₹2.4L / ₹1.2Cr, on Home too.
+
 ## v0.15.6 — 23 Nov 2026 · Apply modal spacing
 
 Shreya: "Looks a bit crammed."
