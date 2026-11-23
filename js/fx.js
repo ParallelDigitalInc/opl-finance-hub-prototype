@@ -75,7 +75,8 @@
     let startY = 0, dy = 0, dragging = false, t0 = 0;
     page.addEventListener("pointerdown", (e) => {
       const grip = e.target.closest("[data-sheet-drag]");
-      if (!grip || !current) return;
+      // buttons inside the grip (e.g. "Clear all") keep their tap: capturing the pointer would retarget the click
+      if (!grip || !current || e.target.closest("button")) return;
       dragging = true; startY = e.clientY; dy = 0; t0 = performance.now();
       current.classList.add("is-dragging");
       grip.setPointerCapture?.(e.pointerId);
@@ -140,11 +141,59 @@
       if (det) return open(det.dataset.detail);
       const dc = e.target.closest("[data-detail-compare]");
       if (dc) {
-        const changed = (onCompare || defaultToggle)(dc.dataset.detailCompare, dc);
+        const id = dc.dataset.detailCompare, was = lo().sel.includes(id);
+        const changed = (onCompare || defaultToggle)(id, dc);
         if (changed) { paintFoot(); page.querySelector("[data-detail-compare]")?.classList.add("is-popping"); }
+        // Outside Loan offers there's nothing on screen to compare against: ticking takes you to
+        // Loan offers, where the compare tray holds this loan and asks for another (382:35666).
+        if (changed && !onCompare && !was) {
+          lo().arriveWithTray = true;
+          setTimeout(() => { sheets.close(); setTimeout(() => OPL.go("loan-offers", { compare: null, sheet: null }), motionOff() ? 0 : 260); }, motionOff() ? 0 : 380);
+        }
       }
     });
     return { open, paintFoot };
+  };
+
+  /* Footer morph on page push/pop. Each page carries its own nav, so a section change
+     (Finance hub tabs ↔ Loans tabs) used to slide away with the page and go unnoticed.
+     Now the footer holds still (counter-moves against the page slide) and swaps its tabs
+     in place: old tabs drop out, new ones rise in one by one, the active pill pops.
+     Same tab set → it just holds still, so only the active tab changes. */
+  fx.navMorph = (oldPage, newPage, dir) => {
+    const oldNav = oldPage.querySelector(".nav"), newNav = newPage.querySelector(".nav");
+    if (!oldNav || !newNav || motionOff() || !newNav.animate) return;
+    const ease = "cubic-bezier(0.22, 1, 0.36, 1)", spring = "cubic-bezier(0.34, 1.56, 0.64, 1)";
+    const W = newPage.offsetWidth;
+    // counter the page keyframes (push-in from 100%, pop-in from -28%) so the bar stays put.
+    // A CSS animation started in the same style pass as the page's keeps the two in lockstep.
+    newNav.style.setProperty("--hold-from", `${dir === "back" ? 0.28 * W : -W}px`);
+    newNav.classList.add(dir === "back" ? "is-hold-pop" : "is-hold-push");
+    setTimeout(() => newNav.classList.remove("is-hold-pop", "is-hold-push"), 460);
+    oldNav.style.visibility = "hidden";
+
+    const labels = (n) => [...n.querySelectorAll(".nav__label")].map((l) => l.textContent).join("|");
+    if (labels(oldNav) === labels(newNav)) {
+      const pill = newNav.querySelector(".nav__item.is-active");
+      pill?.animate([{ backgroundColor: "rgba(56, 88, 229, 0)" }, {}], { duration: 260, easing: ease });
+      return;
+    }
+    const ghost = oldNav.cloneNode(true);
+    ghost.classList.add("nav--ghost");
+    ghost.setAttribute("aria-hidden", "true");
+    ghost.style.visibility = "visible";
+    newNav.appendChild(ghost);
+    const out = [...ghost.querySelectorAll(".nav__item")], inc = [...newNav.querySelectorAll(":scope > .nav__item")];
+    out.forEach((it, i) => it.animate([{ opacity: 1, transform: "none" }, { opacity: 0, transform: "translateY(12px)" }],
+      { duration: 200, delay: i * 30, easing: "cubic-bezier(0.4, 0, 1, 1)", fill: "forwards" }));
+    inc.forEach((it, i) => it.animate([{ opacity: 0, transform: "translateY(14px)" }, { opacity: 1, transform: "none" }],
+      { duration: 380, delay: 170 + i * 50, easing: ease, fill: "backwards" }));
+    const active = newNav.querySelector(":scope > .nav__item.is-active .nav__pill");
+    active?.animate([{ transform: "scale(1)" }, { transform: "scale(1.18)" }, { transform: "none" }],
+      { duration: 460, delay: 170 + inc.length * 50 + 80, easing: spring });
+    newNav.animate([{ boxShadow: "0 4px 12px rgba(0,0,0,.04), 0 0 0 0 rgba(56,88,229,0)" }, { boxShadow: "0 4px 12px rgba(0,0,0,.04), 0 0 0 4px rgba(56,88,229,.14)" }, { boxShadow: "0 4px 12px rgba(0,0,0,.04), 0 0 0 0 rgba(56,88,229,0)" }],
+      { duration: 700, delay: 140, easing: "ease-out" });
+    setTimeout(() => ghost.remove(), 800);
   };
 
   /* Bare sheet shell (custom layout, e.g. Apply / Milestone). Returns the body element. */

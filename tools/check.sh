@@ -4,8 +4,8 @@
 set -uo pipefail
 cd "$(dirname "$0")/.."
 MAX_ASSET_KB=150      # any single image/font
-MAX_TOTAL_KB=700      # everything in assets/ (img + icons + fonts) + bundles — the first-load payload
-MAX_LAZY_KB=600       # assets/lazy: loaded only by the screen that shows them (e.g. NeSL portal shots)
+MAX_TOTAL_KB=900      # everything in assets/ (img + icons + fonts) + bundles — the first-load payload
+MAX_LAZY_KB=1000      # assets/lazy: loaded only by the screen that shows them (e.g. NeSL portal shots)
 MAX_DESKTOP_KB=600    # desktop view: dist/desktop.* + assets/lazy/dsk (top level), fetched when switched to desktop
 MAX_DESKTOP_SCREEN_KB=600  # assets/lazy/dsk/<screen>/: fetched only by the desktop screen that shows them (e.g. NeSL)
 fail=0

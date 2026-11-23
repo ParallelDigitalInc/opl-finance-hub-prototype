@@ -37,7 +37,7 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
     ] },
     { label: "Get financing", items: [
       { id: "loans", label: "Loans", icon: "nav-banknote-active", goto: "loans-overview" },
-      { id: "subsidies", label: "Govt. subsidies", icon: "nav-hand-stars", goto: "subsidy-detail" },
+      { id: "subsidies", label: "Govt. subsidies", icon: "nav-hand-stars", goto: "subsidies-overview" },
       { id: "equity", label: "Equity", icon: "nav-pie" },
       { id: "insurance", label: "Insurance", icon: "nav-shield-star" },
     ] },
@@ -993,8 +993,9 @@ window.OPL=window.OPL||{};OPL.dIcons={"add-circle":"<svg preserveAspectRatio=\"n
     render(page) {
       const name = OPL.current();
       const mobile = OPL.screens[name];
+      const subsidy = /^subsid/.test(name);
       page.innerHTML = D.shell({
-        nav: "loans", title: "Loans", tab: TAB[name] || "overview",
+        nav: subsidy ? "subsidies" : "loans", title: subsidy ? "Govt. subsidies" : "Loans", tab: subsidy ? null : TAB[name] || "overview",
         body: html`
           <div class="d-missing">
             <p class="d-missing__eyebrow">Prototype</p>

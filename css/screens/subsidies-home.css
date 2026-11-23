@@ -1,0 +1,107 @@
+/* ==========================================================================
+   Screen · Subsidies home (Figma 524:103425)
+   Rhythm from the frame: header 47–119 → title 127 → chip rows 223 / 274 →
+   hero ends 338 → Top subsidies 370 (head 28, +16 filters 36, +16 cards 252)
+   → promo card 742 (350 × 262) → frame ends 1070, AI Mitra floating.
+   ========================================================================== */
+
+.sh { position: relative; padding-bottom: 100px; --dy: calc(var(--status-h) - 47px); }
+
+/* ---- Hero (visible layer 524:103429 covers 524:103426) ------------------ */
+.sh-hero { position: relative; height: calc(338px + var(--dy)); }
+.sh-hero__bg { position: absolute; inset: 0; overflow: hidden; background: var(--hero-bg); border-radius: 0 0 var(--r-xl) var(--r-xl); }
+/* Ellipse 1844: 190 at top 196 with a 60% blur bleed → the kit's 418 glow at 82 */
+.sh-hero__ellipse { position: absolute; left: calc(50% - 209px); top: calc(82px + var(--dy)); width: 418px; height: 418px; max-width: none; }
+/* image 1003 at 30% under a 5px backdrop blur (Rectangle 34628719) */
+.sh-hero__texture { position: absolute; left: calc(50% - 258.45px); top: calc(-124px + var(--dy)); width: 516.9px; height: 683px; max-width: none; opacity: 0.3; filter: blur(5px); }
+.sh-hero__header { position: absolute; top: var(--status-h); left: 0; right: 0; z-index: 2; }
+.sh-hero__header .app-header__title { line-height: 28px; }
+
+.sh-hero__title { position: absolute; left: 50%; top: calc(127px + var(--dy)); width: 314px; margin-left: -157px; display: flex; flex-direction: column; align-items: center; gap: var(--s8); text-align: center; }
+.sh-hero__eyebrow { font-size: 20px; line-height: 28px; font-weight: var(--fw-medium); color: var(--muted-foreground); }
+.sh-hero__amount { font-size: 30px; line-height: 36px; letter-spacing: -0.4px; font-weight: var(--fw-semibold); color: var(--foreground); white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+.sh-hero__chips { position: absolute; left: 0; right: 0; top: calc(223px + var(--dy)); display: flex; flex-direction: column; align-items: center; gap: 11px; }
+.sh-hero__row { display: flex; gap: 12px; justify-content: center; translate: 0.5px 0; }
+.sh-hero__row + .sh-hero__row { translate: 0 0; }
+/* Chip · benefit type (524:103434): white stroke inside → 16+24+6+label+6+24+6+16+10 */
+.sh-chip {
+  display: inline-flex; align-items: center; gap: var(--s6); padding: var(--s8) 10px var(--s8) var(--s16);
+  border-radius: var(--r-full); background: var(--primary-tint); outline: 1px solid #fff; outline-offset: -1px;
+  transition: transform var(--dur-press) var(--ease-out), background var(--dur-fast);
+}
+.sh-chip__label { font-size: 14px; line-height: 20px; font-weight: var(--fw-medium); color: var(--foreground); white-space: nowrap; }
+.sh-chip__count {
+  width: 24px; height: 24px; border-radius: var(--r-full); background: #fff; display: grid; place-items: center;
+  font-size: 14px; line-height: 20px; font-weight: var(--fw-medium); color: var(--muted-foreground); font-variant-numeric: tabular-nums;
+}
+.sh-chip__chev { transform: scaleX(-1); transition: transform var(--dur-fast) var(--ease-out); }
+.sh-chip.is-pressed { transform: scale(0.96); background: #e3edfd; }
+.sh-chip.is-pressed .sh-chip__chev { transform: scaleX(-1) translateX(-2px); }
+.sh-chip > .ico:first-child { transition: transform var(--dur-base) var(--ease-spring); }
+.sh-chip.is-pressed > .ico:first-child { transform: scale(0.88) rotate(-8deg); }
+
+/* ---- Top subsidies (524:103489) ---------------------------------------- */
+.sh-top { display: flex; flex-direction: column; gap: var(--s16); margin-top: var(--s32); }
+/* Sort pill "Schemes in Gujarat" (524:103497) */
+.sh-where {
+  flex-shrink: 0; display: inline-flex; align-items: center; gap: var(--s4); height: 36px; padding: 0 12px 0 14px;
+  border-radius: var(--r-full); background: var(--muted); font-size: 14px; line-height: 20px; white-space: nowrap;
+  transition: transform var(--dur-press) var(--ease-out), background var(--dur-fast);
+}
+.sh-where__label { color: var(--muted-foreground); }
+.sh-where__value { font-weight: var(--fw-semibold); color: var(--foreground); }
+.sh-where__chev { transform: rotate(90deg); transition: transform var(--dur-fast) var(--ease-out); }
+.sh-where.is-pressed { transform: scale(0.97); background: var(--border); }
+.sh-where.is-pressed .sh-where__chev { transform: rotate(90deg) translateX(2px); }
+.sh-filters { align-items: center; }
+
+/* filtering: cards that don't match fold away, the rest slide together */
+.sh-rail .match { transition: transform var(--dur-press) var(--ease-out), opacity 220ms var(--ease-out), flex-basis 360ms var(--ease-out), width 360ms var(--ease-out), margin 360ms var(--ease-out), padding 360ms var(--ease-out); }
+.sh-rail .match.is-filtered-out { flex-basis: 0; width: 0; padding: 0; margin-right: -16px; opacity: 0; transform: scale(0.9); overflow: hidden; outline-color: transparent; }
+
+/* ---- "New unit" card (524:103552): 350 × 262, stroke inside ------------- */
+.sh-promo {
+  position: relative; height: 262px; margin: 24px var(--gutter) 0; overflow: hidden;
+  border-radius: var(--r-large); background: var(--surface); outline: 1px solid var(--border); outline-offset: -1px; box-shadow: var(--shadow-s);
+}
+.sh-promo__title { position: relative; z-index: 2; padding: 16px 0 0 16px; width: 321px; font-size: 18px; line-height: 26px; letter-spacing: -0.4px; font-weight: var(--fw-semibold); color: var(--foreground); }
+.sh-promo__actions { position: absolute; z-index: 2; left: 16px; top: 83px; display: flex; gap: 12px; }
+.sh-pbtn {
+  display: inline-flex; align-items: center; gap: var(--s8); height: 32px; padding: var(--s8) 12px; border-radius: var(--r-full);
+  font-size: 12px; line-height: 16px; font-weight: var(--fw-semibold); color: var(--primary); white-space: nowrap;
+  transition: transform var(--dur-press) var(--ease-out), background var(--dur-fast);
+}
+.sh-pbtn--line { background: var(--surface); box-shadow: inset 0 0 0 1px var(--border); }
+.sh-pbtn--tonal { background: #eef2ff; }
+.sh-pbtn .ico { transition: transform var(--dur-fast) var(--ease-out); }
+.sh-pbtn.is-pressed { transform: scale(0.96); }
+.sh-pbtn--line.is-pressed { background: var(--slate-50); }
+.sh-pbtn--tonal.is-pressed { background: #e0e7ff; }
+.sh-pbtn--tonal.is-pressed .sh-pbtn__arrow { transform: translateX(3px); }
+.sh-pbtn--line.is-pressed .ico { transform: rotate(-14deg); }
+
+.sh-promo__ground { position: absolute; left: calc(50% - 372px); top: 216px; width: 744px; height: 744px; max-width: none; }
+.sh-promo__factory { position: absolute; left: calc(50% - 62px); top: 141px; width: 124px; height: 124px; }
+.sh-promo__factory img { position: absolute; inset: 0; width: 124px; height: 124px; max-width: none; }
+.sh-promo__pin { position: absolute; max-width: none; transform-origin: 50% 100%; }
+.sh-promo__pin--sm { left: 253.5px; top: 213.6px; width: 18.1px; height: 23.2px; }
+.sh-promo__pin--lg { left: 63.4px; top: 203.6px; width: 34px; height: 43px; }
+
+/* the story plays once when the card scrolls into view */
+.sh-promo.is-playing .sh-promo__ground { animation: promo-ground 700ms var(--ease-out) both; }
+.sh-promo.is-playing .sh-promo__building { animation: promo-rise 620ms var(--ease-out) 120ms both; }
+.sh-promo.is-playing .sh-promo__pin--lg { animation: pin-drop 640ms cubic-bezier(0.3, 1.4, 0.5, 1) 520ms both; }
+.sh-promo.is-playing .sh-promo__pin--sm { animation: pin-drop 640ms cubic-bezier(0.3, 1.4, 0.5, 1) 700ms both; }
+.sh-promo.is-playing .sh-promo__smoke--a { animation: smoke 2600ms ease-in-out 700ms 2 both; }
+.sh-promo.is-playing .sh-promo__smoke--b { animation: smoke 2600ms ease-in-out 1100ms 2 both; }
+@keyframes promo-ground { from { transform: translateY(40px); } }
+@keyframes promo-rise { from { opacity: 0; transform: translateY(18px); } }
+@keyframes pin-drop { 0% { opacity: 0; transform: translateY(-36px) scale(0.8); } 60% { opacity: 1; transform: translateY(2px) scaleY(0.9); } 100% { opacity: 1; transform: none; } }
+/* smoke drifts up and thins, then resets to its drawn place */
+@keyframes smoke { 0% { opacity: 0; transform: translateY(8px) scale(0.85); } 25% { opacity: 1; transform: none; } 75% { opacity: 1; transform: translateY(-3px) scale(1.04); } 100% { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .sh-promo.is-playing * { animation: none !important; }
+  .sh-rail .match { transition: opacity 120ms; }
+}

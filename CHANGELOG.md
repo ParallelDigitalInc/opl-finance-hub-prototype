@@ -1,6 +1,98 @@
 # Changelog
 
-## v0.13.6 — 23 Nov 2026 · Icons with masks render fully again
+## v0.14.0 — 23 Nov 2026 · Desktop view lands on main
+
+Merges branch `flow/desktop` into main (which now has the subsidies flow, v0.10.0–v0.10.2). Its own version numbers (0.10.0–0.13.6) overlapped main's, so they're kept below as **flow/desktop** history, and this release is v0.14.0.
+
+**Added**
+
+- **Mobile ⇄ Desktop switch.** "View" in the panel, the **D** key, or `#device=desktop`. The current screen, the Compare picks and applications carry over between views.
+- **Desktop view of the loan journey**, built from the desktop Figma frames (page *Finance Hub - Desktop Loans* `357:54674`, shell and cards from `476:200124`):
+  - Overview (CIBIL MSME Rank gauge), Loan Offers with the sticky Compare tray, and Compare with the Add-offers drawer
+  - Apply, then Applications, then the Application page in every status
+  - KFS reader (two-pane), NeSL signing (desktop portal `524:105163`), then Confirming → Signed → Money on its way → Money received
+  - the same milestone delight as mobile
+- **Desktop loads on demand.** It's a separate bundle (`dist/desktop.*`), so the mobile first load is unchanged. Budgets in `tools/check.sh`: desktop 600 KB, desktop screen-only images 600 KB.
+- **Subsidies on desktop:** the subsidy screens from main open on desktop as "not designed for desktop yet", with a one-click switch to mobile. Desktop subsidy screens are not built.
+
+## v0.10.2 — 23 Nov 2026 · Bottom sheets close on phones
+
+- **The X on subsidy benefit sheets now closes them on touch.** The X sits inside the draggable header, so on a touchscreen, pressing it started drag-to-dismiss, which captures the pointer and retargets the tap to the header, and the close never fired. Buttons inside a sheet's grip no longer start a drag. This also fixes Filters "Clear all". Dragging the header still dismisses.
+- **Bottom buttons in sheets now work on iPhones.** The page uses `viewport-fit=cover`, but sheets didn't pad for the home-indicator area, so Cancel, Later, Done and "I'll come back later" sat where iOS treats a touch as the home gesture. Sheets now add `env(safe-area-inset-bottom)`. Nothing changes where there's no inset.
+- **Tapping the dimmed area closes sheets on iOS:** the scrim gets `cursor: pointer`, which iOS needs before it fires taps on a plain element.
+
+## v0.10.1 — 23 Nov 2026 · Collapsible prototype panel
+
+- **The prototype panel collapses for presenting.**
+  - The chevron in its header (or the **P** key) folds it into a small pill pinned top-right, showing the screen name and version. The phone then centres on its own.
+  - Tap the pill or press P to bring the panel back.
+  - The browser remembers your choice. A link with `#panel=closed` (or `open`) sets it for whoever opens it.
+
+## v0.10.0 — 23 Nov 2026 · Subsidies: home, details, benefit sheets, Calculate estimate
+
+Merged from `flow/subsidies`. Synced from Figma:
+- Subsidies home `524:103425`
+- Subsidy details `416:44852` (`416:44853` / `416:45617`)
+- Benefit sheets `416:47994`
+- Calculate estimate `416:76869` (`416:77107`, `416:76872`, `416:77363`)
+
+**Added**
+
+- **Subsidy details screen** (`subsidy-detail`), for Gujarat Textile Policy 2024. Home's "Top subsidy matches" cards now open it.
+  - The hero has a five-layer illustration and the estimate.
+  - Policy period widget, computed from today.
+  - Policy Benefits 2×2 tiles and "See other benefits" (4 rows).
+  - Apply: the expert help card, portal and website links, and How it works (4 steps, "Share these steps with my CA").
+  - A sticky Apply Now / Talk to an Expert bar.
+- **Benefit sheets** (`416:47994`, 10 frames): Capital (Activity 1 / 2), Interest (Activity 1 / 2), Power tariff, Payroll, SHG job work, Quality certification, Energy and water saving, and Technology acquisition.
+  - Each is opened from its tile or row.
+  - All ten match their Figma heights exactly.
+  - New components: `BenefitSheetBody`, `ActivitySwitch`, `RateRows`, `SheetCondition`, `.btn--ghost`.
+- **Presets:** Collapsed, Expanded, and one per benefit sheet. AI Mitra nudge toggle.
+- **Subsidies home** (`524:103425`), `subsidies-overview`, reached from Finance Home → "Explore Subsidies".
+  - Hero with the count-up amount and benefit-type chips.
+  - Top subsidies, with a location pill and filters (Central / State filter live) and the kit's subsidy match cards.
+  - The "new unit" promo card with its animated illustration.
+  - Listing links show hotspot hints until the listing is designed.
+- **Calculate estimate** (`416:76869`): a form (`416:77107` / `416:76872`) with live per-benefit figures, Add more / Remove and validation, and a result (`416:77363`) with a calculated total and breakdown.
+  - **The result is a "cash arrives" celebration:**
+    - a bundle drops onto the plinth for each benefit, with a thud, gold sparks and the total climbing
+    - then confetti cannons and a shine across the total
+  - The celebration is a lazy-loaded canvas script.
+  - Formulas and flags are in the README.
+- **Components** (`js/components-subsidy.js`, `css/components/subsidy.css`; also on `library.html`): `PolicyPeriod`, `BenefitTile`, `ListRow`, `Disclosure`, `HelpCardExpert`, `HowItWorks` / `HowStep`, `SubsidyFoot`, `CountBadge`, `.deadline-chip`, `.btn--line`.
+- **Motion:** the benefits landing, period fill, disclosure height and stagger with self-scroll, rail draw, stamp press, and directional press nudges. See README.
+- **Assets** in `assets/lazy/subsidy/` (screen-only): the illustration SVGs, the satin texture, the expert photo, the stamp (rasterised from a 139 KB vector to 6 KB), and 23 icons.
+
+**Changed**
+
+- `tools/build.sh` strips comments from the bundles. Sources keep them.
+  - CSS: all comments.
+  - JS: whole-line comments only, never inside template strings.
+  - JS and CSS: leading indentation too, since no template text is whitespace-sensitive.
+  - Loading caps raised (agreed 23 Nov 2026): first load **900 KB** (was 700), screen-only assets **1000 KB** (was 600). Per-asset stays 150 KB.
+- Lazy SVGs: removed Figma boilerplate and unused ids, and rounded paths to 2 decimals (−34 KB).
+
+## v0.9.4 — 23 Nov 2026 · Footer morph between sections
+
+- **The bottom nav now visibly changes when you move between sections** (Finance hub tabs ↔ Loans tabs). It used to slide away with the page, so the switch went unnoticed.
+  - The bar holds still while the page slides underneath (a CSS counter-move synced to the push/pop).
+  - The old tabs drop out, the new tabs rise in one after another, the bar gives a soft primary glow, and the active tab's pill pops.
+  - Within a section (e.g. Loans overview → Track Loans) the bar simply stays put and only the active tab changes.
+  - Pages without a nav are unaffected. Motion off and reduced motion skip it.
+
+## v0.9.3 — 23 Nov 2026 · Compare from anywhere
+
+- **Ticking "Compare" in a Loan details sheet on Home or Loans overview now does something.** It used to add the loan to the compare selection silently, because those screens have no compare tray.
+  - The tick pops, the sheet closes, and **Loan offers** opens.
+  - The loan's card is ticked, the compare tray slides in ("Comparing 1 of 3 loans"), and the empty slot nudges for another pick.
+  - Tick a second loan from anywhere and "Compare" is ready.
+  - Unticking stays put.
+  - On Loan offers itself nothing changes: the tray is already there.
+
+## flow/desktop history (merged in v0.14.0)
+
+### flow/desktop 0.13.6 — 23 Nov 2026 · Icons with masks render fully again
 
 **Fixed**
 
@@ -8,11 +100,11 @@
   - The inliner is now `tools/inline-icons.py`. It keeps referenced ids, and the build fails if any icon is left with a dangling reference.
 - **Compare tray arrow** was exported from the disabled button, so 50% opacity was baked in. It looked faded even when Compare was enabled. It now uses a full-strength copy (`bar-arrow-on`); the disabled state fades it in CSS.
 
-## v0.13.5 — 23 Nov 2026 · Quieter "Selected"
+### flow/desktop 0.13.5 — 23 Nov 2026 · Quieter "Selected"
 
 - **Compare's Select → Selected** no longer bounces; Shreya found the 0.6 → 1.2 → 1 spring too dramatic. The button now settles in 240ms (slight fade and 98.5% scale to full) while the check slides in. The selected column's blue glow is softer too, at rest and on hover.
 
-## v0.13.4 — 23 Nov 2026 · Compare that actually compares; tooltips stay in view
+### flow/desktop 0.13.4 — 23 Nov 2026 · Compare that actually compares; tooltips stay in view
 
 **Changed**
 
@@ -32,7 +124,7 @@
 
 - **Tooltips** near the panel edge (e.g. the APR info on Compare) ran off the left and were clipped. Tooltips now measure themselves on hover and focus, nudge sideways to stay inside the panel with the arrow still on the icon, and open below when there's no room under the top bar.
 
-## v0.13.3 — 23 Nov 2026 · Desktop polish from a rendered audit (radii, strokes, shadows, hovers)
+### flow/desktop 0.13.3 — 23 Nov 2026 · Desktop polish from a rendered audit (radii, strokes, shadows, hovers)
 
 An audit script ran on every desktop screen. It measured nested radii, icons clipped by their containers, shadows cut by `overflow: hidden`, and clickable elements with no `:hover` rule.
 
@@ -48,7 +140,7 @@ An audit script ran on every desktop screen. It measured nested radii, icons cli
   - Every hover keeps selected states (outline colour changes, not a box-shadow swap).
   - New hovers: rail accordion headers, copy buttons, WhatsApp toggle, KFS consent checkbox, Compare info icon.
 
-## v0.13.2 — 23 Nov 2026 · Compare tray + selection hovers
+### flow/desktop 0.13.2 — 23 Nov 2026 · Compare tray + selection hovers
 
 **Added**
 
@@ -65,7 +157,7 @@ An audit script ran on every desktop screen. It measured nested radii, icons cli
 
 - Hovering a **selected** Compare column or a **picked** offer in the Add-offers drawer swapped the blue selected outline for the grey hover one. Selected states now keep their outline, and hover only deepens it. Selected chips and checked checkboxes get their own hover too.
 
-## v0.13.1 — 23 Nov 2026 · Desktop NeSL as drawn
+### flow/desktop 0.13.1 — 23 Nov 2026 · Desktop NeSL as drawn
 
 Synced from Figma section "nesl" `524:105163`. Shreya: the desktop NeSL screens were wrong; they reused the mobile portal.
 
@@ -85,7 +177,7 @@ Synced from Figma section "nesl" `524:105163`. Shreya: the desktop NeSL screens 
 
 - Desktop screen-only images go in `assets/lazy/dsk/<screen>/`, with their own 600 KB cap in `tools/check.sh`. They load only on that screen. The NeSL shots are 1.5× JPEGs, 418 KB in total.
 
-## v0.13.0 — 23 Nov 2026 · Desktop loan journey complete: application page, KFS, NeSL, signed + disbursed
+### flow/desktop 0.13.0 — 23 Nov 2026 · Desktop loan journey complete: application page, KFS, NeSL, signed + disbursed
 
 Branch `flow/desktop`. Synced from section *final-loan applications* `440:134259`: application page `440:136328` (verifying) / `440:136512` (KFS ready) / `440:136901` (money on its way) / `440:137099` (money in account), sanction signed `440:136706`, KFS reader `440:134934`, NeSL `471:24999`… and confirming `440:135654`.
 
@@ -113,7 +205,7 @@ Branch `flow/desktop`. Synced from section *final-loan applications* `440:134259
 
 - "View All", "View details" and other link arrows were indigo `#4338CA` (from the frame) next to `#3858E5` labels; they now use the primary chevron. Breadcrumb separators use the grey chevron.
 
-## v0.12.0 — 23 Nov 2026 · Desktop Applications + Apply, with the approval moment
+### flow/desktop 0.12.0 — 23 Nov 2026 · Desktop Applications + Apply, with the approval moment
 
 Branch `flow/desktop`. Synced from Figma `440:134641` (Your Applications) and `440:137299` ("Citi Bank approved your loan" over the list), in section *final-loan applications* `440:134259`.
 
@@ -137,7 +229,7 @@ Branch `flow/desktop`. Synced from Figma `440:134641` (Your Applications) and `4
 
 **Not on desktop yet** (opens the "isn't designed for desktop yet" page, with a one-click switch to mobile): Application page (`440:136328`, `440:136512`, `440:136901`, `440:137099`), KFS reader (`440:134934`), NeSL signing (`471:24999`…), and the Signed / Disbursed milestones (`440:136706`, `440:137099`).
 
-## v0.11.0 — 23 Nov 2026 · Desktop Loan Offers + Compare
+### flow/desktop 0.11.0 — 23 Nov 2026 · Desktop Loan Offers + Compare
 
 Branch `flow/desktop`. Synced from Figma `357:102436` (Loan Offers tab), `507:84666` (tagged offer rows), `507:85604` (Compare, empty), `507:86537` / `507:87387` (three added, Selected and the Apply bar) and `507:86111` / `507:85929` (Add offers drawer).
 
@@ -159,7 +251,7 @@ Branch `flow/desktop`. Synced from Figma `357:102436` (Loan Offers tab), `507:84
 
 - `tools/build.sh` minifies the inlined desktop SVGs. `tools/check.sh` no longer counts those SVG files twice. Desktop is 277 KB on demand.
 
-## v0.10.0 — 23 Nov 2026 · Desktop view + Loans overview (desktop)
+### flow/desktop 0.10.0 — 23 Nov 2026 · Desktop view + Loans overview (desktop)
 
 Branch `flow/desktop`. Synced from Figma `476:200124` "loans overview" (page *Finance Hub - Desktop Loans* `357:54674`).
 

@@ -30,7 +30,7 @@
 .note-row__text { flex: 1 1 0; min-width: 0; font-size: 14px; line-height: 20px; color: var(--foreground); }
 
 /* ---- Apply sheet (382:41022) — rendered in the Sheet shell ------------- */
-.sheet--bare { padding: 0 0 12px; }
+.sheet--bare { padding: 0 0 calc(12px + env(safe-area-inset-bottom, 0px)); }   /* 12 as drawn + home-indicator zone on phones */
 .sheet--bare > .sheet__bare-body { align-self: stretch; }   /* full width; content sets its own gutters */
 .sheet--bare > .sheet__grip { display: none; }
 .apply { width: 100%; display: flex; flex-direction: column; gap: var(--s20); }

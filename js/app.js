@@ -23,7 +23,9 @@
   const isDesktop = () => OPL.state.get().device === "desktop" && window.innerWidth > 500;
   OPL.isDesktop = isDesktop;
   const dName = (name) => (OPL.dscreens[name] ? name : OPL.dscreens[OPL.dalias[name]] ? OPL.dalias[name] : null);
-  OPL.hasScreen = (name) => (isDesktop() ? !!dName(name) : !!OPL.screens[name]);
+  // On desktop a mobile-only screen still opens: it lands on the "not designed for desktop yet"
+  // page (OPL.dscreens.__missing) with a one-click switch to mobile, instead of a dead link.
+  OPL.hasScreen = (name) => (isDesktop() ? !!dName(name) || !!OPL.screens[name] : !!OPL.screens[name]);
 
   let dLoading = null;
   function loadDesktop() {
@@ -133,6 +135,7 @@
         const [inC, outC] = dir === "back" ? ["is-pop-in", "is-pop-out"] : ["is-push-in", "is-push-out"];
         page.classList.add(inC);
         old.classList.add(outC);
+        OPL.fx.navMorph(old, page, dir);
         old.style.pointerEvents = "none";
         setTimeout(() => { old.remove(); page.classList.remove(inC); }, 440);
       } else {
@@ -151,7 +154,8 @@
     screenEl.style.height = "";
     if (window.innerWidth <= 500) return;
     if (document.documentElement.dataset.device === "desktop") {
-      const panelW = panelEl && getComputedStyle(panelEl).display !== "none" && window.innerWidth > 1000 ? panelEl.offsetWidth + 32 : 0;
+      // the collapsed panel is a pinned pill (position: fixed), so it takes no room
+      const panelW = panelEl && getComputedStyle(panelEl).display !== "none" && !panelEl.classList.contains("is-collapsed") && window.innerWidth > 1000 ? panelEl.offsetWidth + 32 : 0;
       const chrome = wrap.offsetHeight - screenEl.offsetHeight;          // browser bar
       const availW = window.innerWidth - 48 - panelW;
       const availH = window.innerHeight - 48;
@@ -194,11 +198,18 @@
     const list = desk ? Object.entries(OPL.dscreens).filter(([id]) => !id.startsWith("__")) : Object.entries(OPL.screens);
     const active = desk ? dName(name) : name;
 
+    const closed = panelClosed();
+    panelEl.classList.toggle("is-collapsed", closed);
     panelEl.innerHTML = `
       <div class="panel__head">
         <span class="panel__title">${scr.title}</span>
         <span class="panel__ver">v${OPL.VERSION}</span>
+        <button class="panel__toggle" data-panel-toggle aria-expanded="${!closed}" aria-controls="panel-body"
+          title="${closed ? "Show" : "Hide"} controls (P)" aria-label="${closed ? "Show" : "Hide"} prototype controls">
+          <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M4 10l4-4 4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
       </div>
+      <div class="panel__body" id="panel-body" ${closed ? "inert" : ""}><div class="panel__inner">
       <p class="panel__sub">OPL Finance Hub · HTML prototype</p>
 
       <div class="panel__group panel__group--device">
@@ -242,10 +253,41 @@
       <div class="panel__group panel__links">
         ${figmaNode ? `<a href="${OPL.figmaLink(figmaNode)}" target="_blank" rel="noopener">Open frame in Figma <span>${figmaNode} ↗</span></a>` : ""}
         <a href="library.html" target="_blank">Component library <span>↗</span></a>
-      </div>`;
+      </div>
+      </div></div>`;
   }
 
+  /* ---- collapsible panel (for presenting) --------------------------------
+     #panel=closed|open in the URL wins (shareable); otherwise the viewer's
+     last choice, remembered in this browser. "P" toggles it. */
+  const PANEL_KEY = "opl.panel";
+  function panelClosed() {
+    const st = OPL.state.get();
+    if (st.panel === "closed" || st.panel === "open") return st.panel === "closed";
+    try { return localStorage.getItem(PANEL_KEY) === "closed"; } catch (_) { return false; }
+  }
+  function togglePanel() {
+    const closed = !panelEl.classList.contains("is-collapsed");
+    try { localStorage.setItem(PANEL_KEY, closed ? "closed" : "open"); } catch (_) {}
+    if (OPL.state.get().panel) OPL.state.set({ panel: closed ? "closed" : "open" }, { silent: true });
+    panelEl.classList.toggle("is-collapsed", closed);
+    const btn = panelEl.querySelector("[data-panel-toggle]");
+    btn.setAttribute("aria-expanded", !closed);
+    btn.title = `${closed ? "Show" : "Hide"} controls (P)`;
+    btn.setAttribute("aria-label", `${closed ? "Show" : "Hide"} prototype controls`);
+    panelEl.querySelector(".panel__body").toggleAttribute("inert", closed);
+    setTimeout(fit, 320);
+  }
+  document.addEventListener("keydown", (e) => {
+    if (!panelEl || e.metaKey || e.ctrlKey || e.altKey || e.key.toLowerCase() !== "p") return;
+    if (e.target.closest && e.target.closest("input, textarea, select, [contenteditable]")) return;
+    togglePanel();
+  });
+
   panelEl?.addEventListener("click", (e) => {
+    if (e.target.closest("[data-panel-toggle]")) return togglePanel();
+    // the collapsed pill expands when tapped anywhere
+    if (panelEl.classList.contains("is-collapsed") && e.target.closest(".panel__head")) return togglePanel();
     const scr = e.target.closest("[data-screen]");
     if (scr) {
       const target = scr.dataset.screen;

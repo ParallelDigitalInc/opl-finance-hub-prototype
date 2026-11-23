@@ -13,8 +13,9 @@
     render(page) {
       const name = OPL.current();
       const mobile = OPL.screens[name];
+      const subsidy = /^subsid/.test(name);
       page.innerHTML = D.shell({
-        nav: "loans", title: "Loans", tab: TAB[name] || "overview",
+        nav: subsidy ? "subsidies" : "loans", title: subsidy ? "Govt. subsidies" : "Loans", tab: subsidy ? null : TAB[name] || "overview",
         body: html`
           <div class="d-missing">
             <p class="d-missing__eyebrow">Prototype</p>

@@ -9,7 +9,7 @@ starts the HTML component kit that later mobile flows reuse.
 - **Component library:** `library.html` (tokens, icons and every component, rendered by the same functions)
 - **Figma:** `GHuBkYGEQZvQppv3v55EaA`, section *Finance Home* `416:82748`
 
-**Screens (v0.9.0):**
+**Screens (v0.10.0):**
 - **Home:** frames `382:34093`, `382:33823`, `382:36681`
 - **Loans overview:** `382:36150`. Home → "Explore Loans" pushes it; the back arrow or browser back pops it.
 - **Loan offers:** list `382:35324`, comparing `382:35666`, Sort sheet `393:505`, Filters sheet `393:869`. Reached from:
@@ -28,8 +28,23 @@ starts the HTML component kit that later mobile flows reuse.
     - "I'll come back later" or Cancel on NeSL leads to Application · Sign letter (`431:7803`).
   - **Disbursal** (group F, v0.9.0): Money on its way (`435:8001`), then Money received with the Disbursed sheet (`435:8572`). After the signed sheet closes, these follow on their own (3.5 s, then 6 s).
   - **The loan journey is complete:** offers → compare → apply → track → approved → KFS → NeSL → signed → disbursed.
+- **Subsidies home** (`524:103425`), screen `subsidies-overview`: Finance Home → "Explore Subsidies". It's the gateway to every subsidy.
+  - The "Top subsidies" cards are Home's subsidy match cards and open Subsidy details.
+  - Central and State filter the rail live.
+  - The benefit-type chips, View all, Sector, Import & Export, "Schemes in Gujarat" and Explore Now lead to the subsidy listing (`subsidy-list`), which isn't designed yet, so they show a hotspot hint.
+- **Subsidy details** (section "Subsidy Home - First Cut" `416:44852`):
+  - Gujarat Textile Policy 2024, collapsed `416:44853` and expanded `416:45617` (panel presets).
+  - Reached from any Home "Top subsidy matches" card.
+  - "See other benefits" and "How it works" open and close in place.
+  - **Benefit sheets** (section `416:47994`): any Policy Benefits tile or "See other benefits" row opens its sheet.
+    - Capital and Interest have an Activity 1 / 2 switch.
+    - Each Figma frame is a panel preset, e.g. "Sheet · Capital · Activity 2".
+- **Calculate estimate** (section `416:76869`), opened from "Calculate Estimate" on the policy page:
+  - **Form** `subsidy-estimate` (`416:77107`; preset "All benefits open" = `416:76872`): one card per benefit, live figures, Add more / Remove.
+  - **Result** `subsidy-estimate-result` (`416:77363`): replaces the form, so ✕ and Back return to the policy page. "Add more" swaps back to the form.
+  - Hotspots for later: Talk to an Expert, Apply Now / Apply Online and the two links.
 
-## Desktop view (`flow/desktop`)
+## Desktop view (merged in v0.14.0)
 
 Switch with **View → Desktop** in the panel, press **D**, or link `#device=desktop`. The current screen and its params carry over. Desktop renders `OPL.dscreens` (in `js/desktop/`), a separate bundle loaded the first time you switch, so the mobile first load is unchanged.
 
@@ -77,7 +92,9 @@ cd ~/Code/opl-finance-hub-prototype && npx serve .
 On a phone (≤ 500px wide) the prototype goes full-bleed with no shell and no panel, and
 uses the real status bar and safe areas. Any state can be linked through the URL hash, for example:
 
-`index.html#order=subsidies&emi=on` · `#autoplay=on` · `#frame=off` · `#hotspots=off` · `#motion=off`
+`index.html#order=subsidies&emi=on` · `#autoplay=on` · `#frame=off` · `#hotspots=off` · `#motion=off` · `#panel=closed`
+
+While presenting, press **P** (or use the chevron in the panel header) to fold the controls panel into a small pill; the browser remembers it.
 
 ## Structure
 
@@ -128,9 +145,9 @@ Rules for every new screen and asset:
 3. **Fonts are self-hosted** (`assets/fonts`, Geist variable latin + latin-ext, which carries ₹) and preloaded. No Google Fonts in the prototype, so it works offline in a meeting room.
 4. **Images are ≤3× their displayed size.**
    - Opaque photos and textures are JPEG; transparent art is PNG; icons are SVG.
-   - Max **150 KB per asset** and **700 KB total**, enforced by `tools/check.sh`.
+   - Max **150 KB per asset** and **900 KB total** (raised from 700 on 23 Nov 2026 as flows were added), enforced by `tools/check.sh`.
    - Full-resolution originals live in `assets/_source/` for re-export and are never loaded.
-5. **Screen-only images live in `assets/lazy/`** (for example the NeSL portal shots). They're fetched only by the screen that shows them, and never referenced from `index.html`. They have their own cap (150 KB each, 600 KB total) and don't count against the first-load total.
+5. **Screen-only images live in `assets/lazy/`** (for example the NeSL portal shots). They're fetched only by the screen that shows them, and never referenced from `index.html`. They have their own cap (150 KB each, 1000 KB total; raised from 600 on 23 Nov 2026) and don't count against the first-load total.
 6. **Every image has a fixed CSS size**, so nothing shifts as it loads.
 7. **First paint is the boot layer.**
    - Inline critical CSS in `index.html` paints the device and a neutral placeholder at first byte.
@@ -157,6 +174,8 @@ Geometry was checked against Figma on 23 Nov 2026:
 - nav items 56 / 57
 
 ## Motion and behaviour (prototype layer)
+
+- **Footer morph** (`fx.navMorph`, v0.9.4): on push/pop the bottom nav holds still. When the tab set changes (Finance hub ↔ Loans), the tabs swap in place with a stagger and the active pill pops. Not in Figma; it's an interaction layer.
 
 All of this is behaviour on existing elements. None of it adds UI:
 
@@ -225,7 +244,7 @@ All of this is behaviour on existing elements. None of it adds UI:
 6. **Toggle On state.** The DS Toggle is drawn Off only, so "On" (primary track) is inferred.
 7. **Sort and filters change state only.** All three All-offers cards share the same figures, so sort updates the chip but doesn't reorder; quick and sheet filters toggle without filtering. "Show 4 offers" is static.
 8. **Not built yet:** Apply now and "Apply to N lenders" show hotspot hints.
-9. **Loan details sheet (proposed, v0.5.0; not in Figma).** Tapping an offer card's head opens a bottom sheet built only from existing parts:
+9. **Loan details sheet (proposed, v0.5.0; not in Figma).** Ticking Compare on Home or Loans overview opens Loan offers with the compare tray (v0.9.3). Tapping an offer card's head opens a bottom sheet built only from existing parts:
    - the card's tinted head (tags, logo, name)
    - a 2×2 figures panel on slate-50, the Sanction summary pattern: Loan up to, Interest, APR, Est. EMI
    - detail rows in the card's style: Loan type, Tenure, Pay on, Processing fee, Collateral, Money in
@@ -286,6 +305,110 @@ All of this is behaviour on existing elements. None of it adds UI:
 8. **The Track Loans list** has no card for the disbursal states; they keep the KFS card.
 9. **First load is 687 KB of the 700 KB budget**, mostly from the two inlined milestone heroes. The next big addition should move something to `assets/lazy` or trim.
 8. **Prototype behaviour:** about 5 s after Submit, the first lender "approves" and the milestone sheet plays. This simulates the async lender response so the full flow can be demoed.
+
+## Figma flags · Subsidy details (`416:44852`)
+
+1. **Every Home subsidy card opens the Textile Policy page.** The three Home cards are other schemes (MSME Competitive, Gujarat Electronics, Aatmanirbhar Gujarat), and only Textile Policy has a details design.
+2. **Strokes differ between the two frames.**
+   - "See other benefits" is 52 tall with the stroke inside when closed. It is 1 + 56 + rows + 1, with the stroke in layout, when open.
+   - The closed label sits 14 from the top with no gap before the count badge. The open one sits 16 down with an 8 gap.
+   - The closed header is 13 + the 1px border, so the label still lands at 14. The 8 gap is used in both states.
+3. **The How it works chevron points down in both frames.** "See other benefits" flips to up when open. Both use the flip here, for consistency.
+4. **The deadline chip copy differs:** "Apply within 1 year of production" (accordion header) vs "Apply within 1yr of production" (step 1). Both are used as drawn.
+5. **"See other benefits" is 351 wide**, 1px wider than the 350 column. 350 is used.
+6. **The Steps frame has a 1px drop shadow on a frame with no fill**, so it would shadow the text. Not used.
+7. **Step 2's inset labels are ink (`#0F172A`)**, while the component default is `#64748B`. Used as drawn.
+8. **Buttons are drawn in Instrument Sans** (Calculate Estimate, Apply Now, Talk to an Expert). Geist SemiBold is used, per the Geist-only rule.
+9. **Policy period is computed from today,** per the widget's description. Today, 23 Nov 2026, gives "2 years 10 months left" and a 43% bar, the same as the frame (137 of 316). It moves with the date, and the chip turns amber in the last 6 months.
+10. **Proposed, not in Figma:**
+    - the AI Mitra nudge line "Ask anything about this policy" (panel toggle)
+    - the "Steps copied" confirmation when sharing steps without a native share sheet
+11. **Illustration:** the five vector layers (plinth ×2, notes, two coin stacks) are composed from Figma's own SVGs at their offsets, so the entrance can land them. The two clip-path groups inside the coins came through empty from Figma, so check the coin rims against the frame.
+12. **Sheets: the exclusion row tint differs.** Power tariff has white at 50% over `#FFEDD5`; Quality and Technology have 40%. 40% is used for all three.
+13. **Sheets: Power tariff and Payroll have no "Apply Now" link**, only Talk to an Expert. Kept as drawn.
+14. **Sheets: Apply Now is drawn in Figtree** (label/medium) and the primary button in Instrument Sans. Geist is used.
+15. **Sheets on a phone:** a sheet taller than the screen stops 12 below the status bar and its body scrolls. Capital, Interest and Payroll are 914–993 tall in Figma.
+
+## Figma flags · Subsidies home (`524:103425`)
+
+1. **Two hero layers:** `524:103429` fully covers `524:103426`, which has a stroke. The visible one is built, as on Loans overview.
+2. **"Up to ₹72 Lakhs" and the chip counts are as drawn.** They don't come from the cards (Capital 2 + Interest 1 + Other 6 = 9 schemes, while three cards are shown).
+3. **Gujarat Electronics Policy is tagged "Central Government"** here and on Home, but it's a state policy. The Central filter follows the tag, so it shows that card.
+4. **Sector and Import & Export** need the listing, as do "Schemes in Gujarat" and the benefit chips, so they lead there.
+5. **No filter-chip selected state is drawn.** The kit's selected chip (Loan offers `392:490`) is used.
+6. **Proposed, not in Figma:** the AI Mitra nudge "Ask anything about subsidies" (panel toggle).
+7. **Promo illustration:** the factory is composed from Figma's own vectors (building plus two smoke layers), with the ground and two pins, so the card can tell its story.
+
+**Motion (Subsidies home):**
+- "Up to ₹72 Lakhs" counts up, the benefit chips settle in and their counts tick up, and the cards slide in from the right.
+- Central / State filter the rail in place: non-matching cards fold away and the rest slide together. Tap again to clear.
+- When the "new unit" card scrolls in, the ground rises, the factory settles, both map pins drop in with a bounce, and the smoke drifts up twice.
+- Press states: chips dip and their icons tilt, chevrons and arrows nudge the way they lead, and the phone icon rings.
+
+## Figma flags · Calculate estimate (`416:76869`)
+
+1. **The estimate is calculated, not copied.**
+   - Figma's figures are placeholders: every card reads ₹87.5L, and the breakdown (87.5 + 36.5 + 12) doesn't add up to "Up to ₹87.5 L".
+   - The formulas use the benefit-sheet rates at the "Up to" end: Category 1 / PM MITRA Park, Activity 1.
+     - **Capital:** 35% of project cost, capped at ₹100 Cr.
+     - **Interest:** min(7%, rate − 2%) on each year's opening balance (annual instalments), for up to 8 years, capped at 3% of project cost a year when a project cost is entered.
+     - **Power:** ₹1/kWh × annual units × 5 years.
+     - **Payroll:** ₹5,000 per woman and ₹4,000 per man a month, for 5 years.
+     - **SHG:** ₹5,000 a member for 3 months of training, plus ₹5,000 a month for 5 years.
+     - **Quality:** 50%, up to ₹10 L.
+     - **Energy:** 75% of the audit, up to ₹50,000, plus 25% of equipment, up to ₹20 L.
+     - **Technology:** 65%, up to ₹50 L.
+   - With the drawn inputs (₹20 Cr loan at 9.45% over 15 years, ₹1.5 Cr project) plus 2,40,000 kWh, the result reads Capital ₹52.5 L, Interest ₹36 L, Power ₹12 L, Up to ₹1 Cr.
+   - **These formulas need a policy owner's check.**
+2. **The two form frames differ.**
+   - `416:76872`: "Calculate Estimate" in title case, Medium 44px inputs with Geist 14 labels, and the typo "Power Tariff Sabusidy".
+   - `416:77107`: sentence case, Small 38px inputs.
+   - Both presets use `416:77107`; the "All benefits open" preset only opens every card.
+3. **The chips list "Power tariff" even though Power is already added.** Here the chips are always the benefits not yet added: two are shown, plus "+ N more", which expands them all.
+4. **Copy:** the result line has a double space ("business is  applicable"); one space is used.
+5. **Proposed, not in Figma:**
+   - input fields for Payroll, SHG, Quality, Energy and Technology, so "Add more" works
+   - segment colours for those five, taken from their icons
+   - the "Calculating…" state
+   - the error state when an added benefit has no number (DS Input has an Error state)
+   - the result preset fills 2,40,000 kWh so Power shows, as in `416:77363`
+6. **The hatched "not added" segments** are drawn as CSS stripes, because the pattern fill didn't export.
+7. **Strokes on the cards and action bar are inside** (cards 336 / 56, bar 126).
+
+**Motion (Calculate estimate):**
+- **Form:**
+  - Each card's figure re-counts as you type, with a blue tick.
+  - Cards open by height.
+  - An added benefit drops in from its chip, its icon pops, and its first field takes focus.
+  - A removed card folds away and its chip returns.
+  - Get Estimate shows "Calculating…" before the result.
+- **Result: the cash arrives.** One bundle of cash falls onto the plinth for each benefit. With the three drawn benefits it ends as Figma's three-bundle stack; more benefits stack it higher.
+  - **Each landing:**
+    - the plinth takes the weight
+    - gold coins spark off the bundle
+    - that benefit's segment fills the Build-up bar, its row counts in, and the headline total climbs by its amount
+  - **Around it:** a warm OPL Yellow glow blooms behind the stack, the rays turn, sparkles twinkle, and "Congratulations" springs in letter by letter.
+  - **Finale (total complete):**
+    - a confetti burst from the stack, plus cannons from both sides
+    - an indigo-and-gold shine sweeps the total
+    - a nudge on "Add more"
+  - Android gets haptics on every landing and the finale.
+  - The celebration is `assets/lazy/subsidy/estimate/celebrate.js` (canvas, one-shot, about 9 KB). It loads only on this screen, outside the first-load budget. If it fails to load, the kit's milestone confetti plays instead.
+  - Reduced motion shows the final state.
+
+**Motion (prototype layer):**
+- **The benefits land:** the plinth settles, the notes drop onto it, the coins clink down, and "Up to ₹1.2Cr" counts up as they land.
+- The period bar fills to today, then the time-left chip appears.
+- Disclosures open by height. Their rows stagger in, and the list scrolls into view if it opened below the fold.
+- The How it works rail draws step by step.
+- The OPL Verified stamp presses onto the expert card once.
+- **Sheets:**
+  - The sheet slides up and its sections rise in.
+  - The benefit's icon pops into its tile, and the condition marks tick in one by one.
+  - On Activity 1 / 2, the white thumb slides across and the rate figures slide out and back in the same direction.
+  - Close turns its ✕. Drag down, tap the scrim or press Esc to dismiss, and focus returns to the tile you came from.
+- Tiles, rows and buttons have press states, with their arrows nudging in the direction they lead.
+- Reduced motion and "Motion off" render everything at rest.
 
 ## Versioning
 

@@ -156,6 +156,24 @@
       name: "NoticeBanner", node: "382:36897", use: "Dismissible reminder that sits above the nav.",
       demos: [["EMI due", OPL.raw(`<div style="width:358px">${ui.NoticeBanner(d.emi)}</div>`), `ui.NoticeBanner({ icon, parts: [{ text, strong }] })`]],
     },
+    ...(() => {
+      const sd = OPL.data.subsidyDetail;
+      if (!sd || !ui.PolicyPeriod) return [];
+      const w = (h, px = 350) => OPL.raw(`<div style="width:${px}px">${h}</div>`);
+      return [
+        { name: "PolicyPeriod", node: "238:4515", use: "Operative period. Bar = share elapsed; chip = time left from today, amber in the last 6 months.",
+          demos: [["Textile Policy 2024", w(ui.PolicyPeriod({ period: sd.period })), `ui.PolicyPeriod({ period: { start, end, warnMonths } })`],
+                  ["Last 6 months", w(ui.PolicyPeriod({ period: { start: "2022-01-01", end: new Date(Date.now() + 90 * 864e5).toISOString().slice(0, 10) } })), ``]] },
+        { name: "BenefitTile", node: "416:45785", use: "Policy benefit with its key figure. Opens the benefit sheet.",
+          demos: [["", OPL.raw(`<div style="width:350px;display:grid;grid-template-columns:1fr 1fr;gap:16px">${sd.benefits.tiles.slice(0, 2).map((t) => ui.BenefitTile(t)).join("")}</div>`), `ui.BenefitTile({ id, icon, title, value, label })`]] },
+        { name: "Disclosure · ListRow", node: "416:45873 · 416:45883", use: "Tap the header to open. Rows stagger in.",
+          demos: [["", w(ui.Disclosure({ id: "lib", label: sd.benefits.others.label, count: 4, open: true, body: OPL.raw(sd.benefits.others.rows.slice(0, 2).map((r, i) => ui.ListRow({ ...r, attrs: `style="--i:${i}"` })).join("")) })), `ui.Disclosure({ id, label, count, open, body }) · ui.ListRow({ icon, title, sub, trailing })`]] },
+        { name: "HelpCardExpert", node: "416:45923", use: "Expert help with the OPL Verified stamp.",
+          demos: [["", w(ui.HelpCardExpert(sd.apply.help)), `ui.HelpCardExpert({ title: [l1, l2], cta, goto })`]] },
+        { name: "HowItWorks", node: "141:21242 · step 137:21194", use: "Collapsed shows the deadline chip; expanded hides it.",
+          demos: [["Collapsed", w(ui.HowItWorks({ ...sd.steps, open: false })), `ui.HowItWorks({ title, headerDeadline, items, share, open })`]] },
+      ];
+    })(),
     {
       name: "AiMitraFab · BottomNav", node: "382:34310 · 382:34337", bg: "#f1f5f8",
       demos: [

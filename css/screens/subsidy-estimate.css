@@ -1,0 +1,224 @@
+/* ==========================================================================
+   Screens · Calculate estimate (416:76869)
+   Form 416:77107: status 47 → header row pt16 (title 18/24, ✕ 32 white +
+   slate-300 ring) → body py24 px20, cards 16 apart → Add more benefits.
+   Actions bar: border slate-200, py16 px24, Get Estimate (44) + text button (38).
+   ========================================================================== */
+
+.page[data-screen="subsidy-estimate"], .page[data-screen="subsidy-estimate-result"] { --est-foot: calc(110px + max(16px, env(safe-area-inset-bottom)));   /* 126 */ }
+
+/* ---- header ------------------------------------------------------------ */
+.est-head {
+  position: absolute; z-index: 5; top: var(--status-h); left: 0; right: 0;
+  display: flex; align-items: flex-start; gap: var(--s12); padding: var(--s16) var(--gutter) 0;
+  background: var(--surface);
+}
+.est-head__title { flex: 1 1 0; padding-top: var(--s4); font-size: 18px; line-height: 24px; font-weight: var(--fw-semibold); color: var(--foreground); }
+.est-close {
+  position: relative; flex-shrink: 0; width: 32px; height: 32px; border-radius: var(--r-full); background: var(--surface);
+  box-shadow: inset 0 0 0 1px #cbd5e1; display: grid; place-items: center;
+  transition: transform var(--dur-press) var(--ease-out), background var(--dur-fast);
+}
+.est-close::before { content: ""; position: absolute; inset: -6px; }
+.est-close .ico { transition: transform var(--dur-base) var(--ease-out); }
+.est-close.is-pressed { transform: scale(0.9); background: var(--slate-50); }
+.est-close.is-pressed .ico { transform: rotate(90deg); }
+
+.est-scroller { top: calc(var(--status-h) + 48px); bottom: var(--est-foot); }
+.est-body { display: flex; flex-direction: column; gap: var(--s24); padding: var(--s24) var(--gutter); }
+.est-list { display: flex; flex-direction: column; gap: var(--s16); }
+
+/* ---- benefit card (416:77243 open / 416:77266 closed) ------------------- */
+.ecard {
+  outline: 1px solid var(--border); outline-offset: -1px;          /* stroke inside: 4 + 56 + 3×… = 336 */
+  border-radius: var(--r-large); background: var(--surface);
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.04));
+  padding: 0; transition: padding var(--dur-base) var(--ease-out);
+}
+.ecard.is-open { padding: var(--s4); }
+.ecard__head {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s8); width: 100%;
+  padding: var(--s16); border-radius: var(--r-large); background: var(--surface); text-align: left;
+  transition: background var(--dur-base) var(--ease-out);
+}
+.ecard.is-open > .ecard__head { background: var(--muted); }
+.ecard__name { display: flex; align-items: center; gap: var(--s8); min-width: 0; font-size: 16px; line-height: 21px; font-weight: var(--fw-medium); color: var(--foreground); white-space: nowrap; }
+.ecard__right { display: flex; align-items: center; gap: var(--s8); flex-shrink: 0; }
+.ecard__amt { font-size: 16px; line-height: 21px; font-weight: var(--fw-semibold); color: var(--foreground); white-space: nowrap; font-variant-numeric: tabular-nums; display: inline-block; }
+.ecard__amt.is-ticking { animation: amt-tick 420ms var(--ease-out); }
+@keyframes amt-tick { 0% { color: var(--primary); transform: translateY(-3px); } 60% { color: var(--primary); } 100% { transform: none; } }
+.ecard__chev { transform: rotate(-90deg); transition: transform var(--dur-base) var(--ease-out); }
+.ecard.is-open .ecard__chev { transform: rotate(90deg); }
+.ecard__head.is-pressed { background: var(--slate-50); }
+.ecard.is-open > .ecard__head.is-pressed { background: var(--border); }
+
+.ecard__panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--dur-base) var(--ease-out); }
+.ecard.is-open .ecard__panel { grid-template-rows: 1fr; }
+.ecard__inner { min-height: 0; overflow: hidden; }
+.ecard__fields { display: flex; flex-direction: column; }
+
+/* Input · Small (282:28795): label caption 12/16 semibold, box 38 r8 px12 */
+.efield { display: flex; flex-direction: column; gap: var(--s6); padding: var(--s12) var(--s16) 0; }
+.efield--first { padding-top: var(--s16); }
+.efield__label { font-size: 12px; line-height: 16px; font-weight: var(--fw-semibold); color: var(--foreground); }
+.efield__box {
+  height: 38px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface);
+  font: inherit; font-size: 14px; line-height: 20px; color: var(--foreground); outline: none; min-width: 0; width: 100%;
+  transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
+  font-variant-numeric: tabular-nums;
+}
+.efield__box::placeholder { color: var(--muted-foreground); }
+.efield__box:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(56, 88, 229, 0.12); }
+.efield__box.is-error { border-color: #dc2626; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1); animation: shake 420ms var(--ease-out); }
+
+.ecard__remove-row { display: flex; justify-content: flex-end; padding: 12px 12px 8px; }
+.ecard__remove {
+  height: 32px; padding: var(--s8) 12px; border-radius: var(--r-full); background: #fef2f2; color: #b91c1c;
+  font-size: 12px; line-height: 16px; font-weight: var(--fw-semibold); transition: transform var(--dur-press) var(--ease-out), background var(--dur-fast);
+}
+.ecard__remove.is-pressed { transform: scale(0.95); background: #fee2e2; }
+
+/* added from a chip: drops in and its icon pops · removed: folds away */
+.ecard.is-entering { animation: card-in 420ms var(--ease-out) both; }
+.ecard.is-entering .ecard__icon { animation: tile-pop 520ms var(--ease-spring) 120ms both; }
+@keyframes card-in { from { opacity: 0; transform: translateY(-10px) scale(0.98); } }
+.ecard.is-leaving { overflow: hidden; height: 0 !important; opacity: 0; margin-top: -16px; transform: scale(0.98);
+  transition: height 280ms var(--ease-out), opacity 200ms, margin 280ms var(--ease-out), transform 280ms var(--ease-out); }
+
+/* Add more benefits (416:77347) */
+.est-more { display: flex; flex-direction: column; gap: 10px; }
+.est-more__label { font-size: 14px; line-height: 20px; font-weight: var(--fw-medium); color: var(--foreground); }
+.est-more__chips { display: flex; flex-wrap: wrap; gap: var(--s8); }
+.est-chip {
+  padding: var(--s8) 12px; border-radius: var(--r-full); background: var(--muted); color: var(--primary);
+  font-size: 14px; line-height: 20px; font-weight: var(--fw-medium); white-space: nowrap;
+  transition: transform var(--dur-press) var(--ease-out), background var(--dur-fast), opacity 160ms;
+}
+.est-chip.is-pressed { transform: scale(0.95); background: var(--soft-primary); }
+.est-chip.is-taken { transform: scale(0.6) translateY(-8px); opacity: 0; }
+
+/* ---- actions (416:77360) ---------------------------------------------- */
+.est-actions {
+  position: absolute; z-index: 21; left: 0; right: 0; bottom: 0;
+  display: flex; flex-direction: column; gap: 12px;
+  padding: var(--s16) 24px max(var(--s16), env(safe-area-inset-bottom));
+  background: var(--surface); box-shadow: inset 0 1px 0 var(--border);   /* stroke inside: 16+44+12+38+16 = 126 */
+  filter: drop-shadow(0 -2px 6px rgba(0, 0, 0, 0.04));
+}
+.est-go .ico { transition: transform var(--dur-fast) var(--ease-out); }
+.est-go.is-loading { pointer-events: none; }
+.est-go.is-loading .btn__label::after { content: "…"; display: inline-block; width: 1.1em; text-align: left; animation: dots 900ms steps(4) infinite; overflow: hidden; vertical-align: bottom; }
+.est-go.is-loading .ico { animation: go-nudge 600ms var(--ease-out) infinite; }
+.est-go[disabled] { opacity: 0.45; }
+@keyframes dots { from { width: 0; } to { width: 1.1em; } }
+@keyframes go-nudge { 50% { transform: translateX(4px); } }
+
+/* ==========================================================================
+   Result (416:77363)
+   ========================================================================== */
+.er { position: absolute; inset: 0; display: flex; flex-direction: column; }
+.er-sheet { position: relative; flex: 1 1 0; min-height: 0; overflow-x: hidden; overflow-y: auto; display: flex; flex-direction: column; padding-bottom: var(--s24); scrollbar-width: none; }
+.er-sheet::-webkit-scrollbar { display: none; }
+.er .est-actions { position: relative; flex-shrink: 0; }
+
+/* satin texture at 78% under a white fade (image 982, 416:77366) */
+.er-bg { position: absolute; left: 0; right: 0; top: -48px; height: 416px; opacity: 0.78; pointer-events: none; }
+.er-bg img { width: 100%; height: 100%; object-fit: fill; display: block; }
+.er-bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255, 255, 255, 0) 45.913%, rgba(255, 255, 255, 0.8) 77.404%); }
+/* rays (Ellipse 1846 stroke, 354 at 50% opacity, centred 200 above the sheet middle) */
+.er-rays { position: absolute; left: calc(50% - 177px); top: calc(50% - 377px); width: 354px; height: 354px; max-width: none; opacity: 0.5; pointer-events: none; }
+.er-confetti { position: absolute; left: calc(50% - 195px); top: calc(var(--status-h) + 59px); pointer-events: none; z-index: 1; }
+
+.er-head { position: relative; z-index: 2; display: flex; align-items: flex-start; gap: var(--s12); padding: calc(var(--status-h) + 16px) var(--gutter) 0; }
+.er-head__title { flex: 1 1 0; padding-top: var(--s4); font-size: 18px; line-height: 24px; font-weight: var(--fw-semibold); color: var(--foreground); opacity: 0; }   /* drawn at 0% */
+
+.er-col { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 46px; padding: 0 24px; }
+
+/* money illustration (416:77387) 145 × 111.36 */
+.er-money { position: relative; width: 145px; height: 111.36px; flex-shrink: 0; }
+.er-money__plinth, div.er-money__stack { position: absolute; inset: 0; }
+.er-l { position: absolute; max-width: none; }
+img.er-l[style*="inset"] { width: auto; height: auto; }
+.er-l--mul { mix-blend-mode: multiply; }
+
+.er-text { display: flex; flex-direction: column; gap: var(--s16); align-self: stretch; }
+.er-copy { display: flex; flex-direction: column; gap: 12px; padding: 0 24px; text-align: center; }
+.er-copy__lead { display: flex; flex-direction: column; gap: var(--s8); }
+.er-title { font-size: 20px; line-height: normal; font-weight: var(--fw-medium); color: var(--foreground); }
+.er-sub { font-size: 16px; line-height: normal; color: var(--muted-foreground); }
+.er-total { font-size: 32px; line-height: 48px; font-weight: var(--fw-medium); color: var(--foreground); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.er-total [data-total] { display: inline-block; }
+
+/* Estimate card (416:77577) */
+.er-card {
+  display: flex; flex-direction: column; gap: var(--s16); padding: var(--s16);
+  border: 1px solid var(--border); border-radius: var(--r-large); background: var(--surface); box-shadow: var(--shadow-m);
+}
+/* Build-up bar: 8 segments, 3px white gaps, white 2px ring on slate-300 */
+.er-bar { display: flex; height: 12px; border: 2px solid #fff; border-radius: var(--r-full); background: #cbd5e1; overflow: hidden; box-sizing: content-box; margin: -2px 0; }
+.er-seg {
+  position: relative; flex: 1 1 0; border-radius: 2px; overflow: hidden;
+  background: repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.55) 0 1.5px, transparent 1.5px 4px);
+}
+.er-seg.is-on { background: var(--c); }
+.er-bar__gap { width: 3px; flex-shrink: 0; background: #fff; }
+.er-caption { display: flex; align-items: center; justify-content: space-between; font-size: 14px; line-height: 20px; white-space: nowrap; }
+.er-caption__count { color: var(--muted-foreground); }
+.er-caption__more { font-weight: var(--fw-semibold); color: var(--primary); transition: opacity var(--dur-fast); }
+.er-caption__more.is-pressed { opacity: 0.6; }
+.er-break { display: flex; flex-direction: column; gap: 12px; padding-top: var(--s16); border-top: 1px solid var(--hairline); }
+.er-row { display: flex; align-items: center; gap: 10px; }
+.er-row__key { flex-shrink: 0; width: 8px; height: 8px; border-radius: 50%; }
+.er-row__label { flex: 1 1 0; min-width: 0; font-size: 14px; line-height: 21px; color: var(--muted-foreground); }
+.er-row__amt { font-size: 14px; line-height: 21px; font-weight: var(--fw-semibold); color: var(--foreground); white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+.er-note { flex: 1 0 auto; display: flex; align-items: flex-end; justify-content: center; padding: var(--s24) 24px 0; }
+.er-note p { font-size: 12px; line-height: 16px; color: var(--muted-foreground); text-align: center; }
+.er-actions { gap: 12px; }
+
+/* ---- the celebration ----------------------------------------------------
+   0       rays bloom, plinth settles
+   +905…   a bundle of cash falls onto the plinth for each benefit (see celebrate.js
+           for the thud, the gold sparks, and the finale: confetti + banknote rain)
+   +420…   Congratulations + line rise; the card arrives with every segment empty
+   +1250   each benefit fills its segment, its row slides in and counts, the total climbs
+   end     total settle-pop + glow; the empty segments shimmer toward "Add more"     */
+.er .er-seg.is-on { transform-origin: 0 50%; }
+.er:not(.is-celebrating) .er-motion { }
+.er.is-celebrating .er-rays { animation: rays-bloom 900ms var(--ease-out) both, rays-spin 60s linear 900ms infinite; }
+.er.is-celebrating .er-money__plinth { animation: plinth-rise 560ms var(--ease-out) both; }
+/* each bundle falls in and lands (at 75%) exactly when its benefit counts in: 1250 + k × 560 */
+.er.is-celebrating .er-money__stack { animation: stack-drop 460ms cubic-bezier(0.45, 0, 0.55, 1) both; animation-delay: calc(var(--k) * 560ms + 905ms); }
+.er.is-celebrating .er-confetti .cf {
+  animation: cf-burst 1150ms cubic-bezier(0.18, 0.89, 0.32, 1.12) both, cf-fall 1500ms cubic-bezier(0.55, 0, 0.85, 0.4) forwards;
+  animation-delay: calc(var(--i) * 22ms + 700ms), calc(1800ms + var(--i) * 45ms);
+}
+.er-confetti .cf { opacity: 0; }
+.er.is-celebrating .er-copy__lead { animation: enter-up 480ms var(--ease-out) 420ms both; }
+.er.is-celebrating .er-total { animation: enter-up 480ms var(--ease-out) 560ms both; }
+.er.is-celebrating .er-card { animation: enter-up 520ms var(--ease-out) 760ms both; }
+.er.is-celebrating .er-caption { animation: fade-in 400ms var(--ease-out) 1000ms both; }
+.er.is-celebrating .er-note, .er.is-celebrating .er-actions > * { animation: fade-in 400ms var(--ease-out) 900ms both; }
+.er.is-celebrating .er-seg.is-on { animation: seg-fill 520ms var(--ease-out) both; animation-delay: calc(var(--k) * 560ms + 1250ms); }
+.er.is-celebrating .er-seg.is-on::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent); transform: translateX(-100%); animation: seg-gloss 700ms var(--ease-out) both; animation-delay: calc(var(--k) * 560ms + 1450ms); }
+.er.is-celebrating .er-row { animation: row-in 420ms var(--ease-out) both; animation-delay: calc(var(--k) * 560ms + 1250ms); }
+.er.is-celebrating .er-row__key { animation: tile-pop 420ms var(--ease-spring) both; animation-delay: calc(var(--k) * 560ms + 1300ms); }
+.er.is-built [data-total] { animation: total-pop 620ms var(--ease-spring); }
+.er.is-built .er-total { text-shadow: 0 0 0 transparent; animation: total-glow 1400ms var(--ease-out); }
+.er.is-built .er-seg:not(.is-on) { animation: seg-shimmer 1200ms var(--ease-out) 200ms; }
+.er.is-built .er-caption__more { animation: more-nudge 700ms var(--ease-out) 900ms; }
+@keyframes rays-bloom { from { opacity: 0; transform: scale(0.6) rotate(-20deg); } }
+@keyframes rays-spin { to { transform: rotate(360deg); } }
+@keyframes stack-drop { 0% { opacity: 0; transform: translateY(-90px) rotate(-9deg); } 35% { opacity: 1; } 75% { transform: translateY(0) rotate(0); animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); } 88% { transform: translateY(-5px) rotate(1deg); } 100% { opacity: 1; transform: none; } }
+@keyframes seg-fill { from { transform: scaleX(0); } }
+@keyframes seg-gloss { to { transform: translateX(100%); } }
+@keyframes row-in { from { opacity: 0; transform: translateX(-10px); } }
+@keyframes total-pop { 40% { transform: scale(1.06); } }
+@keyframes total-glow { 30% { text-shadow: 0 0 24px rgba(56, 88, 229, 0.35); } }
+@keyframes seg-shimmer { 40% { filter: brightness(1.12); } }
+@keyframes more-nudge { 30% { transform: translateX(-3px); } 60% { transform: translateX(2px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .er.is-celebrating *, .er.is-built * { animation: none !important; }
+  .er-confetti { display: none; }
+}
