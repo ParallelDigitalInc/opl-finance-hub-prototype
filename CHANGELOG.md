@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.18.1 — 27 Nov 2026 · Prototype panel: bigger screen when collapsed
+
+Shreya: when the panel is minimised the screen should get bigger, so viewers don't need "Open full screen".
+
+- Collapsing the panel shrinks it to one round button in the corner, and the device takes the whole window with equal margins. On a 1440×900 laptop the desktop mock grows from 1068px to 1312px wide.
+- With the panel open, the device now shares the panel's top edge.
+- 3A / 3B (approach 3) are listed as "In progress" until they're built.
+
 ## v0.18.0 — 27 Nov 2026 · Responsive approach 2 + prototype panel
 
 **Approach 2, "Light wash"** (`/responsive/approach-2/`), from Figma Section 5 `21:6331`:
