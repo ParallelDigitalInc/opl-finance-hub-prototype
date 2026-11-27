@@ -889,3 +889,16 @@ body { font-feature-settings: "tnum" 0; }
   .limit { background: #cdead4; }
   [data-theme="b"] .limit { background: #014042; }
 }
+
+/* 3B hero as Figma builds it (1:3730): teal gradient, stripes flipped at 10% (plus-lighter) */
+[data-theme="b"] .m-hero__bg { background: linear-gradient(180deg, #001d21 22.727%, #004746 88.727%); }
+[data-theme="b"] .m-hero__stripes { top: 0; bottom: auto; height: 693px; object-fit: cover; object-position: top; transform: scaleY(-1); opacity: 0.1; mix-blend-mode: plus-lighter; }
+[data-theme="b"] .m-hero__eyebrow { color: #b2bfc1; }
+
+/* AI Mitra FAB (12:14205 / 17:26435): white with a lavender radial, mint inner shadow, 24px logo */
+.fab { width: 60px; height: 60px; border-radius: 50%; display: grid; place-items: center;
+  background: radial-gradient(circle at 93% 30%, rgba(189, 187, 255, 0.5) 24.5%, rgba(255, 255, 255, 0.5) 100%), #fff;
+  box-shadow: 0 6.923px 16.154px rgba(67, 56, 202, 0.3), inset 0 0 0 1px #fff, inset 0 -7px 14px #cdead4, inset 0 4px 4px #fff; }
+.fab .ico { width: 24px; height: 24px; }
+.fab::after { box-shadow: 0 0 0 0 rgba(92, 87, 255, 0.35); }
+@keyframes fab-ripple { 0% { box-shadow: 0 0 0 0 rgba(92, 87, 255, 0.35); } 100% { box-shadow: 0 0 0 16px rgba(92, 87, 255, 0); } }

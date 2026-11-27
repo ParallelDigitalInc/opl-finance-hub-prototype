@@ -233,7 +233,7 @@
       <div class="floating">
         <div class="fab-wrap">
           <span class="fab-nudge" aria-hidden="true"><span class="fab-nudge__text">${D.nudge.lead} <strong>${D.nudge.topic}</strong></span></span>
-          <button class="fab" data-press data-next="mitra" aria-label="Ask AI Mitra">${ico("ai-mitra-logo", 26)}</button>
+          <button class="fab" data-press data-next="mitra" aria-label="Ask AI Mitra">${ico("ai-mitra-logo", 24)}</button>
         </div>
         <nav class="bnav only-m" aria-label="App sections">
           ${D.nav.map((n) => `<button class="bnav__item ${n.id === "finance" ? "is-active" : ""}" data-press ${n.id === "finance" ? 'aria-current="page"' : `data-next="${n.id}"`}><span class="bnav__pill">${ico(n.id === "finance" ? `nav-finance-${THEME}` : n.icon, 24)}</span><span class="bnav__label">${n.label}</span></button>`).join("")}
