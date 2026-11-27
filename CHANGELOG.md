@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.19.0 — 27 Nov 2026 · Responsive approach 3: 3A light hero + 3B dark hero
+
+`/responsive/approach-3/` (`?theme=b` gives 3B), from Figma Section 1 `1:4534`:
+- **3A:** mobile `12:14030` + desktop 1A `34:2114`.
+- **3B:** mobile `1:3729` + desktop 1B `17:29741`.
+
+What's new:
+- **Type:** Stack Sans Text for titles and numbers (₹50 Lakhs in Light), Manrope for body. Both are self-hosted.
+- **Mobile cards:** "Check Details" buttons, subsidy cards with photo headers, and a violet help card with a photo and the OPL Verified badge.
+- **3B:** a dark teal gradient hero with faint stripes and a white sheet below it, plus lavender accents.
+- **AI Mitra button:** as drawn (lavender radial, mint inner shadow).
+- **Panel:** 3A and 3B are now switchable in the Look list.
+- **Cache-busting:** the asset versions were bumped, so viewers get the new files.
+- **Flags:** in `responsive/approach-3/README.md`, including that the violet/lavender comes back in this direction.
+
 ## v0.18.1 — 27 Nov 2026 · Prototype panel: bigger screen when collapsed
 
 Shreya: when the panel is minimised the screen should get bigger, so viewers don't need "Open full screen".
