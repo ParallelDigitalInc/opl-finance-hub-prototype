@@ -6,7 +6,7 @@
 (function () {
   const OPL = (window.OPL = window.OPL || {});
 
-  OPL.VERSION = "0.16.17";
+  OPL.VERSION = "0.17.0";
   OPL.FIGMA_FILE = "https://www.figma.com/design/GHuBkYGEQZvQppv3v55EaA/OPL----Internal-Playground--5-";
   OPL.figmaLink = (nodeId) => `${OPL.FIGMA_FILE}?node-id=${nodeId.replace(":", "-")}`;
 

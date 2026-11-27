@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.17.0 — 27 Nov 2026 · Responsive prototype in the teal look: Loans overview
+
+The client asked to drop the blue. This adds a **new, separate page**, `responsive/`, built in the teal look. The prototype at the root is unchanged.
+
+- **Figma:** `lpZnNP6VNO0xnz5s9lUgPo`, section "light teal gradient" `1:1558`. Loans overview: mobile `1:1559`, desktop `1:1994`.
+- **One page, two layouts:** the mobile frame below 1024px, the desktop frame from 1024px. Container queries stack rows when the content area is narrow.
+- **Motion and states** carry over from the kit: the entrance, count-ups, hero card stack, AI Mitra nudge, rotating AI questions, CIBIL gauge sweep, chip filters, sort, compare tray, tab ink, and press and hover states.
+- **No build step.** Its own tokens, CSS, JS and assets; it shares only the Geist fonts.
+- **Flags** are in `responsive/README.md`: leftover blues mapped to teal, the Debt Profile tag says 68% but the maths gives 62%, chart months derived from bar heights, and proposed active icons.
+
 ## v0.16.17 — 23 Nov 2026 · Money on its way: working days, not a date
 
 Shreya: we can't promise when the money arrives, so show "5–8 working days", not a date.
