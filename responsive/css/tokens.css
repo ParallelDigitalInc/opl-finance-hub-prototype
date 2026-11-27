@@ -1,0 +1,81 @@
+/* ==========================================================================
+   OPL Finance Hub · responsive prototype — design tokens, teal VD
+   Source: Figma lpZnNP6VNO0xnz5s9lUgPo, section "light teal gradient" 1:1558
+   (mobile Loans overview 1:1559, desktop loans overview 1:1994).
+
+   The old kit's blue (#3858E5) is gone. Where the new frames still carry a
+   stray blue (two card tags, the subsidy count badge, the AI Mitra logo note),
+   it is mapped to the teal primary below. Every value here is read off the
+   frames; names follow the Figma variables where one exists.
+   ========================================================================== */
+
+:root {
+  /* ---- Primary · teal --------------------------------------------------- */
+  --primary: #2b5143;                 /* filled buttons (Explore Loans, Request a Call), dot fill */
+  --primary-ink: #185853;             /* links, counts, Apply Now, selected states (#185853/#185854/#195c57 on frames) */
+  --primary-accent: #2e8380;          /* hero fact figures "9.45% p.a." · "7 offers" */
+  --primary-deep: #104842;            /* AI Mitra FAB */
+  --primary-line: #ccdad9;            /* count badge, outlined button stroke */
+  --primary-tint: #e4f2f0;            /* color-teal-100 — avatar, selected chip */
+  --primary-on: #042f2e;              /* color-teal-950 — text on teal-100 */
+  --primary-foreground: #ffffff;
+  --grad-hero-card: linear-gradient(110.38deg, #366560 14.52%, #144b45 100%);   /* desktop limit card */
+  --grad-bar: linear-gradient(180deg, #1b5e59 0%, #267571 100%);                 /* active chart bar */
+  --grad-tip: linear-gradient(180deg, #124d48 0%, #25736f 100%);                 /* chart tooltip */
+  --grad-mitra: linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 60%), #104842;
+
+  /* ---- Sage / cream accents ---------------------------------------------- */
+  --sage: #f4f5ea;                    /* loan card header */
+  --sage-nav: #f2f4e6;                /* active bottom-nav pill */
+  --sage-side: linear-gradient(90deg, #f4f5ea 0%, #ebedd8 100%);   /* active sidebar row (#fdfefc→#ebedd8, drawn mostly #ebedd8) */
+  --sage-tile: linear-gradient(180deg, #ffffff 0%, rgba(235, 237, 216, 0.5) 100%);  /* debt profile tiles */
+  --mint-card: linear-gradient(180deg, #f2fbf7 0%, #e8f8f1 100%);  /* subsidy card header */
+  --mint-hero: #ade8d6;               /* mobile hero gradient foot */
+
+  /* ---- Text --------------------------------------------------------------- */
+  --foreground: #0f172a;
+  --foreground-2: #1e293b;            /* sidebar-accent-foreground, gauge rank */
+  --sidebar-fg: #334155;
+  --muted-foreground: #475569;
+  --tertiary-foreground: #64748b;
+  --nav-fg: #707070;                  /* inactive bottom-nav label */
+  --nav-fg-on: #24262c;               /* active bottom-nav label */
+
+  /* ---- Surfaces & lines --------------------------------------------------- */
+  --surface: #ffffff;
+  --app-bg: #f7f7f7;                  /* desktop canvas + sidebar */
+  --tile: #f7f7f7;                    /* chips, quick-action tiles, icon wells */
+  --pill: #fafafa;                    /* hero fact pills, hero card inner */
+  --track: #f5f5f5;                   /* inactive dots, card strokes */
+  --bar: #e2dfdf;                     /* idle chart bars, EN pill */
+  --border: #e2e8f0;
+  --border-subtle: #f1f5f9;
+  --border-strong: #cbd5e1;
+  --divider-soft: #ebecf3;            /* hero pick separators */
+
+  /* ---- Status ------------------------------------------------------------- */
+  --risk-low-bg: rgba(5, 150, 105, 0.1);
+  --risk-low-fg: #047857;
+  --warning-fg: #92400e;
+  --danger: #dc2626;
+
+  /* ---- Type (Geist only) ------------------------------------------------- */
+  --font: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* ---- Radius, shadow ---------------------------------------------------- */
+  --r-full: 999px;
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-s: 0 2px 12px 0 rgba(0, 0, 0, 0.04);
+  --shadow-m: 0 4px 12px 0 rgba(0, 0, 0, 0.04);
+  --shadow-help: 0 2px 4px rgba(0, 0, 0, 0.04), 0 8px 16px rgba(0, 0, 0, 0.08);
+  --shadow-hover: 0 12px 28px -8px rgba(15, 23, 42, 0.12), 0 2px 6px rgba(15, 23, 42, 0.04);
+  --focus: 0 0 0 3px rgba(24, 88, 83, 0.24);
+
+  /* ---- Motion (same curves and timings as the kit) ------------------------ */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-press: 120ms;
+  --dur-fast: 200ms;
+  --dur-base: 320ms;
+  --dur-slow: 560ms;
+}
