@@ -12,7 +12,9 @@ Resize the window to switch between them.
 
 It has no build step. Serve the **repo root** so `../assets/fonts` resolves, then open `/responsive/`.
 In the Claude preview, the launch config is `finance-hub-responsive` on port 4794.
-**Switching views:** use the **View: Desktop | Mobile** switch at the bottom left, or press **M**. On a laptop, Mobile shows the real phone layout in a 390×844 frame. The choice is kept in the URL (`?view=mobile`), so you can share a link that opens in mobile view. On a phone or tablet the page uses the mobile layout by itself, and the switch is hidden on phones.
+**Two approaches:** this page is approach 1 (teal look). Approach 2, a white look with a teal and peach wash, is at `approach-2/` (see `approach-2/README.md`). Use **Look 1 / 2** in the controls to switch between them.
+
+**Switching views:** use the **View: Desktop | Mobile** control at the bottom left, or press **M**. On a laptop, Mobile shows the real phone layout in a 390×844 frame. The choice is kept in the URL (`?view=mobile`), so you can share a link that opens in mobile view. On a phone or tablet the page uses the mobile layout by itself, and the switch is hidden on phones.
 
 **Screens built:** 1. Loans overview (mobile + desktop). The other tabs, nav items and buttons show an "isn't built yet" message.
 
