@@ -13,7 +13,7 @@
   if (qs.get("embed") === "1") { document.documentElement.classList.add("is-embed"); return; }
   if (!window.__STAGE) return;
 
-  const VERSION = "v0.18.0";
+  const VERSION = "v0.19.0";
   const root = location.pathname.replace(/approach-\d\/.*$/, "").replace(/[^/]*$/, "");
   const st = {
     look: /\/approach-3\//.test(location.pathname) ? (qs.get("theme") === "b" ? "3b" : "3a") : /\/approach-2\//.test(location.pathname) ? "2" : "1",
@@ -48,7 +48,7 @@
     ["3a", "Mint grid", "Mint grid hero, lavender accents"],
     ["3b", "Dark teal", "Dark teal hero, lavender button"],
   ];
-  const READY = { "1": true, "2": true, "3a": false, "3b": false };   // flip when approach-3/ ships
+  const READY = { "1": true, "2": true, "3a": true, "3b": true };   // flip when approach-3/ ships
 
   const panelHtml = () => `
     <div class="pp__head">

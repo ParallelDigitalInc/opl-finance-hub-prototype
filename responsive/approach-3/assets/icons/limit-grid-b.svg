@@ -1,0 +1,14 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="779" height="300" viewBox="0 0 779 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="grid" clip-path="url(#clip0_0_392)">
+<path id="Vector" d="M0.5 0V300M24.5 0V300M48.5 0V300M72.5 0V300M96.5 0V300M120.5 0V300M144.5 0V300M168.5 0V300M192.5 0V300M216.5 0V300M240.5 0V300M264.5 0V300M288.5 0V300M312.5 0V300M336.5 0V300M360.5 0V300M384.5 0V300M408.5 0V300M432.5 0V300M456.5 0V300M480.5 0V300M504.5 0V300M528.5 0V300M552.5 0V300M576.5 0V300M600.5 0V300M624.5 0V300M648.5 0V300M672.5 0V300M696.5 0V300M720.5 0V300M744.5 0V300M768.5 0V300M0 0.5H779M0 24.5H779M0 48.5H779M0 72.5H779M0 96.5H779M0 120.5H779M0 144.5H779M0 168.5H779M0 192.5H779M0 216.5H779M0 240.5H779M0 264.5H779M0 288.5H779" stroke="url(#paint0_linear_0_392)" stroke-opacity="0.12"/>
+</g>
+<defs>
+<linearGradient id="paint0_linear_0_392" x1="389.5" y1="0" x2="389.5" y2="300" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" stop-opacity="0"/>
+<stop offset="0.778846" stop-color="white"/>
+</linearGradient>
+<clipPath id="clip0_0_392">
+<rect width="779" height="300" fill="white"/>
+</clipPath>
+</defs>
+</svg>
