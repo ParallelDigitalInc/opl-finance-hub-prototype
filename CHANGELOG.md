@@ -1,5 +1,26 @@
 # Changelog
 
+## v0.20.0 — 28 Nov 2026 · Explorations: Fresh 1 (mobile)
+
+A third link, `/explorations/`, for the new and compiled approaches. **Fresh 1** is built from scratch from Figma Section 2 `172:56553`, mobile frame "1" `172:52419`. It is mobile only for now; desktop is next.
+
+- **Fidelity:** the patterns, fades and gradients are read from Figma's actual paints:
+  - the hero grid and the help-banner grids are SVGs built from the layer values;
+  - the hero card strokes are the lender colour at 20%, fading downward;
+  - the AI Mitra fill and the shadows match.
+- **Type:**
+  - Recoleta for titles and ₹50 Lakhs, loaded from the viewer's machine with `local()` (demo licence, not uploaded), with Fraunces as the fallback;
+  - Stack Sans Text for names and figures;
+  - Manrope for body text.
+- **App-like motion:**
+  - a liquid nav pill and tab switching;
+  - hide-on-scroll chrome;
+  - a swipeable hero stack (the front card slides behind the CTA);
+  - parallax on the rail photos;
+  - AI Mitra springs in, breathes, nudges, and opens a draggable sheet with suggested questions.
+- **Kept from the kit:** the motion, press states, toasts and reduced-motion support.
+- **Presenting panel:** the kit-style "Finance Hub · Explorations" panel, with Compiled A and B listed as in progress.
+
 ## v0.19.2 — 27 Nov 2026 · Approach 3 fidelity pass
 
 (Tag `v0.19.1` points at the v0.19.0 commit because of a mis-tag; this release supersedes it.)
