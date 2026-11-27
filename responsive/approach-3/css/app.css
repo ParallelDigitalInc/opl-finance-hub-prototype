@@ -875,3 +875,17 @@ body { font-feature-settings: "tnum" 0; }
   .fab { width: 60px; height: 60px; }
 }
 .tag.tag--warn, .tile .tag { color: var(--warning-fg); background: #fff; }
+
+/* Exact values from the Figma extraction (spec.md, 27 Nov) */
+:root { --mint-a: #cdead4; --mint-b: #cdead4; }
+.m-hero__bg { background: #cdead4; }
+.sub-panel { background: #f1f4ef; }
+.bnav__item.is-active { background: #cdead4; }
+[data-theme="b"] .m-hero__bg { background: linear-gradient(180deg, #001d21 0%, #004746 100%); }
+[data-theme="b"] .sub-panel { background: linear-gradient(180deg, rgba(189, 187, 255, 0.3) 0%, #fff 100%); }
+[data-theme="b"] .help { background-color: #8885ff; }
+[data-theme="b"] .bnav__item.is-active { background: rgba(189, 187, 255, 0.3); }
+@media (min-width: 1024px) {
+  .limit { background: #cdead4; }
+  [data-theme="b"] .limit { background: #014042; }
+}
