@@ -8,15 +8,9 @@ Below **1024px** it shows the mobile frame; at **1024px and above**, the desktop
 - Desktop, loans overview: `21:7403`
 - Not built yet: Loan application (mobile `21:6598`; desktop `21:7035` and `21:7219`)
 
-## Prototype controls (bottom left)
+## Prototype panel
 
-| Control | What it does |
-|---|---|
-| **Look 1 / 2** | Switches between approach 1 (`/responsive/`) and this page. |
-| **View Desktop / Mobile** | Mobile shows the real phone layout in a 390×844 frame. **M** also switches. |
-| **Icons Green / Orange** | Switches between the two Figma colourways. Orange recolours the quick-action icons and the mobile card headers. |
-
-Every choice is kept in the URL (`?view=mobile&icons=orange`), so a shared link opens the same way.
+On a laptop or desktop the page opens in a device mock with the kit-style panel on the right: **View** (Mobile / Desktop, **M**), **Look** (1 · Teal / 2 · Light wash), **Icons** (Green / Orange) and **Screens**. The shell is shared with approach 1 (`../js/present.js`, `../css/present.css`). Choices are kept in the URL, so `?view=mobile&icons=orange` opens straight into that combination; `?bare=1` shows the page full screen and responsive.
 
 ## How it differs from approach 1
 

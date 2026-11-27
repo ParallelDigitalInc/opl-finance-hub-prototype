@@ -12,9 +12,13 @@ Resize the window to switch between them.
 
 It has no build step. Serve the **repo root** so `../assets/fonts` resolves, then open `/responsive/`.
 In the Claude preview, the launch config is `finance-hub-responsive` on port 4794.
-**Two approaches:** this page is approach 1 (teal look). Approach 2, a white look with a teal and peach wash, is at `approach-2/` (see `approach-2/README.md`). Use **Look 1 / 2** in the controls to switch between them.
+**Prototype panel (like the kit's):** on a laptop or desktop, the page opens inside a device mock, a 1440×900 browser window or a 390×844 phone, with a panel on the right:
+- **View Mobile / Desktop:** **M** also switches.
+- **Look 1 · Teal / 2 · Light wash:** switches between this page and `approach-2/` (both are light mode).
+- **Icons Green / Orange:** approach 2 only.
+- **Screens:** the list of built screens.
 
-**Switching views:** use the **View: Desktop | Mobile** control at the bottom left, or press **M**. On a laptop, Mobile shows the real phone layout in a 390×844 frame. The choice is kept in the URL (`?view=mobile`), so you can share a link that opens in mobile view. On a phone or tablet the page uses the mobile layout by itself, and the switch is hidden on phones.
+The panel collapses to a pill (the arrow button) for presenting. Every choice is kept in the URL (`?view=mobile`, `approach-2/?icons=orange`), so a shared link opens the same way. "Open full screen, responsive" (or `?bare=1`) shows the page on its own, which reflows as the window resizes; a phone always gets the page on its own.
 
 **Screens built:** 1. Loans overview (mobile + desktop). The other tabs, nav items and buttons show an "isn't built yet" message.
 
