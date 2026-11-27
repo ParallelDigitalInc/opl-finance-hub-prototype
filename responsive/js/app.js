@@ -7,6 +7,7 @@
    sweep, chip filters + sort with FLIP, compare tray, tab ink, press states.
    ========================================================================== */
 (function () {
+  if (window.__STAGE) return;   // ?view=mobile on a wide window: present.js frames the page instead
   const D = window.LO;
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
