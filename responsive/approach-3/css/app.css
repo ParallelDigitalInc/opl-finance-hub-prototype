@@ -902,3 +902,6 @@ body { font-feature-settings: "tnum" 0; }
 .fab .ico { width: 24px; height: 24px; }
 .fab::after { box-shadow: 0 0 0 0 rgba(92, 87, 255, 0.35); }
 @keyframes fab-ripple { 0% { box-shadow: 0 0 0 0 rgba(92, 87, 255, 0.35); } 100% { box-shadow: 0 0 0 16px rgba(92, 87, 255, 0); } }
+
+/* The ₹50 Lakhs amounts: Stack Sans Text Light (Figma: S Light) */
+.m-hero__amount, .limit__amount { font-weight: 300; }
