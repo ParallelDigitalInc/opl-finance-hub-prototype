@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.19.1 — 27 Nov 2026 · Approach 3 fidelity pass
+
+Shreya: the OPL Verified marker in the bottom banner was misaligned, and some things didn't match Figma.
+
+- **Help banner:** the badge is at Figma's spot (195, 27) at −21.86°, with the dark badge in 3B. The man photo is 125.7×144.4 at (222, 14), and the grid decoration is in.
+- **Hero:**
+  - 3A uses Figma's grid with its fades;
+  - ₹50 Lakhs is 48px Light;
+  - in the fact pills, only "9.45% p.a." and the "7" are violet;
+  - the stack cards carry their tints and borders;
+  - the button is flat.
+- **Cards:**
+  - 20px corners with the `#E6E1D9` stroke and the exact head tints;
+  - tag shapes and colours;
+  - the Check Details style;
+  - the overlay on the subsidy photos, with the logo overlapping;
+  - the grid on the subsidy panel.
+
 ## v0.19.0 — 27 Nov 2026 · Responsive approach 3: 3A light hero + 3B dark hero
 
 `/responsive/approach-3/` (`?theme=b` gives 3B), from Figma Section 1 `1:4534`:
