@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.17.1 — 27 Nov 2026 · Responsive page: Desktop | Mobile switch
+
+Shreya asked how to see the mobile screens on a laptop.
+
+- A **View: Desktop | Mobile** switch sits at the bottom left; **M** toggles it.
+- **Mobile** loads the same page in a 390×844 phone frame, so it shows the real mobile layout.
+- The choice is kept in the URL (`/responsive/?view=mobile`).
+
 ## v0.17.0 — 27 Nov 2026 · Responsive prototype in the teal look: Loans overview
 
 The client asked to drop the blue. This adds a **new, separate page**, `responsive/`, built in the teal look. The prototype at the root is unchanged.
