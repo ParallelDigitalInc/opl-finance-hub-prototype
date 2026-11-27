@@ -1,6 +1,8 @@
 # Changelog
 
-## v0.19.1 — 27 Nov 2026 · Approach 3 fidelity pass
+## v0.19.2 — 27 Nov 2026 · Approach 3 fidelity pass
+
+(Tag `v0.19.1` points at the v0.19.0 commit because of a mis-tag; this release supersedes it.)
 
 Shreya: the OPL Verified marker in the bottom banner was misaligned, and some things didn't match Figma.
 
