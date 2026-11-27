@@ -8,7 +8,7 @@ window.LO = {
   hero: {
     eyebrow: "Get a loan up to",
     amount: 50, prefix: "₹", suffix: " Lakhs",
-    facts: [{ lead: "From", value: "9.45% p.a." }, { value: "7 offers" }],
+    facts: [{ lead: "From", value: "9.45% p.a." }, { value: "7", tail: " offers" }],
     cta: "Explore Loans",
     // front first; the stack cycles (kit HeroStack behaviour)
     stack: [

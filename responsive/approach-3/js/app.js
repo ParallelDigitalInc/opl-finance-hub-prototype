@@ -50,7 +50,7 @@
           <div class="fig"><span class="fig__l">Loan up to</span><span class="fig__v">${c.amount}</span></div>
           <div class="fig"><span class="fig__l">Interest</span><span class="fig__v">${c.rate}<small>p.a.</small></span></div>
         </div>
-        <span class="check-details only-m">Check Details${ico("chev-link", 16)}</span>
+        <span class="check-details only-m">Check Details${ico("chev-check", 16)}</span>
         ${c.details.length ? `
         <dl class="details only-d">${c.details.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("")}</dl>
         <div class="match__foot only-d">
@@ -100,7 +100,7 @@
       <main class="lo">
         <!-- ===== mobile hero (21:6333 + 21:6475 + 21:6505) ===== -->
         <section class="m-hero only-m">
-          <div class="m-hero__bg">${THEME === "b" ? `<img class="m-hero__stripes" src="${img("hero-stripes-b.jpg")}" alt="">` : ""}</div>
+          <div class="m-hero__bg">${THEME === "b" ? `<img class="m-hero__stripes" src="${img("hero-stripes-b.jpg")}" alt="">` : `<img class="m-hero__grid" src="assets/icons/hero-grid-a.svg" alt="">`}</div>
           <div class="m-head">
             <h1 class="m-head__title">${D.header.title}</h1>
             <button class="round round--glass" data-press data-next="notifications" aria-label="Notifications">${ico(`bell-${THEME}`, 20, "ring-on-hover")}</button>
@@ -111,7 +111,7 @@
             <div class="m-hero__title" data-m-enter>
               <p class="m-hero__eyebrow">${h.eyebrow}</p>
               <p class="m-hero__amount" data-count="${h.amount}" data-prefix="${h.prefix}" data-suffix="${h.suffix}">${h.prefix}${h.amount}${h.suffix}</p>
-              <div class="facts">${h.facts.map((f) => `<span class="fact">${f.lead ? `${f.lead} ` : ""}<b>${f.value}</b></span>`).join("")}</div>
+              <div class="facts">${h.facts.map((f) => `<span class="fact">${f.lead ? `<i>${f.lead}</i> ` : ""}<b>${f.value}</b>${f.tail ? `<i>${f.tail}</i>` : ""}</span>`).join("")}</div>
             </div>
             <div class="stack" data-stack>
               ${h.stack.map((c, i) => `
@@ -119,7 +119,7 @@
                   <div class="hcard" data-m-enter="${i === 0 ? "front" : "back"}"><div class="hcard__inner">${logo(c.logo, 44)}<div><p class="hcard__title">${c.name}</p><p class="hcard__sub">${c.sub}</p></div></div></div>
                 </div>`).join("")}
             </div>
-            <button class="btn btn--cta btn--block btn--lg" data-press data-next="all-loans" data-m-enter>${h.cta}${ico("chev-white", 16, "btn__arrow")}</button>
+            <button class="btn btn--cta btn--block btn--lg" data-press data-next="all-loans" data-m-enter>${h.cta}${ico(THEME === "b" ? "chev-ink" : "chev-white", 16, "btn__arrow")}</button>
           </div>
         </section>
         <div class="dots only-m" data-m-enter role="tablist" aria-label="Featured offers">${h.stack.map((_, i) => `<button class="dot ${i === 0 ? "is-active" : ""}" data-dot="${i}" aria-label="Offer ${i + 1}"><span class="dot__fill"></span></button>`).join("")}</div>
@@ -192,7 +192,7 @@
               <div class="match__photo"><img src="${img("subsidy-photo.jpg")}" alt=""><span class="tag">${c.tag}</span></div>
               <div class="match__id">${logo(c.logo, 40, `logo--ring${c.ring}`)}<p class="match__title match__title--2">${c.name}</p></div>
               <div class="match__body"><div class="fig"><span class="fig__l">Assistance</span><span class="fig__v">${c.value}</span></div>
-                <span class="check-details">Check Details${ico("chev-link", 16)}</span></div>
+                <span class="check-details">Check Details${ico("chev-check", 16)}</span></div>
             </article>`).join("")}</div>
         </section>
 
@@ -225,7 +225,8 @@
         <section class="help only-m" data-m-enter>
           <p class="help__title">${D.help.title}</p>
           <button class="btn btn--dark btn--sm" data-press data-next="call">${ico("phone-calling", 14)}${D.help.cta}</button>
-          <img class="help__badge" src="assets/icons/opl-verified.svg" alt="">
+          <span class="help__grid" aria-hidden="true"><img src="assets/icons/help-grid-hori.svg" alt=""><img src="assets/icons/help-grid-verti.svg" alt=""></span>
+          <span class="help__badge" aria-hidden="true"><img src="assets/icons/opl-verified${THEME === "b" ? "-b" : ""}.svg" alt=""></span>
           <img class="help__ill" src="${img("help-man.png")}" alt="">
         </section>
       </main>
