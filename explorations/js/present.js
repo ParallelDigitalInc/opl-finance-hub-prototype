@@ -11,12 +11,12 @@
   if (qs.get("embed") === "1") { document.documentElement.classList.add("is-embed"); return; }
   if (!window.__STAGE) return;
 
-  const VERSION = "v0.21.0";
+
   const APPROACHES = [
     // id, folder, name, sub, built views — Figma Section 2 (172:56553), mobile frames "1", "2", "3"
     { id: "f1", dir: "fresh-1/", name: "Approach 1", sub: "White grid, navy CTA, Recoleta titles", views: ["mobile"] },
     { id: "a2", dir: "approach-2/", name: "Approach 2", sub: "Sky + clouds, mint schemes arch, trust band", views: ["mobile"] },
-    { id: "a3", dir: null, name: "Approach 3", sub: "Frame 3", views: [] },
+    { id: "a3", dir: "approach-3/", name: "Approach 3", sub: "Mint wash, dark CTA, tinted loan cards", views: ["mobile"] },
   ];
   const root = location.pathname.replace(/[^/]+\/[^/]*$/, "");   // …/explorations/
   const current = APPROACHES.find((a) => a.dir && location.pathname.includes("/" + a.dir)) || APPROACHES[0];
@@ -32,19 +32,16 @@
     const a = ap(), canDesk = a.views.includes("desktop");
     return `
     <div class="pp__head">
-      <p class="pp__title">Finance Hub · Explorations</p>
-      <span class="pp__ver">${VERSION}</span>
+      <span class="pp__label pp__headlabel">View <kbd>M</kbd></span>
+      <div class="seg pp__headseg" role="radiogroup" aria-label="View">
+        <button role="radio" aria-checked="${st.view === "mobile"}" class="${st.view === "mobile" ? "is-on" : ""}" data-view="mobile">Mobile</button>
+        <button role="radio" aria-checked="${st.view === "desktop"}" class="${st.view === "desktop" ? "is-on" : ""}" data-view="desktop" ${canDesk ? "" : 'disabled title="Desktop is next"'}>Desktop</button>
+      </div>
       <button class="pp__toggle" data-collapse aria-label="${collapsed ? "Show" : "Hide"} prototype panel" aria-expanded="${!collapsed}">
         <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 10l4-4 4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
     </div>
     <div class="pp__body">
-      <div class="pp__row"><span class="pp__label">View <kbd>M</kbd></span>
-        <div class="seg" role="radiogroup" aria-label="View">
-          <button role="radio" aria-checked="${st.view === "mobile"}" class="${st.view === "mobile" ? "is-on" : ""}" data-view="mobile">Mobile</button>
-          <button role="radio" aria-checked="${st.view === "desktop"}" class="${st.view === "desktop" ? "is-on" : ""}" data-view="desktop" ${canDesk ? "" : 'disabled title="Desktop is next"'}>Desktop</button>
-        </div>
-      </div>
       ${canDesk ? "" : `<p class="pp__soon">Desktop for ${a.name} comes next.</p>`}
       <div class="pp__sec">
         <p class="pp__label">Approach <span class="pp__hint">light mode</span></p>

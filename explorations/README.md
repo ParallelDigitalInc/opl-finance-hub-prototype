@@ -4,4 +4,5 @@ New approaches for the Finance Hub, from Figma "Section 2" (`172:56553`), presen
 
 - `fresh-1/`: Approach 1, white grid with Recoleta titles (frame "1", `172:52419`). Mobile only.
 - `approach-2/`: Approach 2, sky with clouds, the schemes arch and the trust band (frame "2", `172:52770`). Mobile only.
-- Approach 3 (frame "3", `172:54014`) and the desktops come next.
+- `approach-3/`: Approach 3, mint wash, a dark CTA and tinted loan cards (frame "3", `172:54014`). Mobile only.
+- The desktops come next.

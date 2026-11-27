@@ -1,5 +1,25 @@
 # Changelog
 
+## v0.22.0 — 28 Nov 2026 · Explorations: Approach 3 (mobile) + quieter panel
+
+`/explorations/approach-3/`, built from Figma Section 2, mobile frame "3" (`172:54014`). It sits on Approach 1's code, with an "Approach 3" layer on top. The values come from the Figma paints, and the page height matches the frame (1595px).
+
+- **Hero:**
+  - a mint wash at the top;
+  - neutral inset hero cards with names in Geist (Citi in front, BoB behind);
+  - a solid `#001D21` CTA in sentence case.
+- **Cards and tiles:**
+  - pastel tiles with rounded corners;
+  - loan cards tinted by lender (Citi blue, BoB peach) with a solid divider;
+  - a mint subsidy band.
+- **Help banner:** lilac, with a green grid.
+- **Nav and AI Mitra:** the nav has a warm-grey fade, and AI Mitra is in warm grey, kept opaque.
+- **Copy:** the frame's "Top loan matches" over the subsidy cards reads "Key Subsidies" here (flagged).
+
+Panel (Shreya), for all three approaches:
+- The "Finance Hub · Explorations" title and the version pill are removed.
+- The View · Mobile/Desktop switch moves into the head row, beside the collapse button.
+
 ## v0.21.0 — 28 Nov 2026 · Explorations: Approach 2 (mobile)
 
 `/explorations/approach-2/`, built from Figma Section 2, mobile frame "2" (`172:52770`). It sits on Approach 1's code, so all the motion carries over, with an "Approach 2" layer on top. The values come from the Figma paints, and the page height matches the frame (1860px).
