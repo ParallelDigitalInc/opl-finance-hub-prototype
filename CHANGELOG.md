@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.18.0 — 27 Nov 2026 · Responsive approach 2 + prototype panel
+
+**Approach 2, "Light wash"** (`/responsive/approach-2/`), from Figma Section 5 `21:6331`:
+- Frames: mobile Finance home `21:6332` (green) / `21:6768` (orange), desktop Loans overview `21:7403`.
+- Look: white and airy with a teal-and-peach wash, General Sans (self-hosted), stone neutrals and deep teal `#064651`.
+- Motion and states are the same as approach 1. New: the repayments area chart draws in when it scrolls into view, the Nov'26 point pings, and the amount counts up.
+- Flags are in `responsive/approach-2/README.md`.
+
+**Prototype panel, like the kit's** (both approaches):
+- On a laptop the page opens inside a device mock (a 1440×900 browser window or a 390×844 phone), with a side panel: View Mobile / Desktop (**M**), Look 1 · Teal / 2 · Light wash, Icons Green / Orange, and Screens.
+- Switches swap the page in place, and the URL keeps the choice.
+- `?bare=1` (or opening on a phone) shows the page full screen and responsive.
+
 ## v0.17.1 — 27 Nov 2026 · Responsive page: Desktop | Mobile switch
 
 Shreya asked how to see the mobile screens on a laptop.
