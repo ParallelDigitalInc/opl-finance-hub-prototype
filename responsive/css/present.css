@@ -6,8 +6,9 @@ html.is-stage, .is-stage body { height: 100%; margin: 0; overflow: hidden; backg
 .is-embed::-webkit-scrollbar { display: none; }
 
 .stage { --pp-w: 300px; --accent: #16736a; position: fixed; inset: 0; font: 400 13px/18px "Geist", ui-sans-serif, system-ui, sans-serif; color: #0f172a; }
-.stage__area { position: absolute; inset: 0 calc(var(--pp-w) + 32px) 0 0; display: grid; place-items: center; transition: right 320ms cubic-bezier(0.22, 1, 0.36, 1), top 320ms cubic-bezier(0.22, 1, 0.36, 1); }
-.stage.is-collapsed .stage__area { right: 0; top: 64px; }   /* the collapsed pill sits above the device, never on it */
+/* the device shares the panel's top edge (24px); collapsed, it gets the whole window but a 12px margin */
+.stage__area { position: absolute; inset: 24px calc(var(--pp-w) + 48px) 24px 24px; display: grid; place-items: start center; transition: inset 320ms cubic-bezier(0.22, 1, 0.36, 1); }
+.stage.is-collapsed .stage__area { inset: 12px 64px; place-items: center; }   /* equal side gutters keep it centred, clear of the corner toggle */
 
 /* devices: a sized box holding a scaled inner, so the layout sees the scaled size */
 .device { position: relative; display: none; }
@@ -39,8 +40,17 @@ html.is-stage, .is-stage body { height: 100%; margin: 0; overflow: hidden; backg
 .pp__toggle:hover { background: #e2e8f0; }
 .pp__toggle:active { transform: scale(0.94); }
 .pp__toggle svg { transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1); }
-.is-collapsed .pp { width: 248px; padding: 10px 10px 10px 14px; }
+/* collapsed: just the round toggle, tucked into the corner (over the mock's empty title bar) */
+.is-collapsed .pp { top: 16px; right: 16px; width: 40px; height: 40px; padding: 6px; border-radius: 999px; overflow: visible; }
+.is-collapsed .pp__title, .is-collapsed .pp__ver { display: none; }
+.is-collapsed .pp__head { gap: 0; }
+.is-collapsed .pp__toggle { background: #0f172a; color: #fff; }
+.is-collapsed .pp__toggle:hover { background: #1e293b; }
+.is-collapsed .pp::after { content: "Prototype panel"; position: absolute; right: calc(100% + 8px); top: 50%; padding: 4px 8px; border-radius: 6px; background: #0f172a; color: #fff; font-size: 11px; line-height: 16px; white-space: nowrap;
+  transform: translateY(-50%) translateX(4px); opacity: 0; pointer-events: none; transition: opacity 160ms, transform 200ms cubic-bezier(0.22, 1, 0.36, 1); }
+.is-collapsed .pp:hover::after { opacity: 1; transform: translateY(-50%); }
 .is-collapsed .pp__toggle svg { transform: rotate(180deg); }
+.is-collapsed .pp { transition: none; }
 .is-collapsed .pp__body { display: none; }
 .pp__body { display: flex; flex-direction: column; gap: 14px; margin-top: 14px; padding-top: 14px; border-top: 1px solid #f1f5f9; animation: pp-open 320ms cubic-bezier(0.22, 1, 0.36, 1); }
 @keyframes pp-open { from { opacity: 0.4; transform: translateY(-4px); } }
@@ -68,6 +78,8 @@ html.is-stage, .is-stage body { height: 100%; margin: 0; overflow: hidden; backg
 .pp__swatch { width: 28px; height: 28px; flex-shrink: 0; border-radius: 8px; box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.06); }
 .pp__swatch--1 { background: linear-gradient(135deg, #366560 0%, #144b45 55%, #f4f5ea 55%, #f4f5ea 100%); }
 .pp__swatch--2 { background: linear-gradient(160deg, #fff 30%, #9fded4 62%, #fdcc9d 100%); }
+.pp__swatch--3a { background: linear-gradient(180deg, #d7efe2 0 55%, #fff 55%), repeating-linear-gradient(90deg, transparent 0 5px, rgba(15, 23, 42, 0.05) 5px 6px); background-blend-mode: multiply; }
+.pp__swatch--3b { background: linear-gradient(180deg, #0b3d3f 0 55%, #b8b0fb 55% 70%, #fff 70%); }
 .pp__out { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; padding: 2px 0; font-size: 12px; line-height: 16px; font-weight: 500; color: var(--accent); text-decoration: none; }
 .pp__out:hover { text-decoration: underline; text-underline-offset: 3px; }
 .pp button:focus-visible, .pp a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }

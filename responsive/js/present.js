@@ -1,7 +1,8 @@
 /* Presenting shell (outside the product UI), shared by both approaches — modelled on the kit's
    prototype panel. On a wide window the page is shown inside a device mock (a 1440×900 browser
    window, or a 390×844 phone) with a side panel to switch:
-     Look   1 · Teal | 2 · Light wash   (/responsive/ ⇄ /responsive/approach-2/)
+     Look   1 · Teal | 2 · Light wash | 3A · Mint grid | 3B · Dark teal
+          (/responsive/, /responsive/approach-2/, /responsive/approach-3/ [?theme=b])
      View   Desktop | Mobile            (M key)
      Icons  Green | Orange              (approach 2 only; the two Figma colourways)
    The device is this same page in an iframe (?embed=1), so each layout is the real one.
@@ -13,25 +14,29 @@
   if (!window.__STAGE) return;
 
   const VERSION = "v0.18.0";
-  const root = location.pathname.replace(/approach-2\/.*$/, "").replace(/[^/]*$/, "");
+  const root = location.pathname.replace(/approach-\d\/.*$/, "").replace(/[^/]*$/, "");
   const st = {
-    look: /\/approach-2\//.test(location.pathname) ? "2" : "1",
+    look: /\/approach-3\//.test(location.pathname) ? (qs.get("theme") === "b" ? "3b" : "3a") : /\/approach-2\//.test(location.pathname) ? "2" : "1",
     view: qs.get("view") === "mobile" ? "mobile" : "desktop",
     icons: qs.get("icons") === "orange" ? "orange" : "green",
   };
   let collapsed = false; try { collapsed = localStorage.getItem("opl.responsive.panel") === "1"; } catch (_) {}
 
-  const pagePath = () => (st.look === "2" ? root + "approach-2/" : root);
+  const pagePath = () => (st.look === "2" ? root + "approach-2/" : st.look.startsWith("3") ? root + "approach-3/" : root);
+  const lookParams = (u) => {
+    if (st.look === "2" && st.icons === "orange") u.searchParams.set("icons", "orange");
+    if (st.look === "3b") u.searchParams.set("theme", "b");
+    return u;
+  };
   const frameSrc = () => {
     const u = new URL(pagePath(), location.origin);
     u.searchParams.set("embed", "1");
-    if (st.look === "2" && st.icons === "orange") u.searchParams.set("icons", "orange");
-    return u.toString();
+    return lookParams(u).toString();
   };
   const syncUrl = () => {
     const u = new URL(pagePath(), location.origin);
     if (st.view === "mobile") u.searchParams.set("view", "mobile");
-    if (st.look === "2" && st.icons === "orange") u.searchParams.set("icons", "orange");
+    lookParams(u);
     history.replaceState(null, "", u.pathname + u.search);
   };
 
@@ -40,7 +45,10 @@
   const looks = [
     ["1", "Teal", "Deep teal hero, sage cards"],
     ["2", "Light wash", "White, teal + peach wash"],
+    ["3a", "Mint grid", "Mint grid hero, lavender accents"],
+    ["3b", "Dark teal", "Dark teal hero, lavender button"],
   ];
+  const READY = { "1": true, "2": true, "3a": false, "3b": false };   // flip when approach-3/ ships
 
   const panelHtml = () => `
     <div class="pp__head">
@@ -55,19 +63,19 @@
       <div class="pp__sec">
         <p class="pp__label">Look <span class="pp__hint">light mode</span></p>
         <div class="pp__list" role="radiogroup" aria-label="Look">
-          ${looks.map(([v, name, sub]) => `<button role="radio" aria-checked="${st.look === v}" class="pp__item ${st.look === v ? "is-on" : ""}" data-look="${v}">
-            <span class="pp__swatch pp__swatch--${v}" aria-hidden="true"></span><span><b>${v} · ${name}</b><small>${sub}</small></span></button>`).join("")}
+          ${looks.map(([v, name, sub]) => `<button role="radio" aria-checked="${st.look === v}" class="pp__item ${st.look === v ? "is-on" : ""}" data-look="${v}" ${READY[v] ? "" : "disabled"}>
+            <span class="pp__swatch pp__swatch--${v}" aria-hidden="true"></span><span><b>${v.toUpperCase()} · ${name}</b><small>${READY[v] ? sub : "In progress"}</small></span></button>`).join("")}
         </div>
       </div>
       ${st.look === "2" ? `<div class="pp__row"><span class="pp__label">Icons</span>${seg("icons", [["green", "Green"], ["orange", "Orange"]])}</div>` : ""}
       <div class="pp__sec">
         <p class="pp__label">Screens <span class="pp__count">1 of 2</span></p>
         <div class="pp__list">
-          <button class="pp__item is-on" aria-current="page"><span><b>Loans · Overview</b><small>${st.look === "2" ? "Finance home on mobile" : "Mobile + desktop"}</small></span></button>
+          <button class="pp__item is-on" aria-current="page"><span><b>Loans · Overview</b><small>${st.look === "1" ? "Mobile + desktop" : "Finance home on mobile"}</small></span></button>
           <button class="pp__item" disabled><span><b>Loan application</b><small>Lender verification · next</small></span></button>
         </div>
       </div>
-      <a class="pp__out" href="${pagePath()}?bare=1${st.look === "2" && st.icons === "orange" ? "&icons=orange" : ""}" target="_blank" rel="noopener">Open full screen, responsive<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 2.5h5v5M9.5 2.5l-7 7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></a>
+      <a class="pp__out" href="${(() => { const u = lookParams(new URL(pagePath(), location.origin)); u.searchParams.set("bare", "1"); return u.pathname + u.search; })()}" target="_blank" rel="noopener">Open full screen, responsive<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 2.5h5v5M9.5 2.5l-7 7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></a>
     </div>`;
 
   const mount = () => {
@@ -99,7 +107,7 @@
     const fit = () => {
       const r = area.getBoundingClientRect();
       const W = st.view === "mobile" ? 390 + 16 : 1440, H = st.view === "mobile" ? 844 + 16 : 900 + 36;
-      stage.style.setProperty("--fit", Math.min(1, (r.width - 32) / W, (r.height - 32) / H).toFixed(4));
+      stage.style.setProperty("--fit", Math.min(1, r.width / W, r.height / H).toFixed(4));
     };
     const repaint = () => { document.querySelector(".pp").innerHTML = panelHtml(); };
     const set = (patch) => {
@@ -119,6 +127,7 @@
       const b = e.target.closest("button"); if (!b || b.disabled) return;
       if (b.dataset.collapse !== undefined) {
         collapsed = !collapsed; stage.classList.toggle("is-collapsed", collapsed);
+        fit(); setTimeout(fit, 340);
         try { localStorage.setItem("opl.responsive.panel", collapsed ? "1" : "0"); } catch (_) {}
         return repaint();
       }
