@@ -88,3 +88,5 @@ html.is-stage, .is-stage body { height: 100%; margin: 0; overflow: hidden; backg
 .pp__swatch--c1 { background: linear-gradient(135deg, #e6f2ea, #f1ecfd); }
 .pp__swatch--c2 { background: linear-gradient(135deg, #fdece8, #eaf2fd); }
 .pp__soon { margin: 0; font-size: 12px; line-height: 16px; color: #94a3b8; }
+.pp__swatch--a2 { background: linear-gradient(180deg, #98c0fb 0%, #e6f0ff 40%, #fff 60%, #d3e8da 60% 72%, #fff 72%); }
+.pp__swatch--a3 { background: linear-gradient(135deg, #fdece8, #eaf2fd); }

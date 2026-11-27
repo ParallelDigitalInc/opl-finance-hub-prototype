@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.21.0 — 28 Nov 2026 · Explorations: Approach 2 (mobile)
+
+`/explorations/approach-2/`, built from Figma Section 2, mobile frame "2" (`172:52770`). It sits on Approach 1's code, so all the motion carries over, with an "Approach 2" layer on top. The values come from the Figma paints, and the page height matches the frame (1860px).
+
+- **Look:**
+  - a sky gradient with hard-light clouds that drift and part as you scroll;
+  - white outlined header buttons and quick-action circles;
+  - ₹50 Lakhs in Stack Sans Light and a navy gradient CTA;
+  - loan cards with a dashed divider.
+- **Schemes:** a mint arch with an illustration that hops on, and "3 Key Schemes Matched".
+- **Trust band:** the OPL Verified seal stamps in, followed by "Built for the MSMEs of Bharat." and the legal line.
+- **Panel:** lists Approach 1, Approach 2 and Approach 3 (in progress).
+
+Fixes in both approaches (Shreya):
+- The stray "View all 12" at the end of the subsidy card rail is removed.
+- The AI Mitra button is now opaque, with a stronger blue glow, a thin ring and a deeper shadow. It was getting lost over the sky band and the cards.
+
 ## v0.20.0 — 28 Nov 2026 · Explorations: Fresh 1 (mobile)
 
 A third link, `/explorations/`, for the new and compiled approaches. **Fresh 1** is built from scratch from Figma Section 2 `172:56553`, mobile frame "1" `172:52419`. It is mobile only for now; desktop is next.

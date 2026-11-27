@@ -11,12 +11,12 @@
   if (qs.get("embed") === "1") { document.documentElement.classList.add("is-embed"); return; }
   if (!window.__STAGE) return;
 
-  const VERSION = "v0.20.0";
+  const VERSION = "v0.21.0";
   const APPROACHES = [
-    // id, folder, name, sub, built views
-    { id: "f1", dir: "fresh-1/", name: "Fresh 1", sub: "White grid, navy CTA, serif titles", views: ["mobile"] },
-    { id: "c1", dir: null, name: "Compiled A", sub: "Best parts of the morning's approaches", views: [] },
-    { id: "c2", dir: null, name: "Compiled B", sub: "Best parts of the morning's approaches", views: [] },
+    // id, folder, name, sub, built views — Figma Section 2 (172:56553), mobile frames "1", "2", "3"
+    { id: "f1", dir: "fresh-1/", name: "Approach 1", sub: "White grid, navy CTA, Recoleta titles", views: ["mobile"] },
+    { id: "a2", dir: "approach-2/", name: "Approach 2", sub: "Sky + clouds, mint schemes arch, trust band", views: ["mobile"] },
+    { id: "a3", dir: null, name: "Approach 3", sub: "Frame 3", views: [] },
   ];
   const root = location.pathname.replace(/[^/]+\/[^/]*$/, "");   // …/explorations/
   const current = APPROACHES.find((a) => a.dir && location.pathname.includes("/" + a.dir)) || APPROACHES[0];
@@ -50,7 +50,7 @@
         <p class="pp__label">Approach <span class="pp__hint">light mode</span></p>
         <div class="pp__list" role="radiogroup" aria-label="Approach">
           ${APPROACHES.map((x) => `<button role="radio" aria-checked="${st.look === x.id}" class="pp__item ${st.look === x.id ? "is-on" : ""}" data-look="${x.id}" ${x.dir ? "" : "disabled"}>
-            <span class="pp__swatch pp__swatch--${x.id}" aria-hidden="true"></span><span><b>${x.id.toUpperCase()} · ${x.name}</b><small>${x.dir ? x.sub : "In progress"}</small></span></button>`).join("")}
+            <span class="pp__swatch pp__swatch--${x.id}" aria-hidden="true"></span><span><b>${x.name}</b><small>${x.dir ? x.sub : "In progress"}</small></span></button>`).join("")}
         </div>
       </div>
       <div class="pp__sec">

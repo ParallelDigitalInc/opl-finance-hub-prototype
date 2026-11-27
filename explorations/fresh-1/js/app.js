@@ -101,7 +101,6 @@
               <button class="link link--muted" data-press data-next="subsidies">View all${ico("chev-muted", 16)}</button></div>
             <div class="rail rail--subs" data-rail data-parallax>
               ${D.subsidies.cards.map(subCard).join("")}
-              <button class="rail__more" data-press data-next="subsidies">View all ${D.subsidies.total}${ico("chev-blue", 16)}</button>
             </div>
           </section>
 
