@@ -460,7 +460,7 @@ img { display: block; }
 .loan__foot { margin-top: 18px; padding: 18px 0 0; border-top: 1px solid #f1f5f9; border-radius: 0; background: none; }
 @media (hover: hover) { .loan:hover { box-shadow: 0 14px 30px -14px rgba(0, 29, 33, 0.2); } }
 
-/* subsidies (172:54737): white now, 24/20/24, no level tab on the photo, no "View all 8" */
+/* subsidies (172:54737): white now, 24/20/24, no "View all 8"; the level tab stays on every photo (233:59464) */
 .sec--subs { gap: 20px; padding: 24px 0; border-radius: 0; background: none; }
 .sub { padding: 2px; border-color: #e2e8f0; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); }
 .sub__photo { border-radius: 20px; }

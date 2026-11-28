@@ -38,7 +38,7 @@ window.OPL_F1 = {
   loans: {
     title: "Top loan matches",
     cards: [
-      { id: "citi", name: "Citi Bank", product: "Working Capital Loan", logo: "logo-citi.png", tag: "", amount: "₹50 Lakhs", rate: "9.45%", tint: "#eef4fc", tintEnd: "36.9%" },
+      { id: "citi", name: "Citi Bank", product: "Working Capital Loan", logo: "logo-citi.png", tag: "Collateral-free", amount: "₹50 Lakhs", rate: "9.45%", tint: "#eef4fc", tintEnd: "36.9%" },
       { id: "bob", name: "Bank of Baroda", product: "Working Capital Loan", logo: "logo-bob.png", tag: "Collateral-free", amount: "₹50 Lakhs", rate: "9.45%", tint: "#fef2ec", tintEnd: "42%" },
     ],
   },

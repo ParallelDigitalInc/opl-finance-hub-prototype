@@ -58,7 +58,7 @@
 
   const subCard = (c) => `
     <article class="card sub" tabindex="0" data-press data-next="subsidy" data-m-enter="left" aria-label="${c.name}, ${c.tag}, estimated assistance ${c.value}">
-      <div class="sub__photo"><img src="${img(c.photo)}" alt="" loading="lazy" decoding="async"></div>
+      <div class="sub__photo"><img src="${img(c.photo)}" alt="" loading="lazy" decoding="async"><span class="sub__tag sub__tag--${c.level}">${c.tag}</span></div>
       <div class="sub__body">${logo(c.logo, 40, "logo--ring")}<b class="sub__name">${c.name}</b></div>
       <div class="sub__foot">
         <div class="fig"><small>Estimated assistance</small><b>${c.value}</b></div>

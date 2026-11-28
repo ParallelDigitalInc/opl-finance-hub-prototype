@@ -13,7 +13,7 @@ Figma finesse (Section 2, `172:56553`):
   - **Top:** the wash runs #C9E8DD to white, with two soft ornament shapes; the CTA is 48px, 12px corners, #07181A.
   - **Links and buttons:** "View all" and the help button use the same #07181A.
   - **Sections:** split by 0.5px #E2E8F0 rules instead of the mint band; card dividers are #F1F5F9.
-  - **Cards:** the Citi card has no tag, subsidy photos have no level tab, and "View all 8" is removed.
+  - **Cards:** "View all 8" is removed. Every loan card keeps its "Collateral-free" tag and every subsidy photo its government tab (the frame had lost them on the first cards).
   - **Help banner:** white, with a lilac ornament, the green OPL stamp and an advisor photo.
   - **Nav:** the active pill is #F1F5F9.
 
