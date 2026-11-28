@@ -1,5 +1,26 @@
 # Changelog
 
+## v0.23.0 — 28 Nov 2026 · Explorations: Subsidies hero slide + Approach 3 polish
+
+All three approaches (`/explorations/`) now have a hero carousel like the kit home's: Loans, then Subsidies.
+
+- **Subsidies slide:** "Get assistance up to ₹1 Crore", a cycling stack of the page's three Key Subsidies, and "Explore Subsidies". It is proposed, since the frames draw only the loans slide.
+- **Card layout:** taller subsidy cards with the logo top-aligned and two-line names at 16/21, following the kit's subsidy card.
+  - The stack rises into the gap under the amount, so the CTA stays level across slides.
+- **Motion:**
+  - the stack auto-steps through its cards, then moves to the other slide;
+  - native swipe, mouse drag and parallax;
+  - card taps open the usual toast.
+- **Pager:** one dot group per slide, and the inactive group folds to a single dot.
+
+Approach 3 (Shreya):
+- **Footer:** the dock fades to white instead of the frame's warm grey (#E8E5DD).
+- **Card type:** names and figures on the hero, loan and subsidy cards use Stack Sans Text Light.
+- **From the Figma frame:**
+  - the mint wash starts at #CDEADF;
+  - subsidy names are #0F1517.
+- **Help banner grid:** redrawn upright (`help-grid-a3.svg`), so the lines are as soft and even as in Figma instead of rendering grey and uneven.
+
 ## v0.22.0 — 28 Nov 2026 · Explorations: Approach 3 (mobile) + quieter panel
 
 `/explorations/approach-3/`, built from Figma Section 2, mobile frame "3" (`172:54014`). It sits on Approach 1's code, with an "Approach 3" layer on top. The values come from the Figma paints, and the page height matches the frame (1595px).

@@ -22,9 +22,26 @@
   const later = (fn, ms) => timers.push(setTimeout(fn, ms));
 
   /* ---- markup --------------------------------------------------------------- */
-  const heroCard = (c, i) => `
-    <div class="hcard" data-pos="${i === 0 ? "front" : i === 1 ? "back" : "queue"}" style="--brand:${c.brand};--wash:${c.wash};--soft:${c.soft};--softer:${c.softer}" data-next="explore">
-      <div class="hcard__in">${logo(c.logo, 44)}<span class="hcard__t"><b>${c.name}</b><small>${c.product}</small></span></div>
+  const heroCard = (next) => (c, i) => `
+    <div class="hcard" data-pos="${i === 0 ? "front" : i === 1 ? "back" : "queue"}" style="--brand:${c.brand};--wash:${c.wash};--soft:${c.soft};--softer:${c.softer}" data-next="${next}">
+      <div class="hcard__in">${logo(c.logo, 44, c.ring ? "logo--ring" : "")}<span class="hcard__t"><b>${c.name}</b><small>${c.product}</small></span></div>
+    </div>`;
+
+  // Hero slides, as in the kit's home: Loans first, then Subsidies (kit Figma 382:34093 / 382:33823)
+  const SLIDES = [
+    { id: "loans", label: "Loans", next: "explore", stack: "Lenders that match you", count: true, ...D.promo },
+    { id: "subs", label: "Subsidies", next: "subsidy", cta_next: "exploreSubs", stack: "Schemes that match you", ...D.promoSubs },
+  ];
+  const heroSlide = (s, si) => `
+    <div class="promo promo--${s.id}" data-slide="${si}" role="group" aria-roledescription="slide" aria-label="${si + 1} of ${SLIDES.length}, ${s.label}">
+      <p class="promo__eyebrow" ${si ? "" : "data-m-enter"}>${s.eyebrow}</p>
+      <p class="promo__amount" ${si ? "" : "data-m-enter"} aria-label="₹${s.amount} ${s.unit}"><span class="promo__rupee">₹</span><span ${s.count ? `data-count="${s.amount}"` : ""}>${s.amount}</span> ${s.unit}</p>
+      <div class="promo__deck">
+        <div class="stack" data-stack ${si ? "" : 'data-m-enter="stack"'} role="group" aria-label="${s.stack}">
+          ${s.cards.map(heroCard(s.next)).join("")}
+        </div>
+        <button class="cta" data-press data-next="${s.cta_next || s.next}" ${si ? "" : "data-m-enter"}><span class="cta__shine" aria-hidden="true"></span><span class="cta__t">${s.cta}</span>${ico("chev-white", 16, "cta__chev")}</button>
+      </div>
     </div>`;
 
   const loanCard = (c, i) => `
@@ -72,17 +89,12 @@
 
       <main class="views">
         <div class="view view--finance" data-view="finance">
-          <section class="promo" aria-label="Loan offer">
-            <p class="promo__eyebrow" data-m-enter>${P.eyebrow}</p>
-            <p class="promo__amount" data-m-enter aria-label="₹${P.amount} ${P.unit}"><span class="promo__rupee">₹</span><span data-count="${P.amount}">${P.amount}</span> ${P.unit}</p>
-            <div class="promo__deck">
-              <div class="stack" data-stack data-m-enter="stack" role="group" aria-roledescription="carousel" aria-label="Lenders that match you">
-                ${P.cards.map(heroCard).join("")}
-              </div>
-              <button class="cta" data-press data-next="explore" data-m-enter><span class="cta__shine" aria-hidden="true"></span><span class="cta__t">${P.cta}</span>${ico("chev-white", 16, "cta__chev")}</button>
+          <section class="hero" aria-label="Loans and subsidies" aria-roledescription="carousel">
+            <div class="hero__track" data-hero>
+              ${SLIDES.map(heroSlide).join("")}
             </div>
-            <div class="pager" data-m-enter role="tablist" aria-label="Lender">
-              ${P.cards.map((c, i) => `<button class="pager__dot ${i === 0 ? "is-active" : ""}" role="tab" aria-selected="${i === 0}" aria-label="${c.name}"><i></i></button>`).join("")}
+            <div class="pager" data-m-enter role="tablist" aria-label="Offers">
+              ${SLIDES.map((s, si) => `<span class="pager__group ${si === 0 ? "is-on" : ""}">${s.cards.map((c, i) => `<button class="pager__dot ${si === 0 && i === 0 ? "is-active" : ""}" role="tab" aria-selected="${si === 0 && i === 0}" aria-label="${s.label}, ${c.name}" data-slide="${si}" data-card="${i}"><i></i></button>`).join("")}</span>`).join("")}
             </div>
           </section>
 
@@ -107,7 +119,7 @@
 
           <section class="help" aria-label="Help">
             <div class="help__banner" data-m-enter>
-              <span class="help__grid help__grid--r" aria-hidden="true"><img src="assets/icons/help-grid.svg" alt="" width="195" height="280"></span>
+              <span class="help__grid help__grid--r" aria-hidden="true"><img src="assets/icons/help-grid-a3.svg" alt="" width="280" height="195"></span>
               <div class="help__text">
                 <p class="help__title">${D.help.title.join("<br>")}</p>
                 <button class="btn-navy" data-press data-next="call">${ico("phone", 14, "ico--phone")}${D.help.cta}</button>
@@ -204,49 +216,105 @@
     });
   };
 
-  // Hero stack: front slides under the CTA, back steps forward, the next one fades in behind.
-  // Auto-advances every 3.2s (pager fills as progress); tap, swipe or pick a dot to step.
-  const heroStack = () => {
-    const el = $("[data-stack]"); if (!el) return;
-    const items = $$(".hcard", el), dots = $$(".pager__dot"), pager = $(".pager");
-    let front = 0, busy = false, held = false, tick = null;
-    const paint = () => dots.forEach((d, i) => { d.classList.toggle("is-active", i === front); d.setAttribute("aria-selected", i === front); });
-    const go = (to, dir = 1) => {
-      if (busy || to === front) return;
-      busy = true;
-      const n = items.length, leaving = items[front];
-      leaving.dataset.pos = dir > 0 ? "leave" : "leave-up";
-      front = (to + n) % n;
-      items[front].dataset.pos = "front";
-      items[(front + 1) % n].dataset.pos = "back";
-      paint(); restart();
-      setTimeout(() => {
-        items.forEach((it, k) => { if (k !== front && k !== (front + 1) % n) { it.classList.add("is-instant"); it.dataset.pos = "queue"; void it.offsetWidth; it.classList.remove("is-instant"); } });
-        busy = false;
-      }, 820);
-    };
-    const next = () => go(front + 1, 1);
-    const restart = () => { pager.classList.remove("is-auto"); void pager.offsetWidth; if (!motionOff()) pager.classList.add("is-auto"); };
-    dots.forEach((d, i) => d.addEventListener("click", () => go(i, i > front ? 1 : -1)));
+  // Hero carousel — two slides, as in the kit's home: Loans, then Subsidies. Native scroll-snap, so a swipe feels like
+  // the OS (a mouse drag is wired for presenting on a laptop). Each slide's card stack steps every 3.2s: the front slides
+  // under the CTA, the back steps forward, the next fades in behind. After a slide's last card the carousel moves on.
+  // The pager shows both levels: one group of dots per slide, the current group open with a filling pill on the
+  // current card, the other folded to a single dot. Tap a dot to jump; tap a card to open it.
+  const heroCarousel = () => {
+    const track = $("[data-hero]"); if (!track) return;
+    const slides = $$(".promo", track), groups = $$(".pager__group"), pager = $(".pager");
+    let cur = 0, timer = null, held = false, started = false;
 
-    // swipe (touch or mouse): horizontal drag tilts the front card; release past 40px steps
-    let sx = 0, dx = 0, down = false, moved = false;
-    el.addEventListener("pointerdown", (e) => { down = true; moved = false; sx = e.clientX; dx = 0; held = true; pager.classList.add("is-paused"); el.setPointerCapture?.(e.pointerId); });
-    el.addEventListener("pointermove", (e) => {
-      if (!down) return; dx = e.clientX - sx; if (Math.abs(dx) > 4) moved = true;
-      items[front].style.setProperty("--drag", `${Math.max(-60, Math.min(60, dx))}px`);
-      items[front].classList.add("is-dragging");
+    const stacks = slides.map((sl) => {
+      const items = $$(".hcard", sl);
+      const s = { front: 0, busy: false, n: items.length };
+      const instant = (it, pos) => { it.classList.add("is-instant"); it.dataset.pos = pos; void it.offsetWidth; it.classList.remove("is-instant"); };
+      s.go = (to, dir = 1) => {
+        if (s.busy || to === s.front) return;
+        s.busy = true;
+        items[s.front].dataset.pos = dir > 0 ? "leave" : "leave-up";
+        s.front = (to + s.n) % s.n;
+        items[s.front].dataset.pos = "front";
+        items[(s.front + 1) % s.n].dataset.pos = "back";
+        setTimeout(() => { items.forEach((it, k) => { if (k !== s.front && k !== (s.front + 1) % s.n) instant(it, "queue"); }); s.busy = false; }, 820);
+      };
+      s.reset = () => { s.front = 0; items.forEach((it, k) => instant(it, k === 0 ? "front" : k === 1 ? "back" : "queue")); };
+      return s;
     });
-    const up = () => {
-      if (!down) return; down = false; held = false; pager.classList.remove("is-paused");
-      const f = items[front]; f.classList.remove("is-dragging"); f.style.removeProperty("--drag");
-      if (Math.abs(dx) > 40) { buzz(); go(front + 1, 1); }
-      else if (!moved) toast(`${D.next.explore} isn't built in this prototype yet`);
+
+    const paint = () => groups.forEach((g, si) => {
+      g.classList.toggle("is-on", si === cur);
+      $$(".pager__dot", g).forEach((d, i) => {
+        const on = si === cur && i === stacks[si].front;
+        d.classList.toggle("is-active", on); d.setAttribute("aria-selected", on);
+        d.tabIndex = si === cur || i === 0 ? 0 : -1;
+      });
+    });
+    const stop = () => { clearTimeout(timer); timer = null; pager.classList.remove("is-auto"); };
+    const schedule = () => {
+      stop(); if (!started || held || motionOff()) return;
+      void pager.offsetWidth; pager.classList.add("is-auto");
+      timer = setTimeout(step, 3200);
     };
-    el.addEventListener("pointerup", up); el.addEventListener("pointercancel", up);
+    const toSlide = (i, smooth = true) => track.scrollTo({ left: i * track.clientWidth, behavior: smooth && !motionOff() ? "smooth" : "auto" });
+    function step() {
+      if (document.hidden || sheetOpen()) return schedule();
+      const s = stacks[cur];
+      if (s.front === s.n - 1 && slides.length > 1) { const nx = (cur + 1) % slides.length; stacks[nx].reset(); toSlide(nx); }
+      else { s.go(s.front + 1, 1); paint(); schedule(); }
+    }
+    const arrive = (i) => {
+      cur = i;
+      slides.forEach((s, k) => { s.inert = k !== i; s.setAttribute("aria-hidden", String(k !== i)); });
+      paint(); schedule();
+    };
+    const onScroll = () => {
+      const w = track.clientWidth; if (!w) return;
+      slides.forEach((s, k) => { const p = (k * w - track.scrollLeft) / w; s.style.setProperty("--p", p.toFixed(3)); s.style.setProperty("--pa", Math.min(1, Math.abs(p)).toFixed(3)); });
+      const i = Math.max(0, Math.min(slides.length - 1, Math.round(track.scrollLeft / w)));
+      if (i !== cur) arrive(i);
+    };
+    track.addEventListener("scroll", () => requestAnimationFrame(onScroll), { passive: true });
+    addEventListener("resize", () => { track.scrollLeft = cur * track.clientWidth; });
+    arrive(0);
+
+    pager.addEventListener("click", (e) => {
+      const d = e.target.closest(".pager__dot"); if (!d) return;
+      const si = +d.dataset.slide, ci = +d.dataset.card;
+      if (si !== cur) return toSlide(si);
+      const s = stacks[si]; s.go(ci, ci > s.front ? 1 : -1); paint(); schedule();
+    });
+
+    // a finger on the hero holds the timer; lifting it restarts the current card's pill
+    track.addEventListener("touchstart", () => { held = true; stop(); }, { passive: true });
+    ["touchend", "touchcancel"].forEach((t) => track.addEventListener(t, () => { held = false; schedule(); }, { passive: true }));
+
+    // mouse drag: snap is lifted while dragging, then the release settles on the next or previous slide
+    let down = false, moved = false, sx = 0, sl = 0;
+    track.addEventListener("pointerdown", (e) => { if (e.pointerType !== "mouse" || e.button !== 0) return; down = true; moved = false; sx = e.clientX; sl = track.scrollLeft; });
+    addEventListener("pointermove", (e) => {
+      if (!down) return;
+      const dx = e.clientX - sx;
+      if (!moved && Math.abs(dx) > 5) { moved = true; held = true; stop(); track.classList.add("is-grabbing"); }
+      if (moved) track.scrollLeft = sl - dx;
+    });
+    addEventListener("pointerup", (e) => {
+      if (!down) return; down = false;
+      if (!moved) return;
+      const w = track.clientWidth, from = Math.round(sl / w), dx = e.clientX - sx;
+      const to = Math.max(0, Math.min(slides.length - 1, dx < -48 ? from + 1 : dx > 48 ? from - 1 : from));
+      held = false; if (to !== from) buzz();
+      toSlide(to);
+      let done = false;
+      const unsnap = () => { if (done) return; done = true; track.classList.remove("is-grabbing"); };
+      track.addEventListener("scrollend", unsnap, { once: true }); setTimeout(unsnap, 700);
+      if (to === cur) schedule();
+    });
+    track.addEventListener("click", (e) => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
 
     if (motionOff()) return;
-    afterReveal(() => later(() => { restart(); tick = setInterval(() => { if (!held && !document.hidden && !sheetOpen()) next(); }, 3200); timers.push(tick); }, 2200));
+    afterReveal(() => later(() => { started = true; schedule(); }, 2200));
   };
 
   // Grid fades and drifts slower than the page (parallax); the top bar frosts once content slides under it
@@ -429,7 +497,7 @@
   const bind = () => {
     document.addEventListener("click", (e) => {
       const nx = e.target.closest("[data-next]");
-      if (!nx || nx.closest("[data-stack]")) return;
+      if (!nx) return;
       toast(`${D.next[nx.dataset.next] || "This"} isn't built in this prototype yet`);
     });
     document.addEventListener("keydown", (e) => { if ((e.key === "Enter" || e.key === " ") && e.target.matches("article[data-next]")) { e.preventDefault(); e.target.click(); } });
@@ -437,7 +505,7 @@
 
   /* ---- boot ------------------------------------------------------------------ */
   render();
-  press(); bind(); enter(); heroStack(); scrollFx(); railFx(); helpFx(); navFx(); mitra();
+  press(); bind(); enter(); heroCarousel(); scrollFx(); railFx(); helpFx(); navFx(); mitra();
   $$("[data-count]").forEach((el) => countUp(el, { to: +el.dataset.count, fmt: (v) => `${Math.round(v)}` }));
 
   const ready = [document.fonts ? document.fonts.ready : Promise.resolve()]

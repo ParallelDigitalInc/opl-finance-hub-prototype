@@ -15,6 +15,19 @@ window.OPL_F1 = {
     ],
   },
 
+  // Second hero slide, as in the kit's home (Figma 382:33823) — proposed; the frame draws the loans slide only.
+  // Cards are the page's own Key Subsidies, tinted the way the lender cards are.
+  promoSubs: {
+    eyebrow: "Get assistance up to",
+    amount: 1, unit: "Crore",
+    cta: "Explore Subsidies",
+    cards: [
+      { id: "mcls", name: "MSME Competitive Lean Scheme", product: "Central Government", logo: "logo-msme.png", ring: true, brand: "217,119,6", wash: "#fdf1dc", soft: "#f4cd8c", softer: "#fcebcb" },
+      { id: "gtp", name: "Gujarat Textile Policy 2024", product: "State Government", logo: "logo-gujarat.png", ring: true, brand: "37,99,235", wash: "#dfe8fd", soft: "#a9c2fa", softer: "#dde6fd" },
+      { id: "ags", name: "Aatmanirbhar Gujarat Scheme", product: "State Government", logo: "logo-gujarat.png", ring: true, brand: "21,128,61", wash: "#ddf2e4", soft: "#a2d6b3", softer: "#d8efdf" },
+    ],
+  },
+
   quick: [
     { id: "cmr", label: "CMR score", icon: "qa-cmr", tile: "amber" },
     { id: "track", label: "Track Loans", icon: "qa-track", tile: "sky" },
@@ -72,7 +85,7 @@ window.OPL_F1 = {
 
   next: {
     bell: "Notifications", help: "Help & support", profile: "Your profile",
-    explore: "Explore Loans", cmr: "CMR score", track: "Track Loans", debt: "Debt Snapshot", emi: "View EMIs",
+    explore: "Explore Loans", exploreSubs: "Explore Subsidies", cmr: "CMR score", track: "Track Loans", debt: "Debt Snapshot", emi: "View EMIs",
     loans: "All loan matches", loan: "Loan details", subsidies: "All subsidies", subsidy: "Subsidy details", call: "Request a call",
   },
 };
