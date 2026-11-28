@@ -493,3 +493,21 @@ img { display: block; }
 .fab::after { box-shadow: inset 0 -7px 14px #dce8fc, inset 0 4px 4px #fff; }
 @keyframes breathe { 0%, 70%, 100% { box-shadow: 0 0 0 1px rgba(31, 95, 191, 0.14), 0 8px 20px -4px rgba(31, 95, 191, 0.34); }
   82% { box-shadow: 0 0 0 1px rgba(31, 95, 191, 0.2), 0 10px 26px -3px rgba(31, 95, 191, 0.44), 0 0 0 7px rgba(31, 95, 191, 0.06); } }
+
+/* Subsidies stack (fix, 28 Nov): the card behind peeks 30px, as on the Loans slide, and its name stays on one line,
+   so the front card never slices through it. The front card still shows its two-line name above the CTA. */
+.promo--subs .hcard[data-pos="front"] { transform: translateY(30px); }
+.promo--subs .hcard[data-pos="leave"] { transform: translateY(140px); }
+.promo--subs .hcard.is-dragging { transform: translate(var(--drag, 0), 30px) rotate(calc(var(--drag, 0px) / 60px * 2deg)); }
+.promo--subs .hcard:not([data-pos="front"]):not([data-pos="leave"]) .hcard__t b { -webkit-line-clamp: 1; }
+/* keep ~12px between the front card's subtitle and the CTA: the stack rises 4px more into the gap under the figure
+   (same CTA position), and the card's top padding and name-to-subtitle gap tighten by 2px each */
+.promo--subs .stack { height: 118px; margin-top: -12px; }
+.promo--subs .hcard__in { padding-top: 14px; }
+.promo--subs .hcard__t { gap: 2px; }
+
+/* hero card stroke (fix, 28 Nov): the stroke is the lender colour at 20% fading down, so on its own it is see-through and
+   the card behind showed through it as dark dots (its lettering). A white layer under it keeps the same colour, opaque. */
+.hcard { background: linear-gradient(180deg, var(--wash) 0px, #fff 49px) padding-box,
+  linear-gradient(180deg, rgba(var(--brand), 0.2) 0px, rgba(var(--brand), 0.077) 76px, rgba(var(--brand), 0.06) 82px) border-box,
+  linear-gradient(#fff, #fff) border-box; }

@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.24.1 — 28 Nov 2026 · Explorations: hero card fixes, lighter card type
+
+- **Hero card stroke (Vanilla Sprinkles, Sky):** the lender-tinted stroke was see-through, so the lettering of the card behind showed through it as dark dots. It now sits on a white base: same colour, opaque.
+- **Subsidies slide (Vanilla Sprinkles, Sky, Mint Grid):** the card behind peeks 30px, as on the Loans slide, with its name on one line, so the front card never slices it. The CTA stays level across slides, with 12px between the front card's subtitle and the CTA.
+- **Card type (Vanilla Sprinkles):** loan and subsidy names and figures use Stack Sans Text Light.
+
 ## v0.24.0 — 28 Nov 2026 · Explorations: five named approaches, Figma finesse, Recoleta, full-screen switcher
 
 `/explorations/` now holds five mobile approaches in two groups, named by Shreya:
