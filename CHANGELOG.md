@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.24.2 — 28 Nov 2026 · Explorations: phone menu for switching approaches
+
+- **Phones (narrower than 900px):** a small menu icon just left of the page title opens a compact dropdown of the five approaches, grouped as New approaches and Clean up · old, with thumbnails and a tick on the current one. It works on the plain link, so a link opened on a phone can reach every approach. On Gradient the menu takes the inert back arrow's place.
+- The right-edge handle stays for laptops in full screen; phones no longer show it.
+
 ## v0.24.1 — 28 Nov 2026 · Explorations: hero card fixes, lighter card type
 
 - **Hero card stroke (Vanilla Sprinkles, Sky):** the lender-tinted stroke was see-through, so the lettering of the card behind showed through it as dark dots. It now sits on a white base: same colour, opaque.

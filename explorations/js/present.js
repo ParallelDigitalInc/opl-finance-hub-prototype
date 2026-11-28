@@ -28,6 +28,71 @@
   /* Full screen (?bare=1, or a phone): no panel, the page runs edge to edge. A hairline handle on the right edge
      opens a slim tray of the approaches; on a keyboard, 1-5 jump straight to one and [ ] step through. The handle
      shows for a moment on load, then only when the pointer moves (on touch screens it stays faintly visible). */
+  /* Phones (narrower than 900px, so no panel): a small menu icon just before the page title opens a compact
+     dropdown of the approaches, grouped as in the panel. Nothing floats over the design; the icon sits in the header
+     row like a native control. (Laptops in full screen keep the right-edge handle and the number keys.) */
+  const phoneMenu = () => {
+    const href = (x) => `${root}${x.dir}?bare=1${location.hash}`;
+    const title = document.querySelector(".top__title");
+    if (!title) return quick();
+    document.documentElement.classList.add("has-qm");
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "qm__btn";
+    btn.setAttribute("aria-label", "Switch approach");
+    btn.setAttribute("aria-haspopup", "menu");
+    btn.setAttribute("aria-expanded", "false");
+    btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5.5h14M3 10h14M3 14.5h14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+    btn.style.color = getComputedStyle(title).color;
+    const back = document.querySelector(".top__back");   // Gradient: the menu takes the (inert) back arrow's place
+    if (back) back.before(btn);
+    else {
+      const lead = document.createElement("div");
+      lead.className = "qm__lead";
+      title.before(lead); lead.append(btn, title);
+    }
+    const menu = document.createElement("div");
+    menu.className = "qm";
+    menu.hidden = true;
+    menu.innerHTML = `
+      <div class="qm__scrim" data-qm-close></div>
+      <div class="qm__panel" role="menu" aria-label="Approaches">
+        ${GROUPS.map((g) => `<p class="qm__label">${g.label}</p>
+        ${APPROACHES.filter((x) => x.group === g.id).map((x) => `<a class="qm__item ${x === current ? "is-on" : ""}" role="menuitem" href="${href(x)}" ${x === current ? 'aria-current="page"' : ""} data-i="${APPROACHES.indexOf(x)}">
+          <img src="${thumb(x)}" alt="" width="28" height="36"><span>${x.name}</span>${x === current ? '<svg class="qm__check" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' : ""}</a>`).join("")}`).join("")}
+      </div>`;
+    document.body.appendChild(menu);
+    const panel = menu.querySelector(".qm__panel");
+    let open = false;
+    const set = (on) => {
+      if (on === open) return;
+      open = on; btn.setAttribute("aria-expanded", on);
+      if (on) {
+        const r = btn.getBoundingClientRect();
+        panel.style.top = `${Math.round(r.bottom + 6)}px`;
+        panel.style.left = `${Math.max(8, Math.round(r.left - 6))}px`;
+        menu.hidden = false;
+        requestAnimationFrame(() => menu.classList.add("is-open"));
+      } else {
+        menu.classList.remove("is-open");
+        setTimeout(() => { if (!open) menu.hidden = true; }, 200);
+      }
+    };
+    btn.addEventListener("click", (e) => { e.stopPropagation(); set(!open); });
+    menu.addEventListener("click", (e) => {
+      if (e.target.closest("[data-qm-close]")) return set(false);
+      const a = e.target.closest(".qm__item"); if (!a) return;
+      e.preventDefault();
+      const x = APPROACHES[+a.dataset.i];
+      if (x === current) return set(false);
+      document.documentElement.classList.add("qs-leaving");
+      setTimeout(() => { location.href = href(x); }, 160);
+    });
+    addEventListener("keydown", (e) => { if (e.key === "Escape") set(false); });
+    addEventListener("scroll", () => set(false), { passive: true });
+    addEventListener("pageshow", () => document.documentElement.classList.remove("qs-leaving"));
+  };
+
   const quick = () => {
     const href = (x) => `${root}${x.dir}?bare=1${location.hash}`;
     const el = document.createElement("div");
@@ -68,7 +133,8 @@
     addEventListener("pageshow", () => document.documentElement.classList.remove("qs-leaving"));   // back/forward cache
   };
   if (!window.__STAGE) {
-    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", quick); else quick();
+    const start = () => (matchMedia("(max-width: 899px)").matches ? phoneMenu() : quick());
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
     return;
   }
   const st = { look: current.id, view: qs.get("view") === "desktop" && current.views.includes("desktop") ? "desktop" : "mobile" };

@@ -7,7 +7,7 @@ starts the HTML component kit that later mobile flows reuse.
 - **Repo:** https://github.com/ParallelDigitalInc/opl-finance-hub-prototype. GitHub Pages redeploys from `main` on every push, usually within a minute or two.
 - **Prototype:** `index.html` (a device frame plus a variant panel; full-screen on a phone)
 - **Responsive prototype, new looks (v0.18.0):** https://paralleldigitalinc.github.io/opl-finance-hub-prototype/responsive/. Approach 1 is the teal look; approach 2 (light wash) is at `responsive/approach-2/`. A side panel switches look, mobile/desktop and icons. See `responsive/README.md`.
-- **Explorations (v0.24.1):** https://paralleldigitalinc.github.io/opl-finance-hub-prototype/explorations/. Five mobile approaches: New (Vanilla Sprinkles, Sky, Fresh Mint) and Clean up · old (Gradient, Mint Grid). The side panel switches between them; full-screen pages keep a right-edge switcher and keys 1–5. See `explorations/README.md`.
+- **Explorations (v0.24.2):** https://paralleldigitalinc.github.io/opl-finance-hub-prototype/explorations/. Five mobile approaches: New (Vanilla Sprinkles, Sky, Fresh Mint) and Clean up · old (Gradient, Mint Grid). The side panel switches between them; full-screen pages keep a right-edge switcher and keys 1–5. See `explorations/README.md`.
 - **Component library:** `library.html` (tokens, icons and every component, rendered by the same functions)
 - **Figma:** `GHuBkYGEQZvQppv3v55EaA`, section *Finance Home* `416:82748`
 
