@@ -38,13 +38,13 @@ window.OPL_F1 = {
   loans: {
     title: "Top loan matches",
     cards: [
-      { id: "citi", name: "Citi Bank", product: "Working Capital Loan", logo: "logo-citi.png", tag: "Collateral-free", amount: "₹50 Lakhs", rate: "9.45%", tint: "#e7f0fb" },
-      { id: "bob", name: "Bank of Baroda", product: "Working Capital Loan", logo: "logo-bob.png", tag: "Collateral-free", amount: "₹50 Lakhs", rate: "9.45%", tint: "#fdebe3" },
+      { id: "citi", name: "Citi Bank", product: "Working Capital Loan", logo: "logo-citi.png", tag: "", amount: "₹50 Lakhs", rate: "9.45%", tint: "#eef4fc", tintEnd: "36.9%" },
+      { id: "bob", name: "Bank of Baroda", product: "Working Capital Loan", logo: "logo-bob.png", tag: "Collateral-free", amount: "₹50 Lakhs", rate: "9.45%", tint: "#fef2ec", tintEnd: "42%" },
     ],
   },
 
   subsidies: {
-    title: "Key Subsidies", total: 8,   // the frame titles this section "Top loan matches" (copy slip); "View all 8" sits under the cards
+    title: "Key Subsidies", total: 8,   // the frame titles this section "Top loan matches" (copy slip)
     cards: [
       { id: "mcls", name: "MSME Competitive Lean Scheme", photo: "subsidy-1.jpg", logo: "logo-msme.png", tag: "Central Government", level: "central", value: "Up to ₹2.4 Lakhs" },
       { id: "gtp", name: "Gujarat Textile Policy 2024", photo: "subsidy-2.jpg", logo: "logo-gujarat.png", tag: "State Government", level: "state", value: "Up to ₹3.9 Lakhs" },

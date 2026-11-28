@@ -1,5 +1,5 @@
 /* OPL Finance Hub · Explorations · Approach 3 (mobile)
-   Markup from Figma frame "3" (172:54014): mint wash, neutral inset hero cards, pastel tiles, lender-tinted loan cards, lilac help banner. Motion carries the kit's grammar (reveal gate, staggered
+   Markup from Figma frame "3" (172:54014): mint wash, neutral inset hero cards, pastel tiles, lender-tinted loan cards, white help banner with an advisor and the OPL stamp. Motion carries the kit's grammar (reveal gate, staggered
    entrance, count-up, hero card stack with progress pager, AI Mitra nudge, press states, toasts) and adds
    an app layer: a liquid nav pill, tab switching, hide-on-scroll chrome, swipeable hero, rail parallax,
    and an AI Mitra sheet with drag-to-dismiss. */
@@ -45,9 +45,9 @@
     </div>`;
 
   const loanCard = (c, i) => `
-    <article class="card loan" style="--tint:${c.tint}" tabindex="0" data-press data-next="loan" data-m-enter="left" aria-label="${c.name}, ${c.product}, loan up to ${c.amount} at ${c.rate} a year">
+    <article class="card loan" style="--tint:${c.tint};--tint-end:${c.tintEnd || "42%"}" tabindex="0" data-press data-next="loan" data-m-enter="left" aria-label="${c.name}, ${c.product}, loan up to ${c.amount} at ${c.rate} a year">
       <div class="loan__body">
-        <div class="loan__top">${logo(c.logo, 40)}<span class="tag tag--green">${c.tag}</span></div>
+        <div class="loan__top">${logo(c.logo, 40)}${c.tag ? `<span class="tag tag--green">${c.tag}</span>` : ""}</div>
         <div class="loan__name"><b>${c.name}</b><small>${c.product}</small></div>
       </div>
       <div class="loan__foot">
@@ -58,7 +58,7 @@
 
   const subCard = (c) => `
     <article class="card sub" tabindex="0" data-press data-next="subsidy" data-m-enter="left" aria-label="${c.name}, ${c.tag}, estimated assistance ${c.value}">
-      <div class="sub__photo"><img src="${img(c.photo)}" alt="" loading="lazy" decoding="async"><span class="sub__tag sub__tag--${c.level}">${c.tag}</span></div>
+      <div class="sub__photo"><img src="${img(c.photo)}" alt="" loading="lazy" decoding="async"></div>
       <div class="sub__body">${logo(c.logo, 40, "logo--ring")}<b class="sub__name">${c.name}</b></div>
       <div class="sub__foot">
         <div class="fig"><small>Estimated assistance</small><b>${c.value}</b></div>
@@ -74,7 +74,7 @@
     const P = D.promo;
     $("#app").innerHTML = `
     <div class="app" data-tab="finance">
-      <div class="wash" aria-hidden="true"></div>
+      <div class="wash" aria-hidden="true"><img class="wash__pat wash__pat--r" src="assets/icons/hero-pattern-a3.svg" alt="" width="139" height="179"><img class="wash__pat wash__pat--l" src="assets/icons/hero-pattern-a3.svg" alt="" width="139" height="179"></div>
       <header class="top">
         ${document.documentElement.classList.contains("is-embed") ? statusBar() : ""}
         <div class="top__bar">
@@ -94,7 +94,7 @@
               ${SLIDES.map(heroSlide).join("")}
             </div>
             <div class="pager" data-m-enter role="tablist" aria-label="Offers">
-              ${SLIDES.map((s, si) => `<span class="pager__group ${si === 0 ? "is-on" : ""}">${s.cards.map((c, i) => `<button class="pager__dot ${si === 0 && i === 0 ? "is-active" : ""}" role="tab" aria-selected="${si === 0 && i === 0}" aria-label="${s.label}, ${c.name}" data-slide="${si}" data-card="${i}"><i></i></button>`).join("")}</span>`).join("")}
+              ${SLIDES.map((s, si) => `<button class="pager__dot ${si === 0 ? "is-active" : ""}" role="tab" aria-selected="${si === 0}" aria-label="${s.label}" data-slide="${si}"><i></i></button>`).join("")}
             </div>
           </section>
 
@@ -104,27 +104,27 @@
 
           <section class="sec sec--loans" aria-labelledby="h-loans">
             <div class="sec__head" data-m-enter><h2 id="h-loans" class="sec__title">${D.loans.title}</h2>
-              <button class="link" data-press data-next="loans">View all${ico("chev-link", 16)}</button></div>
+              <button class="link" data-press data-next="loans">View all${ico("chev-dark", 16)}</button></div>
             <div class="rail" data-rail>${D.loans.cards.map(loanCard).join("")}</div>
           </section>
 
           <section class="sec sec--subs" aria-labelledby="h-subs">
             <div class="sec__head" data-m-enter><h2 id="h-subs" class="sec__title">${D.subsidies.title}</h2>
-              <button class="link" data-press data-next="subsidies">View all${ico("chev-link", 16)}</button></div>
+              <button class="link" data-press data-next="subsidies">View all${ico("chev-dark", 16)}</button></div>
             <div class="rail rail--subs" data-rail data-parallax>
               ${D.subsidies.cards.map(subCard).join("")}
             </div>
-            <button class="link link--blue link--center" data-press data-next="subsidies">View all ${D.subsidies.total}${ico("chev-blue", 16)}</button>
           </section>
 
           <section class="help" aria-label="Help">
             <div class="help__banner" data-m-enter>
-              <span class="help__grid help__grid--r" aria-hidden="true"><img src="assets/icons/help-grid-a3.svg" alt="" width="280" height="195"></span>
+              <img class="help__pat" src="assets/icons/help-pattern-a3.svg" alt="" width="139" height="179" aria-hidden="true">
               <div class="help__text">
                 <p class="help__title">${D.help.title.join("<br>")}</p>
                 <button class="btn-navy" data-press data-next="call">${ico("phone", 14, "ico--phone")}${D.help.cta}</button>
               </div>
-              <img class="help__ill" src="${img("help-headset.png")}" alt="" width="84" height="96" loading="lazy">
+              <img class="help__stamp" src="assets/icons/opl-stamp-green.svg" alt="" width="54" height="54" aria-hidden="true">
+              <img class="help__person" src="${img("help-person.webp")}" alt="" width="133" height="190" loading="lazy" decoding="async">
             </div>
           </section>
         </div>
@@ -219,11 +219,11 @@
   // Hero carousel — two slides, as in the kit's home: Loans, then Subsidies. Native scroll-snap, so a swipe feels like
   // the OS (a mouse drag is wired for presenting on a laptop). Each slide's card stack steps every 3.2s: the front slides
   // under the CTA, the back steps forward, the next fades in behind. After a slide's last card the carousel moves on.
-  // The pager shows both levels: one group of dots per slide, the current group open with a filling pill on the
-  // current card, the other folded to a single dot. Tap a dot to jump; tap a card to open it.
+  // The pager has one dot per slide; the current one is a pill that fills a step per card. Tap a dot to switch
+  // slides; tap a card to open it.
   const heroCarousel = () => {
     const track = $("[data-hero]"); if (!track) return;
-    const slides = $$(".promo", track), groups = $$(".pager__group"), pager = $(".pager");
+    const slides = $$(".promo", track), dots = $$(".pager__dot"), pager = $(".pager");
     let cur = 0, timer = null, held = false, started = false;
 
     const stacks = slides.map((sl) => {
@@ -243,14 +243,15 @@
       return s;
     });
 
-    const paint = () => groups.forEach((g, si) => {
-      g.classList.toggle("is-on", si === cur);
-      $$(".pager__dot", g).forEach((d, i) => {
-        const on = si === cur && i === stacks[si].front;
-        d.classList.toggle("is-active", on); d.setAttribute("aria-selected", on);
-        d.tabIndex = si === cur || i === 0 ? 0 : -1;
-      });
-    });
+    // one dot per slide (Loans, Subsidies); the current one is a pill that fills one step per card, so a full
+    // pill means the carousel is about to move on to the other slide
+    const paint = () => {
+      dots.forEach((d, si) => { const on = si === cur; d.classList.toggle("is-active", on); d.setAttribute("aria-selected", on); });
+      const s = stacks[cur];
+      if (motionOff()) return pager.style.setProperty("--to", "100%");   // no auto-steps: a solid pill
+      pager.style.setProperty("--from", `${((s.front / s.n) * 100).toFixed(2)}%`);
+      pager.style.setProperty("--to", `${(((s.front + 1) / s.n) * 100).toFixed(2)}%`);
+    };
     const stop = () => { clearTimeout(timer); timer = null; pager.classList.remove("is-auto"); };
     const schedule = () => {
       stop(); if (!started || held || motionOff()) return;
@@ -281,9 +282,8 @@
 
     pager.addEventListener("click", (e) => {
       const d = e.target.closest(".pager__dot"); if (!d) return;
-      const si = +d.dataset.slide, ci = +d.dataset.card;
-      if (si !== cur) return toSlide(si);
-      const s = stacks[si]; s.go(ci, ci > s.front ? 1 : -1); paint(); schedule();
+      const si = +d.dataset.slide;
+      if (si !== cur) { stacks[si].reset(); toSlide(si); }
     });
 
     // a finger on the hero holds the timer; lifting it restarts the current card's pill

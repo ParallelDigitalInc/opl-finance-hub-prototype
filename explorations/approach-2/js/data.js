@@ -54,10 +54,12 @@ window.OPL_F1 = {
     ],
   },
 
+  help: { title: ["Need help?", "We’re here for you"], cta: "Request a Call" },
+
   trust: {
     title: "Built for the MSMEs of Bharat.",
     made: "Made with care in India",
-    legal: "OPL is a marketplace. Loans are offered by partner banks and NBFCs, subject to their approval. Scheme benefits are subject to the government eligibility rules.",
+    // the disclaimer line was removed from the band in the 28 Nov finesse
   },
 
   nav: [

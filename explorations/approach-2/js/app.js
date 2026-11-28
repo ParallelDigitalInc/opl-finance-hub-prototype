@@ -94,7 +94,7 @@
               ${SLIDES.map(heroSlide).join("")}
             </div>
             <div class="pager" data-m-enter role="tablist" aria-label="Offers">
-              ${SLIDES.map((s, si) => `<span class="pager__group ${si === 0 ? "is-on" : ""}">${s.cards.map((c, i) => `<button class="pager__dot ${si === 0 && i === 0 ? "is-active" : ""}" role="tab" aria-selected="${si === 0 && i === 0}" aria-label="${s.label}, ${c.name}" data-slide="${si}" data-card="${i}"><i></i></button>`).join("")}</span>`).join("")}
+              ${SLIDES.map((s, si) => `<button class="pager__dot ${si === 0 ? "is-active" : ""}" role="tab" aria-selected="${si === 0}" aria-label="${s.label}" data-slide="${si}"><i></i></button>`).join("")}
             </div>
           </section>
 
@@ -109,7 +109,7 @@
           </section>
 
           <section class="schemes" aria-labelledby="h-subs">
-            <div class="schemes__arch" aria-hidden="true"><img class="schemes__arc" src="assets/icons/arch.svg" alt="" width="390" height="62"><img class="schemes__ill" src="${img("schemes.png")}" alt="" width="79" height="67"></div>
+            <div class="schemes__arch" aria-hidden="true"><img class="schemes__arc" src="assets/icons/arch.svg" alt="" width="390" height="42"><img class="schemes__ill" src="${img("schemes.png")}" alt="" width="79" height="67"></div>
             <div class="schemes__body">
               <div class="sec__head sec__head--center" data-m-enter><h2 id="h-subs" class="schemes__title">${D.subsidies.matched} ${D.subsidies.title}</h2></div>
               <div class="rail rail--subs" data-rail data-parallax>
@@ -119,12 +119,21 @@
             </div>
           </section>
 
+          <section class="help" aria-label="Help">
+            <div class="help__banner" data-m-enter>
+              <div class="help__text">
+                <p class="help__title">${D.help.title.join("<br>")}</p>
+                <button class="btn-navy" data-press data-next="call">${ico("phone", 14, "ico--phone")}${D.help.cta}</button>
+              </div>
+              <span class="help__art" aria-hidden="true"><img src="${img("help-headset-a2.webp")}" alt="" width="147" height="119" loading="lazy" decoding="async"></span>
+            </div>
+          </section>
+
           <section class="trust" aria-label="About OPL">
             <span class="trust__clouds" aria-hidden="true"><img class="cloud cloud--c" src="${img("cloud.png")}" alt="" loading="lazy"><img class="cloud cloud--d" src="${img("cloud.png")}" alt="" loading="lazy"></span>
             <span class="trust__seal"><img src="assets/icons/opl-stamp.svg" alt="OPL verified" width="72" height="72"></span>
             <p class="trust__title">${D.trust.title}</p>
             <p class="trust__made">${D.trust.made}</p>
-            <p class="trust__legal">${D.trust.legal}</p>
           </section>
         </div>
 
@@ -218,11 +227,11 @@
   // Hero carousel — two slides, as in the kit's home: Loans, then Subsidies. Native scroll-snap, so a swipe feels like
   // the OS (a mouse drag is wired for presenting on a laptop). Each slide's card stack steps every 3.2s: the front slides
   // under the CTA, the back steps forward, the next fades in behind. After a slide's last card the carousel moves on.
-  // The pager shows both levels: one group of dots per slide, the current group open with a filling pill on the
-  // current card, the other folded to a single dot. Tap a dot to jump; tap a card to open it.
+  // The pager has one dot per slide; the current one is a pill that fills a step per card. Tap a dot to switch
+  // slides; tap a card to open it.
   const heroCarousel = () => {
     const track = $("[data-hero]"); if (!track) return;
-    const slides = $$(".promo", track), groups = $$(".pager__group"), pager = $(".pager");
+    const slides = $$(".promo", track), dots = $$(".pager__dot"), pager = $(".pager");
     let cur = 0, timer = null, held = false, started = false;
 
     const stacks = slides.map((sl) => {
@@ -242,14 +251,15 @@
       return s;
     });
 
-    const paint = () => groups.forEach((g, si) => {
-      g.classList.toggle("is-on", si === cur);
-      $$(".pager__dot", g).forEach((d, i) => {
-        const on = si === cur && i === stacks[si].front;
-        d.classList.toggle("is-active", on); d.setAttribute("aria-selected", on);
-        d.tabIndex = si === cur || i === 0 ? 0 : -1;
-      });
-    });
+    // one dot per slide (Loans, Subsidies); the current one is a pill that fills one step per card, so a full
+    // pill means the carousel is about to move on to the other slide
+    const paint = () => {
+      dots.forEach((d, si) => { const on = si === cur; d.classList.toggle("is-active", on); d.setAttribute("aria-selected", on); });
+      const s = stacks[cur];
+      if (motionOff()) return pager.style.setProperty("--to", "100%");   // no auto-steps: a solid pill
+      pager.style.setProperty("--from", `${((s.front / s.n) * 100).toFixed(2)}%`);
+      pager.style.setProperty("--to", `${(((s.front + 1) / s.n) * 100).toFixed(2)}%`);
+    };
     const stop = () => { clearTimeout(timer); timer = null; pager.classList.remove("is-auto"); };
     const schedule = () => {
       stop(); if (!started || held || motionOff()) return;
@@ -280,9 +290,8 @@
 
     pager.addEventListener("click", (e) => {
       const d = e.target.closest(".pager__dot"); if (!d) return;
-      const si = +d.dataset.slide, ci = +d.dataset.card;
-      if (si !== cur) return toSlide(si);
-      const s = stacks[si]; s.go(ci, ci > s.front ? 1 : -1); paint(); schedule();
+      const si = +d.dataset.slide;
+      if (si !== cur) { stacks[si].reset(); toSlide(si); }
     });
 
     // a finger on the hero holds the timer; lifting it restarts the current card's pill
@@ -362,7 +371,7 @@
 
   // Trust band: the seal stamps in (settling at its 6° tilt) and the clouds part as the band arrives
   const trustFx = () => {
-    const els = $$(".trust, .schemes"); if (!els.length) return;
+    const els = $$(".trust, .schemes, .help__banner"); if (!els.length) return;
     if (motionOff()) return els.forEach((t) => t.classList.add("is-seen"));
     const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("is-seen"); io.unobserve(e.target); } }), { threshold: 0.3 });
     els.forEach((t) => io.observe(t));

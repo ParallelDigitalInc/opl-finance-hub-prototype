@@ -133,10 +133,10 @@ img { display: block; }
 .pager__group:not(.is-on) .pager__dot:not(:first-child) { width: 0; margin-left: -6px; opacity: 0; pointer-events: none; }
 .pager__dot i { position: absolute; inset: 0 auto 0 0; width: 0; border-radius: inherit; background: var(--navy); }
 .pager__dot.is-active { width: 20px; background: rgba(15, 30, 90, 0.2); }
-.pager__dot.is-active i { width: 20px; }
+.pager__dot.is-active i { width: var(--to, 100%); }
 .pager.is-auto .pager__dot.is-active i { animation: pager-fill 3.2s linear both; }
 .pager.is-auto.is-paused .pager__dot.is-active i { animation-play-state: paused; }
-@keyframes pager-fill { from { width: 6px; } to { width: 20px; } }
+@keyframes pager-fill { from { width: var(--from, 0%); } to { width: var(--to, 100%); } }
 
 /* ---- quick actions -------------------------------------------------------------------------------- */
 .qa { display: flex; justify-content: space-between; align-items: flex-start; padding: 32px 20px 0; }
@@ -427,9 +427,9 @@ img { display: block; }
 
 /* schemes (172:52910): mint arch with the scheme illustration riding its crest, mint → white body */
 .schemes { position: relative; padding-bottom: 48px; }
-.schemes__arch { position: relative; height: 62px; }
-.schemes__arc { position: absolute; inset: 0; width: 100%; height: 62px; }
-.schemes__ill { position: absolute; left: 50%; top: -14px; width: 79px; height: 67px; margin-left: -38px; transform-origin: 50% 100%; }
+.schemes__arch { position: relative; height: 66px; }   /* 24px above a flatter 42px arch (28 Nov finesse; was 62) */
+.schemes__arc { position: absolute; left: 0; right: 0; top: 24px; width: 100%; height: 42px; }
+.schemes__ill { position: absolute; left: 50%; top: -8px; width: 79px; height: 67px; margin-left: -38px; transform-origin: 50% 100%; }
 .schemes__body { display: flex; flex-direction: column; gap: 20px; margin-top: -1px; background: linear-gradient(180deg, #eef6f1, #fff); }
 .sec__head--center { justify-content: center; }
 .schemes__title { font: 400 20px/1.3 var(--font-ui); background: linear-gradient(90deg, #243652, #165f54); -webkit-background-clip: text; background-clip: text; color: transparent; }
@@ -452,12 +452,11 @@ img { display: block; }
 .trust__made { margin-top: 4px; font: 600 11px/16px var(--font); letter-spacing: 0.22px; color: #3f5f8f; }
 .trust__legal { margin-top: 16px; max-width: 342px; font: 500 10px/15px var(--font); color: #4c6286; }
 /* arrival: the seal stamps down to its 6° tilt, the clouds part, the line fades up */
-.trust:not(.is-seen) .trust__seal, .trust:not(.is-seen) .trust__title, .trust:not(.is-seen) .trust__made, .trust:not(.is-seen) .trust__legal { opacity: 0; }
+.trust:not(.is-seen) .trust__seal, .trust:not(.is-seen) .trust__title, .trust:not(.is-seen) .trust__made { opacity: 0; }
 .trust.is-seen .trust__seal { animation: seal-in 760ms var(--ease-spring) both; }
 .trust.is-seen .trust__seal img { animation: stamp 900ms var(--ease-spring) 80ms both; }
 .trust.is-seen .trust__title { animation: enter-up 600ms var(--ease-out) 260ms both; }
 .trust.is-seen .trust__made { animation: enter-up 600ms var(--ease-out) 340ms both; }
-.trust.is-seen .trust__legal { animation: enter-up 600ms var(--ease-out) 420ms both; }
 .trust.is-seen .cloud--c { animation: cloud-in-l 1600ms var(--ease-out) both; }
 .trust.is-seen .cloud--d { animation: cloud-in-r 1800ms var(--ease-out) both; }
 @keyframes seal-in { from { opacity: 0; transform: translateY(18px) scale(0.8); } }
@@ -468,7 +467,19 @@ img { display: block; }
 /* heights matched to the frame: the loan rail carries 12px under the cards (172:52871); the trust band is
    428px tall in Figma, so 155px sits below the legal line (the nav floats over it) */
 .sec--loans .rail { margin-bottom: -2px; }
-.trust { padding-bottom: 155px; }
+/* the band now ends on "Made with care in India" (no disclaimer): frame 2 runs 151px past it, under the nav */
+.trust { padding-bottom: 151px; }
+
+/* help banner (233:60950, added 28 Nov): slate-100 -> white at 59%, #E2E8F0 hairline, 20px corners; the same
+   navy pill as the hero CTA; the headset art cropped into a 104x119 window 21px from the right */
+.help { padding: 0 20px; }
+.help__banner { min-height: 136px; padding: 19px 23px; border: 1px solid #e2e8f0; background: linear-gradient(180deg, #f1f5f9 0%, #fff 59.191%); }
+.help__title { font: 500 16px/22px var(--font-ui); color: #0f1517; }
+.help__banner .btn-navy { position: relative; height: 36px; width: 146px; gap: 8px; padding: 0 12px 0 16px; white-space: nowrap; border-radius: 9999px;
+  background: linear-gradient(180deg, #263a59, #10151e); box-shadow: 0 8px 18px -6px rgba(12, 20, 22, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.18); }
+.help__art { position: absolute; right: 20px; top: 5px; width: 104px; height: 119px; overflow: hidden; pointer-events: none; }
+.help__art img { position: absolute; top: 0; left: -27.87%; width: 141.46%; height: 100%; max-width: none; }
+.help__banner.is-seen .help__art img { animation: bob 4.2s ease-in-out 600ms infinite; }
 /* frame 2 has no serif: the sheet and placeholder titles use Stack Sans like the section titles */
 .serif { font: 400 20px/1.3 var(--font-ui); letter-spacing: 0; font-variation-settings: normal; background: none; -webkit-background-clip: border-box; background-clip: border-box; color: var(--ink); }
 .sheet__head h2 { font-size: 20px; }

@@ -9,11 +9,12 @@
 @font-face { font-family: "Manrope"; font-style: normal; font-weight: 400 800; font-display: swap; src: url("../assets/fonts/manrope-latin-1.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 @font-face { font-family: "Stack Sans Text"; font-style: normal; font-weight: 200 700; font-display: swap; src: url("../assets/fonts/stack-sans-text-latin-ext-0.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
 @font-face { font-family: "Stack Sans Text"; font-style: normal; font-weight: 200 700; font-display: swap; src: url("../assets/fonts/stack-sans-text-latin-1.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-/* Display serif: Recoleta, as in the frame. Only demo cuts are installed (no web licence), so it is
-   loaded from the viewer's machine with local(), never uploaded; where it isn't installed, Fraunces
-   (soft axis up) stands in. Recoleta has no ₹, so Fraunces draws it, exactly as the Figma text does. */
+/* Display serif: Recoleta Regular, as in the frame. Licensed as a webfont (Fontspring Webfont EULA); the supplied
+   WOFF2 is served from Shreya's Vercel project opl-webfonts, never from this public repo (the EULA forbids shipping
+   it with site source). That host only allows https://paralleldigitalinc.github.io, so localhost previews and any
+   load failure fall back to Fraunces (soft axis up). The ₹ stays in Fraunces, exactly as the Figma text does. */
 @font-face { font-family: "Recoleta OPL"; font-style: normal; font-weight: 400; font-display: swap;
-  src: local("Recoleta Regular DEMO"), local("Recoleta-RegularDEMO"), local("FSP DEMO - Recoleta Regular"), local("FONTSPRINGDEMO-RecoletaRegular"), local("Recoleta Regular"), local("Recoleta-Regular"); }
+  src: url("https://opl-webfonts.vercel.app/fonts/recoleta-regular.woff2") format("woff2"); }
 @font-face { font-family: "Fraunces"; font-style: normal; font-weight: 300 500; font-display: swap; src: url("../assets/fonts/fraunces-latin-ext.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
 @font-face { font-family: "Fraunces"; font-style: normal; font-weight: 300 500; font-display: swap; src: url("../assets/fonts/fraunces-latin.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 
@@ -47,7 +48,9 @@
 
   /* ---- Quick action tiles ------------------------------------------------- */
   --tile-amber: #fdf3e1;
+  --tile-green: #e7fbe4;              /* CMR score tile (28 Nov finesse: was amber) */
   --tile-sky: #eaf2fd;
+  --tile-indigo: #ebefff;             /* Track Loans tile (28 Nov finesse) */
   --tile-rose: #fdece8;
   --tile-lilac: #f1ecfd;
 

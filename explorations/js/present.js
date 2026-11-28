@@ -1,7 +1,7 @@
 /* Presenting shell for /explorations/ — the kit-style prototype panel, like /responsive/'s.
    On a wide window the page is shown inside a device mock (a 390×844 phone, or a 1440×900 browser
    window once a desktop exists) with a side panel to switch:
-     Approach  F1 · Fresh (built) | C1, C2 · Compiled (next)
+     Approach  F1, A2, A3 · Fresh | C1, C2 · Older directions, cleaned up
      View      Mobile | Desktop        (M key; desktop only where it is built)
    The device is this same page in an iframe (?embed=1), so each layout is the real one.
    On a phone (or with ?bare=1) the page renders on its own, full screen, with no shell.
@@ -9,17 +9,68 @@
 (function () {
   const qs = new URLSearchParams(location.search);
   if (qs.get("embed") === "1") { document.documentElement.classList.add("is-embed"); return; }
-  if (!window.__STAGE) return;
-
 
   const APPROACHES = [
     // id, folder, name, sub, built views — Figma Section 2 (172:56553), mobile frames "1", "2", "3"
-    { id: "f1", dir: "fresh-1/", name: "Approach 1", sub: "White grid, navy CTA, Recoleta titles", views: ["mobile"] },
-    { id: "a2", dir: "approach-2/", name: "Approach 2", sub: "Sky + clouds, mint schemes arch, trust band", views: ["mobile"] },
-    { id: "a3", dir: "approach-3/", name: "Approach 3", sub: "Mint wash, dark CTA, tinted loan cards", views: ["mobile"] },
+    { id: "f1", group: "new", dir: "fresh-1/", name: "Vanilla Sprinkles", sub: "White grid, navy CTA, Recoleta titles", views: ["mobile"] },
+    { id: "a2", group: "new", dir: "approach-2/", name: "Sky", sub: "Sky and clouds, mint schemes arch, trust band", views: ["mobile"] },
+    { id: "a3", group: "new", dir: "approach-3/", name: "Fresh Mint", sub: "Mint wash, dark CTA, tinted loan cards", views: ["mobile"] },
+    // Figma "Old Cleaned Up" (233:61391): the earlier directions, cleaned up — frames "1" (172:56049) and "2" (172:55627)
+    { id: "c1", group: "old", dir: "cleaned-1/", name: "Gradient", sub: "Loans page, mint gradient panel, teal CTA", views: ["mobile"] },
+    { id: "c2", group: "old", dir: "cleaned-2/", name: "Mint Grid", sub: "Mint grid hero, lilac icons and subsidies", views: ["mobile"] },
   ];
+  // Shreya's labels: the three new approaches, then the two older ones, cleaned up
+  const GROUPS = [{ id: "new", label: "New approaches" }, { id: "old", label: "Clean up · old" }];
   const root = location.pathname.replace(/[^/]+\/[^/]*$/, "");   // …/explorations/
   const current = APPROACHES.find((a) => a.dir && location.pathname.includes("/" + a.dir)) || APPROACHES[0];
+  const thumb = (x) => `${root}assets/thumbs/${x.id}.webp`;   // top of each frame (status bar, hero, tiles), 40x54 @3x
+
+  /* Full screen (?bare=1, or a phone): no panel, the page runs edge to edge. A hairline handle on the right edge
+     opens a slim tray of the approaches; on a keyboard, 1-5 jump straight to one and [ ] step through. The handle
+     shows for a moment on load, then only when the pointer moves (on touch screens it stays faintly visible). */
+  const quick = () => {
+    const href = (x) => `${root}${x.dir}?bare=1${location.hash}`;
+    const el = document.createElement("div");
+    el.className = "qs is-awake";
+    el.innerHTML = `
+      <button class="qs__handle" type="button" aria-label="Switch approach" aria-expanded="false"><i></i></button>
+      <nav class="qs__tray" aria-label="Approaches">
+        ${APPROACHES.map((x, i) => `${i && x.group !== APPROACHES[i - 1].group ? '<hr class="qs__sep">' : ""}<a class="qs__item ${x === current ? "is-on" : ""}" href="${href(x)}" ${x === current ? 'aria-current="page"' : ""} data-i="${i}">
+          <img src="${thumb(x)}" alt="" width="32" height="41"><kbd aria-hidden="true">${i + 1}</kbd>
+          <span class="qs__tip"><small>${GROUPS.find((g) => g.id === x.group).label}</small><b>${x.name}</b></span></a>`).join("")}
+      </nav>`;
+    document.body.appendChild(el);
+    const handle = el.querySelector(".qs__handle");
+    let sleep = null;
+    const wake = (ms = 2500) => { el.classList.add("is-awake"); clearTimeout(sleep); sleep = setTimeout(() => el.classList.remove("is-awake"), ms); };
+    const open = (on) => { el.classList.toggle("is-open", on); handle.setAttribute("aria-expanded", on); if (on) wake(); };
+    const go = (x) => {
+      if (!x || x === current) return open(false);
+      document.documentElement.classList.add("qs-leaving");
+      setTimeout(() => { location.href = href(x); }, 160);
+    };
+    wake(3200);
+    handle.addEventListener("click", (e) => { e.stopPropagation(); open(!el.classList.contains("is-open")); });
+    el.querySelector(".qs__tray").addEventListener("click", (e) => {
+      const a = e.target.closest(".qs__item"); if (!a) return;
+      e.preventDefault(); go(APPROACHES[+a.dataset.i]);
+    });
+    document.addEventListener("click", (e) => { if (!el.contains(e.target)) open(false); });
+    addEventListener("mousemove", (e) => { if (e.clientX > innerWidth - 120) wake(); }, { passive: true });
+    addEventListener("keydown", (e) => {
+      if (e.metaKey || e.ctrlKey || e.altKey || /INPUT|TEXTAREA|SELECT/.test(e.target.tagName || "") || e.target.isContentEditable) return;
+      const i = APPROACHES.indexOf(current);
+      if (/^[1-9]$/.test(e.key)) go(APPROACHES[+e.key - 1]);
+      else if (e.key === "]") go(APPROACHES[(i + 1) % APPROACHES.length]);
+      else if (e.key === "[") go(APPROACHES[(i - 1 + APPROACHES.length) % APPROACHES.length]);
+      else if (e.key === "Escape") open(false);
+    });
+    addEventListener("pageshow", () => document.documentElement.classList.remove("qs-leaving"));   // back/forward cache
+  };
+  if (!window.__STAGE) {
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", quick); else quick();
+    return;
+  }
   const st = { look: current.id, view: qs.get("view") === "desktop" && current.views.includes("desktop") ? "desktop" : "mobile" };
   let collapsed = false; try { collapsed = localStorage.getItem("opl.explorations.panel") === "1"; } catch (_) {}
 
@@ -43,20 +94,22 @@
     </div>
     <div class="pp__body">
       ${canDesk ? "" : `<p class="pp__soon">Desktop for ${a.name} comes next.</p>`}
+      ${GROUPS.map((g) => `
       <div class="pp__sec">
-        <p class="pp__label">Approach <span class="pp__hint">light mode</span></p>
-        <div class="pp__list" role="radiogroup" aria-label="Approach">
-          ${APPROACHES.map((x) => `<button role="radio" aria-checked="${st.look === x.id}" class="pp__item ${st.look === x.id ? "is-on" : ""}" data-look="${x.id}" ${x.dir ? "" : "disabled"}>
-            <span class="pp__swatch pp__swatch--${x.id}" aria-hidden="true"></span><span><b>${x.name}</b><small>${x.dir ? x.sub : "In progress"}</small></span></button>`).join("")}
+        <p class="pp__label">${g.label}</p>
+        <div class="pp__list" role="radiogroup" aria-label="${g.label}">
+          ${APPROACHES.filter((x) => x.group === g.id).map((x) => `<button role="radio" aria-checked="${st.look === x.id}" class="pp__item pp__item--approach ${st.look === x.id ? "is-on" : ""}" data-look="${x.id}" title="${x.sub}" ${x.dir ? "" : "disabled"}>
+            <img class="pp__thumb" src="${thumb(x)}" alt="" width="28" height="36"><b>${x.name}</b><kbd class="pp__key" aria-hidden="true">${APPROACHES.indexOf(x) + 1}</kbd></button>`).join("")}
         </div>
-      </div>
+      </div>`).join("")}
       <div class="pp__sec">
         <p class="pp__label">Screens <span class="pp__count">1</span></p>
         <div class="pp__list">
           <button class="pp__item is-on" aria-current="page"><span><b>Finance Hub · Home</b><small>Loans, subsidies, help</small></span></button>
         </div>
       </div>
-      <a class="pp__out" href="${(() => { const u = new URL(pagePath(), location.origin); u.searchParams.set("bare", "1"); return u.pathname + u.search; })()}" target="_blank" rel="noopener">Open full screen, responsive<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 2.5h5v5M9.5 2.5l-7 7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></a>
+      <a class="pp__out" href="${(() => { const u = new URL(pagePath(), location.origin); u.searchParams.set("bare", "1"); return u.pathname + u.search; })()}" target="_blank" rel="noopener">Open full screen<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 2.5h5v5M9.5 2.5l-7 7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></a>
+      <p class="pp__note">Number keys switch approaches. Full screen keeps a switcher on the right edge.</p>
     </div>`;
   };
 
@@ -116,6 +169,9 @@
       if (b.dataset.look) set({ look: b.dataset.look });
     });
     const key = (e) => {
+      if (/^[1-9]$/.test(e.key) && !e.metaKey && !e.ctrlKey && !e.altKey && !/INPUT|TEXTAREA/.test(e.target.tagName || "")) {
+        const x = APPROACHES[+e.key - 1]; if (x) set({ look: x.id }); return;
+      }
       if (e.key.toLowerCase() !== "m" || e.metaKey || e.ctrlKey || e.altKey || /INPUT|TEXTAREA/.test(e.target.tagName || "")) return;
       if (ap().views.includes("desktop")) set({ view: st.view === "mobile" ? "desktop" : "mobile" });
     };

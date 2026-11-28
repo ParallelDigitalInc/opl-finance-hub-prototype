@@ -1,5 +1,30 @@
 # Changelog
 
+## v0.24.0 — 28 Nov 2026 · Explorations: five named approaches, Figma finesse, Recoleta, full-screen switcher
+
+`/explorations/` now holds five mobile approaches in two groups, named by Shreya:
+- **New approaches:** 1 Vanilla Sprinkles (`fresh-1/`), 2 Sky (`approach-2/`), 3 Fresh Mint (`approach-3/`).
+- **Clean up · old:** Gradient (`cleaned-1/`) and Mint Grid (`cleaned-2/`), built from Figma "Old Cleaned Up" (`233:61391`), frames "1" (`172:56049`) and "2" (`172:55627`).
+
+Figma finesse (Section 2, `172:56553`):
+- **Vanilla Sprinkles:** the CMR score tile is green (#E7FBE4, icon #089D43) and Track Loans indigo (#EBEFFF, icon #2F52E0). The page ends 182px below the help banner, as in the frame.
+- **Sky:** a flatter 42px schemes arch, a new slate "Need help" banner before the trust band, and no disclaimer line under it.
+- **Fresh Mint:**
+  - **Top:** the wash runs #C9E8DD to white, with two soft ornament shapes; the CTA is 48px, 12px corners, #07181A.
+  - **Links and buttons:** "View all" and the help button use the same #07181A.
+  - **Sections:** split by 0.5px #E2E8F0 rules instead of the mint band; card dividers are #F1F5F9.
+  - **Cards:** the Citi card has no tag, subsidy photos have no level tab, and "View all 8" is removed.
+  - **Help banner:** white, with a lilac ornament, the green OPL stamp and an advisor photo.
+  - **Nav:** the active pill is #F1F5F9.
+
+All five:
+- **Hero pager:** two dots, Loans and Subsidies. The current one is a pill that fills a step per card, then the carousel moves on.
+- **Recoleta (Vanilla Sprinkles titles):** now loads for everyone under Shreya's Fontspring webfont licence. The WOFF2 is served from her Vercel project `opl-webfonts`, not from this repo, and only this Pages site may load it; localhost falls back to Fraunces.
+
+Presenting:
+- **Panel:** two labelled groups, one-line rows with a small thumbnail of each frame (`explorations/assets/thumbs/`) and its number key. Keys 1–5 switch approaches.
+- **Full screen:** a hairline handle on the right edge opens a slim tray of thumbnails; 1–5 jump to an approach and [ ] step through.
+
 ## v0.23.0 — 28 Nov 2026 · Explorations: Subsidies hero slide + Approach 3 polish
 
 All three approaches (`/explorations/`) now have a hero carousel like the kit home's: Loans, then Subsidies.

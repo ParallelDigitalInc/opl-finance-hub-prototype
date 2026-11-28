@@ -43,7 +43,7 @@ img { display: block; }
 [data-press].is-pressed { transform: scale(0.96); }
 
 /* ---- views (tab switching) ---------------------------------------------------------------------- */
-.views { position: relative; padding-bottom: 168px; }
+.views { position: relative; padding-bottom: 182px; }   /* frame 1 ends 182px below the help banner */
 .view.is-leaving { animation: view-out 180ms var(--ease-out) both; }
 .view.is-arriving { animation: view-in 440ms var(--ease-out) both; }
 @keyframes view-out { to { opacity: 0; transform: translateX(calc(var(--dir, 1) * -18px)); } }
@@ -133,10 +133,10 @@ img { display: block; }
 .pager__group:not(.is-on) .pager__dot:not(:first-child) { width: 0; margin-left: -6px; opacity: 0; pointer-events: none; }
 .pager__dot i { position: absolute; inset: 0 auto 0 0; width: 0; border-radius: inherit; background: var(--navy); }
 .pager__dot.is-active { width: 20px; background: rgba(15, 30, 90, 0.2); }
-.pager__dot.is-active i { width: 20px; }
+.pager__dot.is-active i { width: var(--to, 100%); }
 .pager.is-auto .pager__dot.is-active i { animation: pager-fill 3.2s linear both; }
 .pager.is-auto.is-paused .pager__dot.is-active i { animation-play-state: paused; }
-@keyframes pager-fill { from { width: 6px; } to { width: 20px; } }
+@keyframes pager-fill { from { width: var(--from, 0%); } to { width: var(--to, 100%); } }
 
 /* ---- quick actions -------------------------------------------------------------------------------- */
 .qa { display: flex; justify-content: space-between; align-items: flex-start; padding: 32px 20px 0; }
@@ -144,6 +144,8 @@ img { display: block; }
 .qa__tile { width: 62px; height: 62px; display: grid; place-items: center; border-radius: 22px; transition: transform 260ms var(--ease-spring), box-shadow var(--dur-fast); }
 .qa__tile--amber { background: var(--tile-amber); }
 .qa__tile--sky { background: var(--tile-sky); }
+.qa__tile--green { background: var(--tile-green); }
+.qa__tile--indigo { background: var(--tile-indigo); }
 .qa__tile--rose { background: var(--tile-rose); }
 .qa__tile--lilac { background: var(--tile-lilac); }
 .qa__tile .ico { transition: transform 360ms var(--ease-spring); }
@@ -211,7 +213,7 @@ img { display: block; }
 
 /* ---- help banner --------------------------------------------------------------------------------- */
 .help { padding: 32px 20px 0; }
-.help__banner { position: relative; display: flex; align-items: center; gap: 12px; padding: 20px 24px; border: 1px solid transparent; border-radius: 20px; overflow: hidden;
+.help__banner { position: relative; display: flex; align-items: center; gap: 12px; padding: 19px 23px; border: 1px solid transparent; border-radius: 20px; overflow: hidden;
   background: linear-gradient(180deg, var(--help-top), var(--help-bottom)) padding-box, linear-gradient(180deg, #f4e6c1, #f4dca0) border-box; }   /* fill + stroke are both gradients in Figma */
 /* two grids exactly as Figma: a 195×280 grid turned -90° in a 280×195 box at right -111 (172:52659),
    and its mirror (also flipped) at left -91, 10px lower (172:52697) */

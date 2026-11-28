@@ -94,7 +94,7 @@
               ${SLIDES.map(heroSlide).join("")}
             </div>
             <div class="pager" data-m-enter role="tablist" aria-label="Offers">
-              ${SLIDES.map((s, si) => `<span class="pager__group ${si === 0 ? "is-on" : ""}">${s.cards.map((c, i) => `<button class="pager__dot ${si === 0 && i === 0 ? "is-active" : ""}" role="tab" aria-selected="${si === 0 && i === 0}" aria-label="${s.label}, ${c.name}" data-slide="${si}" data-card="${i}"><i></i></button>`).join("")}</span>`).join("")}
+              ${SLIDES.map((s, si) => `<button class="pager__dot ${si === 0 ? "is-active" : ""}" role="tab" aria-selected="${si === 0}" aria-label="${s.label}" data-slide="${si}"><i></i></button>`).join("")}
             </div>
           </section>
 
@@ -218,11 +218,11 @@
   // Hero carousel — two slides, as in the kit's home: Loans, then Subsidies. Native scroll-snap, so a swipe feels like
   // the OS (a mouse drag is wired for presenting on a laptop). Each slide's card stack steps every 3.2s: the front slides
   // under the CTA, the back steps forward, the next fades in behind. After a slide's last card the carousel moves on.
-  // The pager shows both levels: one group of dots per slide, the current group open with a filling pill on the
-  // current card, the other folded to a single dot. Tap a dot to jump; tap a card to open it.
+  // The pager has one dot per slide; the current one is a pill that fills a step per card. Tap a dot to switch
+  // slides; tap a card to open it.
   const heroCarousel = () => {
     const track = $("[data-hero]"); if (!track) return;
-    const slides = $$(".promo", track), groups = $$(".pager__group"), pager = $(".pager");
+    const slides = $$(".promo", track), dots = $$(".pager__dot"), pager = $(".pager");
     let cur = 0, timer = null, held = false, started = false;
 
     const stacks = slides.map((sl) => {
@@ -242,14 +242,15 @@
       return s;
     });
 
-    const paint = () => groups.forEach((g, si) => {
-      g.classList.toggle("is-on", si === cur);
-      $$(".pager__dot", g).forEach((d, i) => {
-        const on = si === cur && i === stacks[si].front;
-        d.classList.toggle("is-active", on); d.setAttribute("aria-selected", on);
-        d.tabIndex = si === cur || i === 0 ? 0 : -1;
-      });
-    });
+    // one dot per slide (Loans, Subsidies); the current one is a pill that fills one step per card, so a full
+    // pill means the carousel is about to move on to the other slide
+    const paint = () => {
+      dots.forEach((d, si) => { const on = si === cur; d.classList.toggle("is-active", on); d.setAttribute("aria-selected", on); });
+      const s = stacks[cur];
+      if (motionOff()) return pager.style.setProperty("--to", "100%");   // no auto-steps: a solid pill
+      pager.style.setProperty("--from", `${((s.front / s.n) * 100).toFixed(2)}%`);
+      pager.style.setProperty("--to", `${(((s.front + 1) / s.n) * 100).toFixed(2)}%`);
+    };
     const stop = () => { clearTimeout(timer); timer = null; pager.classList.remove("is-auto"); };
     const schedule = () => {
       stop(); if (!started || held || motionOff()) return;
@@ -280,9 +281,8 @@
 
     pager.addEventListener("click", (e) => {
       const d = e.target.closest(".pager__dot"); if (!d) return;
-      const si = +d.dataset.slide, ci = +d.dataset.card;
-      if (si !== cur) return toSlide(si);
-      const s = stacks[si]; s.go(ci, ci > s.front ? 1 : -1); paint(); schedule();
+      const si = +d.dataset.slide;
+      if (si !== cur) { stacks[si].reset(); toSlide(si); }
     });
 
     // a finger on the hero holds the timer; lifting it restarts the current card's pill

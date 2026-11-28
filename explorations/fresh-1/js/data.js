@@ -31,8 +31,8 @@ window.OPL_F1 = {
   },
 
   quick: [
-    { id: "cmr", label: "CMR score", icon: "qa-cmr", tile: "amber" },
-    { id: "track", label: "Track Loans", icon: "qa-track", tile: "sky" },
+    { id: "cmr", label: "CMR score", icon: "qa-cmr", tile: "green" },
+    { id: "track", label: "Track Loans", icon: "qa-track", tile: "indigo" },
     { id: "debt", label: "Debt Snapshot", icon: "qa-debt", tile: "rose" },
     { id: "emi", label: "View EMIs", icon: "qa-emi", tile: "lilac" },
   ],
